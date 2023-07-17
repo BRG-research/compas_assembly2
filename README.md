@@ -2,6 +2,9 @@
 
 A data structure is needed to represent a model consisting of structural elements like blocks, beams, nodes, and plates, as well as fabrication elements for subtractive and additive processes. This data structure should also facilitate the computation and storage of adjacency and joinery information, as well as interfaces between these elements. Additionally, it should allow for the transfer of data between the model, structural simulation, and fabrication processes.
 
+![Untitled Diagram drawio](https://github.com/BRG-research/compas_assembly2/assets/18013985/9a6dd260-0b67-4520-8640-f34c32c58913)
+
+
 ![image](https://github.com/BRG-research/compas_assembly2/assets/18013985/ef00db99-6557-4fe5-a1cd-39caad9bd7ca)
 
 ![image](https://github.com/BRG-research/compas_assembly2/assets/18013985/0ce85ba1-2c01-40d5-8a5b-40f017bd787b)
