@@ -2,7 +2,7 @@
 
 A data structure is needed to represent a model consisting of structural elements like blocks, beams, nodes, and plates, as well as fabrication elements for subtractive and additive processes. This data structure should also facilitate the computation and storage of adjacency and joinery information, as well as interfaces between these elements. Additionally, it should allow for the transfer of data between the model, structural simulation, and fabrication processes.
 
-* BOOK-KEEPING OBJECTS IN A SMARTER COLLECTION In many packages elements, joints are stored in a list. The list itself can be changed to something else, e.g. an OrderedList since for example we never randomly fabricate elements, but start from the first item and gradually iterate, these indices can serve as element tags too. A collection can have grouping functionality and selection methods for retrieving objects based on element or joint attributes. For example, we want to select element fabrication, structure data or highlight strcture objects such Blocks or Beams.
+* BOOK-KEEPING OBJECTS IN AN ORDERED COLLECTION WITH SELECTION LOGIC In many packages elements, joints are stored in a list. The list itself can be changed to something else, e.g. an OrderedList since for example we never randomly fabricate elements, but start from the first item and gradually iterate, these indices can serve as element tags too. A collection can have grouping functionality and selection methods for retrieving objects based on element or joint attributes. For example, we want to select element fabrication, structure data or highlight strcture objects such Blocks or Beams.
 
 ![Untitled Diagram drawio](https://github.com/BRG-research/compas_assembly2/assets/18013985/fc6ddbbd-8b30-49be-aa69-705e9e1eee0e)
 
