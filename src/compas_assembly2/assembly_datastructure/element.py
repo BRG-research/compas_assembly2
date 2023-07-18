@@ -9,3 +9,12 @@ class Element:
         self.fabrication = dict()
         self.structure = dict()
         self.attr = attr  # dict e.g. {"type": Block, "mass": 20}
+
+    def __repr__(self):
+        """
+        Return a string representation of the Element.
+
+        Returns:
+            str: The string representation of the Element.
+        """
+        return f"({self.id}, {self.attr})"
