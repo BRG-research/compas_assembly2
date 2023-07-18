@@ -2,14 +2,13 @@ from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import division
 
-from compas.datastructures import Datastructure
-# from compas.geometry import Frame
+from compas.geometry import Frame
 
 
-class Element(Datastructure):
+class Element():
 
     def __init__(self, id, l_frame, g_frame=None, attr=None):
-        pass
+        """A data structure for the individual elements of a discrete element assembly."""
     #     """
     #     Initialize an Element with a value, an id tuple, and a dictionary of keys.
 
@@ -18,12 +17,12 @@ class Element(Datastructure):
     #         frame (compas.geometry.Frame): The frame associated with the Element.
     #         attr (dict): A dictionary of keys associated with the Element.
     #     """
-    #     self.id = id  # tuple e.g. (0, 1) or (1, 5, 9)
-    #     self.l_frame = l_frame if l_frame is not None else Frame.worldXY()
-    #     self.g_frame = g_frame if g_frame is not None else Frame.worldXY()
-    #     self.fabrication = dict()
-    #     self.structure = dict()
-    #     self.attr = attr  # dict e.g. {"type": Block, "mass": 20}
+        self.id = id  # tuple e.g. (0, 1) or (1, 5, 9)
+        self.l_frame = l_frame if l_frame is not None else Frame.worldXY()
+        self.g_frame = g_frame if g_frame is not None else Frame.worldXY()
+        self.fabrication = dict()
+        self.structure = dict()
+        self.attr = attr  # dict e.g. {"type": Block, "mass": 20}
 
     # def __repr__(self):
     #     """
