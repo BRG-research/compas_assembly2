@@ -1,23 +1,23 @@
-from __future__ import print_function
-from __future__ import absolute_import
-from __future__ import division
+# from __future__ import print_function
+# from __future__ import absolute_import
+# from __future__ import division
 
-from compas.datastructures import Datastructure
-from group import Group
+# from compas.datastructures import Datastructure
+# from group import Group
 
 
-class Assembly(Datastructure):
+# class Assembly(Datastructure):
 
-    def __init__(self, name=None, **kwargs):
-        super(Assembly, self).__init__()
-        self.attributes = {"name": name or "Assembly"}
-        self.attributes.update(kwargs)
+#     def __init__(self, name=None, **kwargs):
+#         super(Assembly, self).__init__()
+#         self.attributes = {"name": name or "Assembly"}
+#         self.attributes.update(kwargs)
 
-        # two collections of elements and joints that has
-        # indices for groupînt
-        # and keys for selectin
-        self.elements_group = Group()
-        self.joints_group = Group()
+#         # two collections of elements and joints that has
+#         # indices for groupînt
+#         # and keys for selectin
+#         self.elements_group = Group()
+#         self.joints_group = Group()
 
 
 # class Assembly(Datastructure):
