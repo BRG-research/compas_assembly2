@@ -1,16 +1,40 @@
 """
-********************************************************************************
-compas_assembly2
-********************************************************************************
 
 .. currentmodule:: compas_assembly2
 
 
 .. toctree::
-    :maxdepth: 1
+    :maxdepth: 2
 
+test module
+===========
+
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
+
+    test.hello_compas_assembly2
+
+element module
+==============
+
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
+
+    element.Element
+
+group module
+==============
+
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
+
+    group.Group
 
 """
+
 
 from __future__ import print_function
 
@@ -31,5 +55,8 @@ DATA = os.path.abspath(os.path.join(HOME, "data"))
 DOCS = os.path.abspath(os.path.join(HOME, "docs"))
 TEMP = os.path.abspath(os.path.join(HOME, "temp"))
 
+__all_plugins__ = [
+    "compas_assembly2",
+]
 
 __all__ = ["HOME", "DATA", "DOCS", "TEMP"]

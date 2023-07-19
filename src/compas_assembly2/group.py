@@ -7,7 +7,7 @@ from collections import OrderedDict
 from compas.datastructures import Datastructure
 from compas.geometry import Frame
 
-from compas_assembly2.assembly_datastructure.element import Element
+from compas_assembly2.element import Element
 
 
 class Group(Datastructure):
