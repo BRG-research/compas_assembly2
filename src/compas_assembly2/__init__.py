@@ -15,8 +15,14 @@ test module
 
     test.hello_compas_assembly2
 
-element module
-==============
+Element class
+=============
+
+.. image:: /_images/element.png
+   :width: 100%
+   :align: right
+   :alt: compas_assembly2
+
 
 .. autosummary::
     :toctree: generated/
@@ -24,8 +30,8 @@ element module
 
     element.Element
 
-group module
-==============
+Group class
+===========
 
 .. autosummary::
     :toctree: generated/

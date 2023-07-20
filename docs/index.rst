@@ -2,7 +2,6 @@
 compas_assembly2
 ********************************************************************************
 
-.. add image in markdown from a local link
 .. image:: /_images/logo.png
    :width: 20%
    :align: right
