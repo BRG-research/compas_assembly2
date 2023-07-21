@@ -18,7 +18,7 @@ test module
 Element class
 =============
 
-.. image:: /_images/element.png
+.. image:: ../_images/element.png
    :width: 100%
    :align: right
    :alt: compas_assembly2
