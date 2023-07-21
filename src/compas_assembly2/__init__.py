@@ -18,7 +18,7 @@ test module
 Element class
 =============
 
-.. image:: ../_images/element.png
+.. image:: https://github.com/BRG-research/compas_assembly2/blob/main/docs/_images/element.png
    :width: 100%
    :align: right
    :alt: compas_assembly2
