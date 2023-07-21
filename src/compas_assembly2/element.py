@@ -101,13 +101,14 @@ class Element:
             if isinstance(g, Geometry) or isinstance(g, Mesh):
                 self.geometries.append(g.copy())
 
-        # collision detection
-        self.aabb = []  # XYZ coordinates of 8 points defining a box
-        self.oobb = []  # XYZ coordinates of 8 points defining a box
-        self.convex_hull = Mesh()  # convex hull of the geometry
+        # collision detection, these members are private access them using getters
+        self._aabb = []  # XYZ coordinates of 8 points defining a box
+        self._oobb = []  # XYZ coordinates of 8 points defining a box
+        self._convex_hull = Mesh()  # convex hull of the geometry
+        self._outlines = []  # closed polylines - in majority of cases objects will have planar faces
+        self._outlines_frames = []  # closed polylines planes - in majority of cases objects will have planar faces
 
-        # orientation
-
+        # orientation frames
         self.local_frame = Frame.copy(local_frame) or Frame.worldXY()  # set the local frame of an object
         self.global_frame = Frame.copy(global_frame) or Frame.worldXY()  # set the global frame of an object
 
@@ -134,7 +135,7 @@ class Element:
             if compute_object_oriented_bounding_box:
                 pass
 
-        return self.aabb
+        return self._aabb
 
     def __repr__(self):
         """
