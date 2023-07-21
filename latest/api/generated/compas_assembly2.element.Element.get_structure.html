@@ -3,7 +3,7 @@
 
 <head>
   
-  <title>compas_assembly2 - Element</title>
+  <title>compas_assembly2 - Element.get_structure</title>
   
 
   <meta charset="utf-8" />
@@ -20,11 +20,11 @@
   <link rel="stylesheet" type="text/css" href="../../_static/css/compas-reference.css" />
 
   
-  <link rel="next" title="Element.collide" href="compas_assembly2.element.Element.collide.html" />
+  <link rel="next" title="Element.orient" href="compas_assembly2.element.Element.orient.html" />
   
 
   
-  <link rel="prev" title="hello_compas_assembly2" href="compas_assembly2.test.hello_compas_assembly2.html" />
+  <link rel="prev" title="Element.get_fabrication" href="compas_assembly2.element.Element.get_fabrication.html" />
   
 
   <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
@@ -86,60 +86,21 @@
             
             <li class="breadcrumb-item"><a href="../compas_assembly2.html">compas_assembly2</a></li>
             
-            <!-- <li class="breadcrumb-item active" aria-current="page">Element</li> -->
+            <li class="breadcrumb-item"><a href="compas_assembly2.element.Element.html">Element</a></li>
+            
+            <!-- <li class="breadcrumb-item active" aria-current="page">Element.get_structure</li> -->
           </ol>
         </nav>
         
 
         
         
-        <section class="detail" id="element">
-<h1>Element</h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="compas_assembly2.element.Element">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_assembly2.element.</span></span><span class="sig-name descname"><span class="pre">Element</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element_type=ElementType.BLOCK</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id=(0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">1)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geo=[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_frame=&lt;bound</span> <span class="pre">method</span> <span class="pre">Frame.worldXY</span> <span class="pre">of</span> <span class="pre">&lt;class</span> <span class="pre">'compas.geometry.primitives.frame.Frame'&gt;&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">global_frame=&lt;bound</span> <span class="pre">method</span> <span class="pre">Frame.worldXY</span> <span class="pre">of</span> <span class="pre">&lt;class</span> <span class="pre">'compas.geometry.primitives.frame.Frame'&gt;&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BRG-research/compas_assembly2/blob/master/src/compas_assembly2/element.py#L23"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>Class representing a structural object of an assembly.</p>
-<p class="rubric">Methods</p>
-<table class="autosummary longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element.Element.collide.html#compas_assembly2.element.Element.collide" title="compas_assembly2.element.Element.collide"><code class="xref py py-obj docutils literal notranslate"><span class="pre">collide</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element.Element.display.html#compas_assembly2.element.Element.display" title="compas_assembly2.element.Element.display"><code class="xref py py-obj docutils literal notranslate"><span class="pre">display</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element.Element.duplicate.html#compas_assembly2.element.Element.duplicate" title="compas_assembly2.element.Element.duplicate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">duplicate</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element.Element.get_assembly.html#compas_assembly2.element.Element.get_assembly" title="compas_assembly2.element.Element.get_assembly"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_assembly</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element.Element.get_fabrication.html#compas_assembly2.element.Element.get_fabrication" title="compas_assembly2.element.Element.get_fabrication"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_fabrication</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element.Element.get_structure.html#compas_assembly2.element.Element.get_structure" title="compas_assembly2.element.Element.get_structure"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_structure</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element.Element.orient.html#compas_assembly2.element.Element.orient" title="compas_assembly2.element.Element.orient"><code class="xref py py-obj docutils literal notranslate"><span class="pre">orient</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element.Element.oriented.html#compas_assembly2.element.Element.oriented" title="compas_assembly2.element.Element.oriented"><code class="xref py py-obj docutils literal notranslate"><span class="pre">oriented</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element.Element.transform.html#compas_assembly2.element.Element.transform" title="compas_assembly2.element.Element.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element.Element.transformed.html#compas_assembly2.element.Element.transformed" title="compas_assembly2.element.Element.transformed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transformed</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
+        <section class="detail" id="element-get-structure">
+<h1>Element.get_structure</h1>
+<dl class="py method">
+<dt class="sig sig-object py" id="compas_assembly2.element.Element.get_structure">
+<span class="sig-prename descclassname"><span class="pre">Element.</span></span><span class="sig-name descname"><span class="pre">get_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BRG-research/compas_assembly2/blob/master/src/compas_assembly2/element.py#L145"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd></dd></dl>
 
 </section>
 
@@ -170,7 +131,7 @@
 <li class="toctree-l1 nav-item active"><a class="nav-link reference internal" href="../../api.html">API Reference</a><ul class="nav flex-column collapse show active">
 <li class="toctree-l2 nav-item active"><a class="nav-link reference internal" href="../compas_assembly2.html">compas_assembly2</a><ul class="nav flex-column collapse show active">
 <li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="compas_assembly2.test.hello_compas_assembly2.html">hello_compas_assembly2</a></li>
-<li class="toctree-l3 nav-item active"><a class="nav-link active reference internal" href="#">Element</a></li>
+<li class="toctree-l3 nav-item active"><a class="nav-link reference internal" href="compas_assembly2.element.Element.html">Element</a></li>
 <li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="compas_assembly2.group.Group.html">Group</a></li>
 </ul>
 </li>
@@ -187,7 +148,7 @@
       <div class="d-none d-xl-block col-xl-2 compas-toc" role="toc">
         
         <ul class="nav flex-column" id="compas-toc">
-<li class="nav-item"><a class="nav-link reference internal" href="#">Element</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="#">Element.get_structure</a></li>
 </ul>
 
       </div>
@@ -199,20 +160,20 @@
   <footer class="compas-footer">
     <nav class="nav p-2">
       
-      <a href="compas_assembly2.test.hello_compas_assembly2.html" title="hello_compas_assembly2" class="nav-link footer-link float-start text-left d-flex w-50" rel="prev">
+      <a href="compas_assembly2.element.Element.get_fabrication.html" title="Element.get_fabrication" class="nav-link footer-link float-start text-left d-flex w-50" rel="prev">
         <div class="nav-button p-2 m-2"><i class="fas fa-arrow-left"></i></div>
         <div class="nav-title flex-grow-1 align-self-center">
           <div class="nav-direction small font-weight-light">Previous</div>
-          hello_compas_assembly2
+          Element.get_fabrication
         </div>
       </a>
       
 
       
-      <a href="compas_assembly2.element.Element.collide.html" title="Element.collide" class="nav-link footer-link float-end text-right d-flex w-50" rel="next">
+      <a href="compas_assembly2.element.Element.orient.html" title="Element.orient" class="nav-link footer-link float-end text-right d-flex w-50" rel="next">
         <div class="nav-title footer-link flex-grow-1 align-self-center">
           <div class="nav-direction small font-weight-light">Next</div>
-          Element.collide
+          Element.orient
         </div>
         <div class="nav-button p-2 m-2"><i class="fas fa-arrow-right"></i></div>
       </a>
