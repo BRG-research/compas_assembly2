@@ -23,6 +23,11 @@ Element class
    :align: right
    :alt: compas_assembly2
 
+.. image:: ../_images/element_type.png
+   :width: 100%
+   :align: right
+   :alt: compas_assembly2
+
 
 .. autosummary::
     :toctree: generated/
