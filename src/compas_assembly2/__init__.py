@@ -18,7 +18,7 @@ test module
 Element class
 =============
 
-.. image:: https://github.com/BRG-research/compas_assembly2/blob/main/docs/_images/element.png
+.. image:: ../_images/element.png
    :width: 100%
    :align: right
    :alt: compas_assembly2
@@ -66,3 +66,14 @@ __all_plugins__ = [
 ]
 
 __all__ = ["HOME", "DATA", "DOCS", "TEMP"]
+
+# Define the base URL for images based on the environment
+if os.getenv("READTHEDOCS") == "True":
+    base_url = "https://github.com/BRG-research/compas_assembly2/blob/main/docs/_images/"
+else:
+    base_url = ""
+
+# Set the base URL for images in the html_context
+html_context = {
+    "base_url": base_url,
+}
