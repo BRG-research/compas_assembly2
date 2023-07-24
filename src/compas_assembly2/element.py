@@ -7,6 +7,7 @@ from compas.geometry import (
     Frame,
     Geometry,
     Transformation,
+    Translation,
     Polyline,
     Point,
     Box,
@@ -346,8 +347,9 @@ class Element:
     # DISPLAY IN DIFFERENT VIEWERS
     # ==========================================================================
 
+    @staticmethod
     def display(
-        self,
+        elements=[],
         viewer_type="view2-0_rhino-1_blender-2",
         show_simplex=True,
         show_shapes=False,
@@ -362,65 +364,6 @@ class Element:
         if viewer_type == "view" or "view2" or "compas_view2" or "0":
             try:
                 from compas_view2.app import App
-                from qtpy import QtWidgets
-
-                class Select:
-                    """Class representing a selection list.
-
-                    Parameters
-                    ----------
-                    app : :class:`compas_view2.app.App`
-                        The app containing the widget.
-                    parent : QtWidgets.QWidget
-                        The parent widget for the combo box.
-                    items : list[dict[str, Any]]
-                        A list of selection options, with each item defined as a dict with a particular structure.
-                        See Notes for more info.
-                    action : callable
-                        The action associated with the combo box.
-
-                    Attributes
-                    ----------
-                    combo : QtWidgets.QComboBox
-                        The combo box containing the selection options.
-                    action : callable
-                        The action associated with the index change event of the combo box.
-
-                    Notes
-                    -----
-                    Every `item` dict should have the following structure.
-
-                    .. code-block:: python
-
-                        item['text']     # str  : The text label of the item.
-
-                    """
-
-                    def __init__(self, app, parent, *, items, action):
-                        container = QtWidgets.QWidget()
-                        layout = QtWidgets.QHBoxLayout()
-                        combo = QtWidgets.QComboBox()
-                        for item in items:
-                            combo.addItem(item["text"])
-                        layout.addWidget(combo)
-                        container.setLayout(layout)
-                        parent.addWidget(container)
-                        combo.currentIndexChanged.connect(self)
-                        combo.currentIndexChanged.connect(app.view.update)
-                        self.combo = combo
-                        self.action = action
-
-                    def __call__(self, *args, **kwargs):
-                        """Wrapper for the action associated with the combo box.
-
-                        Returns
-                        -------
-                        None
-
-                        """
-                        index = self.combo.currentIndex()
-                        text = self.combo.currentText()
-                        self.action(index, text)
 
             except ImportError:
                 print("compas_view2 is not installed. Skipping the code. ---> Use pip install compas_view <---")
@@ -429,60 +372,85 @@ class Element:
 
                 # initialize the viewer
                 viewer = App(viewmode="shaded", enable_sidebar=True, width=1280, height=800)
-
-                # --------------------------------------------------------------------------
-                # ui
-                # --------------------------------------------------------------------------
-                # viewer.add()
-
-                # --------------------------------------------------------------------------
-                # add simplex
-                # --------------------------------------------------------------------------
-
-                # --------------------------------------------------------------------------
-                # add display shapes
-                # --------------------------------------------------------------------------
-
-                # loop through the display_shapes and add them to the viewer
                 viewer_display_shapes = []
-                for i in range(len(self.display_shapes)):
-                    if (
-                        isinstance(self.display_shapes[i], Mesh)
-                        or isinstance(self.display_shapes[i], Polyline)
-                        or isinstance(self.display_shapes[i], Line)
-                        or isinstance(self.display_shapes[i], Box)
-                    ):
-                        viewer_display_shapes.append(
-                            viewer.add(
-                                data=self.display_shapes[i],
-                                name="viewer_display_shape_mesh",
-                                is_selected=False,
-                                is_visible=True,
-                                show_points=False,
-                                show_lines=True,
-                                show_faces=True,
-                                pointcolor=Color(0, 0, 0),
-                                linecolor=Color(0, 0, 0),
-                                facecolor=Color(0.5, 0.5, 0.5),
+                viewer_aabbs = []
+
+                for element in elements:
+                    # --------------------------------------------------------------------------
+                    # add simplex
+                    # --------------------------------------------------------------------------
+
+                    # --------------------------------------------------------------------------
+                    # add display shapes
+                    # --------------------------------------------------------------------------
+
+                    # loop through the display_shapes and add them to the viewer
+
+                    for i in range(len(element.display_shapes)):
+                        if (
+                            isinstance(element.display_shapes[i], Mesh)
+                            or isinstance(element.display_shapes[i], Polyline)
+                            or isinstance(element.display_shapes[i], Line)
+                            or isinstance(element.display_shapes[i], Box)
+                        ):
+                            viewer_display_shapes.append(
+                                viewer.add(
+                                    data=element.display_shapes[i],
+                                    name="viewer_display_shape_mesh",
+                                    is_selected=False,
+                                    is_visible=True,
+                                    show_points=False,
+                                    show_lines=True,
+                                    show_faces=True,
+                                    pointcolor=Color(0, 0, 0),
+                                    linecolor=Color(0, 0, 0),
+                                    facecolor=Color(0.75, 0.75, 0.75),
+                                )
                             )
-                        )
-                    elif isinstance(self.display_shapes[i], Pointcloud):
-                        viewer_display_shapes.append(
-                            viewer.add(
-                                data=self.display_shapes[i],
-                                name="viewer_display_shape_mesh",
-                                is_selected=False,
-                                is_visible=True,
-                                show_points=True,
-                                show_lines=False,
-                                show_faces=False,
-                                pointcolor=Color(0, 0, 0),
-                                linecolor=Color(0, 0, 0),
-                                facecolor=Color(0, 0, 0),
-                                linewidth=0,
-                                pointsize=5,
+                        elif isinstance(element.display_shapes[i], Pointcloud):
+                            viewer_display_shapes.append(
+                                viewer.add(
+                                    data=element.display_shapes[i],
+                                    name="viewer_display_shape_mesh",
+                                    is_selected=False,
+                                    is_visible=True,
+                                    show_points=True,
+                                    show_lines=False,
+                                    show_faces=False,
+                                    pointcolor=Color(0, 0, 0),
+                                    linecolor=Color(0, 0, 0),
+                                    facecolor=Color(0, 0, 0),
+                                    linewidth=0,
+                                    pointsize=3,
+                                )
                             )
+
+                    # --------------------------------------------------------------------------
+                    # add frames
+                    # --------------------------------------------------------------------------
+
+                    # --------------------------------------------------------------------------
+                    # add aabb | oobb | convex hull
+                    # --------------------------------------------------------------------------
+                    viewer_aabbs.append(
+                        viewer.add(
+                            data=Pointcloud(element._aabb),
+                            name="viewer_aabb",
+                            is_selected=False,
+                            is_visible=True,
+                            show_points=True,
+                            show_lines=False,
+                            show_faces=False,
+                            pointcolor=Color(1, 0, 0),
+                            linecolor=Color(0, 0, 0),
+                            facecolor=Color(1, 0, 0),
+                            linewidth=1,
+                            pointsize=7,
                         )
+                    )
+                    # --------------------------------------------------------------------------
+                    # add fabrication geometry
+                    # --------------------------------------------------------------------------
 
                 @viewer.checkbox(text="display_shapes", checked=True)
                 def check(checked):
@@ -490,17 +458,11 @@ class Element:
                         obj.is_visible = checked
                     viewer.view.update()
 
-                # --------------------------------------------------------------------------
-                # add frames
-                # --------------------------------------------------------------------------
-
-                # --------------------------------------------------------------------------
-                # add aabb | oobb | convex hull
-                # --------------------------------------------------------------------------
-
-                # --------------------------------------------------------------------------
-                # add fabrication geometry
-                # --------------------------------------------------------------------------
+                @viewer.checkbox(text="display_aabbs", checked=True)
+                def check_aabb(checked):
+                    for obj in viewer_aabbs:
+                        obj.is_visible = checked
+                        viewer.view.update()
 
                 viewer.show()
 
@@ -512,67 +474,75 @@ class Element:
 
 if __name__ == "__main__":
     mesh = Mesh.from_polyhedron(4)
+    mesh.transform(Translation.from_vector((-3, 0, 0)))
     polyline_0 = Polyline(
         [
-            (2.0 + 0.75, 2, -0.25),
-            (2.0 + 0.75, 2, 0.25),
-            (2.0 + 0.25, 2, 0.25),
-            (2.0 + 0.25, 2, -0.25),
-            (2.0 + 0.75, 2, -0.25),
+            (0.25, 2, -0.25),
+            (0.25, 2, 0.25),
+            (-0.25, 2, 0.25),
+            (-0.25, 2, -0.25),
+            (0.25, 2, -0.25),
         ]
     )
 
     polyline_1 = Polyline(
         [
-            (2.0 + 0.75, -2, -0.25),
-            (2.0 + 0.75, -2, 0.25),
-            (2.0 + 0.25, -2, 0.25),
-            (2.0 + 0.25, -2, -0.25),
-            (2.0 + 0.75, -2, -0.25),
+            (0.25, -2, -0.25),
+            (0.25, -2, 0.25),
+            (-0.25, -2, 0.25),
+            (-0.25, -2, -0.25),
+            (0.25, -2, -0.25),
         ]
     )
-    line = Line((2.5, -2, 0), (2.5, 2, 0))
+    line = Line((0, -2, 0), (0, 2, 0))
     cloud = Pointcloud(
-        [Point(random.uniform(3.0, 3.5), random.uniform(-2, 2), random.uniform(-0.25, 0.25)) for _ in range(200)]
+        [Point(random.uniform(-0.25, 0.25), random.uniform(-2, 2), random.uniform(-0.25, 0.25)) for _ in range(200)]
     )
 
-    # curve = cg.NurbsCurve(
-    #     points=[(0, 0, 0), (1, 3, 0), (2, 3, 0), (3, 0, 0)],
-    #     knots=[0, 0, 0, 1, 1, 1],
-    #     degree=2,
-    #     weights=[1.0, 1.0, 1.0, 1.0],
-    # )
-    point = Point(0, 0, 0)
-    box = Box(Frame([-3, 0, 0], [0.866, 0.1, 0.0], [0.5, 0.866, 0.0]), 2, 4, 0.25)
+    box = Box(Frame([3, 0, 0], [0.866, 0.1, 0.0], [0.5, 0.866, 0.0]), 2, 4, 0.25)
 
-    geos = [
-        mesh,
-        polyline_0,
-        polyline_1,
-        cloud,
-        box,
-        line,
-    ]
+    geo_0 = [mesh]
 
-    elem = Element(
+    geo_1 = [line, polyline_0, polyline_1, cloud]
+
+    geo_2 = [box]
+
+    elem_0 = Element(
         element_type=ElementType.BLOCK,
         id=(0, 1),
         simplex=[line],
-        display_shapes=geos,
-        local_frame=Frame(point=(0, 0, 0), xaxis=(1, 0, 0), yaxis=(0, 1, 0)),
+        display_shapes=geo_0,
+        local_frame=Frame(point=(-3, 0, 0), xaxis=(1, 0, 0), yaxis=(0, 1, 0)),
         global_frame=Frame.worldXY(),
-        width=10,
-        height=50,
-        length=95,
     )
 
-    # # print before updating the fabrication, assembly, and structural information
-    print(type(elem))
-    print(elem.get_aabb(0, Frame.worldXY, True))
-    print(elem._oobb)
-    print(elem._convex_hull)
+    elem_1 = Element(
+        element_type=ElementType.BLOCK,
+        id=(0, 2),
+        simplex=[line],
+        display_shapes=geo_1,
+        local_frame=Frame(point=(0, 0, 0), xaxis=(1, 0, 0), yaxis=(0, 1, 0)),
+        global_frame=Frame.worldXY(),
+    )
 
-    elem.display("view2")
+    elem_2 = Element(
+        element_type=ElementType.BLOCK,
+        id=(3, 0),
+        simplex=[line],
+        display_shapes=geo_2,
+        local_frame=Frame(point=(3, 0, 0), xaxis=(1, 0, 0), yaxis=(0, 1, 0)),
+        global_frame=Frame.worldXY(),
+    )
+
+    elements = [elem_0, elem_1, elem_2]
+    for elem in elements:
+        elem.get_aabb()
+    Element.display(elements=elements, viewer_type="view2")
+
+    # # print before updating the fabrication, assembly, and structural information
+    # print(type(elem))
+    # print(elem.get_aabb(0, Frame.worldXY, True))
+    # print(elem._oobb)
 
     # # Update fabrication information
     # elem.fabrication["cut"] = True
