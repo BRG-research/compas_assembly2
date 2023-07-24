@@ -143,10 +143,9 @@ class Element:
     # PROPERTIES
     # ==========================================================================
 
-    def get_aabb(self, inflate=0.01, frame=Frame.worldXY, compute_convex_hull=False):
+    def get_aabb(self, inflate=0.00, compute_oobb=True, compute_convex_hull=False):
         # iterate display_shapes  and get the bounding box by geometry type
         # Mesh, Polyline, Box, Line
-        frame_to_computed_oobb = frame or Frame.worldXY
         points = []
         points_bbox = []
 
@@ -154,30 +153,30 @@ class Element:
             corners = []
             if isinstance(self.display_shapes[i], Mesh):
                 corners = mesh_bounding_box(self.display_shapes[i])
-                if compute_convex_hull:
+                if compute_convex_hull or compute_oobb:
                     points.extend(list(self.display_shapes[i].vertices_attributes("xyz")))
             elif isinstance(self.display_shapes[i], Polyline):
-                # polylines are a list of points
                 corners = bounding_box(self.display_shapes[i])
-                if compute_convex_hull:
+                if compute_convex_hull or compute_oobb:
                     points.extend(self.display_shapes[i])
             elif isinstance(self.display_shapes[i], Line):
                 corners = [self.display_shapes[i].start, self.display_shapes[i].end]
-                if compute_convex_hull:
+                if compute_convex_hull or compute_oobb:
                     points.extend(corners)
             elif isinstance(self.display_shapes[i], Box):
-                corners = bounding_box(self.display_shapes[i].points)
-                frame_to_computed_oobb = self.display_shapes[i].frame
-                if compute_convex_hull:
-                    points.extend(corners)
+                points = self.display_shapes[i].points
+                corners = bounding_box(points)
+                if compute_convex_hull or compute_oobb:
+                    points.extend(points)
             elif isinstance(self.display_shapes[i], Pointcloud):
+                corners = bounding_box(self.display_shapes[i].points)
                 points.extend(self.display_shapes[i].points)
 
             if len(corners) == 8:
                 points_bbox.extend([corners[0], corners[6]])
             elif len(corners) == 2:
                 points_bbox.extend(corners)
-
+            points_bbox.extend(corners)
         # if no points found, return
         if len(points_bbox) < 2:
             return
@@ -192,13 +191,13 @@ class Element:
         )
 
         # compute the object oriented bounding box
-        if frame_to_computed_oobb != Frame.worldXY:
-            xform = Transformation.from_frame_to_frame(Frame.worldXY(), frame_to_computed_oobb)
+        if self.local_frame != Frame.worldXY:
+            xform = Transformation.from_frame_to_frame(self.local_frame, Frame.worldXY())
             xform_inv = xform.inverse()
 
             self._oobb = []
-            for i in range(len(points_bbox)):
-                point = Point(*points_bbox[i])
+            for i in range(len(points)):
+                point = Point(*points[i])
                 point.transform(xform)
                 self._oobb.append(point)
             self._oobb = bounding_box(self._oobb)
@@ -212,7 +211,8 @@ class Element:
 
         # compute the convex hull
         if compute_convex_hull and len(points) > 2:
-            self._convex_hull = convex_hull(points)
+            faces = convex_hull(points)
+            self._convex_hull = Mesh.from_vertices_and_faces(points, faces)
         else:
             self._convex_hull = None
 
@@ -372,8 +372,17 @@ class Element:
 
                 # initialize the viewer
                 viewer = App(viewmode="shaded", enable_sidebar=True, width=1280, height=800)
+                # viewer_indices = []
+                # viewer_types = []
+                # viewer_simplices = []
                 viewer_display_shapes = []
                 viewer_aabbs = []
+                viewer_oobbs = []
+                viewer_convex_hulls = []
+                # viewer_frames = []
+                # viewer_fabrication = []
+                # viewer_assembly = []
+                # viewer_structure = []
 
                 for element in elements:
                     # --------------------------------------------------------------------------
@@ -443,17 +452,52 @@ class Element:
                             show_faces=False,
                             pointcolor=Color(1, 0, 0),
                             linecolor=Color(0, 0, 0),
-                            facecolor=Color(1, 0, 0),
+                            facecolor=Color(0, 0, 0),
                             linewidth=1,
                             pointsize=7,
                         )
                     )
+
+                    viewer_oobbs.append(
+                        viewer.add(
+                            data=Pointcloud(element._oobb),
+                            name="viewer_oobb",
+                            is_selected=False,
+                            is_visible=True,
+                            show_points=True,
+                            show_lines=False,
+                            show_faces=False,
+                            pointcolor=Color(0.5, 0.1, 0.1),
+                            linecolor=Color(0, 0, 0),
+                            facecolor=Color(0, 0, 0),
+                            linewidth=1,
+                            pointsize=6,
+                        )
+                    )
+
+                    viewer_convex_hulls.append(
+                        viewer.add(
+                            data=element._convex_hull,
+                            name="viewer_convex_hull",
+                            is_selected=False,
+                            is_visible=True,
+                            show_points=False,
+                            show_lines=True,
+                            show_faces=True,
+                            pointcolor=Color(0, 0, 0),
+                            linecolor=Color(0, 0, 0),
+                            facecolor=Color(1.0, 0.0, 0.0),
+                            linewidth=1,
+                            pointsize=5,
+                        )
+                    )
+
                     # --------------------------------------------------------------------------
                     # add fabrication geometry
                     # --------------------------------------------------------------------------
 
                 @viewer.checkbox(text="display_shapes", checked=True)
-                def check(checked):
+                def check_display_shapes(checked):
                     for obj in viewer_display_shapes:
                         obj.is_visible = checked
                     viewer.view.update()
@@ -461,6 +505,18 @@ class Element:
                 @viewer.checkbox(text="display_aabbs", checked=True)
                 def check_aabb(checked):
                     for obj in viewer_aabbs:
+                        obj.is_visible = checked
+                        viewer.view.update()
+
+                @viewer.checkbox(text="display_oobbs", checked=True)
+                def check_oobb(checked):
+                    for obj in viewer_oobbs:
+                        obj.is_visible = checked
+                        viewer.view.update()
+
+                @viewer.checkbox(text="display_convex_hulls", checked=True)
+                def check_convex_hulls(checked):
+                    for obj in viewer_convex_hulls:
                         obj.is_visible = checked
                         viewer.view.update()
 
@@ -512,7 +568,7 @@ if __name__ == "__main__":
         id=(0, 1),
         simplex=[line],
         display_shapes=geo_0,
-        local_frame=Frame(point=(-3, 0, 0), xaxis=(1, 0, 0), yaxis=(0, 1, 0)),
+        local_frame=box.frame,
         global_frame=Frame.worldXY(),
     )
 
@@ -521,7 +577,7 @@ if __name__ == "__main__":
         id=(0, 2),
         simplex=[line],
         display_shapes=geo_1,
-        local_frame=Frame(point=(0, 0, 0), xaxis=(1, 0, 0), yaxis=(0, 1, 0)),
+        local_frame=box.frame,
         global_frame=Frame.worldXY(),
     )
 
@@ -530,13 +586,13 @@ if __name__ == "__main__":
         id=(3, 0),
         simplex=[line],
         display_shapes=geo_2,
-        local_frame=Frame(point=(3, 0, 0), xaxis=(1, 0, 0), yaxis=(0, 1, 0)),
+        local_frame=box.frame,
         global_frame=Frame.worldXY(),
     )
 
     elements = [elem_0, elem_1, elem_2]
     for elem in elements:
-        elem.get_aabb()
+        elem.get_aabb(0, True, True)
     Element.display(elements=elements, viewer_type="view2")
 
     # # print before updating the fabrication, assembly, and structural information
