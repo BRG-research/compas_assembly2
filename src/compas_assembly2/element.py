@@ -3,9 +3,23 @@ from __future__ import absolute_import
 from __future__ import division
 
 import copy
-from compas.geometry import Frame, Geometry, Transformation, Polyline, Point, Box
+from compas.geometry import (
+    Frame,
+    Geometry,
+    Transformation,
+    Polyline,
+    Point,
+    Box,
+    Line,
+    Pointcloud,
+    bounding_box,
+    convex_hull,
+)
 from compas.datastructures import Mesh
+from compas.datastructures import mesh_bounding_box
 from enum import Enum
+from compas.colors import Color
+import random
 
 
 class ElementType(Enum):
@@ -37,7 +51,8 @@ class Element:
         element_type (ElementType): The type of the element, e.g., ElementType.BLOCK, ElementType.BEAM and etc.
         id (tuple or int): A unique identifier for the element, represented as a tuple, e.g.,(0) or (0, 1) or (1, 5, 9).
         attr (dict, optional): A dictionary containing attributes of the element. Defaults to an empty dictionary.
-        geometries (list, optional): A list of geometries. It can include meshes, breps, curves, points and etc.
+        simplex (list, optional): Supported types: Point, Polyline (for lines use two points), List(Polyline)
+        display_shapes  (list, optional): Supported types: Mesh, Polyline, Box, Line, Pointcloud.
         local_frame (Frame, optional): The local frame of the element.
         global_frame (Frame, optional): The global frame of the element.
         kwargs (dict, optional): Additional keyword arguments can be passed to the element.
@@ -52,7 +67,7 @@ class Element:
             elem = Element(
                 element_type=ElementType.BLOCK,
                 id=(0, 1),
-                geometries=[],
+                display_shapes =[],
                 local_frame=Frame(point=(0, 0, 0), xaxis=(1, 0, 0), yaxis=(0, 1, 0)),
                 global_frame=Frame.worldXY(),
                 width=10,
@@ -81,7 +96,8 @@ class Element:
         self,
         element_type=ElementType.BLOCK,
         id=(0, 1),
-        geometries=[],
+        simplex=[],
+        display_shapes=[],
         local_frame=Frame.worldXY,
         global_frame=Frame.worldXY,
         **kwargs,
@@ -92,14 +108,19 @@ class Element:
         self.attributes = {}  # set the attributes of an object
         self.attributes.update(kwargs)  # update the attributes of with the kwargs
 
-        # geometrical shape
+        # minimal representatio and geometrical shapes
         # iterate through the input geometry
         # check if they are valid geometry objects
         # duplicate them and add them geometry list to avoid transformation issues
-        self.geometries = []  # geometry, can be meshes, breps, curves, points, etc.
-        for g in geometries:
+        self.simplex = []  # geometry, can be meshes, breps, curves, points, etc.
+        for g in simplex:
             if isinstance(g, Geometry) or isinstance(g, Mesh):
-                self.geometries.append(g.copy())
+                self.simplex.append(g.copy())
+
+        self.display_shapes = []  # geometry, can be meshes, breps, curves, points, etc.
+        for g in display_shapes:
+            if isinstance(g, Geometry) or isinstance(g, Mesh):
+                self.display_shapes.append(g.copy())
 
         # collision detection, these members are private access them using getters
         self._aabb = []  # XYZ coordinates of 8 points defining a box
@@ -121,19 +142,78 @@ class Element:
     # PROPERTIES
     # ==========================================================================
 
-    @property
-    def get_aabb(self, compute_object_oriented_bounding_box=False, compute_convex_hull=False):
-        # iterate geometries and get the bounding box
-        for i in range(len(self.geometries)):
-            pass
+    def get_aabb(self, inflate=0.01, frame=Frame.worldXY, compute_convex_hull=False):
+        # iterate display_shapes  and get the bounding box by geometry type
+        # Mesh, Polyline, Box, Line
+        frame_to_computed_oobb = frame or Frame.worldXY
+        points = []
+        points_bbox = []
 
-            # compute the object oriented bounding box
-            if compute_object_oriented_bounding_box:
-                pass
+        for i in range(len(self.display_shapes)):
+            corners = []
+            if isinstance(self.display_shapes[i], Mesh):
+                corners = mesh_bounding_box(self.display_shapes[i])
+                if compute_convex_hull:
+                    points.extend(list(self.display_shapes[i].vertices_attributes("xyz")))
+            elif isinstance(self.display_shapes[i], Polyline):
+                # polylines are a list of points
+                corners = bounding_box(self.display_shapes[i])
+                if compute_convex_hull:
+                    points.extend(self.display_shapes[i])
+            elif isinstance(self.display_shapes[i], Line):
+                corners = [self.display_shapes[i].start, self.display_shapes[i].end]
+                if compute_convex_hull:
+                    points.extend(corners)
+            elif isinstance(self.display_shapes[i], Box):
+                corners = bounding_box(self.display_shapes[i].points)
+                frame_to_computed_oobb = self.display_shapes[i].frame
+                if compute_convex_hull:
+                    points.extend(corners)
+            elif isinstance(self.display_shapes[i], Pointcloud):
+                points.extend(self.display_shapes[i].points)
 
-            # compute the convex hull
-            if compute_object_oriented_bounding_box:
-                pass
+            if len(corners) == 8:
+                points_bbox.extend([corners[0], corners[6]])
+            elif len(corners) == 2:
+                points_bbox.extend(corners)
+
+        # if no points found, return
+        if len(points_bbox) < 2:
+            return
+
+        # compute axis-aligned bounding box
+        points_bbox = bounding_box(points_bbox)
+        self._aabb = bounding_box(
+            [
+                [points_bbox[0][0] - inflate, points_bbox[0][1] - inflate, points_bbox[0][2] - inflate],
+                [points_bbox[6][0] + inflate, points_bbox[6][1] + inflate, points_bbox[6][2] + inflate],
+            ]
+        )
+
+        # compute the object oriented bounding box
+        if frame_to_computed_oobb != Frame.worldXY:
+            xform = Transformation.from_frame_to_frame(Frame.worldXY(), frame_to_computed_oobb)
+            xform_inv = xform.inverse()
+
+            self._oobb = []
+            for i in range(len(points_bbox)):
+                point = Point(*points_bbox[i])
+                point.transform(xform)
+                self._oobb.append(point)
+            self._oobb = bounding_box(self._oobb)
+
+            for i in range(len(self._oobb)):
+                point = Point(*self._oobb[i])
+                point.transform(xform_inv)
+                self._oobb[i] = list(point)
+        else:
+            self._oobb = self._aabb
+
+        # compute the convex hull
+        if compute_convex_hull and len(points) > 2:
+            self._convex_hull = convex_hull(points)
+        else:
+            self._convex_hull = None
 
         return self._aabb
 
@@ -147,9 +227,10 @@ class Element:
         return f"""
 (Type: {self.element_type},
  ID: {self.id},
+ Minimal Representation Geometries: {self.display_shapes },
+ Vizualization Geometries: {self.display_shapes },
  Local Frame: {self.local_frame},
  Global Frame: {self.global_frame},
- Geometries: {self.geometries},
  Fabrication: {self.fabrication},
  Assembly: {self.assembly},
  Structure: {self.structure},
@@ -175,7 +256,12 @@ class Element:
     def copy(self):
         # copy main properties
         new_instance = self.__class__(
-            self.element_type, self.id, self.geometries, self.local_frame, self.global_frame, **self.attributes
+            self.element_type,
+            self.id,
+            self.display_shapes,
+            self.local_frame,
+            self.global_frame,
+            **self.attributes,
         )
 
         # deepcopy of the fabrication, assembly and structural information¨
@@ -191,16 +277,19 @@ class Element:
 
     def transform(self, transformation):
         """
-        Transforms the geometries, local frame, and global frame of the Element.
+        Transforms the display_shapes , local frame, and global frame of the Element.
 
         Parameters:
-            transformation (Transformation): The transformation to be applied to the Element's geometries and frames.
+            transformation (Transformation): The transformation to be applied to the Element's geometry and frames.
 
         Returns:
             None
         """
-        for i in range(len(self.geometries)):
-            self.geometries[i].transform(transformation)
+        for i in range(len(self.simplex)):
+            self.simplex[i].transform(transformation)
+
+        for i in range(len(self.display_shapes)):
+            self.display_shapes[i].transform(transformation)
 
         self.local_frame.transform(transformation)
         self.global_frame.transform(transformation)
@@ -221,7 +310,7 @@ class Element:
 
     def orient(self, frame):
         """
-        Applies frame_to_frame transformation to the geometries, local frame, and global frame of the Element.
+        Applies frame_to_frame transformation to the display_shapes , local frame, and global frame of the Element.
 
         Parameters:
             frame (Frame): The target frame to which  the Element will be transformed.
@@ -257,13 +346,196 @@ class Element:
     # DISPLAY IN DIFFERENT VIEWERS
     # ==========================================================================
 
-    def display(self, viewer_type, key):
-        pass
+    def display(
+        self,
+        viewer_type="view2-0_rhino-1_blender-2",
+        show_simplex=True,
+        show_shapes=False,
+        show_frames=False,
+        show_aabb=False,
+        show_oobb=False,
+        show_convex_hull=False,
+        show_fabrication=False,
+        show_assembly=False,
+        show_structure=False,
+    ):
+        if viewer_type == "view" or "view2" or "compas_view2" or "0":
+            try:
+                from compas_view2.app import App
+                from qtpy import QtWidgets
+
+                class Select:
+                    """Class representing a selection list.
+
+                    Parameters
+                    ----------
+                    app : :class:`compas_view2.app.App`
+                        The app containing the widget.
+                    parent : QtWidgets.QWidget
+                        The parent widget for the combo box.
+                    items : list[dict[str, Any]]
+                        A list of selection options, with each item defined as a dict with a particular structure.
+                        See Notes for more info.
+                    action : callable
+                        The action associated with the combo box.
+
+                    Attributes
+                    ----------
+                    combo : QtWidgets.QComboBox
+                        The combo box containing the selection options.
+                    action : callable
+                        The action associated with the index change event of the combo box.
+
+                    Notes
+                    -----
+                    Every `item` dict should have the following structure.
+
+                    .. code-block:: python
+
+                        item['text']     # str  : The text label of the item.
+
+                    """
+
+                    def __init__(self, app, parent, *, items, action):
+                        container = QtWidgets.QWidget()
+                        layout = QtWidgets.QHBoxLayout()
+                        combo = QtWidgets.QComboBox()
+                        for item in items:
+                            combo.addItem(item["text"])
+                        layout.addWidget(combo)
+                        container.setLayout(layout)
+                        parent.addWidget(container)
+                        combo.currentIndexChanged.connect(self)
+                        combo.currentIndexChanged.connect(app.view.update)
+                        self.combo = combo
+                        self.action = action
+
+                    def __call__(self, *args, **kwargs):
+                        """Wrapper for the action associated with the combo box.
+
+                        Returns
+                        -------
+                        None
+
+                        """
+                        index = self.combo.currentIndex()
+                        text = self.combo.currentText()
+                        self.action(index, text)
+
+            except ImportError:
+                print("compas_view2 is not installed. Skipping the code. ---> Use pip install compas_view <---")
+            else:
+                # The code here will only be executed if the import was successful
+
+                # initialize the viewer
+                viewer = App(viewmode="shaded", enable_sidebar=True, width=1280, height=800)
+
+                # --------------------------------------------------------------------------
+                # ui
+                # --------------------------------------------------------------------------
+                # viewer.add()
+
+                # --------------------------------------------------------------------------
+                # add simplex
+                # --------------------------------------------------------------------------
+
+                # --------------------------------------------------------------------------
+                # add display shapes
+                # --------------------------------------------------------------------------
+
+                # loop through the display_shapes and add them to the viewer
+                viewer_display_shapes = []
+                for i in range(len(self.display_shapes)):
+                    if (
+                        isinstance(self.display_shapes[i], Mesh)
+                        or isinstance(self.display_shapes[i], Polyline)
+                        or isinstance(self.display_shapes[i], Line)
+                        or isinstance(self.display_shapes[i], Box)
+                    ):
+                        viewer_display_shapes.append(
+                            viewer.add(
+                                data=self.display_shapes[i],
+                                name="viewer_display_shape_mesh",
+                                is_selected=False,
+                                is_visible=True,
+                                show_points=False,
+                                show_lines=True,
+                                show_faces=True,
+                                pointcolor=Color(0, 0, 0),
+                                linecolor=Color(0, 0, 0),
+                                facecolor=Color(0.5, 0.5, 0.5),
+                            )
+                        )
+                    elif isinstance(self.display_shapes[i], Pointcloud):
+                        viewer_display_shapes.append(
+                            viewer.add(
+                                data=self.display_shapes[i],
+                                name="viewer_display_shape_mesh",
+                                is_selected=False,
+                                is_visible=True,
+                                show_points=True,
+                                show_lines=False,
+                                show_faces=False,
+                                pointcolor=Color(0, 0, 0),
+                                linecolor=Color(0, 0, 0),
+                                facecolor=Color(0, 0, 0),
+                                linewidth=0,
+                                pointsize=5,
+                            )
+                        )
+
+                @viewer.checkbox(text="display_shapes", checked=True)
+                def check(checked):
+                    for obj in viewer_display_shapes:
+                        obj.is_visible = checked
+                    viewer.view.update()
+
+                # --------------------------------------------------------------------------
+                # add frames
+                # --------------------------------------------------------------------------
+
+                # --------------------------------------------------------------------------
+                # add aabb | oobb | convex hull
+                # --------------------------------------------------------------------------
+
+                # --------------------------------------------------------------------------
+                # add fabrication geometry
+                # --------------------------------------------------------------------------
+
+                viewer.show()
+
+        elif viewer_type == "rhino" or "1":
+            pass
+        elif viewer_type == "blender" or "2":
+            pass
 
 
 if __name__ == "__main__":
-    mesh = Mesh.from_polyhedron(6)
-    polyline = Polyline([(0, 0, 0), (1, 0, 0), (1, 1, 0)])
+    mesh = Mesh.from_polyhedron(4)
+    polyline_0 = Polyline(
+        [
+            (2.0 + 0.75, 2, -0.25),
+            (2.0 + 0.75, 2, 0.25),
+            (2.0 + 0.25, 2, 0.25),
+            (2.0 + 0.25, 2, -0.25),
+            (2.0 + 0.75, 2, -0.25),
+        ]
+    )
+
+    polyline_1 = Polyline(
+        [
+            (2.0 + 0.75, -2, -0.25),
+            (2.0 + 0.75, -2, 0.25),
+            (2.0 + 0.25, -2, 0.25),
+            (2.0 + 0.25, -2, -0.25),
+            (2.0 + 0.75, -2, -0.25),
+        ]
+    )
+    line = Line((2.5, -2, 0), (2.5, 2, 0))
+    cloud = Pointcloud(
+        [Point(random.uniform(3.0, 3.5), random.uniform(-2, 2), random.uniform(-0.25, 0.25)) for _ in range(200)]
+    )
+
     # curve = cg.NurbsCurve(
     #     points=[(0, 0, 0), (1, 3, 0), (2, 3, 0), (3, 0, 0)],
     #     knots=[0, 0, 0, 1, 1, 1],
@@ -271,19 +543,22 @@ if __name__ == "__main__":
     #     weights=[1.0, 1.0, 1.0, 1.0],
     # )
     point = Point(0, 0, 0)
-    box = Box(Frame.worldXY(), 1, 1, 1)
-    # brep = cg.Brep.from_box(box)
+    box = Box(Frame([-3, 0, 0], [0.866, 0.1, 0.0], [0.5, 0.866, 0.0]), 2, 4, 0.25)
+
     geos = [
         mesh,
-        polyline,
-        point,
+        polyline_0,
+        polyline_1,
+        cloud,
         box,
+        line,
     ]
 
     elem = Element(
         element_type=ElementType.BLOCK,
         id=(0, 1),
-        geometries=geos,
+        simplex=[line],
+        display_shapes=geos,
         local_frame=Frame(point=(0, 0, 0), xaxis=(1, 0, 0), yaxis=(0, 1, 0)),
         global_frame=Frame.worldXY(),
         width=10,
@@ -291,23 +566,28 @@ if __name__ == "__main__":
         length=95,
     )
 
-    # print before updating the fabrication, assembly, and structural information
+    # # print before updating the fabrication, assembly, and structural information
+    print(type(elem))
+    print(elem.get_aabb(0, Frame.worldXY, True))
+    print(elem._oobb)
+    print(elem._convex_hull)
+
+    elem.display("view2")
+
+    # # Update fabrication information
+    # elem.fabrication["cut"] = True
+    # elem.fabrication["drill"] = False
+
+    # # Update assembly information
+    # elem.assembly["inerstion_direction"] = (0, 0, 1)
+
+    # # Update structural information
+    # elem.structure["nodes"] = [(0, 0, 1), (0, 0, 0)]
+
+    # # print after updating the fabrication, assembly, and structural information
+    # # print(elem)
+
     # print(elem)
-
-    # Update fabrication information
-    elem.fabrication["cut"] = True
-    elem.fabrication["drill"] = False
-
-    # Update assembly information
-    elem.assembly["inerstion_direction"] = (0, 0, 1)
-
-    # Update structural information
-    elem.structure["nodes"] = [(0, 0, 1), (0, 0, 0)]
-
-    # print after updating the fabrication, assembly, and structural information
-    # print(elem)
-
-    print(elem)
-    elem_copy = elem.copy()
-    elem_copy.fabrication["cut"] = False
-    print(elem_copy)
+    # elem_copy = elem.copy()
+    # elem_copy.fabrication["cut"] = False
+    # print(elem_copy)
