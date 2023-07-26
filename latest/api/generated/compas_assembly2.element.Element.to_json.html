@@ -20,11 +20,11 @@
   <link rel="stylesheet" type="text/css" href="../../_static/css/compas-reference.css" />
 
   
-  <link rel="next" title="Element.transform" href="compas_assembly2.element.Element.transform.html" />
+  <link rel="next" title="Element.to_jsonstring" href="compas_assembly2.element.Element.to_jsonstring.html" />
   
 
   
-  <link rel="prev" title="Element.oriented" href="compas_assembly2.element.Element.oriented.html" />
+  <link rel="prev" title="Element.to_data" href="compas_assembly2.element.Element.to_data.html" />
   
 
   <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
@@ -99,18 +99,19 @@
 <h1>Element.to_json</h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="compas_assembly2.element.Element.to_json">
-<span class="sig-prename descclassname"><span class="pre">Element.</span></span><span class="sig-name descname"><span class="pre">to_json</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BRG-research/compas_assembly2/blob/master/src/compas_assembly2/element.py#L189"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
-<dd><p>Returns a dictionary of structured data representing the graph that can be serialised to JSON format.</p>
-<p>This is effectively a post-processing step for the <a class="reference internal" href="compas_assembly2.element.Element.to_data.html#compas_assembly2.element.Element.to_data" title="compas_assembly2.element.Element.to_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">to_data()</span></code></a> method.</p>
+<span class="sig-prename descclassname"><span class="pre">Element.</span></span><span class="sig-name descname"><span class="pre">to_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BRG-research/compas_assembly2/blob/master/src/compas_assembly2/element.py#L262"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Serialize the data representation of an object to a JSON file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><em>dict</em> -- The serialisable structured data dictionary.</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filepath</strong> (<em>path string or file-like object</em>) -- The path or file-like object to the file containing the data.</p></li>
+<li><p><strong>pretty</strong> (<em>bool, optional</em>) -- If True, serialize to a &quot;pretty&quot;, human-readable representation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>None</em></p>
 </dd>
 </dl>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><a class="reference internal" href="compas_assembly2.element.Element.from_jsondata.html#compas_assembly2.element.Element.from_jsondata" title="compas_assembly2.element.Element.from_jsondata"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_jsondata()</span></code></a></p>
-</div>
 </dd></dl>
 
 </section>
@@ -171,20 +172,20 @@
   <footer class="compas-footer">
     <nav class="nav p-2">
       
-      <a href="compas_assembly2.element.Element.oriented.html" title="Element.oriented" class="nav-link footer-link float-start text-left d-flex w-50" rel="prev">
+      <a href="compas_assembly2.element.Element.to_data.html" title="Element.to_data" class="nav-link footer-link float-start text-left d-flex w-50" rel="prev">
         <div class="nav-button p-2 m-2"><i class="fas fa-arrow-left"></i></div>
         <div class="nav-title flex-grow-1 align-self-center">
           <div class="nav-direction small font-weight-light">Previous</div>
-          Element.oriented
+          Element.to_data
         </div>
       </a>
       
 
       
-      <a href="compas_assembly2.element.Element.transform.html" title="Element.transform" class="nav-link footer-link float-end text-right d-flex w-50" rel="next">
+      <a href="compas_assembly2.element.Element.to_jsonstring.html" title="Element.to_jsonstring" class="nav-link footer-link float-end text-right d-flex w-50" rel="next">
         <div class="nav-title footer-link flex-grow-1 align-self-center">
           <div class="nav-direction small font-weight-light">Next</div>
-          Element.transform
+          Element.to_jsonstring
         </div>
         <div class="nav-button p-2 m-2"><i class="fas fa-arrow-right"></i></div>
       </a>
