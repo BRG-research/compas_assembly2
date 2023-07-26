@@ -17,6 +17,8 @@ from compas.geometry import (
 )
 from compas.datastructures import Mesh
 from compas.datastructures import mesh_bounding_box
+from compas.datastructures import Datastructure
+from compas.data import Data
 from enum import Enum
 
 
@@ -32,7 +34,7 @@ class ElementType(Enum):
     SHELL_X = 32
 
 
-class Element:
+class Element(Data):
     """Class representing a structural object of an assembly."""
 
     # ==========================================================================
@@ -101,12 +103,13 @@ class Element:
         **kwargs,
     ):
         # indexing + attributes
+        self.guid = None  # guid of the element
         self.id = (id,) if isinstance(id, int) else id  # tuple e.g. (0, 1) or (1, 5, 9)
         self.element_type = element_type  # type of the element, e.g., block, beam, plate, node, etc.
         self.attributes = {}  # set the attributes of an object
         self.attributes.update(kwargs)  # update the attributes of with the kwargs
 
-        # minimal representatio and geometrical shapes
+        # minimal representation and geometrical shapes
         # iterate through the input geometry
         # check if they are valid geometry objects
         # duplicate them and add them geometry list to avoid transformation issues
@@ -137,10 +140,124 @@ class Element:
         self.structure = dict()
 
     # ==========================================================================
-    # PROPERTIES
+    # DATA
     # ==========================================================================
 
+    # jsonschema
+    JSONSCHEMA = {
+        "type": "object",
+        "properties": {
+            "element_type": {"type": "integer", "minimum": -0},
+            # "id": {"type": "object"},
+            # "local_frame": Frame.JSONSCHEMA,
+            # "global_frame": Frame.JSONSCHEMA,
+        },
+        "required": [
+            "element_type",
+            # "id",
+            # "local_frame",
+            # "global_frame"
+        ],
+    }
+
+    __slots__ = [
+        "_element_type",
+        # "_id",
+        # "_local_frame",
+        # "_global_frame",
+    ]
+
+    # data
+    @property
+    def data(self):
+        data = {
+            "element_type": self.element_type,
+            # "id": self.id,
+            # "local_frame": self.local_frame,
+            # "global_frame": self.global_frame,
+        }
+        return data
+
+    @data.setter
+    def data(self, data):
+        self.element_type = data.get("element_type") or ElementType.BLOCK
+        # self.id = data.get("id") or (0, 1)
+        # self.local_frame = data.get("local_frame") or Frame.worldXY()
+        # self.global_frame = data.get("global_frame") or Frame.worldXY()
+
+    # json
+    def to_json(self):
+        """Returns a dictionary of structured data representing the graph that can be serialised to JSON format.
+
+        This is effectively a post-processing step for the :meth:`to_data` method.
+
+        Returns
+        -------
+        dict
+            The serialisable structured data dictionary.
+
+        See Also
+        --------
+        :meth:`from_jsondata`
+
+        """
+        data = self.data
+
+        return data
+
+    @classmethod
+    def from_jsondata(cls, data):
+        """Construct a graph from structured data representing the graph in JSON format.
+
+        This is effectively a pre-processing step for the :meth:`from_data` method.
+
+        Parameters
+        ----------
+        data : dict
+            The structured data dictionary.
+
+        Returns
+        -------
+        :class:`~compas.datastructures.Graph`
+            The constructed graph.
+
+        See Also
+        --------
+        :meth:`to_jsondata`
+
+        """
+        # _node = data["node"] or {}
+        # _edge = data["edge"] or {}
+        # # process the nodes
+        # node = {literal_eval(key): attr for key, attr in iter(_node.items())}
+        # data["node"] = node
+        # # process the edges
+        # edge = {}
+        # for u, nbrs in iter(_edge.items()):
+        #     nbrs = nbrs or {}
+        #     u = literal_eval(u)
+        #     edge[u] = {}
+        #     for v, attr in iter(nbrs.items()):
+        #         attr = attr or {}
+        #         v = literal_eval(v)
+        #         edge[u][v] = attr
+        # data["edge"] = edge
+        return cls.from_data(data)
+
+    @property
+    def guid(self):
+        return self._guid
+
+    @guid.setter
+    def guid(self, value):
+        self._guid = value
+
+
+    # ==========================================================================
+    # PROPERTIES
+    # ==========================================================================
     def get_aabb(self, inflate=0.00, compute_oobb=True, compute_convex_hull=False):
+
         # iterate display_shapes  and get the bounding box by geometry type
         # Mesh, Polyline, Box, Line
         points = []
