@@ -97,8 +97,8 @@
 <h1>Element</h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="compas_assembly2.element.Element">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_assembly2.element.</span></span><span class="sig-name descname"><span class="pre">Element</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element_type=ElementType.BLOCK</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id=(0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">1)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simplex=[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">display_shapes=[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_frame=&lt;bound</span> <span class="pre">method</span> <span class="pre">Frame.worldXY</span> <span class="pre">of</span> <span class="pre">&lt;class</span> <span class="pre">'compas.geometry.primitives.frame.Frame'&gt;&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">global_frame=&lt;bound</span> <span class="pre">method</span> <span class="pre">Frame.worldXY</span> <span class="pre">of</span> <span class="pre">&lt;class</span> <span class="pre">'compas.geometry.primitives.frame.Frame'&gt;&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BRG-research/compas_assembly2/blob/master/src/compas_assembly2/element.py#L35"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_assembly2.element.</span></span><span class="sig-name descname"><span class="pre">Element</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element_type=ElementType.BLOCK</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id=(0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">1)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simplex=[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">display_shapes=[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_frame=&lt;bound</span> <span class="pre">method</span> <span class="pre">Frame.worldXY</span> <span class="pre">of</span> <span class="pre">&lt;class</span> <span class="pre">'compas.geometry.primitives.frame.Frame'&gt;&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">global_frame=&lt;bound</span> <span class="pre">method</span> <span class="pre">Frame.worldXY</span> <span class="pre">of</span> <span class="pre">&lt;class</span> <span class="pre">'compas.geometry.primitives.frame.Frame'&gt;&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BRG-research/compas_assembly2/blob/master/src/compas_assembly2/element.py#L37"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://compas.dev/compas/latest/reference/generated/compas.data.Data.html#compas.data.Data" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.data.data.Data</span></code></a></p>
 <p>Class representing a structural object of an assembly.</p>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable docutils align-default">
@@ -111,31 +111,73 @@
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element.Element.copy.html#compas_assembly2.element.Element.copy" title="compas_assembly2.element.Element.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a></p></td>
+<td><p>Make an independent copy of the data object.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element.Element.from_jsondata.html#compas_assembly2.element.Element.from_jsondata" title="compas_assembly2.element.Element.from_jsondata"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_jsondata</span></code></a></p></td>
+<td><p>Construct a graph from structured data representing the graph in JSON format.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element.Element.get_aabb.html#compas_assembly2.element.Element.get_aabb" title="compas_assembly2.element.Element.get_aabb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_aabb</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element.Element.get_aabb.html#compas_assembly2.element.Element.get_aabb" title="compas_assembly2.element.Element.get_aabb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_aabb</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element.Element.get_assembly.html#compas_assembly2.element.Element.get_assembly" title="compas_assembly2.element.Element.get_assembly"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_assembly</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element.Element.get_assembly.html#compas_assembly2.element.Element.get_assembly" title="compas_assembly2.element.Element.get_assembly"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_assembly</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element.Element.get_fabrication.html#compas_assembly2.element.Element.get_fabrication" title="compas_assembly2.element.Element.get_fabrication"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_fabrication</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element.Element.get_fabrication.html#compas_assembly2.element.Element.get_fabrication" title="compas_assembly2.element.Element.get_fabrication"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_fabrication</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element.Element.get_structure.html#compas_assembly2.element.Element.get_structure" title="compas_assembly2.element.Element.get_structure"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_structure</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element.Element.get_structure.html#compas_assembly2.element.Element.get_structure" title="compas_assembly2.element.Element.get_structure"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_structure</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element.Element.orient.html#compas_assembly2.element.Element.orient" title="compas_assembly2.element.Element.orient"><code class="xref py py-obj docutils literal notranslate"><span class="pre">orient</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element.Element.orient.html#compas_assembly2.element.Element.orient" title="compas_assembly2.element.Element.orient"><code class="xref py py-obj docutils literal notranslate"><span class="pre">orient</span></code></a></p></td>
 <td><p>Applies frame_to_frame transformation to the display_shapes , local frame, and global frame of the Element.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element.Element.oriented.html#compas_assembly2.element.Element.oriented" title="compas_assembly2.element.Element.oriented"><code class="xref py py-obj docutils literal notranslate"><span class="pre">oriented</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element.Element.oriented.html#compas_assembly2.element.Element.oriented" title="compas_assembly2.element.Element.oriented"><code class="xref py py-obj docutils literal notranslate"><span class="pre">oriented</span></code></a></p></td>
 <td><p>Creates an oriented copy of the Element.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element.Element.to_json.html#compas_assembly2.element.Element.to_json" title="compas_assembly2.element.Element.to_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_json</span></code></a></p></td>
+<td><p>Returns a dictionary of structured data representing the graph that can be serialised to JSON format.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element.Element.transform.html#compas_assembly2.element.Element.transform" title="compas_assembly2.element.Element.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a></p></td>
 <td><p>Transforms the display_shapes , local frame, and global frame of the Element.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element.Element.transformed.html#compas_assembly2.element.Element.transformed" title="compas_assembly2.element.Element.transformed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transformed</span></code></a></p></td>
 <td><p>Creates a transformed copy of the Element.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Inherited Methods</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element.Element.ToString.html#compas_assembly2.element.Element.ToString" title="compas_assembly2.element.Element.ToString"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ToString</span></code></a></p></td>
+<td><p>Converts the instance to a string.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element.Element.from_data.html#compas_assembly2.element.Element.from_data" title="compas_assembly2.element.Element.from_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_data</span></code></a></p></td>
+<td><p>Construct an object of this type from the provided data.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element.Element.from_json.html#compas_assembly2.element.Element.from_json" title="compas_assembly2.element.Element.from_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_json</span></code></a></p></td>
+<td><p>Construct an object from serialized data contained in a JSON file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element.Element.from_jsonstring.html#compas_assembly2.element.Element.from_jsonstring" title="compas_assembly2.element.Element.from_jsonstring"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_jsonstring</span></code></a></p></td>
+<td><p>Construct an object from serialized data contained in a JSON string.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element.Element.sha256.html#compas_assembly2.element.Element.sha256" title="compas_assembly2.element.Element.sha256"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sha256</span></code></a></p></td>
+<td><p>Compute a hash of the data for comparison during version control using the sha256 algorithm.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element.Element.to_data.html#compas_assembly2.element.Element.to_data" title="compas_assembly2.element.Element.to_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_data</span></code></a></p></td>
+<td><p>Convert an object to its native data representation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element.Element.to_jsonstring.html#compas_assembly2.element.Element.to_jsonstring" title="compas_assembly2.element.Element.to_jsonstring"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_jsonstring</span></code></a></p></td>
+<td><p>Serialize the data representation of an object to a JSON string.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element.Element.validate_data.html#compas_assembly2.element.Element.validate_data" title="compas_assembly2.element.Element.validate_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_data</span></code></a></p></td>
+<td><p>Validate the object's data against its data schema.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element.Element.validate_json.html#compas_assembly2.element.Element.validate_json" title="compas_assembly2.element.Element.validate_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_json</span></code></a></p></td>
+<td><p>Validate the object's data against its json schema.</p></td>
 </tr>
 </tbody>
 </table>
@@ -187,7 +229,9 @@
       <div class="d-none d-xl-block col-xl-2 compas-toc" role="toc">
         
         <ul class="nav flex-column" id="compas-toc">
-<li class="nav-item"><a class="nav-link reference internal" href="#">Element</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="#">Element</a><ul class="nav flex-column">
+</ul>
+</li>
 </ul>
 
       </div>

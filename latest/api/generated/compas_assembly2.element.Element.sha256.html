@@ -3,7 +3,7 @@
 
 <head>
   
-  <title>compas_assembly2 - Element.get_structure</title>
+  <title>compas_assembly2 - Element.sha256</title>
   
 
   <meta charset="utf-8" />
@@ -20,11 +20,11 @@
   <link rel="stylesheet" type="text/css" href="../../_static/css/compas-reference.css" />
 
   
-  <link rel="next" title="Element.orient" href="compas_assembly2.element.Element.orient.html" />
+  <link rel="next" title="Element.to_data" href="compas_assembly2.element.Element.to_data.html" />
   
 
   
-  <link rel="prev" title="Element.get_fabrication" href="compas_assembly2.element.Element.get_fabrication.html" />
+  <link rel="prev" title="Element.from_jsonstring" href="compas_assembly2.element.Element.from_jsonstring.html" />
   
 
   <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
@@ -88,19 +88,41 @@
             
             <li class="breadcrumb-item"><a href="compas_assembly2.element.Element.html">Element</a></li>
             
-            <!-- <li class="breadcrumb-item active" aria-current="page">Element.get_structure</li> -->
+            <!-- <li class="breadcrumb-item active" aria-current="page">Element.sha256</li> -->
           </ol>
         </nav>
         
 
         
         
-        <section class="detail" id="element-get-structure">
-<h1>Element.get_structure</h1>
+        <section class="detail" id="element-sha256">
+<h1>Element.sha256</h1>
 <dl class="py method">
-<dt class="sig sig-object py" id="compas_assembly2.element.Element.get_structure">
-<span class="sig-prename descclassname"><span class="pre">Element.</span></span><span class="sig-name descname"><span class="pre">get_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BRG-research/compas_assembly2/blob/master/src/compas_assembly2/element.py#L364"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="compas_assembly2.element.Element.sha256">
+<span class="sig-prename descclassname"><span class="pre">Element.</span></span><span class="sig-name descname"><span class="pre">sha256</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">as_string</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BRG-research/compas_assembly2/blob/master/src/compas_assembly2/element.py#L378"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Compute a hash of the data for comparison during version control using the sha256 algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>as_string</strong> (<em>bool, optional</em>) -- If True, return the digest in hexadecimal format rather than as bytes.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>bytes | str</em></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest language-python notranslate"><div class="highlight"><pre><button class="btn copy"><i class="far fa-copy"></i></button><code><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">compas.datastructures</span> <span class="kn">import</span> <span class="n">Mesh</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mesh</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">from_obj</span><span class="p">(</span><span class="n">compas</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;faces.obj&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">sha256</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v2</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">sha256</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mesh</span><span class="o">.</span><span class="n">vertex_attribute</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">vertex_sample</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v3</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">sha256</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span> <span class="o">==</span> <span class="n">v2</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v2</span> <span class="o">==</span> <span class="n">v3</span>
+<span class="go">False</span>
+</code></pre></div>
+</div>
+</dd></dl>
 
 </section>
 
@@ -148,7 +170,7 @@
       <div class="d-none d-xl-block col-xl-2 compas-toc" role="toc">
         
         <ul class="nav flex-column" id="compas-toc">
-<li class="nav-item"><a class="nav-link reference internal" href="#">Element.get_structure</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="#">Element.sha256</a></li>
 </ul>
 
       </div>
@@ -160,20 +182,20 @@
   <footer class="compas-footer">
     <nav class="nav p-2">
       
-      <a href="compas_assembly2.element.Element.get_fabrication.html" title="Element.get_fabrication" class="nav-link footer-link float-start text-left d-flex w-50" rel="prev">
+      <a href="compas_assembly2.element.Element.from_jsonstring.html" title="Element.from_jsonstring" class="nav-link footer-link float-start text-left d-flex w-50" rel="prev">
         <div class="nav-button p-2 m-2"><i class="fas fa-arrow-left"></i></div>
         <div class="nav-title flex-grow-1 align-self-center">
           <div class="nav-direction small font-weight-light">Previous</div>
-          Element.get_fabrication
+          Element.from_jsonstring
         </div>
       </a>
       
 
       
-      <a href="compas_assembly2.element.Element.orient.html" title="Element.orient" class="nav-link footer-link float-end text-right d-flex w-50" rel="next">
+      <a href="compas_assembly2.element.Element.to_data.html" title="Element.to_data" class="nav-link footer-link float-end text-right d-flex w-50" rel="next">
         <div class="nav-title footer-link flex-grow-1 align-self-center">
           <div class="nav-direction small font-weight-light">Next</div>
-          Element.orient
+          Element.to_data
         </div>
         <div class="nav-button p-2 m-2"><i class="fas fa-arrow-right"></i></div>
       </a>
