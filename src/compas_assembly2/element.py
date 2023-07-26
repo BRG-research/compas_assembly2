@@ -17,7 +17,6 @@ from compas.geometry import (
 )
 from compas.datastructures import Mesh
 from compas.datastructures import mesh_bounding_box
-from compas.datastructures import Datastructure
 from compas.data import Data
 from enum import Enum
 
@@ -102,8 +101,10 @@ class Element(Data):
         global_frame=Frame.worldXY,
         **kwargs,
     ):
+        # call the inherited Data constructor for json serialization
+        super(Element, self).__init__()
+
         # indexing + attributes
-        self.guid = None  # guid of the element
         self.id = (id,) if isinstance(id, int) else id  # tuple e.g. (0, 1) or (1, 5, 9)
         self.element_type = element_type  # type of the element, e.g., block, beam, plate, node, etc.
         self.attributes = {}  # set the attributes of an object
@@ -123,16 +124,16 @@ class Element(Data):
             if isinstance(g, Geometry) or isinstance(g, Mesh):
                 self.display_shapes.append(g.copy())
 
+        # orientation frames
+        self.local_frame = Frame.copy(local_frame) or Frame.worldXY()  # set the local frame of an object
+        self.global_frame = Frame.copy(global_frame) or Frame.worldXY()  # set the global frame of an object
+
         # collision detection, these members are private access them using getters
         self._aabb = []  # XYZ coordinates of 8 points defining a box
         self._oobb = []  # XYZ coordinates of 8 points defining a box
         self._convex_hull = Mesh()  # convex hull of the geometry
         self._outlines = []  # closed polylines - in majority of cases objects will have planar faces
         self._outlines_frames = []  # closed polylines planes - in majority of cases objects will have planar faces
-
-        # orientation frames
-        self.local_frame = Frame.copy(local_frame) or Frame.worldXY()  # set the local frame of an object
-        self.global_frame = Frame.copy(global_frame) or Frame.worldXY()  # set the global frame of an object
 
         # output for further processing
         self.fabrication = dict()
@@ -141,123 +142,102 @@ class Element(Data):
 
     # ==========================================================================
     # DATA
+    # element_type=ElementType.BLOCK,
+    # id=(0, 1),
+    # simplex=[],
+    # display_shapes=[],
+    # local_frame=Frame.worldXY,
+    # global_frame=Frame.worldXY,
     # ==========================================================================
-
-    # jsonschema
-    JSONSCHEMA = {
-        "type": "object",
-        "properties": {
-            "element_type": {"type": "integer", "minimum": -0},
-            # "id": {"type": "object"},
-            # "local_frame": Frame.JSONSCHEMA,
-            # "global_frame": Frame.JSONSCHEMA,
-        },
-        "required": [
-            "element_type",
-            # "id",
-            # "local_frame",
-            # "global_frame"
-        ],
-    }
-
-    __slots__ = [
-        "_element_type",
-        # "_id",
-        # "_local_frame",
-        # "_global_frame",
-    ]
-
-    # data
+    # create the data object from the class properties
     @property
     def data(self):
+
+        # call the inherited Data constructor for json serialization
         data = {
-            "element_type": self.element_type,
-            # "id": self.id,
-            # "local_frame": self.local_frame,
-            # "global_frame": self.global_frame,
+            "element_type": self.element_type.value,
+            "id": self.id,
+            "simplex": self.simplex,
+            "display_shapes": self.display_shapes,
+            "local_frame": self.local_frame,
+            "global_frame": self.global_frame,
+            "attributes": self.attributes,
         }
+
+        # custom properties
+        data["aabb"] = self._aabb
+        data["oobb"] = self._oobb
+        data["convex_hull"] = self._convex_hull
+        data["outlines"] = self._outlines
+        data["outlines_frames"] = self._outlines_frames
+        
+        # fabrication | assembly | structure
+        data["fabrication"] = self.fabrication
+        data["assembly"] = self.assembly
+        data["structure"] = self.structure
+
+        # return the data object
         return data
 
+    # vice versa - create the class properties from the data object
     @data.setter
     def data(self, data):
-        self.element_type = data.get("element_type") or ElementType.BLOCK
-        # self.id = data.get("id") or (0, 1)
-        # self.local_frame = data.get("local_frame") or Frame.worldXY()
-        # self.global_frame = data.get("global_frame") or Frame.worldXY()
 
-    # json
-    def to_json(self):
-        """Returns a dictionary of structured data representing the graph that can be serialised to JSON format.
+        # call the inherited Data constructor for json serialization
+        Element.data.fset(self, data)
 
-        This is effectively a post-processing step for the :meth:`to_data` method.
+        # main properties
+        self.element_type = data["element_type"]
+        self.id = data["id"]
+        self.simplex = data["simplex"]
+        self.display_shapes = data["display_shapes"]
+        self.local_frame = data["local_frame"]
+        self.global_frame = data["global_frame"]
+        self.attributes = data["attributes"]
 
-        Returns
-        -------
-        dict
-            The serialisable structured data dictionary.
+        # custom properties
+        self._aabb = data["aabb"]
+        self._oobb = data["oobb"]
+        self._convex_hull = data["convex_hull"]
+        self._outlines = data["outlines"]
+        self._outlines_frames = data["outlines_frames"]
 
-        See Also
-        --------
-        :meth:`from_jsondata`
-
-        """
-        data = self.data
-
-        return data
+        # fabrication | assembly | structure
+        self.fabrication = data["fabrication"]
+        self.assembly = data["assembly"]
+        self.structure = data["structure"]
 
     @classmethod
-    def from_jsondata(cls, data):
-        """Construct a graph from structured data representing the graph in JSON format.
+    def from_data(cls, data):
 
-        This is effectively a pre-processing step for the :meth:`from_data` method.
+        """Alternative to None default __init__ parameters."""
+        obj = Element(element_type=ElementType(data["element_type"]),
+                      id=data["id"],
+                      simplex=data["simplex"],
+                      display_shapes=data["display_shapes"],
+                      local_frame=data["local_frame"],
+                      global_frame=data["global_frame"],
+                      **data["attributes"],)
+        
+        # custom properties
+        obj._aabb = data["aabb"]
+        obj._oobb = data["oobb"]
+        obj._convex_hull = data["convex_hull"]
+        obj._outlines = data["outlines"]
+        obj._outlines_frames = data["outlines_frames"]
 
-        Parameters
-        ----------
-        data : dict
-            The structured data dictionary.
+        # fabrication | assembly | structure
+        obj.fabrication = data["fabrication"]
+        obj.assembly = data["assembly"]
+        obj.structure = data["structure"]
 
-        Returns
-        -------
-        :class:`~compas.datastructures.Graph`
-            The constructed graph.
-
-        See Also
-        --------
-        :meth:`to_jsondata`
-
-        """
-        # _node = data["node"] or {}
-        # _edge = data["edge"] or {}
-        # # process the nodes
-        # node = {literal_eval(key): attr for key, attr in iter(_node.items())}
-        # data["node"] = node
-        # # process the edges
-        # edge = {}
-        # for u, nbrs in iter(_edge.items()):
-        #     nbrs = nbrs or {}
-        #     u = literal_eval(u)
-        #     edge[u] = {}
-        #     for v, attr in iter(nbrs.items()):
-        #         attr = attr or {}
-        #         v = literal_eval(v)
-        #         edge[u][v] = attr
-        # data["edge"] = edge
-        return cls.from_data(data)
-
-    @property
-    def guid(self):
-        return self._guid
-
-    @guid.setter
-    def guid(self, value):
-        self._guid = value
-
+        # return the object
+        return obj
 
     # ==========================================================================
     # PROPERTIES
     # ==========================================================================
     def get_aabb(self, inflate=0.00, compute_oobb=True, compute_convex_hull=False):
-
         # iterate display_shapes  and get the bounding box by geometry type
         # Mesh, Polyline, Box, Line
         points = []

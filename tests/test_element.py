@@ -3,7 +3,7 @@ from compas.geometry import Point, Polyline, Box, Translation, Frame, Line, Poin
 import random
 from compas_assembly2.element import Element, ElementType
 from compas_assembly2.viewer import Viewer
-from compas.data import json_dumps, json_loads  # https://compas.dev/compas/latest/reference/generated/compas.data.Data.html
+from compas.data import json_dump, json_load  # https://compas.dev/compas/latest/reference/generated/compas.data.Data.html
 
 if __name__ == "__main__":
     mesh = Mesh.from_polyhedron(4)
@@ -82,8 +82,9 @@ if __name__ == "__main__":
         elem.get_aabb(0, True, True)
     # Viewer.run(elements=elements, viewer_type="view2")
 
-    print(json_dumps(elements))
-
+    json_dump(data=elements, fp="tests/data_sets/1_block_beam_plate.json", pretty=True)
+    elements_loaded_from_json = json_load(fp="tests/data_sets/1_block_beam_plate.json")
+    Viewer.run(elements=elements_loaded_from_json, viewer_type="view2")
     # # print before updating the fabrication, assembly, and structural information
     # print(type(elem))
     # print(elem.get_aabb(0, Frame.worldXY, True))

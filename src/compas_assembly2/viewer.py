@@ -249,64 +249,68 @@ class Viewer:
                     # --------------------------------------------------------------------------
                     # add aabb | oobb | convex hull
                     # --------------------------------------------------------------------------
-                    aabb_mesh = Mesh.from_vertices_and_faces(
-                        element._aabb,
-                        [[0, 1, 2, 3], [4, 5, 6, 7], [0, 1, 5, 4], [1, 2, 6, 5], [2, 3, 7, 6], [3, 0, 4, 7]],
-                    )
+                    if (element._aabb):
+                        aabb_mesh = Mesh.from_vertices_and_faces(
+                            element._aabb,
+                            [[0, 1, 2, 3], [4, 5, 6, 7], [0, 1, 5, 4], [1, 2, 6, 5], [2, 3, 7, 6], [3, 0, 4, 7]],
+                        )
 
-                    viewer_aabbs.append(
-                        viewer.add(
-                            data=aabb_mesh,  # Pointcloud(element._aabb),
-                            name="viewer_aabb",
-                            is_selected=False,
-                            is_visible=show_aabbs,
-                            show_points=True,
-                            show_lines=True,
-                            show_faces=True,
-                            pointcolor=colors[0],
-                            linecolor=Color(1, 1, 1),
-                            facecolor=Color(0, 0, 0),
-                            linewidth=1,
-                            pointsize=point_size,
+                        viewer_aabbs.append(
+                            viewer.add(
+                                data=aabb_mesh,  # Pointcloud(element._aabb),
+                                name="viewer_aabb",
+                                is_selected=False,
+                                is_visible=show_aabbs,
+                                show_points=True,
+                                show_lines=True,
+                                show_faces=True,
+                                pointcolor=colors[0],
+                                linecolor=Color(1, 1, 1),
+                                facecolor=Color(0, 0, 0),
+                                linewidth=1,
+                                pointsize=point_size,
+                            )
                         )
-                    )
-                    oobb_mesh = Mesh.from_vertices_and_faces(
-                        element._oobb,
-                        [[0, 1, 2, 3], [4, 5, 6, 7], [0, 1, 5, 4], [1, 2, 6, 5], [2, 3, 7, 6], [3, 0, 4, 7]],
-                    )
-                    viewer_oobbs.append(
-                        viewer.add(
-                            data=oobb_mesh,  # Pointcloud(element._oobb),
-                            name="viewer_oobb",
-                            is_selected=False,
-                            is_visible=show_oobbs,
-                            show_points=True,
-                            show_lines=True,
-                            show_faces=True,
-                            pointcolor=colors[1],
-                            linecolor=Color(1, 1, 1),
-                            facecolor=Color(0, 0, 0),
-                            linewidth=1,
-                            pointsize=point_size,
-                        )
-                    )
 
-                    viewer_convex_hulls.append(
-                        viewer.add(
-                            data=element._convex_hull,
-                            name="viewer_convex_hull",
-                            is_selected=False,
-                            is_visible=show_convex_hulls,
-                            show_points=False,
-                            show_lines=True,
-                            show_faces=True,
-                            pointcolor=Color(0, 0, 0),
-                            linecolor=Color(1, 1, 1),
-                            facecolor=colors[4],
-                            linewidth=1,
-                            pointsize=point_size,
+                        if (element._oobb):
+                            oobb_mesh = Mesh.from_vertices_and_faces(
+                                element._oobb,
+                                [[0, 1, 2, 3], [4, 5, 6, 7], [0, 1, 5, 4], [1, 2, 6, 5], [2, 3, 7, 6], [3, 0, 4, 7]],
+                            )
+                            viewer_oobbs.append(
+                                viewer.add(
+                                    data=oobb_mesh,  # Pointcloud(element._oobb),
+                                    name="viewer_oobb",
+                                    is_selected=False,
+                                    is_visible=show_oobbs,
+                                    show_points=True,
+                                    show_lines=True,
+                                    show_faces=True,
+                                    pointcolor=colors[1],
+                                    linecolor=Color(1, 1, 1),
+                                    facecolor=Color(0, 0, 0),
+                                    linewidth=1,
+                                    pointsize=point_size,
+                                )
+                            )
+
+                    if (element._convex_hull):
+                        viewer_convex_hulls.append(
+                            viewer.add(
+                                data=element._convex_hull,
+                                name="viewer_convex_hull",
+                                is_selected=False,
+                                is_visible=show_convex_hulls,
+                                show_points=False,
+                                show_lines=True,
+                                show_faces=True,
+                                pointcolor=Color(0, 0, 0),
+                                linecolor=Color(1, 1, 1),
+                                facecolor=colors[4],
+                                linewidth=1,
+                                pointsize=point_size,
+                            )
                         )
-                    )
 
                 # --------------------------------------------------------------------------
                 # add fabrication geometry
