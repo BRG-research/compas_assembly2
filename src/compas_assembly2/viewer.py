@@ -74,6 +74,7 @@ class Viewer:
                     # --------------------------------------------------------------------------
                     # add text - indices
                     # --------------------------------------------------------------------------
+
                     text = Text(
                         ",".join(map(str, element.id)),
                         element.local_frame.point + Vector(0, 0, 0.01),
@@ -102,7 +103,8 @@ class Viewer:
                     # --------------------------------------------------------------------------
 
                     text = Text(
-                        str(element.element_type.name),
+                        
+                        element.element_type,
                         element.local_frame.point + Vector(0, 0, 0.01),
                         height=text_height,
                     )
@@ -128,8 +130,8 @@ class Viewer:
                     # --------------------------------------------------------------------------
                     # add simplex
                     # --------------------------------------------------------------------------
-
                     for i in range(len(element.simplex)):
+                        
                         if (
                             isinstance(element.simplex[i], Polyline)
                             or isinstance(element.simplex[i], Line)
@@ -144,6 +146,23 @@ class Viewer:
                                     show_points=True,
                                     show_lines=False,
                                     show_faces=False,
+                                    pointcolor=Color(0, 0, 0),
+                                    linecolor=Color(0, 0, 0),
+                                    facecolor=Color(0.75, 0.75, 0.75),
+                                    linewidth=line_width,
+                                    pointsize=point_size,
+                                )
+                            )
+                        elif(isinstance(element.simplex[i], Mesh)):
+                            viewer_simplices.append(
+                                viewer.add(
+                                    data=element.simplex[i],
+                                    name="viewer_simplex",
+                                    is_selected=False,
+                                    is_visible=show_simplices,
+                                    show_points=True,
+                                    show_lines=True,
+                                    show_faces=True,
                                     pointcolor=Color(0, 0, 0),
                                     linecolor=Color(0, 0, 0),
                                     facecolor=Color(0.75, 0.75, 0.75),

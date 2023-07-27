@@ -1,36 +1,33 @@
 from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import division
-
 import copy
-from compas.geometry import (
-    Frame,
-    Geometry,
-    Transformation,
-    Polyline,
-    Point,
-    Box,
-    Line,
-    Pointcloud,
-    bounding_box,
-    convex_hull,
-)
-from compas.datastructures import Mesh
-from compas.datastructures import mesh_bounding_box
+from compas.geometry import Frame, Geometry, Transformation, Polyline, Point, Box, Line, Pointcloud, bounding_box, convex_hull
+from compas.datastructures import Mesh, mesh_bounding_box
 from compas.data import Data
-from enum import Enum
 
 
-class ElementType(Enum):
-    BLOCK = 10
-    BLOCK_CONCAVE = 11
-    BLOCK_X = 12
-    FRAME = 20
-    FRAME_BENT = 21
-    FRAME_X = 22
-    PLATE = 30
-    SHELL = 31
-    SHELL_X = 32
+class ELEMENT_TYPE:
+    BLOCK = "BLOCK"
+    BLOCK_CONCAVE = "BLOCK_CONCAVE"
+    BLOCK_X = "BLOCK_X"
+    FRAME = "FRAME"
+    FRAME_BENT = "FRAME_BENT"
+    FRAME_X = "FRAME_X"
+    PLATE = "PLATE"
+    SHELL = "SHELL"
+    SHELL_X = "SHELL_X"
+    CUSTOM = "CUSTOM"
+
+    @classmethod
+    def find_element_type(cls, input_string):
+        input_string = input_string.upper()  # Convert input to uppercase for case-insensitive comparison
+        if hasattr(ELEMENT_TYPE, input_string):
+            return getattr(ELEMENT_TYPE, input_string)
+        else:
+            return None
+
+
 
 
 class Element(Data):
@@ -93,13 +90,13 @@ class Element(Data):
 
     def __init__(
         self,
-        element_type=ElementType.BLOCK,
+        element_type=ELEMENT_TYPE.BLOCK,
         id=(0, 1),
         simplex=[],
         display_shapes=[],
         local_frame=Frame.worldXY,
         global_frame=Frame.worldXY,
-        **kwargs,
+        **kwargs
     ):
         # call the inherited Data constructor for json serialization
         super(Element, self).__init__()
@@ -115,9 +112,13 @@ class Element(Data):
         # check if they are valid geometry objects
         # duplicate them and add them geometry list to avoid transformation issues
         self.simplex = []  # geometry, can be meshes, breps, curves, points, etc.
+
         for g in simplex:
-            if isinstance(g, Geometry) or isinstance(g, Mesh):
+            if isinstance(g, Geometry) or isinstance(g, Mesh) :
                 self.simplex.append(g.copy())
+            elif isinstance(g, list) :
+                if len(g) == 3:
+                    self.simplex.append(Point(g[0],g[1],g[2]))
 
         self.display_shapes = []  # geometry, can be meshes, breps, curves, points, etc.
         for g in display_shapes:
@@ -125,8 +126,8 @@ class Element(Data):
                 self.display_shapes.append(g.copy())
 
         # orientation frames
-        self.local_frame = Frame.copy(local_frame) or Frame.worldXY()  # set the local frame of an object
-        self.global_frame = Frame.copy(global_frame) or Frame.worldXY()  # set the global frame of an object
+        self.local_frame = Frame.copy(local_frame) if isinstance(local_frame, Frame) else Frame.worldXY()  # set the local frame of an object
+        self.global_frame = Frame.copy(global_frame) if isinstance(global_frame, Frame) else Frame.worldXY()   # set the global frame of an object
 
         # collision detection, these members are private access them using getters
         self._aabb = []  # XYZ coordinates of 8 points defining a box
@@ -152,10 +153,9 @@ class Element(Data):
     # create the data object from the class properties
     @property
     def data(self):
-
         # call the inherited Data constructor for json serialization
         data = {
-            "element_type": self.element_type.value,
+            "element_type": self.element_type,
             "id": self.id,
             "simplex": self.simplex,
             "display_shapes": self.display_shapes,
@@ -170,7 +170,7 @@ class Element(Data):
         data["convex_hull"] = self._convex_hull
         data["outlines"] = self._outlines
         data["outlines_frames"] = self._outlines_frames
-        
+
         # fabrication | assembly | structure
         data["fabrication"] = self.fabrication
         data["assembly"] = self.assembly
@@ -182,13 +182,13 @@ class Element(Data):
     # vice versa - create the class properties from the data object
     @data.setter
     def data(self, data):
-
         # call the inherited Data constructor for json serialization
         Element.data.fset(self, data)
 
         # main properties
         self.element_type = data["element_type"]
         self.id = data["id"]
+        
         self.simplex = data["simplex"]
         self.display_shapes = data["display_shapes"]
         self.local_frame = data["local_frame"]
@@ -209,16 +209,17 @@ class Element(Data):
 
     @classmethod
     def from_data(cls, data):
-
         """Alternative to None default __init__ parameters."""
-        obj = Element(element_type=ElementType(data["element_type"]),
-                      id=data["id"],
-                      simplex=data["simplex"],
-                      display_shapes=data["display_shapes"],
-                      local_frame=data["local_frame"],
-                      global_frame=data["global_frame"],
-                      **data["attributes"],)
-        
+        obj = Element(
+            element_type=data["element_type"][0],
+            id=data["id"],
+            simplex=data["simplex"],
+            display_shapes=data["display_shapes"],
+            local_frame=data["local_frame"],
+            global_frame=data["global_frame"],
+            **data["attributes"],
+        )
+
         # custom properties
         obj._aabb = data["aabb"]
         obj._oobb = data["oobb"]
@@ -319,17 +320,28 @@ class Element(Data):
         Returns:
             str: The string representation of the Element.
         """
-        return f"""
-(Type: {self.element_type},
- ID: {self.id},
- Minimal Representation Geometries: {self.display_shapes },
- Vizualization Geometries: {self.display_shapes },
- Local Frame: {self.local_frame},
- Global Frame: {self.global_frame},
- Fabrication: {self.fabrication},
- Assembly: {self.assembly},
- Structure: {self.structure},
- Attributes: {self.attributes})"""
+        return """
+# (Type: {0},
+#  ID: {1},
+#  Minimal Representation Geometries: {2},
+#  Vizualization Geometries: {3},
+#  Local Frame: {4},
+#  Global Frame: {5},
+#  Fabrication: {6},
+#  Assembly: {7},
+#  Structure: {8},
+#  Attributes: {9})""".format(
+        self.element_type,
+        self.id,
+        self.display_shapes,
+        self.display_shapes,
+        self.local_frame,
+        self.global_frame,
+        self.fabrication,
+        self.assembly,
+        self.structure,
+        self.attributes
+    )
 
     # ==========================================================================
     # PROPERTIES FOR DIGITAL FABRICATION (OUTPUT)
@@ -350,16 +362,9 @@ class Element(Data):
 
     def copy(self):
         # copy main properties
-        new_instance = self.__class__(
-            self.element_type,
-            self.id,
-            self.display_shapes,
-            self.local_frame,
-            self.global_frame,
-            **self.attributes,
-        )
+        new_instance = self.__class__(self.element_type, self.id, self.display_shapes, self.local_frame, self.global_frame, **self.attributes)
 
-        # deepcopy of the fabrication, assembly and structural information¨
+        # deepcopy of the fabrication, assembly and structural information
         new_instance.fabrication = copy.deepcopy(self.fabrication)
         new_instance.assembly = copy.deepcopy(self.assembly)
         new_instance.structure = copy.deepcopy(self.structure)

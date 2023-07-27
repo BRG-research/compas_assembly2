@@ -1,9 +1,11 @@
 from compas.datastructures import Mesh
 from compas.geometry import Point, Polyline, Box, Translation, Frame, Line, Pointcloud
 import random
-from compas_assembly2.element import Element, ElementType
+from compas_assembly2.element import Element, ELEMENT_TYPE
 from compas_assembly2.viewer import Viewer
 from compas.data import json_dump, json_load  # https://compas.dev/compas/latest/reference/generated/compas.data.Data.html
+import compas_rhino
+
 
 if __name__ == "__main__":
     mesh = Mesh.from_polyhedron(4)
@@ -41,7 +43,7 @@ if __name__ == "__main__":
     geo_2 = [box]
 
     elem_0 = Element(
-        element_type=ElementType.BLOCK,
+        element_type=ELEMENT_TYPE.BLOCK,
         id=(0, 1),
         simplex=[Point(-3, 0, 0)],
         display_shapes=geo_0,
@@ -50,7 +52,7 @@ if __name__ == "__main__":
     )
 
     elem_1 = Element(
-        element_type=ElementType.FRAME,
+        element_type=ELEMENT_TYPE.FRAME,
         id=(0, 2),
         simplex=[Line((0, -2, 0), (0, 2, 0))],
         display_shapes=geo_1,
@@ -59,7 +61,7 @@ if __name__ == "__main__":
     )
 
     elem_2 = Element(
-        element_type=ElementType.PLATE,
+        element_type=ELEMENT_TYPE.PLATE,
         id=(3, 0),
         simplex=[
             Polyline(
@@ -82,10 +84,19 @@ if __name__ == "__main__":
         elem.get_aabb(0, True, True)
     # Viewer.run(elements=elements, viewer_type="view2")
 
-    json_dump(data=elements, fp="tests/data_sets/1_block_beam_plate.json", pretty=True)
-    elements_loaded_from_json = json_load(fp="tests/data_sets/1_block_beam_plate.json")
+    json_dump(data=elements, fp="src/compas_assembly2/data_sets/1_block_beam_plate.json", pretty=True)
+    #elements_loaded_from_json = json_load(fp="src/compas_assembly2/data_sets/1_block_beam_plate.json")
+    elements_loaded_from_json = json_load(fp="src/compas_assembly2/rhino_commands/rhino_command_convert_to_assembly.json")
+    for elem in elements_loaded_from_json:
+        elem.get_aabb(0, True, True)
+        print(elem.element_type)
     Viewer.run(elements=elements_loaded_from_json, viewer_type="view2")
-    # # print before updating the fabrication, assembly, and structural information
+
+
+
+
+    #"../src/compas_assembly2/rhino_commands/rhino_command_convert_to_assembly.json",
+    # print before updating the fabrication, assembly, and structural information
     # print(type(elem))
     # print(elem.get_aabb(0, Frame.worldXY, True))
     # print(elem._oobb)
