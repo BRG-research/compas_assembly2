@@ -316,11 +316,13 @@ class Element(Data):
             self._oobb = self._aabb
 
         # compute the convex hull
-        print( len(points))
+        # use it with caution, it does not work, specially with coplanar points
+        #print( len(points))
+        #print(points)
 
         if compute_convex_hull and len(points) > 2:
             faces = convex_hull(points)
-            print( len(faces))
+            #print( len(faces))
             self._convex_hull = Mesh.from_vertices_and_faces(points, faces)
         else:
             self._convex_hull = None

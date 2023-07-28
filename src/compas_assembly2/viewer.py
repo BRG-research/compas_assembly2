@@ -247,11 +247,7 @@ class Viewer:
                     for i in range(len(element.display_shapes)):
                         if (
                             isinstance(element.display_shapes[i], Mesh)
-                            or isinstance(element.display_shapes[i], Polyline)
-                            or isinstance(element.display_shapes[i], Line)
-                            or isinstance(element.display_shapes[i], Box)
                         ):
-                            
                             viewer_display_shapes.append(
                                 viewer.add(
                                     data=element.display_shapes[i],
@@ -266,6 +262,26 @@ class Viewer:
                                     facecolor=colors[3],#Viewer.string_to_color(element.element_type),#colors[3],
                                     linewidth=1,
                                     opacity=0.333,  # type: ignore
+                                    hide_coplanaredges=True
+                                )
+                            )
+                        elif (isinstance(element.display_shapes[i], Polyline)
+                             or isinstance(element.display_shapes[i], Line)
+                             or isinstance(element.display_shapes[i], Box)
+                        ):
+                            viewer_display_shapes.append(
+                                viewer.add(
+                                    data=element.display_shapes[i],
+                                    name="viewer_display_shape_mesh",
+                                    is_selected=False,
+                                    is_visible=show_display_shapes,
+                                    show_points=False,
+                                    show_lines=True,
+                                    show_faces=True,
+                                    pointcolor=Color(0, 0, 0),
+                                    linecolor=colors[4],
+                                    facecolor=colors[3],#Viewer.string_to_color(element.element_type),#colors[3],
+                                    linewidth=1,
                                 )
                             )
                         elif isinstance(element.display_shapes[i], Pointcloud):
