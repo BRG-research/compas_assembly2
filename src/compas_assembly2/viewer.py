@@ -5,7 +5,7 @@ from compas_assembly2.element import Element, ELEMENT_TYPE
 # ==========================================================================
 # DISPLAY IN DIFFERENT VIEWERS
 # TODO:
-# data-structures of fabrication, assembly, and structure -> noqa: F841
+# data-structures of fabrication, and structure -> noqa: F841
 # add rhino and blender
 # ==========================================================================
 
@@ -45,7 +45,6 @@ class Viewer:
         show_convex_hulls=False,
         show_frames=False,
         show_fabrication=False,
-        show_assembly=False,
         show_structure=False,
         text_height=30,  # type: ignore
         display_axis_scale=0.5,
@@ -87,7 +86,6 @@ class Viewer:
                 viewer_convex_hulls = []
                 viewer_frames = []
                 viewer_fabrication = []  # noqa: F841
-                viewer_assembly = []  # noqa: F841
                 viewer_structure = []  # noqa: F841
 
                 for element in elements:

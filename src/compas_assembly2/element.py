@@ -1,11 +1,7 @@
-from __future__ import print_function
-from __future__ import absolute_import
-from __future__ import division
-import copy
 from compas.geometry import Frame, Geometry, Transformation, Polyline, Point, Box, Line, Pointcloud, bounding_box, convex_hull
 from compas.datastructures import Mesh, mesh_bounding_box
 from compas.data import Data
-from compas.colors import Color
+import copy
 
 class ELEMENT_TYPE:
     BLOCK = "BLOCK"
@@ -26,16 +22,6 @@ class ELEMENT_TYPE:
             return getattr(ELEMENT_TYPE, input_string)
         else:
             return None
-    
-    # @classmethod
-    # def get_color(cls, input_string):
-    #     if(input_string == "BLOCK"):
-    #         return Color(0.75, 0.75, 0.75)
-    #     elif(input_string == "FRAME"):
-    #         return Color(1.00, 0.75, 0.25)
-    #     elif(input_string == "PLATE"):
-    #         return Color(1.00, 0.75, 0.0)
-    #     return Color(0.75, 0.75, 0.75)
 
 
 
@@ -51,7 +37,7 @@ class Element(Data):
 
     This class defines structural elements used in an assembly.
     Each element is defined by inputs: an ID, attributes, geometrical shape, orientation frames.
-    Additionally, it stores output dictionaries for fabrication, assembly, and structural information.
+    Additionally, it stores output dictionaries for fabrication, and structural information.
 
     Parameters
     ----------
@@ -82,20 +68,19 @@ class Element(Data):
                 length=95,
             )
 
-            # print before updating the fabrication, assembly, and structural information
+            # print before updating the fabrication, and structural information
             print(elem)
 
             # Update fabrication information
             elem.fabrication["cut"] = True
             elem.fabrication["drill"] = False
-
-            # Update assembly information
-            elem.assembly["inerstion_direction"] = (0, 0, 1)
+            elem.fabrication["insertion_sequence"] = [1, 2, 3, 4]
+            elem.fabrication["printing_toolpath"] = [(0, 0, 1), (0, 0, 0)]
 
             # Update structural information
             elem.structure["nodes"] = [(0, 0, 1), (0, 0, 0)]
 
-            # print after updating the fabrication, assembly, and structural information
+            # print after updating the fabrication, and structural information
             print(elem)
     """
 
@@ -149,9 +134,8 @@ class Element(Data):
         self._outlines_frames = []  # closed polylines planes - in majority of cases objects will have planar faces
 
         # output for further processing
-        self.fabrication = dict()
-        self.assembly = dict()
-        self.structure = dict()
+        self.fabrication = []
+        self.structure = []
 
     # ==========================================================================
     # DATA
@@ -183,9 +167,8 @@ class Element(Data):
         data["outlines"] = self._outlines
         data["outlines_frames"] = self._outlines_frames
 
-        # fabrication | assembly | structure
+        # fabrication | structure
         data["fabrication"] = self.fabrication
-        data["assembly"] = self.assembly
         data["structure"] = self.structure
 
         # return the data object
@@ -213,9 +196,8 @@ class Element(Data):
         self._outlines = data["outlines"]
         self._outlines_frames = data["outlines_frames"]
 
-        # fabrication | assembly | structure
+        # fabrication | structure
         self.fabrication = data["fabrication"]
-        self.assembly = data["assembly"]
         self.structure = data["structure"]
 
     @classmethod
@@ -238,9 +220,8 @@ class Element(Data):
         obj._outlines = data["outlines"]
         obj._outlines_frames = data["outlines_frames"]
 
-        # fabrication | assembly | structure
+        # fabrication | structure
         obj.fabrication = data["fabrication"]
-        obj.assembly = data["assembly"]
         obj.structure = data["structure"]
 
         # return the object
@@ -354,7 +335,6 @@ class Element(Data):
         self.local_frame,
         self.global_frame,
         self.fabrication,
-        self.assembly,
         self.structure,
         self.attributes
     )
@@ -364,9 +344,6 @@ class Element(Data):
     # ==========================================================================
 
     def get_fabrication(self, key):
-        pass
-
-    def get_assembly(self, key):
         pass
 
     def get_structure(self, key):
@@ -380,9 +357,8 @@ class Element(Data):
         # copy main properties
         new_instance = self.__class__(self.element_type, self.id, self.display_shapes, self.local_frame, self.global_frame, **self.attributes)
 
-        # deepcopy of the fabrication, assembly and structural information
+        # deepcopy of the fabrication, and structural information
         new_instance.fabrication = copy.deepcopy(self.fabrication)
-        new_instance.assembly = copy.deepcopy(self.assembly)
         new_instance.structure = copy.deepcopy(self.structure)
 
         return new_instance

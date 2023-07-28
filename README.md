@@ -13,6 +13,11 @@ A data structure is needed to represent a model consisting of structural element
 ![image](https://github.com/BRG-research/compas_assembly2/assets/18013985/0ce85ba1-2c01-40d5-8a5b-40f017bd787b)
 
 
+## TODO
+
+- [ ] Start developing fabrication class from "fabrication"
+
+
 ## Getting started with this project
 
 ### Setup code editor

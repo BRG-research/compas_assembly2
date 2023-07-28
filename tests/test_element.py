@@ -3,6 +3,7 @@ from compas.geometry import Point, Polyline, Box, Translation, Frame, Line, Poin
 import random
 from compas_assembly2.element import Element, ELEMENT_TYPE
 from compas_assembly2.viewer import Viewer
+from compas_assembly2.fabrication import Fabrication
 from compas.data import json_dump, json_load  # https://compas.dev/compas/latest/reference/generated/compas.data.Data.html
 import compas_rhino
 
@@ -87,9 +88,16 @@ if __name__ == "__main__":
     json_dump(data=elements, fp="src/compas_assembly2/data_sets/1_block_beam_plate.json", pretty=True)
     #elements_loaded_from_json = json_load(fp="src/compas_assembly2/data_sets/1_block_beam_plate.json")
     elements_loaded_from_json = json_load(fp="src/compas_assembly2/rhino_commands/rhino_command_convert_to_assembly.json")
+
+    center = Point(0, 0, 0)
     for elem in elements_loaded_from_json:
-        elem.get_aabb(0, True, True)
-        #print(elem.element_type)
+        center = center + elem.local_frame.point
+        
+    center = center/len(elements_loaded_from_json)
+    for elem in elements_loaded_from_json:
+        polyline = Polyline([center,elem.local_frame.point])
+        fabrication = Fabrication.create_insertion_sequence_from_polyline(0,polyline,False)
+        elem.fabrication[fabrication.type] = fabrication
     Viewer.run(elements=elements_loaded_from_json, viewer_type="view2")
 
 
@@ -111,7 +119,7 @@ if __name__ == "__main__":
     # # Update structural information
     # elem.structure["nodes"] = [(0, 0, 1), (0, 0, 0)]
 
-    # # print after updating the fabrication, assembly, and structural information
+    # # print after updating the fabrication, and structural information
     # # print(elem)
 
     # print(elem)
