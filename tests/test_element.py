@@ -89,7 +89,7 @@ if __name__ == "__main__":
     elements_loaded_from_json = json_load(fp="src/compas_assembly2/rhino_commands/rhino_command_convert_to_assembly.json")
     for elem in elements_loaded_from_json:
         elem.get_aabb(0, True, True)
-        print(elem.element_type)
+        #print(elem.element_type)
     Viewer.run(elements=elements_loaded_from_json, viewer_type="view2")
 
 

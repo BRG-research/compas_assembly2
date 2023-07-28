@@ -3,7 +3,8 @@ from rhinoscriptsyntax import rhutil  # noqa
 import Rhino
 import compas_rhino
 from compas.datastructures import Mesh
-from compas.geometry import Point, Polyline, Box, Translation, Frame, Line, Pointcloud, Polygon, Vector
+from compas.geometry import Point, Polyline, Box, Translation, Frame, Line, Pointcloud, Polygon, Vector, Plane, Transformation
+from compas.geometry import centroid_points, cross_vectors, bounding_box, distance_point_point, distance_point_plane_signed
 import random
 from compas_assembly2.viewer import Viewer
 from compas_assembly2.element import Element, ELEMENT_TYPE
@@ -15,9 +16,6 @@ ids = rs.GetObjects("Select objects", preselect=True, select=True)
 # ==========================================================================
 # TODO
 # ==========================================================================
-# get object groups, sort objects in a tree based on group names
-# write objects information into json or xml
-# read in compas_assembly and display it in python
 # build display pipeline in rhino, where button acts as radio buttons in compas_assembly2
 
 # ==========================================================================
@@ -72,17 +70,15 @@ for i in ids:
 
 def partition_by_common_group_id(objects_list):
     
-    
-    
     # Manually count the occurrences of each integer ID in group_ids of all objects
     group_id_counts = {}
     for obj in objects_list:
         for group_id in obj.group_ids:
             group_id_counts[group_id] = group_id_counts.get(group_id, 0) + 1
-
+    
     # Sort the objects based on the frequency of integer IDs in descending order
     objects_list.sort(key=lambda obj: sum(group_id_counts[group_id] for group_id in obj.group_ids), reverse=True)
-
+    
     # Create a dictionary to group the objects based on the most common integer IDs
     group_count = Rhino.RhinoDoc.ActiveDoc.Groups.Count
     print("TOTAL GROUP_COUNT: ", group_count)
@@ -127,23 +123,222 @@ class compas_assembly_user_input:
 class conversions:
     
     @classmethod
-    def find_perpendicular_vectors(cls, normalPointA, normalPointB):
-        # Calculate the direction vector of the plane
-        direction_vector = Vector.from_start_end(normalPointA, normalPointB)
-    
-        # Calculate the x-axis vector by taking the cross product of the normal vector and the direction vector
-        normal_vector = Vector(*normalPointA)  # Use one of the normal points
-        x_axis_vector = normal_vector.cross(direction_vector)
-    
-        # Calculate the y-axis vector by taking the cross product of the normal vector and the x-axis vector
-        y_axis_vector = normal_vector.cross(x_axis_vector)
-    
-        # Normalize the vectors (optional step, but makes them unit vectors)
-        x_axis_vector.unitize()
-        y_axis_vector.unitize()
-    
-        return x_axis_vector, y_axis_vector
+    def get_frame(cls, _polyline, _orientation_point = None):
+        """ create a frame from a polyline """
         
+        # create a normal by averaging the cross-products of a polyline
+        normal = Vector(0, 0, 0)
+        count = len(_polyline)
+        for i in range(count - 1):
+            num = ((i - 1) + count - 1) % (count - 1)
+            item1 = ((i + 1) + count - 1) % (count - 1)
+            point3d = _polyline[num]
+            point3d1 = _polyline[item1]
+            item2 = _polyline[i]
+            normal += cross_vectors(item2 - point3d, point3d1 - item2)
+        normal.unitize()
+        
+        # get the longest edge
+        longest_segment_length = 0.0
+        longest_segment_start = None
+        longest_segment_end = None
+    
+        for i in range(len(_polyline)-1):
+            point1 = _polyline[i]
+            point2 = _polyline[(i + 1) % len(_polyline)]  # To create a closed polyline, connect the last point to the first one.
+    
+            segment_length = distance_point_point(point1, point2)
+    
+            if segment_length > longest_segment_length:
+                longest_segment_length = segment_length
+                longest_segment_start = point1
+                longest_segment_end = point2
+        
+        
+        # create x and y-axes for the frame
+        x_axis = Vector.from_start_end(longest_segment_start, longest_segment_end)#Vector.from_start_end(_polyline[0], _polyline[1])
+        x_axis.unitize()
+        y_axis = cross_vectors(normal,x_axis)
+        y_axis = Vector(y_axis[0],y_axis[1],y_axis[2])
+        # create the frame
+        center = centroid_points(_polyline.points)
+        frame = Frame(center, x_axis, y_axis)
+        if(_orientation_point is not None):
+            signed_distance = distance_point_plane_signed(_orientation_point,Plane.from_frame(frame))
+            
+            if(signed_distance  < -0.001):
+                frame = Frame(frame.point,-x_axis,y_axis)
+        
+        # output
+        return frame
+    
+    @staticmethod
+    def is_clockwise_closed_polyline_on_xy_plane(polygon):
+        """ check if a polyline is oriented clockwise or anti-clockwise """
+        n = len(polygon)-1
+        signed_area = 0
+    
+        for i in range(n):
+            x1, y1 = polygon[i][0],polygon[i][1]
+            x2, y2 = polygon[(i + 1) % n][0],polygon[(i + 1) % n][1]  # Connect last vertex to the first vertex
+            signed_area += (x1 * y2 - x2 * y1)
+        
+        sum_val = 0
+        for i in range(len(polygon) - 1):
+            sum_val = sum_val + (polygon[i + 1][0] - polygon[i][0]) * (polygon[i + 1][1] + polygon[i][1])
+        
+        return sum_val > 0
+    
+    
+    @classmethod
+    def sort_polyline_pairs(cls, plines):
+        """ given a list of polylines sort them into top and bottom lists """
+        #return plines, plines
+        # considers types: LineCurve, NurbsCurve, PolylineCurve
+        if len(plines) % 2 != 0:
+            return list_of_curves
+        
+        # Sort polylines based on bounding box diagonal
+        diagonals = []
+        for i in range(len(plines)):
+            pts = bounding_box(plines[i].points)
+            diagonals.append(distance_point_point(pts[0], pts[6]))
+        
+        diagonals, plines = zip(*sorted(zip(diagonals, plines), reverse=True))
+        plines = list(plines)
+        
+        # orient all polylines to the first outline's plane       
+        frame_2d = Frame([0,0,0],[1,0,0],[0,1,0])
+        
+        
+        frame_3d = conversions.get_frame(plines[0],plines[1][0])
+        T = Transformation.from_frame_to_frame(frame_3d, frame_2d)
+        I = Transformation.from_frame_to_frame(frame_2d, frame_3d)
+        frame_3d_ = conversions.get_frame(plines[0],plines[0][0])
+        
+        #print(frame_3d_.point, plines[0][0])
+        point = plines[0][0]
+        #point = T * point
+        #point.transform(T)
+        for i in range(len(plines)):
+            plines[i] = plines[i].transformed(T)
+        # on the first outline's plane:
+        # a) make all polylines orientation anti-clockwise
+        # b) split the plines list into two lists: top and bottom, based on the distance to the first outline's plane
+        # c) in these lists, make order the plines based on the longest bounding box diagonal
+        # d) orient the not the first ones anticlockwise to indicate holes of polygons
+        
+        # Orient bottom_polylines anticlockwise to indicate holes of polygons
+        # Reverse the first two ones
+        for i in range(1, len(plines)):
+            is_clock_wise = conversions.is_clockwise_closed_polyline_on_xy_plane(plines[i])
+            
+            if (is_clock_wise):
+                plines[i] = Polyline(reversed(plines[i].points))
+        
+        plines[0] = Polyline(reversed(plines[0].points))
+        plines[1] = Polyline(reversed(plines[1].points))
+        
+        # Split plines into top and bottom based on their distance to the origin point
+        positions = []
+        for i in range(len(plines)):
+            positions.append(abs(plines[i][0][2]))
+        
+        positions, plines = zip(*sorted(zip(positions, plines)))
+        
+        
+        first_half, second_half = plines[:len(plines)//2], plines[len(plines)//2:]
+        #first_half = plines[::2]
+        #second_half = plines[1::2]
+        
+        # Sort the second list polyline based on the first list order
+        second_half_sorted = []
+        
+        for i in range(len(second_half)):
+            
+            distances = []
+            
+            for j in range(len(first_half)):
+                distances.append((i, distance_point_point(second_half[i][0],first_half[i][0])))
+            
+            sorted_distances = sorted(distances, key=lambda x: x[1])
+            second_half_sorted.append(second_half[sorted_distances[0][0]])
+        
+        # merge the two lists into one
+        merged = []
+        merged.extend(first_half)
+        merged.extend(second_half_sorted)
+        
+        # Orient the plines back to their original position using the inverse matrix
+        # the half is just a reference so no need to transform it twice
+        
+        for i in range(len(merged)):
+            merged[i].transform(I)
+        """
+        for i in range(len(first_half)):
+            first_half[i].transform(I)
+        """
+        return first_half, merged, frame_3d #[first_half[0]] 
+    
+    
+    @classmethod
+    def perpendicular_to(cls, _o, _v):
+        v = Vector.from_start_end(_o, _v)
+        i, j, k = 0, 0, 0
+        a, b = 0.0, 0.0
+        k = 2
+        
+        if abs(v.y) > abs(v.x):
+            if abs(v.z) > abs(v.y):
+                # |v.z| > |v.y| > |v.x|
+                i = 2
+                j = 1
+                k = 0
+                a = v.z
+                b = -v.y
+            elif abs(v.z) >= abs(v.x):
+                # |v.y| >= |v.z| >= |v.x|
+                i = 1
+                j = 2
+                k = 0
+                a = v.y
+                b = -v.z
+            else:
+                # |v.y| > |v.x| > |v.z|
+                i = 1
+                j = 0
+                k = 2
+                a = v.y
+                b = -v.x
+        elif abs(v.z) > abs(v.x):
+            # |v.z| > |v.x| >= |v.y|
+            i = 2
+            j = 0
+            k = 1
+            a = v.z
+            b = -v.x
+        elif abs(v.z) > abs(v.y):
+            # |v.x| >= |v.z| > |v.y|
+            i = 0
+            j = 2
+            k = 1
+            a = v.x
+            b = -v.z
+        else:
+            # |v.x| >= |v.y| >= |v.z|
+            i = 0
+            j = 1
+            k = 2
+            a = v.x
+            b = -v.y
+        
+        perp = Vector(0,0,0)
+        perp[i] = b
+        perp[j] = a
+        perp[k] = 0.0
+        return perp, v.cross(perp)
+        #return True if a != 0.0 else False
+    
     @classmethod
     def from_rhino_frame(cls,line_nurbs_polyline_curve):
         # considers types: LineCurve, NurbsCurve, PolylineCurve
@@ -162,7 +357,7 @@ class conversions:
             if(counter == 2):
                 return Frame(points[0],points[1]-points[0],points[2]-points[0])
             elif(counter == 1):
-                x_axis_vector, y_axis_vector, conversions.find_perpendicular_vectors(points[0],points[1])
+                x_axis_vector, y_axis_vector, conversions.perpendicular_to(points[0],points[1])
                 return Frame(points[0],x_axis_vector, y_axis_vector)
             else:
                 return Frame([0, 0, 0], [1, 0, 0], [0, 1, 0])
@@ -185,21 +380,33 @@ class conversions:
     @classmethod
     def from_rhino_mesh(cls,mesh):
         
-        polygons = []
         
-        for i in range(mesh.Ngons.Count):
-            vertices = mesh.Ngons.GetNgon(i).BoundaryVertexIndexList()
+        compas_mesh = Mesh()
+        if(mesh.Ngons.Count == 0):
+            for vertex in mesh.Vertices:
+                compas_mesh.add_vertex(attr_dict=dict(x=float(vertex.X), y=float(vertex.Y), z=float(vertex.Z)))
             
-            points =  []
-            for v in vertices:
-                p = mesh.Vertices[v]
-                points.append([p.X,p.Y,p.Z])
-            points.append(points[0])
+            for face in mesh.Faces:
+                if face.A == face.D or face.C == face.D:
+                    compas_mesh.add_face([face.A, face.B, face.C])
+                else:
+                    compas_mesh.add_face([face.A, face.B, face.C, face.D])
             
-            
-            polygons.append(Polygon(points))
+        else:
+            polygons = []
+            for i in range(mesh.Ngons.Count):
+                vertices = mesh.Ngons.GetNgon(i).BoundaryVertexIndexList()
+                
+                points =  []
+                for v in vertices:
+                    p = mesh.Vertices[v]
+                    points.append([p.X,p.Y,p.Z])
+                points.append(points[0])
+                polygons.append(Polygon(points))
         
-        compas_mesh = Mesh.from_polygons(polygons)
+            compas_mesh = Mesh.from_polygons(polygons)
+        #compas_mesh = Mesh.from_polylines(polylines)
+        print(compas_mesh)
         return compas_mesh
 
 # ==========================================================================
@@ -255,7 +462,7 @@ for group_id, subsequent_groups in grouped_objects.items():
     # --------------------------------------------------------------------------
     layer_name = subsequent_groups[0].layer_name
     processed_layer_name = process_string(layer_name)
-    #print(processed_layer_name)
+    print(processed_layer_name)
     
     # --------------------------------------------------------------------------
     # create objects, the assignment of right properties is dependent on user
@@ -269,7 +476,7 @@ for group_id, subsequent_groups in grouped_objects.items():
     for obj in subsequent_groups:
         layer_name = obj.layer_name
         processed_layer_name = process_string(layer_name)
-        print(processed_layer_name, layer_name)
+        #print(processed_layer_name, layer_name)
         # --------------------------------------------------------------------------
         # simplex
         # --------------------------------------------------------------------------
@@ -329,31 +536,34 @@ for group_id, subsequent_groups in grouped_objects.items():
             elif isinstance(o.simplex[0], Polyline):
                     if(o.simplex[0].is_closed()):
                         o.local_frame = Frame(o.simplex[0][0], [1,0,0], [0,1,0])
-                        #print("is_closed")
                     else:
-                        x_axis_vector, y_axis_vector = conversions.find_perpendicular_vectors(o.simplex[0][0],o.simplex[0][1])
-                        o.local_frame = Frame(o.simplex[0][0],x_axis_vector, y_axis_vector)
-                        #print("is_open")
+                        x_axis_vector, y_axis_vector = conversions.perpendicular_to(o.simplex[0][0],o.simplex[0][1])
+                        o.local_frame = Frame((o.simplex[0][0]+o.simplex[0][1])*0.5,x_axis_vector, y_axis_vector)
         elif len(o.display_shapes)>0:
             if isinstance(o.display_shapes[0], Mesh):
-                #print(o.display_shapes[0])
                 center = o.display_shapes[0].centroid()
                 o.simplex.append(center)
-                o.local_frame = Frame(center, [1,0,0], [0,1,0])
+                o.local_frame = Frame(center, [1,0,0], [0 ,1,0])
             elif isinstance(o.display_shapes[0], Polyline):
                     if(o.display_shapes[0].is_closed()):
-                        
                         o.local_frame = Frame(o.display_shapes[0][0], [1,0,0], [0,1,0])
-                        #print("is_closed")
                     else:
-                        x_axis_vector, y_axis_vector = conversions.find_perpendicular_vectors(o.display_shapes[0][0],o.display_shapes[0][1])
+                        x_axis_vector, y_axis_vector = conversions.perpendicular_to (o.display_shapes[0][0],o.display_shapes[0][1])
                         o.local_frame = Frame(o.display_shapes[0][0],x_axis_vector, y_axis_vector)
-                        vprint("is_open")
+                        
+    # --------------------------------------------------------------------------
+    # special case for plates, where the simpices must be sorted and split
+    # --------------------------------------------------------------------------
+    #print(o.element_type)
+    if(o.element_type == "PLATE"):
+        first_half, merged, frame = conversions.sort_polyline_pairs(o.simplex)
+        o.simplex = first_half
+        o.local_frame = frame
     
     # --------------------------------------------------------------------------
     # collect the element instance
     # --------------------------------------------------------------------------
-    
+    #print(o)
     elements.append(o)
 
 

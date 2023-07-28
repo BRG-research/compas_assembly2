@@ -5,7 +5,7 @@ import copy
 from compas.geometry import Frame, Geometry, Transformation, Polyline, Point, Box, Line, Pointcloud, bounding_box, convex_hull
 from compas.datastructures import Mesh, mesh_bounding_box
 from compas.data import Data
-
+from compas.colors import Color
 
 class ELEMENT_TYPE:
     BLOCK = "BLOCK"
@@ -26,6 +26,17 @@ class ELEMENT_TYPE:
             return getattr(ELEMENT_TYPE, input_string)
         else:
             return None
+    
+    # @classmethod
+    # def get_color(cls, input_string):
+    #     if(input_string == "BLOCK"):
+    #         return Color(0.75, 0.75, 0.75)
+    #     elif(input_string == "FRAME"):
+    #         return Color(1.00, 0.75, 0.25)
+    #     elif(input_string == "PLATE"):
+    #         return Color(1.00, 0.75, 0.0)
+    #     return Color(0.75, 0.75, 0.75)
+
 
 
 
@@ -104,6 +115,7 @@ class Element(Data):
         # indexing + attributes
         self.id = (id,) if isinstance(id, int) else id  # tuple e.g. (0, 1) or (1, 5, 9)
         self.element_type = element_type  # type of the element, e.g., block, beam, plate, node, etc.
+        print("element_type", element_type)
         self.attributes = {}  # set the attributes of an object
         self.attributes.update(kwargs)  # update the attributes of with the kwargs
 
@@ -183,7 +195,6 @@ class Element(Data):
     @data.setter
     def data(self, data):
         # call the inherited Data constructor for json serialization
-        Element.data.fset(self, data)
 
         # main properties
         self.element_type = data["element_type"]
@@ -211,7 +222,7 @@ class Element(Data):
     def from_data(cls, data):
         """Alternative to None default __init__ parameters."""
         obj = Element(
-            element_type=data["element_type"][0],
+            element_type=data["element_type"],
             id=data["id"],
             simplex=data["simplex"],
             display_shapes=data["display_shapes"],
@@ -305,8 +316,11 @@ class Element(Data):
             self._oobb = self._aabb
 
         # compute the convex hull
+        print( len(points))
+
         if compute_convex_hull and len(points) > 2:
             faces = convex_hull(points)
+            print( len(faces))
             self._convex_hull = Mesh.from_vertices_and_faces(points, faces)
         else:
             self._convex_hull = None

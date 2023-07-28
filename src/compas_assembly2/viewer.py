@@ -1,7 +1,7 @@
 from compas.geometry import Polyline, Point, Box, Line, Vector, Pointcloud
 from compas.datastructures import Mesh
 from compas.colors import Color
-
+from compas_assembly2.element import Element, ELEMENT_TYPE
 # ==========================================================================
 # DISPLAY IN DIFFERENT VIEWERS
 # TODO:
@@ -11,6 +11,25 @@ from compas.colors import Color
 
 
 class Viewer:
+
+    @staticmethod
+    def string_to_color(input_string):
+        # Generate a hash value from the input string
+        hash_value = hash(input_string)
+
+        # Ensure the hash value is positive (hash() can return negative values)
+        hash_value = abs(hash_value)
+
+        # Extract RGB components from the hash value
+        red = hash_value % 256
+        green = (hash_value // 256) % 256
+        blue = (hash_value // (256 ** 2)) % 256
+
+        # Create a compas color
+        compas_color = Color(red / 255.0, green / 255.0, blue / 255.0)
+
+        return compas_color
+
     @staticmethod
     def run(
         elements=[],
@@ -30,8 +49,8 @@ class Viewer:
         show_structure=False,
         text_height=30,  # type: ignore
         display_axis_scale=0.5,
-        point_size=14,
-        line_width=4,
+        point_size=8,
+        line_width=2,
         colors=[
             Color(0.929, 0.082, 0.498),
             Color(0.129, 0.572, 0.815),
@@ -44,6 +63,7 @@ class Viewer:
             try:
                 from compas_view2.app import App
                 from compas_view2.shapes import Text
+                from compas_view2.collections import Collection
 
             except ImportError:
                 print("compas_view2 is not installed. Skipping the code. ---> Use pip install compas_view <---")
@@ -56,7 +76,7 @@ class Viewer:
                     enable_sidebar=True,
                     width=width,
                     height=height,
-                    show_grid=False,
+                    show_grid=True,
                 )
                 viewer_indices = []
                 viewer_types = []
@@ -92,7 +112,7 @@ class Viewer:
                             show_faces=False,
                             pointcolor=Color(0, 0, 0),
                             linecolor=Color(0, 0, 0),
-                            facecolor=Color(0.75, 0.75, 0.75),
+                            facecolor=Color(0.85, 0.85, 0.85),
                             linewidth=line_width,
                             pointsize=point_size,
                         )
@@ -135,8 +155,7 @@ class Viewer:
                         if (
                             isinstance(element.simplex[i], Polyline)
                             or isinstance(element.simplex[i], Line)
-                            or isinstance(element.simplex[i], Point)
-                        ):
+                        ):  
                             viewer_simplices.append(
                                 viewer.add(
                                     data=element.simplex[i],
@@ -146,8 +165,58 @@ class Viewer:
                                     show_points=True,
                                     show_lines=False,
                                     show_faces=False,
-                                    pointcolor=Color(0, 0, 0),
-                                    linecolor=Color(0, 0, 0),
+                                    pointcolor=colors[4],
+                                    linecolor=colors[4],
+                                    facecolor=Color(0.75, 0.75, 0.75),
+                                    linewidth=line_width,
+                                    pointsize=point_size,
+                                )
+                            )
+                            """
+                            lines = []
+                            for j in range(len(element.simplex[i].points) - 1):
+                                # Given points
+                                point_j = element.simplex[i].points[j]
+                                point_j_plus_1 = element.simplex[i].points[j + 1]
+                                vector = Vector.from_start_end(point_j, point_j_plus_1)
+                                vector = vector.unitized()
+                                vector = vector.scaled(0.1)
+                                
+                                #interpolated_point = (point_j[0] + 0.9 * (point_j_plus_1[0] - point_j[0]),
+                                #point_j[1] + 0.9 * (point_j_plus_1[1] - point_j[1]))
+
+                                #lines.append(Line(point_j, point_j_plus_1-vector))
+
+                            
+                                viewer_simplices.append(
+                                    viewer.add(
+                                        data=Line(point_j, point_j_plus_1-vector),
+                                        name="viewer_simplex",
+                                        is_selected=False,
+                                        is_visible=show_simplices,
+                                        show_points=True,
+                                        show_lines=False,
+                                        show_faces=False,
+                                        pointcolor=Color(0, 0, 0),
+                                        linecolor=Color(0, 0, 0),
+                                        facecolor=Color(0.75, 0.75, 0.75),
+                                        linewidth=line_width,
+                                        pointsize=point_size,
+                                    )
+                                )
+                            """
+                        elif(isinstance(element.simplex[i], Point)):
+                            viewer_simplices.append(
+                                viewer.add(
+                                    data=element.simplex[i],
+                                    name="viewer_simplex",
+                                    is_selected=False,
+                                    is_visible=show_simplices,
+                                    show_points=True,
+                                    show_lines=False,
+                                    show_faces=False,
+                                    pointcolor=colors[4],
+                                    linecolor=colors[4],
                                     facecolor=Color(0.75, 0.75, 0.75),
                                     linewidth=line_width,
                                     pointsize=point_size,
@@ -163,8 +232,8 @@ class Viewer:
                                     show_points=True,
                                     show_lines=True,
                                     show_faces=True,
-                                    pointcolor=Color(0, 0, 0),
-                                    linecolor=Color(0, 0, 0),
+                                    pointcolor=colors[4],
+                                    linecolor=colors[4],
                                     facecolor=Color(0.75, 0.75, 0.75),
                                     linewidth=line_width,
                                     pointsize=point_size,
@@ -182,6 +251,7 @@ class Viewer:
                             or isinstance(element.display_shapes[i], Line)
                             or isinstance(element.display_shapes[i], Box)
                         ):
+                            
                             viewer_display_shapes.append(
                                 viewer.add(
                                     data=element.display_shapes[i],
@@ -193,9 +263,9 @@ class Viewer:
                                     show_faces=True,
                                     pointcolor=Color(0, 0, 0),
                                     linecolor=colors[4],
-                                    facecolor=colors[3],
-                                    linewidth=2,
-                                    opacity=0.75,  # type: ignore
+                                    facecolor=colors[3],#Viewer.string_to_color(element.element_type),#colors[3],
+                                    linewidth=1,
+                                    opacity=0.333,  # type: ignore
                                 )
                             )
                         elif isinstance(element.display_shapes[i], Pointcloud):
