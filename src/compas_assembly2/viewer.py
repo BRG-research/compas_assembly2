@@ -1,7 +1,9 @@
-from compas.geometry import Polyline, Point, Box, Line, Vector, Pointcloud
+from compas.geometry import Polyline, Point, Box, Line, Vector, Pointcloud, Transformation, Translation, Frame, Quaternion
 from compas.datastructures import Mesh
 from compas.colors import Color
 from compas_assembly2.element import Element, ELEMENT_TYPE
+from compas_assembly2.fabrication import Fabrication, FABRICATION_TYPES
+import math
 # ==========================================================================
 # DISPLAY IN DIFFERENT VIEWERS
 # TODO:
@@ -36,10 +38,11 @@ class Viewer:
         viewer_type="view2-0_rhino-1_blender-2",
         width=1920,
         height=1200,
+        show_grid=False,
         show_indices=False,
         show_types=False,
         show_simplices=True,
-        show_display_shapes=False,
+        show_display_shapes=True,
         show_aabbs=False,
         show_oobbs=False,
         show_convex_hulls=False,
@@ -75,33 +78,39 @@ class Viewer:
                     enable_sidebar=True,
                     width=width,
                     height=height,
-                    show_grid=True,
+                    show_grid=show_grid,
                 )
-                viewer_indices = []
-                viewer_types = []
-                viewer_simplices = []
-                viewer_display_shapes = []
-                viewer_aabbs = []
-                viewer_oobbs = []
-                viewer_convex_hulls = []
-                viewer_frames = []
-                viewer_fabrication = []  # noqa: F841
-                viewer_structure = []  # noqa: F841
+                
+                viewer_objects = {
+                    "viewer_indices":[], 
+                    "viewer_types":[], 
+                    "viewer_simplices":[], 
+                    "viewer_display_shapes":[], 
+                    "viewer_local_frames":[], 
+                    "viewer_global_frames":[], 
+                    "viewer_aabbs":[], 
+                    "viewer_oobbs":[], 
+                    "viewer_convex_hulls":[], 
+                    "viewer_fabrication":[], 
+                    "viewer_structure":[],
+                    "viewer_all":[]}
+
 
                 for element in elements:
                     # --------------------------------------------------------------------------
                     # add text - indices
                     # --------------------------------------------------------------------------
+                    element_id = str(element.id)
 
                     text = Text(
                         ",".join(map(str, element.id)),
                         element.local_frame.point + Vector(0, 0, 0.01),
                         height=text_height,
                     )
-                    viewer_indices.append(
-                        viewer.add(
+
+                    o = viewer.add(
                             data=text,
-                            name="viewer_text",
+                            name=element_id,
                             color=colors[0],
                             is_selected=False,
                             is_visible=show_indices,
@@ -114,7 +123,8 @@ class Viewer:
                             linewidth=line_width,
                             pointsize=point_size,
                         )
-                    )
+                    
+                    viewer_objects["viewer_indices"].append(o)
 
                     # --------------------------------------------------------------------------
                     # add text - types
@@ -126,11 +136,9 @@ class Viewer:
                         element.local_frame.point + Vector(0, 0, 0.01),
                         height=text_height,
                     )
-
-                    viewer_types.append(
-                        viewer.add(
+                    o = viewer.add(
                             data=text,
-                            name="viewer_types",
+                            name=element_id,
                             color=colors[1],
                             is_selected=False,
                             is_visible=show_types,
@@ -143,7 +151,8 @@ class Viewer:
                             linewidth=line_width,
                             pointsize=point_size,
                         )
-                    )
+
+                    viewer_objects["viewer_types"].append(o)
 
                     # --------------------------------------------------------------------------
                     # add simplex
@@ -154,10 +163,9 @@ class Viewer:
                             isinstance(element.simplex[i], Polyline)
                             or isinstance(element.simplex[i], Line)
                         ):  
-                            viewer_simplices.append(
-                                viewer.add(
+                            o = viewer.add(
                                     data=element.simplex[i],
-                                    name="viewer_simplex",
+                                    name=element_id,
                                     is_selected=False,
                                     is_visible=show_simplices,
                                     show_points=True,
@@ -169,7 +177,8 @@ class Viewer:
                                     linewidth=line_width,
                                     pointsize=point_size,
                                 )
-                            )
+
+                            viewer_objects["viewer_simplices"].append( o)
                             """
                             lines = []
                             for j in range(len(element.simplex[i].points) - 1):
@@ -204,10 +213,9 @@ class Viewer:
                                 )
                             """
                         elif(isinstance(element.simplex[i], Point)):
-                            viewer_simplices.append(
-                                viewer.add(
+                            o = viewer.add(
                                     data=element.simplex[i],
-                                    name="viewer_simplex",
+                                    name=element_id,
                                     is_selected=False,
                                     is_visible=show_simplices,
                                     show_points=True,
@@ -219,12 +227,11 @@ class Viewer:
                                     linewidth=line_width,
                                     pointsize=point_size,
                                 )
-                            )
+                            viewer_objects["viewer_simplices"].append( o)
                         elif(isinstance(element.simplex[i], Mesh)):
-                            viewer_simplices.append(
-                                viewer.add(
+                            o = viewer.add(
                                     data=element.simplex[i],
-                                    name="viewer_simplex",
+                                    name=element_id,
                                     is_selected=False,
                                     is_visible=show_simplices,
                                     show_points=True,
@@ -236,7 +243,7 @@ class Viewer:
                                     linewidth=line_width,
                                     pointsize=point_size,
                                 )
-                            )
+                            viewer_objects["viewer_simplices"].append( o)
 
                     # --------------------------------------------------------------------------
                     # add display shapes
@@ -246,10 +253,11 @@ class Viewer:
                         if (
                             isinstance(element.display_shapes[i], Mesh)
                         ):
-                            viewer_display_shapes.append(
-                                viewer.add(
+                            
+
+                            o = viewer.add(
                                     data=element.display_shapes[i],
-                                    name="viewer_display_shape_mesh",
+                                    name=element_id,
                                     is_selected=False,
                                     is_visible=show_display_shapes,
                                     show_points=False,
@@ -260,17 +268,18 @@ class Viewer:
                                     facecolor=colors[3],#Viewer.string_to_color(element.element_type),#colors[3],
                                     linewidth=1,
                                     opacity=0.333,  # type: ignore
-                                    hide_coplanaredges=True
+                                    hide_coplanaredges=True,
                                 )
-                            )
+                            
+                            viewer_objects["viewer_display_shapes"].append( o)
+
                         elif (isinstance(element.display_shapes[i], Polyline)
                              or isinstance(element.display_shapes[i], Line)
                              or isinstance(element.display_shapes[i], Box)
                         ):
-                            viewer_display_shapes.append(
-                                viewer.add(
+                            o = viewer.add(
                                     data=element.display_shapes[i],
-                                    name="viewer_display_shape_mesh",
+                                    name=element_id,
                                     is_selected=False,
                                     is_visible=show_display_shapes,
                                     show_points=False,
@@ -281,12 +290,11 @@ class Viewer:
                                     facecolor=colors[3],#Viewer.string_to_color(element.element_type),#colors[3],
                                     linewidth=1,
                                 )
-                            )
+                            viewer_objects["viewer_display_shapes"].append( o)
                         elif isinstance(element.display_shapes[i], Pointcloud):
-                            viewer_display_shapes.append(
-                                viewer.add(
+                            o = viewer.add(
                                     data=element.display_shapes[i],
-                                    name="viewer_display_shape_mesh",
+                                    name=element_id,
                                     is_selected=False,
                                     is_visible=show_display_shapes,
                                     show_points=True,
@@ -298,25 +306,14 @@ class Viewer:
                                     linewidth=0,
                                     pointsize=2,
                                 )
-                            )
+                            
+                            viewer_objects["viewer_display_shapes"].append( o)
 
                     # --------------------------------------------------------------------------
                     # add frames
                     # --------------------------------------------------------------------------
 
-                    frames_lines = [
-                        Line(
-                            element.local_frame.point,
-                            element.local_frame.point + element.local_frame.xaxis * display_axis_scale,
-                        ),
-                        Line(
-                            element.local_frame.point,
-                            element.local_frame.point + element.local_frame.yaxis * display_axis_scale,
-                        ),
-                        Line(
-                            element.local_frame.point,
-                            element.local_frame.point + element.local_frame.zaxis * display_axis_scale,
-                        ),
+                    local_frames_lines = [
                         Line(
                             element.global_frame.point,
                             element.global_frame.point + element.global_frame.xaxis * display_axis_scale * 0.5,
@@ -331,11 +328,25 @@ class Viewer:
                         ),
                     ]
 
-                    for i in range(len(frames_lines)):
-                        viewer_frames.append(
-                            viewer.add(
-                                frames_lines[i],
-                                name="viewer_frames",
+                    global_frames_lines = [
+                        Line(
+                            element.local_frame.point,
+                            element.local_frame.point + element.local_frame.xaxis * display_axis_scale,
+                        ),
+                        Line(
+                            element.local_frame.point,
+                            element.local_frame.point + element.local_frame.yaxis * display_axis_scale,
+                        ),
+                        Line(
+                            element.local_frame.point,
+                            element.local_frame.point + element.local_frame.zaxis * display_axis_scale,
+                        )
+                    ]
+
+                    for i in range(len(local_frames_lines)):
+                        o = viewer.add(
+                                local_frames_lines[i],
+                                name=element_id,
                                 is_selected=False,
                                 is_visible=show_frames,
                                 show_points=False,
@@ -347,7 +358,25 @@ class Viewer:
                                 linewidth=line_width,
                                 # u=16,
                             )
-                        )
+                        viewer_objects["viewer_local_frames"].append( o)
+
+
+                    for i in range(len(global_frames_lines)):
+                        o = viewer.add(
+                                global_frames_lines[i],
+                                name=element_id,
+                                is_selected=False,
+                                is_visible=show_frames,
+                                show_points=False,
+                                show_lines=False,
+                                show_faces=True,
+                                pointcolor=Color(1, 0, 0),
+                                linecolor=colors[i % 3],
+                                facecolor=colors[i % 3],
+                                linewidth=line_width,
+                                # u=16,
+                            )
+                        viewer_objects["viewer_global_frames"].append( o)
 
                     # --------------------------------------------------------------------------
                     # add aabb | oobb | convex hull
@@ -358,10 +387,9 @@ class Viewer:
                             [[0, 1, 2, 3], [4, 5, 6, 7], [0, 1, 5, 4], [1, 2, 6, 5], [2, 3, 7, 6], [3, 0, 4, 7]],
                         )
 
-                        viewer_aabbs.append(
-                            viewer.add(
+                        o = viewer.add(
                                 data=aabb_mesh,  # Pointcloud(element._aabb),
-                                name="viewer_aabb",
+                                name=element_id,
                                 is_selected=False,
                                 is_visible=show_aabbs,
                                 show_points=True,
@@ -371,19 +399,18 @@ class Viewer:
                                 linecolor=Color(1, 1, 1),
                                 facecolor=Color(0, 0, 0),
                                 linewidth=1,
-                                pointsize=point_size,
+                                pointsize=point_size
                             )
-                        )
+                        viewer_objects["viewer_aabbs"].append( o)
 
                         if (element._oobb):
                             oobb_mesh = Mesh.from_vertices_and_faces(
                                 element._oobb,
                                 [[0, 1, 2, 3], [4, 5, 6, 7], [0, 1, 5, 4], [1, 2, 6, 5], [2, 3, 7, 6], [3, 0, 4, 7]],
                             )
-                            viewer_oobbs.append(
-                                viewer.add(
+                            o = viewer.add(
                                     data=oobb_mesh,  # Pointcloud(element._oobb),
-                                    name="viewer_oobb",
+                                    name=element_id,
                                     is_selected=False,
                                     is_visible=show_oobbs,
                                     show_points=True,
@@ -395,13 +422,12 @@ class Viewer:
                                     linewidth=1,
                                     pointsize=point_size,
                                 )
-                            )
+                            viewer_objects["viewer_oobbs"].append( o)
 
                     if (element._convex_hull):
-                        viewer_convex_hulls.append(
-                            viewer.add(
+                        o = viewer.add(
                                 data=element._convex_hull,
-                                name="viewer_convex_hull",
+                                name=element_id,
                                 is_selected=False,
                                 is_visible=show_convex_hulls,
                                 show_points=False,
@@ -413,11 +439,15 @@ class Viewer:
                                 linewidth=1,
                                 pointsize=point_size,
                             )
-                        )
+                        viewer_objects["viewer_convex_hulls"].append( o)
 
                 # --------------------------------------------------------------------------
                 # add fabrication geometry
                 # --------------------------------------------------------------------------
+                frames_original = []
+                frames_target = []
+
+
 
                 # --------------------------------------------------------------------------
                 # ui
@@ -425,55 +455,127 @@ class Viewer:
 
                 @viewer.checkbox(text="show_indices", checked=show_indices)
                 def check_display_ids(checked):
-                    for obj in viewer_indices:
+                    for obj in viewer_objects["viewer_indices"]:
                         obj.is_visible = checked
                     viewer.view.update()
 
                 @viewer.checkbox(text="show_types", checked=show_types)
                 def check_display_types(checked):
-                    for obj in viewer_types:
+                    for obj in viewer_objects["viewer_types"]:
                         obj.is_visible = checked
                     viewer.view.update()
 
                 @viewer.checkbox(text="show_simplices", checked=show_simplices)
                 def check_display_implices(checked):
-                    for obj in viewer_simplices:
+                    for obj in viewer_objects["viewer_simplices"]:
                         obj.is_visible = checked
                     viewer.view.update()
 
                 @viewer.checkbox(text="show_display_shapes", checked=show_display_shapes)
                 def check_display_shapes(checked):
-                    for obj in viewer_display_shapes:
+                    for obj in viewer_objects["viewer_display_shapes"]:
                         obj.is_visible = checked
                     viewer.view.update()
 
                 @viewer.checkbox(text="show_aabbs", checked=show_aabbs)
                 def check_aabb(checked):
-                    for obj in viewer_aabbs:
+                    for obj in viewer_objects["viewer_aabbs"]:
                         obj.is_visible = checked
                     viewer.view.update()
 
                 @viewer.checkbox(text="show_oobbs", checked=show_oobbs)
                 def check_oobb(checked):
-                    for obj in viewer_oobbs:
+                    for obj in viewer_objects["viewer_oobbs"]:
                         obj.is_visible = checked
                     viewer.view.update()
 
                 @viewer.checkbox(text="show_convex_hulls", checked=show_convex_hulls)
                 def check_convex_hulls(checked):
-                    for obj in viewer_convex_hulls:
+                    for obj in viewer_objects["viewer_convex_hulls"]:
                         obj.is_visible = checked
                     viewer.view.update()
 
-                @viewer.checkbox(text="show_frames", checked=show_frames)
-                def check_frames(checked):
-                    for obj in viewer_frames:
+                @viewer.checkbox(text="show_local_frames", checked=show_frames)
+                def check_local_frames(checked):
+                    for obj in viewer_objects["viewer_local_frames"]:
                         obj.is_visible = checked
                     viewer.view.update()
+
+                @viewer.checkbox(text="show_global_frames", checked=show_frames)
+                def check_global_frames(checked):
+                    for obj in viewer_objects["viewer_global_frames"]:
+                        obj.is_visible = checked
+                    viewer.view.update()
+
+
+
+                @viewer.slider(title="fabrication_example", maxval=100, step=1, bgcolor=Color.white())
+                def slider(t):
+
+
+                    def interpolate_frames(frame0, frame1, t):
+                        """
+                        Interpolate smoothly between two frames using Slerp and Lerp.
+
+                        Parameters:
+                            frame0 (Frame): The starting frame.
+                            frame1 (Frame): The ending frame.
+                            t (float): Interpolation parameter between 0 and 1.
+
+                        Returns:
+                            Frame: The interpolated frame.
+                        """
+                        # Perform linear interpolation for the position (point) component
+                        point = Point(*frame0.point) * (1 - t) + Point(*frame1.point) * t
+
+                        # Perform spherical linear interpolation (Slerp) for the orientation (quaternion) component
+                        q0 = Quaternion.from_frame(frame0)
+                        q1 = Quaternion.from_frame(frame1)
+
+                        def interpolate_quaternion(q0, q1, t):
+                            # Perform subtraction: q1 - q0
+                            q_diff = Quaternion(q1.w - q0.w, q1.x - q0.x, q1.y - q0.y, q1.z - q0.z)
+
+                            # Perform scaling: t * (q1 - q0)
+                            q_scaled = Quaternion(q_diff.w * t, q_diff.x * t, q_diff.y * t, q_diff.z * t)
+
+                            # Perform addition: q0 + t * (q1 - q0)
+                            interpolated_quaternion = Quaternion(q0.w + q_scaled.w, q0.x + q_scaled.x, q0.y + q_scaled.y, q0.z + q_scaled.z)
+
+                            return interpolated_quaternion
+                        
+                        interpolated_quaternion =  interpolate_quaternion(q0, q1, t) #q0 * (1 - t) + q1 * t
+
+                        # Convert the interpolated quaternion back to a frame
+                        point = Point(*frame0.point) * (1 - t) + Point(*frame1.point) * t
+                        interpolated_frame = Frame.from_quaternion(interpolated_quaternion, point) 
+
+                        return interpolated_frame
+
+                    # try to find fabrication data in the name of nesting
+                    # this matrix will be then applied to multiple objects
+                    dict_matrices = {} 
+                    for id, element in enumerate(elements):
+                        for key, value in element.fabrication.items():
+                            if (key == FABRICATION_TYPES.NESTING):
+                                target_frame = interpolate_frames(value.frames[0],value.frames[1], t / 100)
+                                compas_matrix = Transformation.from_frame_to_frame(value.frames[0], target_frame)
+                                dict_matrices[str(element.id)]=(compas_matrix.matrix)
+
+                    # change positions of elements
+                    for key, value in viewer_objects.items():
+                            for item in value:
+                                item.matrix = dict_matrices[item.name]
+
+
+                    # update the viewer after all the matrices are changed
+                    viewer.view.update()
+
 
                 # --------------------------------------------------------------------------
                 # run
                 # --------------------------------------------------------------------------
+
                 viewer.show()
 
         elif viewer_type == "rhino" or "1":

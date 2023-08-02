@@ -1,14 +1,13 @@
 [
     {
         "dtype": "compas_assembly2.element/Element", 
-        "guid": "92d4ba25-c775-451b-ac83-347158dccda3", 
+        "guid": "31298944-b50f-428c-833c-bc20c885d885", 
         "value": {
             "aabb": [], 
-            "assembly": {}, 
             "attributes": {}, 
             "convex_hull": {
                 "dtype": "compas.datastructures/Mesh", 
-                "guid": "89cfee6d-acc7-4157-8780-a8c7d25caf82", 
+                "guid": "c6faff53-2247-428b-807a-8bb864f0b9b8", 
                 "value": {
                     "attributes": {
                         "name": "Mesh"
@@ -31,7 +30,7 @@
             "display_shapes": [
                 {
                     "dtype": "compas.datastructures/Mesh", 
-                    "guid": "d996eb2f-c9fc-4d06-a035-f22d4398dbe1", 
+                    "guid": "eb5b122b-e464-4231-b8e6-01185685ca02", 
                     "value": {
                         "attributes": {
                             "name": "Mesh"
@@ -141,7 +140,7 @@
             "fabrication": {}, 
             "global_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "88bfa309-3fc0-486f-b8f2-6868e57e7ad3", 
+                "guid": "54172ca2-a748-469f-8520-b2642018282b", 
                 "value": {
                     "point": [
                         0.0, 
@@ -166,7 +165,7 @@
             ], 
             "local_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "cd661ef9-816b-4e74-ae89-3585f5f57195", 
+                "guid": "1d38e3d8-9cbc-42d1-99bc-df744fab205f", 
                 "value": {
                     "point": [
                         -0.59999999999999998, 
@@ -191,7 +190,7 @@
             "simplex": [
                 {
                     "dtype": "compas.geometry/Polyline", 
-                    "guid": "3d6d2ba0-bf9f-44a7-b405-d1e935c82730", 
+                    "guid": "6f10df8e-3c03-49b8-8a31-38663f061fe8", 
                     "value": {
                         "points": [
                             [
@@ -228,14 +227,13 @@
     }, 
     {
         "dtype": "compas_assembly2.element/Element", 
-        "guid": "d0aeb0d6-d374-4f8e-b980-e04c3d6a9109", 
+        "guid": "cb7f8e16-9418-4068-908a-b80996ce1713", 
         "value": {
             "aabb": [], 
-            "assembly": {}, 
             "attributes": {}, 
             "convex_hull": {
                 "dtype": "compas.datastructures/Mesh", 
-                "guid": "7283ab81-d9aa-4290-8ad6-b55e4beba26b", 
+                "guid": "2b3eff1f-427e-4e45-baf9-6a84fe0699eb", 
                 "value": {
                     "attributes": {
                         "name": "Mesh"
@@ -258,7 +256,7 @@
             "display_shapes": [
                 {
                     "dtype": "compas.datastructures/Mesh", 
-                    "guid": "5f4f9131-9efe-4ea8-ae59-ec063a411972", 
+                    "guid": "081d606f-5cf8-47c4-b7d6-9401c3b5e26f", 
                     "value": {
                         "attributes": {
                             "name": "Mesh"
@@ -368,7 +366,7 @@
             "fabrication": {}, 
             "global_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "c71ecf66-7d0f-4e38-bd3f-591dddd397e7", 
+                "guid": "6143386d-7887-4176-b06f-530f5f801402", 
                 "value": {
                     "point": [
                         0.0, 
@@ -393,7 +391,7 @@
             ], 
             "local_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "cd16e305-dbf9-4e2b-a8a3-4358ec10e76a", 
+                "guid": "493b7e54-10aa-4f5d-86a3-fc8814c8bf62", 
                 "value": {
                     "point": [
                         -0.59999999999999998, 
@@ -418,7 +416,7 @@
             "simplex": [
                 {
                     "dtype": "compas.geometry/Polyline", 
-                    "guid": "51b55826-8bf9-4703-9656-f90d505960d3", 
+                    "guid": "33c79417-c1bd-4e0c-b473-31282b77cdd2", 
                     "value": {
                         "points": [
                             [
@@ -455,14 +453,13 @@
     }, 
     {
         "dtype": "compas_assembly2.element/Element", 
-        "guid": "b7319ff7-80f7-4d00-b72f-f5842230e336", 
+        "guid": "336dbcbc-1667-4658-87a8-0cff7099692a", 
         "value": {
             "aabb": [], 
-            "assembly": {}, 
             "attributes": {}, 
             "convex_hull": {
                 "dtype": "compas.datastructures/Mesh", 
-                "guid": "5e36aa50-b64d-4fe1-b78c-6a82546c4e73", 
+                "guid": "0fa98017-4afd-4e1a-8a77-d9ece398180e", 
                 "value": {
                     "attributes": {
                         "name": "Mesh"
@@ -485,7 +482,7 @@
             "display_shapes": [
                 {
                     "dtype": "compas.datastructures/Mesh", 
-                    "guid": "5a033fd8-72a4-4f63-9b93-98c39293a040", 
+                    "guid": "7c4f709d-e6d9-42e5-b66d-439db4d0c8b3", 
                     "value": {
                         "attributes": {
                             "name": "Mesh"
@@ -614,7 +611,7 @@
             "fabrication": {}, 
             "global_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "f1b12276-8ec5-461f-9426-ae85c58ae60b", 
+                "guid": "aefe2347-b3fb-4fd6-bd1b-3cc522261f3e", 
                 "value": {
                     "point": [
                         0.0, 
@@ -639,7 +636,7 @@
             ], 
             "local_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "3776cfb9-09ca-4b45-8b57-f5f195ebd4ad", 
+                "guid": "53548c51-1145-49fc-832e-6b3ada97d61d", 
                 "value": {
                     "point": [
                         -2.1659386745731739, 
@@ -673,14 +670,13 @@
     }, 
     {
         "dtype": "compas_assembly2.element/Element", 
-        "guid": "c8ab543c-a6b6-42f4-a677-4fa53e35c967", 
+        "guid": "deb3d854-c417-423c-a88a-da8d4f5ab333", 
         "value": {
             "aabb": [], 
-            "assembly": {}, 
             "attributes": {}, 
             "convex_hull": {
                 "dtype": "compas.datastructures/Mesh", 
-                "guid": "ffa2f6d5-201c-4691-94cc-daf2eb32e17b", 
+                "guid": "6ea22c3a-6d6b-4c4b-a99a-2d71ab75bcee", 
                 "value": {
                     "attributes": {
                         "name": "Mesh"
@@ -703,7 +699,7 @@
             "display_shapes": [
                 {
                     "dtype": "compas.datastructures/Mesh", 
-                    "guid": "7ad5f927-4a50-4708-9a24-39422cfdea1b", 
+                    "guid": "a353f1b5-6534-43d2-be16-15c912736d35", 
                     "value": {
                         "attributes": {
                             "name": "Mesh"
@@ -832,7 +828,7 @@
             "fabrication": {}, 
             "global_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "0eac1ae2-0e8e-46b3-8f1a-e3dbb7748fb5", 
+                "guid": "5a4f4964-f090-4041-8ca9-93668ae0bb1d", 
                 "value": {
                     "point": [
                         0.0, 
@@ -857,7 +853,7 @@
             ], 
             "local_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "722b6d1a-b930-40d8-a2dd-a734917544ce", 
+                "guid": "f1306264-6d66-442c-a7c1-8fc7f77f88aa", 
                 "value": {
                     "point": [
                         -0.95933540567994791, 
@@ -891,14 +887,13 @@
     }, 
     {
         "dtype": "compas_assembly2.element/Element", 
-        "guid": "21a65bc1-d376-42a4-beba-84a50e2759aa", 
+        "guid": "94d434bc-f3c9-4969-9104-e4feca2af789", 
         "value": {
             "aabb": [], 
-            "assembly": {}, 
             "attributes": {}, 
             "convex_hull": {
                 "dtype": "compas.datastructures/Mesh", 
-                "guid": "76dedaa5-3d28-4488-9ea5-633122d98b3e", 
+                "guid": "8b1dfd3c-6a95-462b-bfe7-8f033d313db1", 
                 "value": {
                     "attributes": {
                         "name": "Mesh"
@@ -921,7 +916,7 @@
             "display_shapes": [
                 {
                     "dtype": "compas.datastructures/Mesh", 
-                    "guid": "c21f90cb-e2a2-4211-8490-9674371ef6af", 
+                    "guid": "1d2a2d18-1845-4eb8-821b-1b7da3294b9b", 
                     "value": {
                         "attributes": {
                             "name": "Mesh"
@@ -1050,7 +1045,7 @@
             "fabrication": {}, 
             "global_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "c491a862-484d-4d57-a9b6-b0a8675ddfa0", 
+                "guid": "7fbd2b4f-0cd1-4bf2-aabd-bcd9e8559bfb", 
                 "value": {
                     "point": [
                         0.0, 
@@ -1075,7 +1070,7 @@
             ], 
             "local_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "2f979158-1d70-4e22-8262-5555fb5f683a", 
+                "guid": "0aad81d7-7857-40f1-8c37-0e24bf0f66b7", 
                 "value": {
                     "point": [
                         0.9593362594379985, 
@@ -1109,14 +1104,13 @@
     }, 
     {
         "dtype": "compas_assembly2.element/Element", 
-        "guid": "c9673c9d-ab8a-4c48-abd1-050a547931d7", 
+        "guid": "32ad2789-d6fb-4fc3-927e-ecfb1d8ce8f5", 
         "value": {
             "aabb": [], 
-            "assembly": {}, 
             "attributes": {}, 
             "convex_hull": {
                 "dtype": "compas.datastructures/Mesh", 
-                "guid": "737e5785-139a-477f-9754-7bc014dc0d4a", 
+                "guid": "67ad3873-b6b0-44c9-8ebf-8da8c027b257", 
                 "value": {
                     "attributes": {
                         "name": "Mesh"
@@ -1139,7 +1133,7 @@
             "display_shapes": [
                 {
                     "dtype": "compas.datastructures/Mesh", 
-                    "guid": "f4e18e48-c0e2-4093-80bc-76134bcecd66", 
+                    "guid": "20dd4bef-9948-42d4-a645-cf7decbb6b0f", 
                     "value": {
                         "attributes": {
                             "name": "Mesh"
@@ -1249,7 +1243,7 @@
             "fabrication": {}, 
             "global_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "96d77647-1c2a-4316-852f-a5c45ff804d8", 
+                "guid": "26ad43df-c83c-479d-a135-5b94bbfc378b", 
                 "value": {
                     "point": [
                         0.0, 
@@ -1274,7 +1268,7 @@
             ], 
             "local_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "80b36d03-e003-4a36-9ec0-ce0e17d6507f", 
+                "guid": "ba141c40-5e9d-43de-8a80-29fd354c713a", 
                 "value": {
                     "point": [
                         2.4747970991874721, 
@@ -1308,14 +1302,13 @@
     }, 
     {
         "dtype": "compas_assembly2.element/Element", 
-        "guid": "280e266d-3c38-4b03-86cd-50bdce079d69", 
+        "guid": "cf1c84ef-55ab-48ed-aba2-0399265e1e74", 
         "value": {
             "aabb": [], 
-            "assembly": {}, 
             "attributes": {}, 
             "convex_hull": {
                 "dtype": "compas.datastructures/Mesh", 
-                "guid": "0cf6bfcf-4b55-4a1c-9a12-7f92cf0e7745", 
+                "guid": "3d5ac4e6-ee12-406e-beb4-ae893ef4bb37", 
                 "value": {
                     "attributes": {
                         "name": "Mesh"
@@ -1338,7 +1331,7 @@
             "display_shapes": [
                 {
                     "dtype": "compas.datastructures/Mesh", 
-                    "guid": "fd7ec65d-ddd5-4e16-99f2-f7134e904c1e", 
+                    "guid": "6cd5b296-8d8e-4e5e-b705-58dbee4d5013", 
                     "value": {
                         "attributes": {
                             "name": "Mesh"
@@ -1467,7 +1460,7 @@
             "fabrication": {}, 
             "global_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "e33449a7-fefd-4603-afcb-bbe40ff0eed1", 
+                "guid": "f473e98f-31c0-4b3c-a7d1-a1a444111345", 
                 "value": {
                     "point": [
                         0.0, 
@@ -1492,7 +1485,7 @@
             ], 
             "local_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "11b98898-2e8b-447d-a11b-22097bd08bbf", 
+                "guid": "544d6eb8-f844-4dd4-a81d-fc376a2032b7", 
                 "value": {
                     "point": [
                         2.1659395548204929, 
@@ -1526,14 +1519,13 @@
     }, 
     {
         "dtype": "compas_assembly2.element/Element", 
-        "guid": "3dd3a500-159d-47f9-a501-39f271a73a2a", 
+        "guid": "bff3a86f-3011-44fc-885c-e0a1a007ebea", 
         "value": {
             "aabb": [], 
-            "assembly": {}, 
             "attributes": {}, 
             "convex_hull": {
                 "dtype": "compas.datastructures/Mesh", 
-                "guid": "7322923f-c4b6-4ad5-9d4e-b6cfbfb46aa7", 
+                "guid": "7144e551-6a0e-4535-97c9-02fb08f0ebb6", 
                 "value": {
                     "attributes": {
                         "name": "Mesh"
@@ -1556,7 +1548,7 @@
             "display_shapes": [
                 {
                     "dtype": "compas.datastructures/Mesh", 
-                    "guid": "c0b751e1-dfbe-4db8-a7fb-b0f95b05ff22", 
+                    "guid": "567aff47-dfec-4815-bf97-1ef310361f79", 
                     "value": {
                         "attributes": {
                             "name": "Mesh"
@@ -1685,7 +1677,7 @@
             "fabrication": {}, 
             "global_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "b486613e-a9e5-4c2a-bf5f-fd1588f1e9b1", 
+                "guid": "550b2146-e26b-4b87-989c-5b5708bf130f", 
                 "value": {
                     "point": [
                         0.0, 
@@ -1710,7 +1702,7 @@
             ], 
             "local_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "e223407f-ca04-482a-8180-d23896faf055", 
+                "guid": "90b934d9-2486-4647-8694-a2574db5ce48", 
                 "value": {
                     "point": [
                         2.1659396609909236, 
@@ -1744,14 +1736,13 @@
     }, 
     {
         "dtype": "compas_assembly2.element/Element", 
-        "guid": "53dda12e-13f3-4737-8ccf-1bc7efa2fb46", 
+        "guid": "eb239977-c220-4ced-aff9-3333389c8c51", 
         "value": {
             "aabb": [], 
-            "assembly": {}, 
             "attributes": {}, 
             "convex_hull": {
                 "dtype": "compas.datastructures/Mesh", 
-                "guid": "ec2059da-877d-4c36-ba48-f183a0769d14", 
+                "guid": "81baa389-4c18-4d8c-bd03-be28a7d1d844", 
                 "value": {
                     "attributes": {
                         "name": "Mesh"
@@ -1774,7 +1765,7 @@
             "display_shapes": [
                 {
                     "dtype": "compas.datastructures/Mesh", 
-                    "guid": "ad9667da-13aa-497f-ac42-14dcf4c035cf", 
+                    "guid": "fbce9038-478b-45f9-b613-7ca3b5d495eb", 
                     "value": {
                         "attributes": {
                             "name": "Mesh"
@@ -1960,7 +1951,7 @@
             "fabrication": {}, 
             "global_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "bf01494e-4c07-4702-b2b2-46a1c53bea34", 
+                "guid": "3b03c023-172b-4265-9fa6-d30380e8a1d9", 
                 "value": {
                     "point": [
                         0.0, 
@@ -1985,7 +1976,7 @@
             ], 
             "local_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "b6b1288b-fdb2-4dad-a742-5a7c64aaef91", 
+                "guid": "e3a539f6-88fb-443e-a546-1cc5ee62d0b4", 
                 "value": {
                     "point": [
                         4.3004433459806609e-07, 
@@ -2019,14 +2010,13 @@
     }, 
     {
         "dtype": "compas_assembly2.element/Element", 
-        "guid": "63c49291-5e35-4bfa-98dd-356880213009", 
+        "guid": "624aef70-779e-4497-8c2a-3d924d633e99", 
         "value": {
             "aabb": [], 
-            "assembly": {}, 
             "attributes": {}, 
             "convex_hull": {
                 "dtype": "compas.datastructures/Mesh", 
-                "guid": "79b53172-bd2f-4ad2-a364-840da9151e28", 
+                "guid": "2497665d-4a98-4e83-9798-53e0e52ffd5f", 
                 "value": {
                     "attributes": {
                         "name": "Mesh"
@@ -2049,7 +2039,7 @@
             "display_shapes": [
                 {
                     "dtype": "compas.datastructures/Mesh", 
-                    "guid": "f610005f-84b0-4307-b803-32b94bfa207c", 
+                    "guid": "0efe401b-8c8b-4ca8-a861-ed897bd4e380", 
                     "value": {
                         "attributes": {
                             "name": "Mesh"
@@ -2178,7 +2168,7 @@
             "fabrication": {}, 
             "global_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "9950e69c-657f-447a-b41d-67365570e961", 
+                "guid": "2c48f3c9-eedb-407d-9b94-63f5cf2337b0", 
                 "value": {
                     "point": [
                         0.0, 
@@ -2203,7 +2193,7 @@
             ], 
             "local_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "af39f8bc-a123-4932-958f-b75f1a632c24", 
+                "guid": "792fa178-e6d4-425d-90f4-ef68ddc3069c", 
                 "value": {
                     "point": [
                         0.95933794512110859, 
@@ -2237,14 +2227,13 @@
     }, 
     {
         "dtype": "compas_assembly2.element/Element", 
-        "guid": "07b1c5c5-bffd-4cc0-ac11-7b7f356cbb29", 
+        "guid": "5d4337bf-9f9f-4540-a304-5c7cd0daf8a6", 
         "value": {
             "aabb": [], 
-            "assembly": {}, 
             "attributes": {}, 
             "convex_hull": {
                 "dtype": "compas.datastructures/Mesh", 
-                "guid": "34493c29-3ae6-4cce-af6a-c6bf82bcfd0e", 
+                "guid": "e1de3a7d-7d03-424a-9d95-17eff544bbfe", 
                 "value": {
                     "attributes": {
                         "name": "Mesh"
@@ -2267,7 +2256,7 @@
             "display_shapes": [
                 {
                     "dtype": "compas.datastructures/Mesh", 
-                    "guid": "09db449d-682a-4918-bd79-641e8b5d8931", 
+                    "guid": "dd0e0c7d-8eaf-403f-8a67-d1f2171d355f", 
                     "value": {
                         "attributes": {
                             "name": "Mesh"
@@ -2377,7 +2366,7 @@
             "fabrication": {}, 
             "global_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "d6ec2cec-8cdd-48ba-b284-f9a4169b7688", 
+                "guid": "6ab83966-b7b6-47c9-b78c-97baf1408e18", 
                 "value": {
                     "point": [
                         0.0, 
@@ -2402,7 +2391,7 @@
             ], 
             "local_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "d7e2ab13-586e-4731-aae8-73716a1e5087", 
+                "guid": "e438c082-fc1a-46d5-9643-561f9ca78a75", 
                 "value": {
                     "point": [
                         2.4747977742470324, 
@@ -2436,14 +2425,13 @@
     }, 
     {
         "dtype": "compas_assembly2.element/Element", 
-        "guid": "8110a678-f363-4982-a3dd-d6910fb636d0", 
+        "guid": "9744721c-de90-45f2-9a01-d250254f2b42", 
         "value": {
             "aabb": [], 
-            "assembly": {}, 
             "attributes": {}, 
             "convex_hull": {
                 "dtype": "compas.datastructures/Mesh", 
-                "guid": "031bba84-00ef-43e9-b441-60ad03b979a7", 
+                "guid": "03df7ec4-f7f4-4ea7-bdc7-54911a0092dc", 
                 "value": {
                     "attributes": {
                         "name": "Mesh"
@@ -2466,7 +2454,7 @@
             "display_shapes": [
                 {
                     "dtype": "compas.datastructures/Mesh", 
-                    "guid": "be8302c7-fe9b-413d-89a0-903a760fe003", 
+                    "guid": "e8ade29a-f267-40fb-8bac-db63e3376806", 
                     "value": {
                         "attributes": {
                             "name": "Mesh"
@@ -2595,7 +2583,7 @@
             "fabrication": {}, 
             "global_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "de83f88e-6d24-40ba-b36d-e7163a1a8c57", 
+                "guid": "f82a862d-63af-4de3-b772-8bafccf43566", 
                 "value": {
                     "point": [
                         0.0, 
@@ -2620,7 +2608,7 @@
             ], 
             "local_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "0f5dc01a-9b7f-4396-a10c-a1f5f2f28c42", 
+                "guid": "e8d22c81-6c2a-4556-99e4-e3be37c53c04", 
                 "value": {
                     "point": [
                         -0.95933877671641976, 
@@ -2654,14 +2642,13 @@
     }, 
     {
         "dtype": "compas_assembly2.element/Element", 
-        "guid": "99720295-6fbc-4591-a75d-ef7f66ff2f76", 
+        "guid": "bc6f986c-0f4b-42e2-aa2d-56648e09f913", 
         "value": {
             "aabb": [], 
-            "assembly": {}, 
             "attributes": {}, 
             "convex_hull": {
                 "dtype": "compas.datastructures/Mesh", 
-                "guid": "9d97994e-06d0-42bc-b78b-16e876640a44", 
+                "guid": "53c8fd25-738d-421c-9b03-f7a76b694e37", 
                 "value": {
                     "attributes": {
                         "name": "Mesh"
@@ -2684,7 +2671,7 @@
             "display_shapes": [
                 {
                     "dtype": "compas.datastructures/Mesh", 
-                    "guid": "2d14e504-30a9-40d0-8fe0-26e940342a5b", 
+                    "guid": "fdcfdc05-4641-4971-b0d6-8206e9f99821", 
                     "value": {
                         "attributes": {
                             "name": "Mesh"
@@ -2794,7 +2781,7 @@
             "fabrication": {}, 
             "global_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "f58f46c2-739a-4dc5-acf6-a886f0396c14", 
+                "guid": "d871db97-bb92-4717-9e46-4e10af3c77ef", 
                 "value": {
                     "point": [
                         0.0, 
@@ -2819,7 +2806,7 @@
             ], 
             "local_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "11476adb-135d-4c89-bbaf-bd441812bbed", 
+                "guid": "232ec96e-c54a-40db-9e77-10d9efb6240c", 
                 "value": {
                     "point": [
                         -2.4747980308912116, 
@@ -2853,14 +2840,13 @@
     }, 
     {
         "dtype": "compas_assembly2.element/Element", 
-        "guid": "0beac6cb-8c2d-4ad7-be89-174875661c50", 
+        "guid": "4a4547df-7dac-429e-9780-14b27acff364", 
         "value": {
             "aabb": [], 
-            "assembly": {}, 
             "attributes": {}, 
             "convex_hull": {
                 "dtype": "compas.datastructures/Mesh", 
-                "guid": "28418519-8132-4efa-b2a2-d178fc6c01fd", 
+                "guid": "d86406b4-efbc-414b-a83e-4b5d4f8bd839", 
                 "value": {
                     "attributes": {
                         "name": "Mesh"
@@ -2883,7 +2869,7 @@
             "display_shapes": [
                 {
                     "dtype": "compas.datastructures/Mesh", 
-                    "guid": "dd25e998-9aa7-4020-9f04-12e46908c59e", 
+                    "guid": "5d925611-758a-4c01-9b15-8845b99bca97", 
                     "value": {
                         "attributes": {
                             "name": "Mesh"
@@ -3012,7 +2998,7 @@
             "fabrication": {}, 
             "global_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "6d475925-9dfa-4891-bac7-b59f59cf0b2d", 
+                "guid": "bebf57c9-e320-4e02-b4ab-28c270ede3e0", 
                 "value": {
                     "point": [
                         0.0, 
@@ -3037,7 +3023,7 @@
             ], 
             "local_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "d27a0ae8-1c96-4b7d-9aa1-ba0340ebc3ff", 
+                "guid": "8a2842ba-e71c-4026-bcd1-da28d1d13b3f", 
                 "value": {
                     "point": [
                         -2.1659398432194319, 
@@ -3071,14 +3057,13 @@
     }, 
     {
         "dtype": "compas_assembly2.element/Element", 
-        "guid": "48283422-c89a-40d4-b87b-3a5533d18e03", 
+        "guid": "993117b6-2e5e-4179-be2a-42af38eddaaf", 
         "value": {
             "aabb": [], 
-            "assembly": {}, 
             "attributes": {}, 
             "convex_hull": {
                 "dtype": "compas.datastructures/Mesh", 
-                "guid": "5340c3b1-49be-4738-b592-632e11844f75", 
+                "guid": "8106821d-1b80-47c6-bdf4-682174f4bede", 
                 "value": {
                     "attributes": {
                         "name": "Mesh"
@@ -3101,7 +3086,7 @@
             "display_shapes": [
                 {
                     "dtype": "compas.datastructures/Mesh", 
-                    "guid": "333532b9-d751-4c24-ba2e-5a078fa2afa3", 
+                    "guid": "d52c8513-d8dc-4375-b978-f9e83c4a1761", 
                     "value": {
                         "attributes": {
                             "name": "Mesh"
@@ -3211,7 +3196,7 @@
             "fabrication": {}, 
             "global_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "b16a9fce-b0ae-4187-a8c1-f87fe5df22ba", 
+                "guid": "105dbd12-329a-4fdc-8f11-71fe440e05bd", 
                 "value": {
                     "point": [
                         0.0, 
@@ -3236,7 +3221,7 @@
             ], 
             "local_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "549fca11-0ab4-4308-a1da-bd8c84930b34", 
+                "guid": "cadb41d3-1c47-48ae-88d8-e5143768c059", 
                 "value": {
                     "point": [
                         -2.4747962810179422, 
@@ -3270,14 +3255,13 @@
     }, 
     {
         "dtype": "compas_assembly2.element/Element", 
-        "guid": "7907defa-c0fd-4575-9cac-3da3d465ead1", 
+        "guid": "038fbc8b-b8c4-44ec-b80c-a238fbb3e4cc", 
         "value": {
             "aabb": [], 
-            "assembly": {}, 
             "attributes": {}, 
             "convex_hull": {
                 "dtype": "compas.datastructures/Mesh", 
-                "guid": "613b8aba-6b39-4daf-bf52-2f66d016d96b", 
+                "guid": "1cf3f088-1835-45c7-b78b-ab80c9390a63", 
                 "value": {
                     "attributes": {
                         "name": "Mesh"
@@ -3300,7 +3284,7 @@
             "display_shapes": [
                 {
                     "dtype": "compas.datastructures/Mesh", 
-                    "guid": "0caeaea3-0cdd-4df1-8480-98b8b02aaaf1", 
+                    "guid": "91acd6f4-5c50-4cfc-b3df-351b8b7492ca", 
                     "value": {
                         "attributes": {
                             "name": "Mesh"
@@ -3410,7 +3394,7 @@
             "fabrication": {}, 
             "global_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "e249d309-d4df-4ef4-b3db-2274eb63b489", 
+                "guid": "2e8d011e-76e9-471a-b132-d7ddbeda114a", 
                 "value": {
                     "point": [
                         0.0, 
@@ -3435,11 +3419,11 @@
             ], 
             "local_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "7e0c2201-357b-425a-9dca-47eee28f853a", 
+                "guid": "25a83557-dd3a-42b3-b7c5-06f64e50a176", 
                 "value": {
                     "point": [
                         0.0, 
-                        1.69166666666667, 
+                        2.9000000000000057, 
                         0.16000000000002834
                     ], 
                     "xaxis": [
@@ -3460,7 +3444,7 @@
             "simplex": [
                 {
                     "dtype": "compas.geometry/Polyline", 
-                    "guid": "c6dea8b0-9e8f-4670-bf37-e7dc0fcdb23e", 
+                    "guid": "5e12716d-4ee8-41e7-9e8a-a45f0a88d9c0", 
                     "value": {
                         "points": [
                             [
@@ -3482,14 +3466,13 @@
     }, 
     {
         "dtype": "compas_assembly2.element/Element", 
-        "guid": "01396f7a-6a0f-4d9e-a7cb-d804ab038415", 
+        "guid": "dbb036a5-5b75-45f0-af1d-b583a5d86b85", 
         "value": {
             "aabb": [], 
-            "assembly": {}, 
             "attributes": {}, 
             "convex_hull": {
                 "dtype": "compas.datastructures/Mesh", 
-                "guid": "b5d1aeff-0ad6-46ad-9583-4a086c11349b", 
+                "guid": "11f462d6-ae8b-471f-b308-3590d9021c22", 
                 "value": {
                     "attributes": {
                         "name": "Mesh"
@@ -3512,7 +3495,7 @@
             "display_shapes": [
                 {
                     "dtype": "compas.datastructures/Mesh", 
-                    "guid": "931f5e2e-fc34-401d-b6b9-69f169acf5e3", 
+                    "guid": "5445db1f-11b9-4c20-8c54-50fcea000ad0", 
                     "value": {
                         "attributes": {
                             "name": "Mesh"
@@ -3622,7 +3605,7 @@
             "fabrication": {}, 
             "global_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "2a800f26-6419-4a4a-b6df-24d7073f82b2", 
+                "guid": "c0ecb7f4-bc12-4cc4-b501-797a0485a11a", 
                 "value": {
                     "point": [
                         0.0, 
@@ -3647,10 +3630,10 @@
             ], 
             "local_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "4280f6fc-5afa-47e8-94c0-fd051cb0d2be", 
+                "guid": "89cd2f8c-0b6e-4bdf-869a-16a6ec49671a", 
                 "value": {
                     "point": [
-                        -1.4499999999999993, 
+                        -2.8999999999999986, 
                         1.9333333333333371, 
                         0.16000000000002834
                     ], 
@@ -3672,7 +3655,7 @@
             "simplex": [
                 {
                     "dtype": "compas.geometry/Polyline", 
-                    "guid": "d88acf06-060a-4c76-9c05-449bf8c07726", 
+                    "guid": "71fffbc2-28dd-4cec-9ed8-750f46867f55", 
                     "value": {
                         "points": [
                             [
@@ -3694,14 +3677,13 @@
     }, 
     {
         "dtype": "compas_assembly2.element/Element", 
-        "guid": "7f66e8af-d647-4657-8e9f-5d463d829d91", 
+        "guid": "15c2f65a-4548-4933-bcb3-b9326cdf24d1", 
         "value": {
             "aabb": [], 
-            "assembly": {}, 
             "attributes": {}, 
             "convex_hull": {
                 "dtype": "compas.datastructures/Mesh", 
-                "guid": "e1287816-bd3c-412d-a1f9-21be54234204", 
+                "guid": "ff44aab1-2152-4612-b9d8-d255bbd79b33", 
                 "value": {
                     "attributes": {
                         "name": "Mesh"
@@ -3724,7 +3706,7 @@
             "display_shapes": [
                 {
                     "dtype": "compas.datastructures/Mesh", 
-                    "guid": "4a70a47f-f927-4630-9f4a-7ea41e4c050e", 
+                    "guid": "d04bb7d0-0705-4217-9090-a69f1a4548e7", 
                     "value": {
                         "attributes": {
                             "name": "Mesh"
@@ -3834,7 +3816,7 @@
             "fabrication": {}, 
             "global_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "9c276b9f-e8a4-4f1c-8b24-0b03ac319e74", 
+                "guid": "ab42e093-3e45-455c-b0b9-dea6ade1b660", 
                 "value": {
                     "point": [
                         0.0, 
@@ -3859,11 +3841,11 @@
             ], 
             "local_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "17f4fbe6-37bb-4179-8444-db94bcad8cf8", 
+                "guid": "49f981e0-9cff-4ee6-818b-2e62ab0d8a7c", 
                 "value": {
                     "point": [
-                        -2.9000000000000004, 
-                        -4.2632564145606011e-13, 
+                        -2.9000000000001549, 
+                        2.899999999999423, 
                         0.16000000000002856
                     ], 
                     "xaxis": [
@@ -3884,7 +3866,7 @@
             "simplex": [
                 {
                     "dtype": "compas.geometry/Polyline", 
-                    "guid": "37cc5113-4df8-45a8-9700-53d0c9f06510", 
+                    "guid": "d6009048-043d-4cd7-8961-df86cce3727e", 
                     "value": {
                         "points": [
                             [
@@ -3906,14 +3888,13 @@
     }, 
     {
         "dtype": "compas_assembly2.element/Element", 
-        "guid": "adf0718b-b665-4096-ae76-63a434cd9b1f", 
+        "guid": "4ff394dc-d4ed-4a0f-8fee-33fcf62d3c8e", 
         "value": {
             "aabb": [], 
-            "assembly": {}, 
             "attributes": {}, 
             "convex_hull": {
                 "dtype": "compas.datastructures/Mesh", 
-                "guid": "9bc29196-8799-4551-9907-233e910c7292", 
+                "guid": "3f8152e0-ab99-4ab1-b35e-94d78f32ec38", 
                 "value": {
                     "attributes": {
                         "name": "Mesh"
@@ -3936,7 +3917,7 @@
             "display_shapes": [
                 {
                     "dtype": "compas.datastructures/Mesh", 
-                    "guid": "7dd01c3b-9329-4bbe-88cf-e3a23d1310e8", 
+                    "guid": "ab0db8df-e000-491a-ad7b-5cff2bfba242", 
                     "value": {
                         "attributes": {
                             "name": "Mesh"
@@ -4046,7 +4027,7 @@
             "fabrication": {}, 
             "global_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "85704260-107c-4711-b515-edf9424e1ab8", 
+                "guid": "c4e61f4e-fbba-4f9b-89e8-d9d6cb76e104", 
                 "value": {
                     "point": [
                         0.0, 
@@ -4071,12 +4052,12 @@
             ], 
             "local_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "27d5e0e4-81af-4804-b7c2-465a6f42ae61", 
+                "guid": "974d7618-0a74-4444-bff4-9b0d6fd22bcb", 
                 "value": {
                     "point": [
-                        -2.8999999999999488, 
-                        2.8999999999999915, 
-                        1.2169758282733554
+                        -2.899999999999892, 
+                        2.8999999999999773, 
+                        2.3739516565466943
                     ], 
                     "xaxis": [
                         -1.0, 
@@ -4096,7 +4077,7 @@
             "simplex": [
                 {
                     "dtype": "compas.geometry/Polyline", 
-                    "guid": "bed3faf7-90b2-429e-9da1-025135ff311f", 
+                    "guid": "511480e6-1de2-4567-9de1-85f5b3884192", 
                     "value": {
                         "points": [
                             [
@@ -4118,14 +4099,13 @@
     }, 
     {
         "dtype": "compas_assembly2.element/Element", 
-        "guid": "c430e4ea-2618-4e7f-8dff-a67ef899a19f", 
+        "guid": "087aa37f-839e-47cd-975b-755ef78c1c14", 
         "value": {
             "aabb": [], 
-            "assembly": {}, 
             "attributes": {}, 
             "convex_hull": {
                 "dtype": "compas.datastructures/Mesh", 
-                "guid": "3bf2f1f4-6cd6-48ac-af88-15536c913c39", 
+                "guid": "443b777f-4e12-44b1-b0da-7ee70abe4e07", 
                 "value": {
                     "attributes": {
                         "name": "Mesh"
@@ -4148,7 +4128,7 @@
             "display_shapes": [
                 {
                     "dtype": "compas.datastructures/Mesh", 
-                    "guid": "daf7b82f-0ad6-4dde-8a0e-2229e5ee9c18", 
+                    "guid": "bc9c7dca-c366-4fda-ae66-6a6dd006592b", 
                     "value": {
                         "attributes": {
                             "name": "Mesh"
@@ -4258,7 +4238,7 @@
             "fabrication": {}, 
             "global_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "36bade62-5b3e-4960-b016-db4d7f176d8c", 
+                "guid": "a7c69653-8db7-4a5f-b3b8-31e69570c8fd", 
                 "value": {
                     "point": [
                         0.0, 
@@ -4283,12 +4263,12 @@
             ], 
             "local_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "6d8d77ee-0b0e-4d8a-a067-1253017ad3ba", 
+                "guid": "594559e1-5bc5-4490-8a28-7f74d94908f8", 
                 "value": {
                     "point": [
-                        3.5527136788005009e-14, 
+                        2.9000000000000306, 
                         2.8999999999997073, 
-                        0.16000000000002845
+                        0.16000000000094028
                     ], 
                     "xaxis": [
                         3.1442281728435955e-13, 
@@ -4308,7 +4288,7 @@
             "simplex": [
                 {
                     "dtype": "compas.geometry/Polyline", 
-                    "guid": "fdbd1ae5-116f-4a39-8484-1af14820b903", 
+                    "guid": "44aca648-0710-4ed5-83e9-f321b7ead6ef", 
                     "value": {
                         "points": [
                             [
@@ -4330,14 +4310,13 @@
     }, 
     {
         "dtype": "compas_assembly2.element/Element", 
-        "guid": "dd4a7939-e35b-4653-92fc-c8cafca374d9", 
+        "guid": "cdc3efd3-e680-4e74-8937-e5b99fbdab2b", 
         "value": {
             "aabb": [], 
-            "assembly": {}, 
             "attributes": {}, 
             "convex_hull": {
                 "dtype": "compas.datastructures/Mesh", 
-                "guid": "92f7a367-44de-4e41-a364-86f0c54572bf", 
+                "guid": "e6d89646-8c4a-47f8-8623-b366396d62e6", 
                 "value": {
                     "attributes": {
                         "name": "Mesh"
@@ -4360,7 +4339,7 @@
             "display_shapes": [
                 {
                     "dtype": "compas.datastructures/Mesh", 
-                    "guid": "365f9a17-05f5-47e2-bfef-3ad21ebe9318", 
+                    "guid": "f84bf0eb-1fe8-47e2-9d96-b76750bce492", 
                     "value": {
                         "attributes": {
                             "name": "Mesh"
@@ -4470,7 +4449,7 @@
             "fabrication": {}, 
             "global_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "795799a8-de03-47fb-858b-459d8cb78530", 
+                "guid": "2d589b34-6ffb-4aee-a2f7-ea7eaffb6417", 
                 "value": {
                     "point": [
                         0.0, 
@@ -4495,12 +4474,12 @@
             ], 
             "local_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "0e4cef33-5262-460d-95bc-0d2e2c47e74e", 
+                "guid": "0a2b7539-a26a-4e60-9b95-e02dd489747f", 
                 "value": {
                     "point": [
-                        2.8999999999999488, 
-                        2.8999999999999915, 
-                        1.2169758282733554
+                        2.899999999999892, 
+                        2.8999999999999773, 
+                        2.3739516565466943
                     ], 
                     "xaxis": [
                         -1.0, 
@@ -4520,7 +4499,7 @@
             "simplex": [
                 {
                     "dtype": "compas.geometry/Polyline", 
-                    "guid": "43a11861-b650-48be-b807-03ce091d60d5", 
+                    "guid": "ef5f82cd-ed3a-4b9a-9caa-ac0966ab3e53", 
                     "value": {
                         "points": [
                             [
@@ -4542,14 +4521,13 @@
     }, 
     {
         "dtype": "compas_assembly2.element/Element", 
-        "guid": "883a5a1f-eb00-4676-8801-ba43c275d53f", 
+        "guid": "6aec17db-4450-4390-ba9c-23758e1dc7e0", 
         "value": {
             "aabb": [], 
-            "assembly": {}, 
             "attributes": {}, 
             "convex_hull": {
                 "dtype": "compas.datastructures/Mesh", 
-                "guid": "65135483-35b2-444c-9a7c-556bbb8180f2", 
+                "guid": "c324756c-e26b-4521-84d7-8093f0cc0295", 
                 "value": {
                     "attributes": {
                         "name": "Mesh"
@@ -4572,7 +4550,7 @@
             "display_shapes": [
                 {
                     "dtype": "compas.datastructures/Mesh", 
-                    "guid": "22aaa379-fc25-45ce-b026-b3eb0d27eea3", 
+                    "guid": "bf829151-8a04-458f-9647-6b3fc1e7e0e7", 
                     "value": {
                         "attributes": {
                             "name": "Mesh"
@@ -4682,7 +4660,7 @@
             "fabrication": {}, 
             "global_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "ccc2663d-4c6e-464a-adff-b3985cd4324e", 
+                "guid": "48fb16cb-9a43-4b0f-9511-06c92d88eb9f", 
                 "value": {
                     "point": [
                         0.0, 
@@ -4707,11 +4685,11 @@
             ], 
             "local_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "87b6fdb3-5d87-4cdb-af15-f465f56c97ac", 
+                "guid": "0ab8c5b9-b07d-49d8-9d21-813d810f28f3", 
                 "value": {
                     "point": [
-                        0.0, 
-                        0.48333333333334139, 
+                        -2.8999999999999986, 
+                        1.4210854715202004e-14, 
                         0.16000000000002834
                     ], 
                     "xaxis": [
@@ -4732,7 +4710,7 @@
             "simplex": [
                 {
                     "dtype": "compas.geometry/Polyline", 
-                    "guid": "b7bf75d1-51b6-4930-ae91-32b1d9af29cf", 
+                    "guid": "6ed6192a-5990-4081-b548-88b149758361", 
                     "value": {
                         "points": [
                             [
@@ -4754,14 +4732,13 @@
     }, 
     {
         "dtype": "compas_assembly2.element/Element", 
-        "guid": "3038d7d9-c06f-4850-9225-483be84b05e2", 
+        "guid": "28130768-73e4-4697-8756-2de23031ce44", 
         "value": {
             "aabb": [], 
-            "assembly": {}, 
             "attributes": {}, 
             "convex_hull": {
                 "dtype": "compas.datastructures/Mesh", 
-                "guid": "c39cfae0-c9c9-4c56-8524-c878c9601d7e", 
+                "guid": "844e1246-9dc6-47c6-8764-b60d4dd25d5c", 
                 "value": {
                     "attributes": {
                         "name": "Mesh"
@@ -4784,7 +4761,7 @@
             "display_shapes": [
                 {
                     "dtype": "compas.datastructures/Mesh", 
-                    "guid": "584bf695-7135-4b32-b3b9-83e8f4ce0842", 
+                    "guid": "eeab0d27-fbbe-4113-80d5-3fe82f9ea4f9", 
                     "value": {
                         "attributes": {
                             "name": "Mesh"
@@ -4894,7 +4871,7 @@
             "fabrication": {}, 
             "global_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "93ce2798-184f-4c6d-8daa-d227a298e8bc", 
+                "guid": "a0820670-1905-4007-9065-44f41cd63c0e", 
                 "value": {
                     "point": [
                         0.0, 
@@ -4919,11 +4896,11 @@
             ], 
             "local_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "b1b3a0d6-f498-4659-92a7-e8faf1e37155", 
+                "guid": "b94ee176-de2c-46d4-b957-f376e56c6c77", 
                 "value": {
                     "point": [
-                        0.0, 
-                        -1.4499999999999886, 
+                        -2.8999999999999986, 
+                        -0.96666666666665435, 
                         0.16000000000002834
                     ], 
                     "xaxis": [
@@ -4944,7 +4921,7 @@
             "simplex": [
                 {
                     "dtype": "compas.geometry/Polyline", 
-                    "guid": "e3416cc2-7ad7-46ef-84ab-f59b3c1b8651", 
+                    "guid": "216ee2b5-5e26-40be-a4e2-93d5b1b933a1", 
                     "value": {
                         "points": [
                             [
@@ -4966,14 +4943,13 @@
     }, 
     {
         "dtype": "compas_assembly2.element/Element", 
-        "guid": "fc642810-f4cd-4aeb-855c-1a5c0388152b", 
+        "guid": "e98e9fa0-f8fc-4778-8e35-347e64818f98", 
         "value": {
             "aabb": [], 
-            "assembly": {}, 
             "attributes": {}, 
             "convex_hull": {
                 "dtype": "compas.datastructures/Mesh", 
-                "guid": "6d9c68c2-76db-4c75-bdea-b8ad9f27dd38", 
+                "guid": "2ab7c1e5-16fd-476b-8f34-76ee51a36ab8", 
                 "value": {
                     "attributes": {
                         "name": "Mesh"
@@ -4996,7 +4972,7 @@
             "display_shapes": [
                 {
                     "dtype": "compas.datastructures/Mesh", 
-                    "guid": "3bba2973-4aec-41df-abfa-edc172a93e81", 
+                    "guid": "684eb8f9-79eb-4121-b32d-2403eb9dbbb1", 
                     "value": {
                         "attributes": {
                             "name": "Mesh"
@@ -5106,7 +5082,7 @@
             "fabrication": {}, 
             "global_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "c1061f8b-43c3-4cef-a897-c7b4569c211d", 
+                "guid": "69c0bfd9-3570-4130-bff9-43f7d984c024", 
                 "value": {
                     "point": [
                         0.0, 
@@ -5131,12 +5107,12 @@
             ], 
             "local_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "d3bbbcbc-8005-4072-802b-c7b9461c9d21", 
+                "guid": "1608c8a8-21f9-421c-aedb-56ba0443083d", 
                 "value": {
                     "point": [
-                        0.0, 
+                        2.899999999999995, 
                         -2.9000000000002899, 
-                        0.16000000000002856
+                        0.16000000000002812
                     ], 
                     "xaxis": [
                         -1.531342102931253e-16, 
@@ -5156,7 +5132,7 @@
             "simplex": [
                 {
                     "dtype": "compas.geometry/Polyline", 
-                    "guid": "da45c87a-6406-4447-8a05-d60ee2f55eed", 
+                    "guid": "074d0dee-a9e4-418b-943d-1ead7303e618", 
                     "value": {
                         "points": [
                             [
@@ -5178,14 +5154,13 @@
     }, 
     {
         "dtype": "compas_assembly2.element/Element", 
-        "guid": "ec991d2d-24bb-4a3e-9e40-4c35f0cd6e74", 
+        "guid": "f972e809-0cfe-45d5-8a93-092651149613", 
         "value": {
             "aabb": [], 
-            "assembly": {}, 
             "attributes": {}, 
             "convex_hull": {
                 "dtype": "compas.datastructures/Mesh", 
-                "guid": "34cb3606-847d-4b0e-a0d4-f856bfccc7a7", 
+                "guid": "35f9d7ad-315f-4bbd-857f-7d14f1d252a7", 
                 "value": {
                     "attributes": {
                         "name": "Mesh"
@@ -5208,7 +5183,7 @@
             "display_shapes": [
                 {
                     "dtype": "compas.datastructures/Mesh", 
-                    "guid": "c04b8940-3937-4bb1-a0b1-86fe29e5c4c8", 
+                    "guid": "dc851362-2bc7-4fd1-8977-924609d14f7c", 
                     "value": {
                         "attributes": {
                             "name": "Mesh"
@@ -5318,7 +5293,7 @@
             "fabrication": {}, 
             "global_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "fcc65422-ef8e-441e-bd9e-f0baee0a2b67", 
+                "guid": "cef32608-7607-4c75-9ad4-fdbd97ee8367", 
                 "value": {
                     "point": [
                         0.0, 
@@ -5343,12 +5318,12 @@
             ], 
             "local_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "7fd9e4c1-ad11-4888-8f62-7cebd30c66e9", 
+                "guid": "e2d567b9-8a81-4bc3-a35b-c018a06f4a0b", 
                 "value": {
                     "point": [
-                        2.8999999999999488, 
-                        -2.9000000000002757, 
-                        1.2169758282733554
+                        2.899999999999892, 
+                        -2.9000000000002615, 
+                        2.3739516565466943
                     ], 
                     "xaxis": [
                         -1.0, 
@@ -5368,7 +5343,7 @@
             "simplex": [
                 {
                     "dtype": "compas.geometry/Polyline", 
-                    "guid": "4d4273ca-287c-4002-86ff-708f15e15602", 
+                    "guid": "c9c532fd-f9f0-40b1-8039-6713e7416f5a", 
                     "value": {
                         "points": [
                             [
@@ -5390,14 +5365,13 @@
     }, 
     {
         "dtype": "compas_assembly2.element/Element", 
-        "guid": "7708dbd0-417d-4ab2-a2e5-ad58489bbb45", 
+        "guid": "68967619-204e-411b-8f57-d9cd92399b19", 
         "value": {
             "aabb": [], 
-            "assembly": {}, 
             "attributes": {}, 
             "convex_hull": {
                 "dtype": "compas.datastructures/Mesh", 
-                "guid": "a51a3808-52ce-4c98-9e4c-ddd78f8d6996", 
+                "guid": "b553b7ca-8cb9-411c-9a76-ef7a8fa35dd3", 
                 "value": {
                     "attributes": {
                         "name": "Mesh"
@@ -5420,7 +5394,7 @@
             "display_shapes": [
                 {
                     "dtype": "compas.datastructures/Mesh", 
-                    "guid": "0bd95ecd-5f83-4821-b7f0-3012f9dfa114", 
+                    "guid": "80e9292b-570b-4c1c-a412-00fd580b72d8", 
                     "value": {
                         "attributes": {
                             "name": "Mesh"
@@ -5530,7 +5504,7 @@
             "fabrication": {}, 
             "global_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "2861ed90-b3c8-4441-bf75-1b4c5a3fbcf1", 
+                "guid": "d3e3ea42-839a-49c6-8bae-e39c4a24130d", 
                 "value": {
                     "point": [
                         0.0, 
@@ -5555,12 +5529,12 @@
             ], 
             "local_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "d767c564-f011-4aff-8920-d64f43c473d7", 
+                "guid": "f114ad37-38a2-41f3-a288-7aff18e538f0", 
                 "value": {
                     "point": [
-                        -2.8999999999999488, 
-                        -2.9000000000002757, 
-                        1.2169758282733554
+                        -2.899999999999892, 
+                        -2.9000000000002615, 
+                        2.3739516565466943
                     ], 
                     "xaxis": [
                         -1.0, 
@@ -5580,7 +5554,7 @@
             "simplex": [
                 {
                     "dtype": "compas.geometry/Polyline", 
-                    "guid": "b202af6c-83b0-4d11-a83c-21f4a7df6b54", 
+                    "guid": "be8d1bb5-0a4e-4064-8238-0e2db6c84cfe", 
                     "value": {
                         "points": [
                             [
@@ -5602,14 +5576,13 @@
     }, 
     {
         "dtype": "compas_assembly2.element/Element", 
-        "guid": "2c6dca24-2f09-4d10-90f3-4b1d284b52fe", 
+        "guid": "3b9619d9-33df-45b9-ac40-554435937c2f", 
         "value": {
             "aabb": [], 
-            "assembly": {}, 
             "attributes": {}, 
             "convex_hull": {
                 "dtype": "compas.datastructures/Mesh", 
-                "guid": "b4dbc66f-33e3-4905-84ce-3f3f3e67bee1", 
+                "guid": "70d2fbc5-2118-407a-91bb-7d5a940cd7b3", 
                 "value": {
                     "attributes": {
                         "name": "Mesh"
@@ -5632,7 +5605,7 @@
             "display_shapes": [
                 {
                     "dtype": "compas.datastructures/Mesh", 
-                    "guid": "1f02f34a-9dde-4d8d-944b-19b2a5f9c36d", 
+                    "guid": "ed30e2a5-e01d-4161-be93-f635f8166211", 
                     "value": {
                         "attributes": {
                             "name": "Mesh"
@@ -5742,7 +5715,7 @@
             "fabrication": {}, 
             "global_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "074e313e-4114-407d-a5b1-fd40c106023f", 
+                "guid": "ef2aca37-19ee-4316-bf17-0962abf88927", 
                 "value": {
                     "point": [
                         0.0, 
@@ -5767,11 +5740,11 @@
             ], 
             "local_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "a7a57f9f-3617-429a-aa08-4052de6238b6", 
+                "guid": "461aeb24-9382-4722-a18d-e0b6cb1b3356", 
                 "value": {
                     "point": [
-                        2.8999999999999968, 
-                        -1.2789769243681803e-13, 
+                        2.8999999999998423, 
+                        2.8999999999997215, 
                         0.16000000000002856
                     ], 
                     "xaxis": [
@@ -5792,7 +5765,7 @@
             "simplex": [
                 {
                     "dtype": "compas.geometry/Polyline", 
-                    "guid": "d1d733e2-d0f0-48e1-84c5-9d6908bd6881", 
+                    "guid": "5cd3e4d7-341b-47a5-8619-776bda2f19ee", 
                     "value": {
                         "points": [
                             [
@@ -5814,14 +5787,13 @@
     }, 
     {
         "dtype": "compas_assembly2.element/Element", 
-        "guid": "f674d414-7988-4276-b3e6-7c22f9097b64", 
+        "guid": "27f01a38-10c2-4f85-853f-e3ef1a566fb1", 
         "value": {
             "aabb": [], 
-            "assembly": {}, 
             "attributes": {}, 
             "convex_hull": {
                 "dtype": "compas.datastructures/Mesh", 
-                "guid": "3527a9ee-d064-47c8-bfb9-167655c00a3e", 
+                "guid": "c6255a4c-4636-4b11-999d-b8bf9c68fae6", 
                 "value": {
                     "attributes": {
                         "name": "Mesh"
@@ -5844,7 +5816,7 @@
             "display_shapes": [
                 {
                     "dtype": "compas.datastructures/Mesh", 
-                    "guid": "a36995b4-adf6-4bd9-9d46-b1b8a0c154d6", 
+                    "guid": "a0207820-dfb5-4af6-818c-507d739be3ed", 
                     "value": {
                         "attributes": {
                             "name": "Mesh"
@@ -8474,7 +8446,7 @@
             "fabrication": {}, 
             "global_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "da319427-2788-49d0-8de6-ba811a25603b", 
+                "guid": "a7d3a792-0d9f-4ee1-bbfb-6c926bb793cf", 
                 "value": {
                     "point": [
                         0.0, 
@@ -8499,7 +8471,7 @@
             ], 
             "local_frame": {
                 "dtype": "compas.geometry/Frame", 
-                "guid": "c50ae855-b5f8-4291-89ad-ca6f41873867", 
+                "guid": "c7be5f96-c864-4ee8-8d29-63be4188137e", 
                 "value": {
                     "point": [
                         -0.59999999999999998, 
@@ -8524,7 +8496,7 @@
             "simplex": [
                 {
                     "dtype": "compas.geometry/Polyline", 
-                    "guid": "387c074d-8e79-4609-9807-327864738229", 
+                    "guid": "cf66b29c-a9a6-4954-b93d-904476ee4d48", 
                     "value": {
                         "points": [
                             [
@@ -8557,7 +8529,7 @@
                 }, 
                 {
                     "dtype": "compas.geometry/Polyline", 
-                    "guid": "cb98c9d3-e21f-45c0-9860-bb2581226dad", 
+                    "guid": "f741e28b-d2fc-49aa-beb3-a84317abce41", 
                     "value": {
                         "points": [
                             [

@@ -538,7 +538,8 @@ for group_id, subsequent_groups in grouped_objects.items():
                         o.local_frame = Frame(o.simplex[0][0], [1,0,0], [0,1,0])
                     else:
                         x_axis_vector, y_axis_vector = conversions.perpendicular_to(o.simplex[0][0],o.simplex[0][1])
-                        o.local_frame = Frame((o.simplex[0][0]+o.simplex[0][1])*0.5,x_axis_vector, y_axis_vector)
+                        #o.local_frame = Frame((o.simplex[0][0]+o.simplex[0][1])*0.5,x_axis_vector, y_axis_vector)
+                        o.local_frame = Frame(o.simplex[0][0],x_axis_vector, y_axis_vector)
         elif len(o.display_shapes)>0:
             if isinstance(o.display_shapes[0], Mesh):
                 center = o.display_shapes[0].centroid()

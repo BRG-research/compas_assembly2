@@ -1,4 +1,4 @@
-from compas.geometry import Frame, Geometry, Transformation, Polyline, Point, Box, Line, Pointcloud, bounding_box, convex_hull
+from compas.geometry import Frame, Geometry, Transformation, Polyline, Point, Box, Line, Pointcloud, bounding_box, convex_hull, distance_point_point
 from compas.datastructures import Mesh, mesh_bounding_box
 from compas.data import Data
 import copy
@@ -42,7 +42,7 @@ class Element(Data):
     Parameters
     ----------
         element_type (ElementType): The type of the element, e.g., ElementType.BLOCK, ElementType.BEAM and etc.
-        id (tuple or int): A unique identifier for the element, represented as a tuple, e.g.,(0) or (0, 1) or (1, 5, 9).
+        id (list[int] or int): A unique identifier for the element, represented as a list, e.g.,[0] or [0, 1] or [1, 5, 9].
         attr (dict, optional): A dictionary containing attributes of the element. Defaults to an empty dictionary.
         simplex (list, optional): Supported types: Point, Polyline (for lines use two points), List(Polyline)
         display_shapes  (list, optional): Supported types: Mesh, Polyline, Box, Line, Pointcloud.
@@ -59,7 +59,7 @@ class Element(Data):
         if __name__ == "__main__":
             elem = Element(
                 element_type=ElementType.BLOCK,
-                id=(0, 1),
+                id=[0, 1],
                 display_shapes =[],
                 local_frame=Frame(point=(0, 0, 0), xaxis=(1, 0, 0), yaxis=(0, 1, 0)),
                 global_frame=Frame.worldXY(),
@@ -98,9 +98,8 @@ class Element(Data):
         super(Element, self).__init__()
 
         # indexing + attributes
-        self.id = (id,) if isinstance(id, int) else id  # tuple e.g. (0, 1) or (1, 5, 9)
+        self.id = [id,] if isinstance(id, int) else id  # tuple e.g. (0, 1) or (1, 5, 9)
         self.element_type = element_type  # type of the element, e.g., block, beam, plate, node, etc.
-        print("element_type", element_type)
         self.attributes = {}  # set the attributes of an object
         self.attributes.update(kwargs)  # update the attributes of with the kwargs
 
@@ -134,8 +133,8 @@ class Element(Data):
         self._outlines_frames = []  # closed polylines planes - in majority of cases objects will have planar faces
 
         # output for further processing
-        self.fabrication = []
-        self.structure = []
+        self.fabrication = {}
+        self.structure = {}
 
     # ==========================================================================
     # DATA
@@ -221,6 +220,7 @@ class Element(Data):
         obj._outlines_frames = data["outlines_frames"]
 
         # fabrication | structure
+        
         obj.fabrication = data["fabrication"]
         obj.structure = data["structure"]
 
@@ -230,45 +230,37 @@ class Element(Data):
     # ==========================================================================
     # PROPERTIES
     # ==========================================================================
-    def get_aabb(self, inflate=0.00, compute_oobb=True, compute_convex_hull=False):
+    def get_aabb(self, inflate=0.00):
+
+        # if the aabb is already computed return it
+        if(self._aabb):
+            return self._aabb
+
         # iterate display_shapes  and get the bounding box by geometry type
         # Mesh, Polyline, Box, Line
-        points = []
         points_bbox = []
 
         for i in range(len(self.display_shapes)):
-            corners = []
             if isinstance(self.display_shapes[i], Mesh):
                 corners = mesh_bounding_box(self.display_shapes[i])
-                if compute_convex_hull or compute_oobb:
-                    points.extend(list(self.display_shapes[i].vertices_attributes("xyz")))
+                points_bbox.extend([corners[0], corners[6]])
             elif isinstance(self.display_shapes[i], Polyline):
                 corners = bounding_box(self.display_shapes[i])
-                if compute_convex_hull or compute_oobb:
-                    points.extend(self.display_shapes[i])
+                points_bbox.extend([corners[0], corners[6]])
             elif isinstance(self.display_shapes[i], Line):
-                corners = [self.display_shapes[i].start, self.display_shapes[i].end]
-                if compute_convex_hull or compute_oobb:
-                    points.extend(corners)
+                points_bbox.extend([self.display_shapes[i].start, self.display_shapes[i].end])
             elif isinstance(self.display_shapes[i], Box):
-                points = self.display_shapes[i].points
-                corners = bounding_box(points)
-                if compute_convex_hull or compute_oobb:
-                    points.extend(points)
+                corners = bounding_box(self.display_shapes[i].points)
+                points_bbox.extend([corners[0], corners[6]])
             elif isinstance(self.display_shapes[i], Pointcloud):
                 corners = bounding_box(self.display_shapes[i].points)
-                points.extend(self.display_shapes[i].points)
-
-            if len(corners) == 8:
                 points_bbox.extend([corners[0], corners[6]])
-            elif len(corners) == 2:
-                points_bbox.extend(corners)
-            points_bbox.extend(corners)
+    
         # if no points found, return
         if len(points_bbox) < 2:
-            return
+            return None
 
-        # compute axis-aligned bounding box
+        # compute axis-aligned-bounding-box of all objects 
         points_bbox = bounding_box(points_bbox)
         self._aabb = bounding_box(
             [
@@ -277,38 +269,103 @@ class Element(Data):
             ]
         )
 
-        # compute the object oriented bounding box
-        if self.local_frame != Frame.worldXY:
-            xform = Transformation.from_frame_to_frame(self.local_frame, Frame.worldXY())
-            xform_inv = xform.inverse()
+        # return the aabb (8 points)
+        return self._aabb
 
-            self._oobb = []
-            for i in range(len(points)):
-                point = Point(*points[i])
-                point.transform(xform)
-                self._oobb.append(point)
-            self._oobb = bounding_box(self._oobb)
+    def get_oobb(self, inflate=0.00):
 
-            for i in range(len(self._oobb)):
-                point = Point(*self._oobb[i])
-                point.transform(xform_inv)
-                self._oobb[i] = list(point)
-        else:
-            self._oobb = self._aabb
+        # if the oobb is already computed return it
+        if(self._oobb):
+            return self._oobb
+        
+        # iterate display_shapes and get the bounding box by geometry type
+        # Mesh, Polyline, Box, Line
+        points = []
+
+        for i in range(len(self.display_shapes)):
+
+            if isinstance(self.display_shapes[i], Mesh):
+                points.extend(list(self.display_shapes[i].vertices_attributes("xyz")))
+            elif isinstance(self.display_shapes[i], Polyline):
+                points.extend(self.display_shapes[i])
+            elif isinstance(self.display_shapes[i], Line):
+                points.extend([self.display_shapes[i].start, self.display_shapes[i].end])
+            elif isinstance(self.display_shapes[i], Box):
+                points.extend(self.display_shapes[i].points)
+            elif isinstance(self.display_shapes[i], Pointcloud):
+                points.extend(self.display_shapes[i].points)
+
+        # if no points found, return
+        if len(points) < 2:
+            return None
+
+        # compute the object-oriented-bounding-box
+        # transforming points from local frame to worldXY
+        # compute the bbox
+        # orient the points back to the local frame
+        xform = Transformation.from_frame_to_frame(self.local_frame, Frame.worldXY())
+        xform_inv = xform.inverse()
+
+        self._oobb = []
+        for i in range(len(points)):
+            point = Point(*points[i])
+            point.transform(xform)
+            self._oobb.append(point)
+        self._oobb = bounding_box(self._oobb)
+
+        # inflate the oobb
+        self._oobb = bounding_box(
+            [
+                [self._oobb[0][0] - inflate, self._oobb[0][1] - inflate, self._oobb[0][2] - inflate],
+                [self._oobb[6][0] + inflate, self._oobb[6][1] + inflate, self._oobb[6][2] + inflate],
+            ]
+        )
+
+        # orient the points back to the local frame
+        for i in range(len(self._oobb)):
+            point = Point(*self._oobb[i])
+            point.transform(xform_inv)
+            self._oobb[i] = list(point)
+
+        # return the oobb  (8 points)
+        return self._oobb
+
+    def get_convex_hull(self):
+
+        # if the convex hull is already computed return it
+        if(self._convex_hull.is_empty() == False):
+            return self._convex_hull
+
+        # iterate display_shapes and get the bounding box by geometry type
+        # Mesh, Polyline, Box, Line
+        points = []
+
+        for i in range(len(self.display_shapes)):
+            if isinstance(self.display_shapes[i], Mesh):
+                points.extend(list(self.display_shapes[i].vertices_attributes("xyz")))
+            elif isinstance(self.display_shapes[i], Polyline):
+                points.extend(self.display_shapes[i])
+            elif isinstance(self.display_shapes[i], Line):
+                points.extend([self.display_shapes[i].start, self.display_shapes[i].end])
+            elif isinstance(self.display_shapes[i], Box):
+                points.extend(self.display_shapes[i].points)
+            elif isinstance(self.display_shapes[i], Pointcloud):
+                points.extend(self.display_shapes[i].points)
+
+        # if no points found, return
+        if len(points) < 2:
+            return Mesh()
 
         # compute the convex hull
         # use it with caution, it does not work, specially with coplanar points
-        #print( len(points))
-        #print(points)
 
-        if compute_convex_hull and len(points) > 2:
+        if len(points) > 2:
             faces = convex_hull(points)
-            #print( len(faces))
             self._convex_hull = Mesh.from_vertices_and_faces(points, faces)
+            return self._convex_hull   
         else:
-            self._convex_hull = None
-
-        return self._aabb
+            self._convex_hull = Mesh()
+            return self._convex_hull
 
     def __repr__(self):
         """
@@ -325,12 +382,11 @@ class Element(Data):
 #  Local Frame: {4},
 #  Global Frame: {5},
 #  Fabrication: {6},
-#  Assembly: {7},
-#  Structure: {8},
-#  Attributes: {9})""".format(
+#  Structure: {7},
+#  Attributes: {8})""".format(
         self.element_type,
         self.id,
-        self.display_shapes,
+        self.simplex,
         self.display_shapes,
         self.local_frame,
         self.global_frame,
@@ -400,7 +456,7 @@ class Element(Data):
         new_instance.transform(transformation)
         return new_instance
 
-    def orient(self, frame):
+    def transform_to_frame(self, frame):
         """
         Applies frame_to_frame transformation to the display_shapes , local frame, and global frame of the Element.
 
@@ -413,7 +469,20 @@ class Element(Data):
         xform = Transformation.from_frame_to_frame(self.local_frame, frame)
         self.transform(xform)
 
-    def oriented(self, frame):
+    def transform_from_frame_to_frame(self, source_frame, target_frame):
+        """
+        Applies frame_to_frame transformation to the display_shapes , local frame, and global frame of the Element.
+
+        Parameters:
+            frame (Frame): The target frame to which  the Element will be transformed.
+
+        Returns:
+            None
+        """
+        xform = Transformation.from_frame_to_frame(source_frame, target_frame)
+        self.transform(xform)
+
+    def transformed_to_frame(self, frame):
         """
         Creates an oriented copy of the Element.
 
@@ -424,7 +493,21 @@ class Element(Data):
             Element: A new instance of the Element with the specified orientation applied.
         """
         new_instance = self.copy()
-        new_instance.orient(frame)
+        new_instance.transform_to_frame(frame)
+        return new_instance
+    
+    def transformed_from_frame_to_frame(self, source_frame, target_frame):
+        """
+        Creates an oriented copy of the Element.
+
+        Parameters:
+            frame (Frame): The target frame to which the Element will be transformed.
+
+        Returns:
+            Element: A new instance of the Element with the specified orientation applied.
+        """
+        new_instance = self.copy()
+        new_instance.transform_from_frame_to_frame(source_frame, target_frame)
         return new_instance
 
     # ==========================================================================

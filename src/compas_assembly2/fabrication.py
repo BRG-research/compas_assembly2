@@ -1,13 +1,24 @@
 from compas.geometry import Frame, Vector, Polyline, Plane, Point, cross_vectors, distance_point_point, distance_point_plane_signed, centroid_points
 
-FABRICATION_TYPES = {}
+class FABRICATION_TYPES:
+    MOVEMENT = "MOVEMENT_LINEAR"
+    SUBTRACTION_DRILL = "SUBTRACTION_DRILL"
+    SUBTRACTION_CUT = "SUBTRACTION_CUT"
+    SUBTRACTION_MILL = "SUBTRACTION_MILL"
+    SUBTRACTION_SLICE = "SUBTRACTION_SLICE"
+    ADDITION_PRINT = "ADDITION_PRINT"
+    ADDITION_SPRAY = "ADDITION_SPRAY"
+    ADDITION_EXTRUDE = "ADDITION_EXTRUDE"
+    NESTING = "NESTING"
+    CUSTOM = "CUSTOM"
+
 
 class Fabrication:
     """Fabrication data-structure for subtractive and additive processes"""
-    def __init__(self, type = None, id = None, frames = None, **kwargs):
-        self.type = type or "fabrication_empty"
+    def __init__(self, fabrication_type = None, id = None, frames = None, **kwargs):
+        self.type = fabrication_type or FABRICATION_TYPES.CUSTOM
         self.id = id or (0)
-        self.frame = frames or []
+        self.frames = frames or []
         self.attributes = {}
         self.attributes.update(kwargs)
     
@@ -107,3 +118,4 @@ class Fabrication:
                 frames.append(frame)
 
         return cls(type = "fabrication_movement", id=id, frames = frames)
+    
