@@ -129,7 +129,7 @@ class Viewer:
                     # --------------------------------------------------------------------------
 
                     text = Text(
-                        element.element_type,
+                        element.name,
                         element.local_frame.point + Vector(0, 0, 0.01),
                         height=text_height,
                     )
@@ -253,7 +253,7 @@ class Viewer:
                                 show_faces=True,
                                 pointcolor=Color(0, 0, 0),
                                 linecolor=colors[4],
-                                facecolor=colors[3],  # Viewer.string_to_color(element.element_type),#colors[3],
+                                facecolor=colors[3],  # Viewer.string_to_color(element.name),#colors[3],
                                 linewidth=1,
                                 opacity=0.9,  # type: ignore
                                 hide_coplanaredges=True,
@@ -276,7 +276,7 @@ class Viewer:
                                 show_faces=True,
                                 pointcolor=Color(0, 0, 0),
                                 linecolor=colors[4],
-                                facecolor=colors[3],  # Viewer.string_to_color(element.element_type),#colors[3],
+                                facecolor=colors[3],  # Viewer.string_to_color(element.name),#colors[3],
                                 linewidth=1,
                             )
                             viewer_objects["viewer_display_shapes"].append(o)

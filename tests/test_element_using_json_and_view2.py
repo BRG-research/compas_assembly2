@@ -46,7 +46,7 @@ if __name__ == "__main__":
     geo_2 = [box]
 
     elem_0 = Element(
-        element_type=compas_assembly2.ELEMENT_NAME.BLOCK,
+        name=compas_assembly2.ELEMENT_NAME.BLOCK,
         id=[0, 1],
         simplex=[Point(-3, 0, 0)],
         display_shapes=geo_0,
@@ -55,7 +55,7 @@ if __name__ == "__main__":
     )
 
     elem_1 = Element(
-        element_type=compas_assembly2.ELEMENT_NAME.FRAME,
+        name=compas_assembly2.ELEMENT_NAME.FRAME,
         id=[0, 2],
         simplex=[Line((0, -2, 0), (0, 2, 0))],
         display_shapes=geo_1,
@@ -64,7 +64,7 @@ if __name__ == "__main__":
     )
 
     elem_2 = Element(
-        element_type=compas_assembly2.ELEMENT_NAME.PLATE,
+        name=compas_assembly2.ELEMENT_NAME.PLATE,
         id=[3, 0],
         simplex=[
             Polyline(
@@ -92,7 +92,7 @@ if __name__ == "__main__":
     json_dump(data=elements, fp="src/compas_assembly2/data_sets/1_block_beam_plate.json", pretty=True)
     # elements_json = json_load(fp="src/compas_assembly2/data_sets/1_block_beam_plate.json")
     elements_json = json_load(fp="src/compas_assembly2/rhino_commands/rhino_command_convert_to_assembly.json")
-    elements_json.sort(key=lambda element: element.element_type, reverse=True)
+    elements_json.sort(key=lambda element: element.name, reverse=True)
 
     # nest elements linearly and add the the nest frame to the fabrication
     # first compute the bounding box of the elements, get the horizontal length, and create frames
@@ -113,7 +113,7 @@ if __name__ == "__main__":
     center = center / len(elements_json)
 
     for e in elements_json:
-        width[e.element_type] = 0
+        width[e.name] = 0
 
     for index, (key, value) in enumerate(width.items()):
         height[key] = index * height_step * 0
@@ -130,7 +130,7 @@ if __name__ == "__main__":
             # --------------------------------------------------------------------------
             temp_width = e.get_aabb()[6][0] - e.get_aabb()[0][0]
             # get the maximum height of the elements
-            height[e.element_type] = max(height[e.element_type], e.get_aabb()[6][1] - e.get_aabb()[0][1])
+            height[e.name] = max(height[e.name], e.get_aabb()[6][1] - e.get_aabb()[0][1])
             source_frame = Frame(
                 e.get_aabb()[0],
                 [
@@ -144,14 +144,14 @@ if __name__ == "__main__":
                     e.get_aabb()[3][2] - e.get_aabb()[0][2],
                 ],
             )
-            target_frame = Frame([width[e.element_type], height[e.element_type], 0], [1, 0, 0], [0, 1, 0])
+            target_frame = Frame([width[e.name], height[e.name], 0], [1, 0, 0], [0, 1, 0])
         elif nest_type == 1 and e.get_oobb() is not None:
             # --------------------------------------------------------------------------
             # oobb linear nesting
             # --------------------------------------------------------------------------
             temp_width = distance_point_point(e.get_oobb()[0], e.get_oobb()[1])
             # get the maximum height of the elements
-            height[e.element_type] = max(height[e.element_type], distance_point_point(e.get_oobb()[0], e.get_oobb()[3]))
+            height[e.name] = max(height[e.name], distance_point_point(e.get_oobb()[0], e.get_oobb()[3]))
             source_frame = Frame(
                 e.get_oobb()[0],
                 [
@@ -165,7 +165,7 @@ if __name__ == "__main__":
                     e.get_oobb()[3][2] - e.get_oobb()[0][2],
                 ],
             )
-            target_frame = Frame([width[e.element_type], height[e.element_type], 0], [1, 0, 0], [0, 1, 0])
+            target_frame = Frame([width[e.name], height[e.name], 0], [1, 0, 0], [0, 1, 0])
         elif nest_type == 3:
             # --------------------------------------------------------------------------
             # move of center
@@ -184,7 +184,7 @@ if __name__ == "__main__":
             fabrication_type=FABRICATION_TYPES.NESTING, id=-1, frames=[source_frame, target_frame]
         )
         e.fabrication[FABRICATION_TYPES.NESTING] = fabrication
-        width[e.element_type] = width[e.element_type] + temp_width
+        width[e.name] = width[e.name] + temp_width
 
     # --------------------------------------------------------------------------
     # center the frames
@@ -197,9 +197,9 @@ if __name__ == "__main__":
 
     for e in elements_json:
         e.fabrication[FABRICATION_TYPES.NESTING].frames[1].point.x = (
-            e.fabrication[FABRICATION_TYPES.NESTING].frames[1].point.x - width[e.element_type] * 0.5
+            e.fabrication[FABRICATION_TYPES.NESTING].frames[1].point.x - width[e.name] * 0.5
         )
-        e.fabrication[FABRICATION_TYPES.NESTING].frames[1].point.y = height[e.element_type] - last_height * 0.5
+        e.fabrication[FABRICATION_TYPES.NESTING].frames[1].point.y = height[e.name] - last_height * 0.5
 
     Viewer.run(elements=elements_json, viewer_type="view2", show_grid=False)
 
