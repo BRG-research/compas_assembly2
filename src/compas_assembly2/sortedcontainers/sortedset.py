@@ -17,7 +17,7 @@ from itertools import chain
 from operator import eq, ne, gt, ge, lt, le
 from textwrap import dedent
 
-import compas_assembly2.sortedcontainers.sortedlist as SortedList
+from compas_assembly2.sortedcontainers.sortedlist import SortedList
 from compas_assembly2.sortedcontainers.sortedlist import recursive_repr
 
 ###############################################################################
@@ -620,41 +620,14 @@ class SortedSet(MutableSet, Sequence):  # type: ignore
     __ixor__ = symmetric_difference_update
 
     def union(self, *iterables):
-        """Return new sorted set with values from itself and all `iterables`.
-
-        The `union` method also corresponds to operator ``|``.
-
-        ``ss.__or__(iterable)`` <==> ``ss | iterable``
-
-        >>> ss = SortedSet([1, 2, 3, 4, 5])
-        >>> ss.union([4, 5, 6, 7])
-        SortedSet([1, 2, 3, 4, 5, 6, 7])
-
-        :param iterables: iterable arguments
-        :return: new sorted set
-
-        """
+        """Return new sorted set with values from itself and all `iterables`."""
         return self.__class__(chain(iter(self), *iterables), key=self._key)
 
     __or__ = union
     __ror__ = __or__
 
     def update(self, *iterables):
-        """Update the sorted set adding values from all `iterables`.
-
-        The `update` method also corresponds to operator ``|=``.
-
-        ``ss.__ior__(iterable)`` <==> ``ss |= iterable``
-
-        >>> ss = SortedSet([1, 2, 3, 4, 5])
-        >>> _ = ss.update([4, 5, 6, 7])
-        >>> ss
-        SortedSet([1, 2, 3, 4, 5, 6, 7])
-
-        :param iterables: iterable arguments
-        :return: itself
-
-        """
+        """Update the sorted set adding values from all `iterables`."""
         _set = self._set
         _list = self._list
         values = set(chain(*iterables))
