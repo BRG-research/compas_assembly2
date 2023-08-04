@@ -97,9 +97,56 @@
 <h1>Element</h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="compas_assembly2.element.Element">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_assembly2.element.</span></span><span class="sig-name descname"><span class="pre">Element</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element_type='BLOCK'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id=(0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">1)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simplex=[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">display_shapes=[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_frame=&lt;bound</span> <span class="pre">method</span> <span class="pre">Frame.worldXY</span> <span class="pre">of</span> <span class="pre">&lt;class</span> <span class="pre">'compas.geometry.primitives.frame.Frame'&gt;&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">global_frame=&lt;bound</span> <span class="pre">method</span> <span class="pre">Frame.worldXY</span> <span class="pre">of</span> <span class="pre">&lt;class</span> <span class="pre">'compas.geometry.primitives.frame.Frame'&gt;&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BRG-research/compas_assembly2/blob/master/src/compas_assembly2/element.py#L39"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_assembly2.element.</span></span><span class="sig-name descname"><span class="pre">Element</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">name='BLOCK',</span> <span class="pre">id=[0,</span> <span class="pre">1],</span> <span class="pre">simplex=[],</span> <span class="pre">display_shapes=[],</span> <span class="pre">local_frame=&lt;bound</span> <span class="pre">method</span> <span class="pre">Frame.worldXY</span> <span class="pre">of</span> <span class="pre">&lt;class</span> <span class="pre">'compas.geometry.primitives.frame.Frame'&gt;&gt;,</span> <span class="pre">global_frame=&lt;bound</span> <span class="pre">method</span> <span class="pre">Frame.worldXY</span> <span class="pre">of</span> <span class="pre">&lt;class</span> <span class="pre">'compas.geometry.primitives.frame.Frame'&gt;&gt;,</span> <span class="pre">**kwargs</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BRG-research/compas_assembly2/blob/master/src/compas_assembly2/element.py#L19"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://compas.dev/compas/latest/reference/generated/compas.data.Data.html#compas.data.Data" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.data.data.Data</span></code></a></p>
 <p>Class representing a structural object of an assembly.</p>
+<p>This class defines structural elements used in an assembly.
+Each element is defined by inputs: an ID, attributes, geometrical shape, orientation frames.
+Additionally, it stores output dictionaries for fabrication, and structural information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name (str)</strong> (<em>The name of the element, e.g., &quot;BLOCK&quot;, &quot;BEAM&quot; and etc.</em>)</p></li>
+<li><p><strong>id (list[int] or int)</strong> (<em>A unique identifier as a list, e.g.,[0] or [0, 1] or [1, 5, 9].</em>)</p></li>
+<li><p><strong>attr (dict, optional)</strong> (<em>A dictionary containing attributes of the element. Defaults to an empty dictionary.</em>)</p></li>
+<li><p><strong>simplex (list, optional)</strong> (<em>Supported types: Point, Polyline (for lines use two points), List(Polyline)</em>)</p></li>
+<li><p><strong>display_shapes  (list, optional)</strong> (<em>Supported types: Mesh, Polyline, Box, Line, Pointcloud.</em>)</p></li>
+<li><p><strong>local_frame (Frame, optional)</strong> (<em>The local frame of the element.</em>)</p></li>
+<li><p><strong>global_frame (Frame, optional)</strong> (<em>The global frame of the element.</em>)</p></li>
+<li><p><strong>kwargs (dict, optional)</strong> (<em>Additional keyword arguments can be passed to the element.</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Attributes</dt>
+<dd class="field-even"><p><strong>get_bbox (list)</strong> (<em>A list of XYZ coordinates defining the bounding box for collision detection.</em>)</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<dl>
+<dt>if __name__ == &quot;__main__&quot;:</dt><dd><dl class="simple">
+<dt>elem = Element(</dt><dd><p>name=compas_assembly2.ELEMENT_NAME.BLOCK,
+id=[0, 1],
+display_shapes =[],
+local_frame=Frame(point=(0, 0, 0), xaxis=(1, 0, 0), yaxis=(0, 1, 0)),
+global_frame=Frame.worldXY(),
+width=10,
+height=50,
+length=95,</p>
+</dd>
+</dl>
+<p>)</p>
+<p># print before updating the fabrication, and structural information
+print(elem)</p>
+<p># Update fabrication information
+elem.fabrication[&quot;cut&quot;] = True
+elem.fabrication[&quot;drill&quot;] = False
+elem.fabrication[&quot;insertion_sequence&quot;] = [1, 2, 3, 4]
+elem.fabrication[&quot;printing_toolpath&quot;] = [(0, 0, 1), (0, 0, 0)]</p>
+<p># Update structural information
+elem.structure[&quot;nodes&quot;] = [(0, 0, 1), (0, 0, 0)]</p>
+<p># print after updating the fabrication, and structural information
+print(elem)</p>
+</dd>
+</dl>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable docutils align-default">
 <colgroup>
