@@ -4,8 +4,8 @@ import random
 from compas_assembly2.element import Element, ELEMENT_TYPE
 from compas_assembly2.viewer import Viewer
 from compas_assembly2.fabrication import Fabrication, FABRICATION_TYPES
-from compas.data import json_dump, json_load  # https://compas.dev/compas/latest/reference/generated/compas.data.Data.html
-import compas_rhino
+# https://compas.dev/compas/latest/reference/generated/compas.data.Data.html
+from compas.data import json_dump, json_load
 
 
 if __name__ == "__main__":
@@ -81,95 +81,85 @@ if __name__ == "__main__":
     )
 
     elements = [elem_0, elem_1, elem_2]
-    for elem in elements:
-        elem.get_aabb(0.01)
-        elem.get_oobb(0.01)
-        elem.get_convex_hull()
+    for e in elements:
+        e.get_aabb(0.01)
+        e.get_oobb(0.01)
+        e.get_convex_hull()
     # Viewer.run(elements=elements, viewer_type="view2")
 
     json_dump(data=elements, fp="src/compas_assembly2/data_sets/1_block_beam_plate.json", pretty=True)
-    #elements_loaded_from_json = json_load(fp="src/compas_assembly2/data_sets/1_block_beam_plate.json")
-    elements_loaded_from_json = json_load(fp="src/compas_assembly2/rhino_commands/rhino_command_convert_to_assembly.json")
-    elements_loaded_from_json.sort(key=lambda element: element.element_type, reverse = True)
-
-
-
-    # center = Point(0, 0, 0)
-    # for elem in elements_loaded_from_json:
-    #     center = center + elem.local_frame.point
-        
-    # center = center/len(elements_loaded_from_json)
-    # for elem in elements_loaded_from_json:
-    #     polyline = Polyline([center,elem.local_frame.point])
-    #     fabrication = Fabrication.create_insertion_sequence_from_polyline(0,polyline,False)
-    #     elem.fabrication[fabrication.type] = fabrication
+    # elements_json = json_load(fp="src/compas_assembly2/data_sets/1_block_beam_plate.json")
+    elements_json = json_load(fp="src/compas_assembly2/rhino_commands/rhino_command_convert_to_assembly.json")
+    elements_json.sort(key=lambda element: element.element_type, reverse=True)
 
     # nest elements linearly and add the the nest frame to the fabrication
-    # first compute the bounding box of the elements, get the horizontal length, and create frame based on previous mesaurements
+    # first compute the bounding box of the elements, get the horizontal length, and create frames
     nest_type = 1
     width = {}
     height = {}
     height_step = 4
     inflate = 0.1
 
-    for elem in elements_loaded_from_json:
-        elem.get_aabb(inflate)
-        elem.get_oobb(inflate)
-        elem.get_convex_hull()
+    for e in elements_json:
+        e.get_aabb(inflate)
+        e.get_oobb(inflate)
+        e.get_convex_hull()
 
     center = Point(0, 0, 0)
-    for elem in elements_loaded_from_json:
-        center = center + elem.local_frame.point
-    center = center/len(elements_loaded_from_json)
+    for e in elements_json:
+        center = center + e.local_frame.point
+    center = center/len(elements_json)
 
+    for e in elements_json:
+        width[e.element_type] = 0
 
-    # width["BLOCK"] = 0
-    # width["FRAME"] = 0
-    # width["PLATE"] = 0
-    for elem in elements_loaded_from_json:
-        width[elem.element_type] = 0
-    
     for index, (key, value) in enumerate(width.items()):
         height[key] = index*height_step*0
-    # print(width)
-    # print(height)
 
-
-
-    for i, elem in enumerate(elements_loaded_from_json):
+    for i, e in enumerate(elements_json):
 
         temp_width = 0
-        source_frame = elem.local_frame.copy()
-        target_frame = Frame([0,0,0],source_frame.xaxis,source_frame.yaxis)
+        source_frame = e.local_frame.copy()
+        target_frame = Frame([0, 0, 0], source_frame.xaxis, source_frame.yaxis)
 
         if nest_type == 0:
             # --------------------------------------------------------------------------
             # aabb linear nesting
             # --------------------------------------------------------------------------
-            temp_width = elem.get_aabb()[6][0]-elem.get_aabb()[0][0]
-            height[elem.element_type] = max(height[elem.element_type], elem.get_aabb()[6][1]-elem.get_aabb()[0][1]) # get the maximum height
+            temp_width = e.get_aabb()[6][0]-e.get_aabb()[0][0]
+            # get the maximum height of the elements
+            height[e.element_type] = max(height[e.element_type], e.get_aabb()[6][1]-e.get_aabb()[0][1])
             source_frame = Frame(
-                elem.get_aabb()[0],
-                [elem.get_aabb()[1][0]-elem.get_aabb()[0][0],elem.get_aabb()[1][1]-elem.get_aabb()[0][1],elem.get_aabb()[1][2]-elem.get_aabb()[0][2]],
-                [elem.get_aabb()[3][0]-elem.get_aabb()[0][0],elem.get_aabb()[3][1]-elem.get_aabb()[0][1],elem.get_aabb()[3][2]-elem.get_aabb()[0][2]])
+                e.get_aabb()[0],
+                [e.get_aabb()[1][0]-e.get_aabb()[0][0],
+                 e.get_aabb()[1][1]-e.get_aabb()[0][1],
+                 e.get_aabb()[1][2]-e.get_aabb()[0][2]],
+                [e.get_aabb()[3][0]-e.get_aabb()[0][0],
+                 e.get_aabb()[3][1]-e.get_aabb()[0][1],
+                 e.get_aabb()[3][2]-e.get_aabb()[0][2]])
             target_frame = Frame(
-                [width[elem.element_type],height[elem.element_type],0],
-                [1,0,0],
-                [0,1,0])
+                [width[e.element_type], height[e.element_type], 0],
+                [1, 0, 0],
+                [0, 1, 0])
         elif nest_type == 1:
             # --------------------------------------------------------------------------
             # oobb linear nesting
             # --------------------------------------------------------------------------
-            temp_width = distance_point_point( elem.get_oobb()[0], elem.get_oobb()[1])
-            height[elem.element_type] = max(height[elem.element_type], distance_point_point( elem.get_oobb()[0], elem.get_oobb()[3])) # get the maximum height
+            temp_width = distance_point_point(e.get_oobb()[0], e.get_oobb()[1])
+            # get the maximum height of the elements
+            height[e.element_type] = max(height[e.element_type], distance_point_point(e.get_oobb()[0], e.get_oobb()[3]))
             source_frame = Frame(
-                elem.get_oobb()[0],
-                [elem.get_oobb()[1][0]-elem.get_oobb()[0][0],elem.get_oobb()[1][1]-elem.get_oobb()[0][1],elem.get_oobb()[1][2]-elem.get_oobb()[0][2]],
-                [elem.get_oobb()[3][0]-elem.get_oobb()[0][0],elem.get_oobb()[3][1]-elem.get_oobb()[0][1],elem.get_oobb()[3][2]-elem.get_oobb()[0][2]])
+                e.get_oobb()[0],
+                [e.get_oobb()[1][0]-e.get_oobb()[0][0],
+                 e.get_oobb()[1][1]-e.get_oobb()[0][1],
+                 e.get_oobb()[1][2]-e.get_oobb()[0][2]],
+                [e.get_oobb()[3][0]-e.get_oobb()[0][0],
+                 e.get_oobb()[3][1]-e.get_oobb()[0][1],
+                 e.get_oobb()[3][2]-e.get_oobb()[0][2]])
             target_frame = Frame(
-                [width[elem.element_type],height[elem.element_type],0],
-                [1,0,0],
-                [0,1,0])
+                [width[e.element_type], height[e.element_type], 0],
+                [1, 0, 0],
+                [0, 1, 0])
         elif nest_type == 3:
             # --------------------------------------------------------------------------
             # move of center
@@ -178,14 +168,18 @@ if __name__ == "__main__":
             x = (1 - t) * center.x + t * source_frame.point.x
             y = (1 - t) * center.y + t * source_frame.point.y
             z = (1 - t) * center.z + t * source_frame.point.z
-            target_frame = Frame([x,y,z],source_frame.xaxis,source_frame.yaxis)
-            
+            target_frame = Frame([x, y, z], source_frame.xaxis, source_frame.yaxis)
+
         # --------------------------------------------------------------------------
         # assignment of fabrication data
         # --------------------------------------------------------------------------
-        fabrication = Fabrication(fabrication_type = FABRICATION_TYPES.NESTING, id=-1, frames=[source_frame,target_frame])
-        elem.fabrication[FABRICATION_TYPES.NESTING] = (fabrication)
-        width[elem.element_type] = width[elem.element_type] + temp_width
+
+        fabrication = Fabrication(
+            fabrication_type=FABRICATION_TYPES.NESTING,
+            id=-1,
+            frames=[source_frame, target_frame])
+        e.fabrication[FABRICATION_TYPES.NESTING] = (fabrication)
+        width[e.element_type] = width[e.element_type] + temp_width
 
     # --------------------------------------------------------------------------
     # center the frames
@@ -196,39 +190,36 @@ if __name__ == "__main__":
         temp_height = height[key]
         height[key] = last_height
         last_height = last_height + temp_height
-         
+
     print(height)
-    for elem in elements_loaded_from_json:
-        elem.fabrication[FABRICATION_TYPES.NESTING].frames[1].point.x = elem.fabrication[FABRICATION_TYPES.NESTING].frames[1].point.x - width[elem.element_type]*0.5
-        elem.fabrication[FABRICATION_TYPES.NESTING].frames[1].point.y = height[elem.element_type] - last_height*0.5
-       
-    
+    for e in elements_json:
+        e.fabrication[FABRICATION_TYPES.NESTING].frames[1].point.x = \
+            e.fabrication[FABRICATION_TYPES.NESTING].frames[1].point.x - \
+            width[e.element_type] * 0.5
+        e.fabrication[FABRICATION_TYPES.NESTING].frames[1].point.y = height[e.element_type] - last_height*0.5
 
+    Viewer.run(elements=elements_json, viewer_type="view2", show_grid=False)
 
-
-    Viewer.run(elements=elements_loaded_from_json, viewer_type="view2", show_grid=False)
-
-
-    #"../src/compas_assembly2/rhino_commands/rhino_command_convert_to_assembly.json",
+    # "../src/compas_assembly2/rhino_commands/rhino_command_convert_to_assembly.json",
     # print before updating the fabrication, assembly, and structural information
-    # print(type(elem))
-    # print(elem.get_aabb(0, Frame.worldXY, True))
-    # print(elem._oobb)
+    # print(type(e))
+    # print(e.get_aabb(0, Frame.worldXY, True))
+    # print(e._oobb)
 
     # # Update fabrication information
-    # elem.fabrication["cut"] = True
-    # elem.fabrication["drill"] = False
+    # e.fabrication["cut"] = True
+    # e.fabrication["drill"] = False
 
     # # Update assembly information
-    # elem.assembly["inerstion_direction"] = (0, 0, 1)
+    # e.assembly["inerstion_direction"] = (0, 0, 1)
 
     # # Update structural information
-    # elem.structure["nodes"] = [(0, 0, 1), (0, 0, 0)]
+    # e.structure["nodes"] = [(0, 0, 1), (0, 0, 0)]
 
     # # print after updating the fabrication, and structural information
-    # # print(elem)
+    # # print(e)
 
-    # print(elem)
-    # elem_copy = elem.copy()
+    # print(e)
+    # elem_copy = e.copy()
     # elem_copy.fabrication["cut"] = False
     # print(elem_copy)
