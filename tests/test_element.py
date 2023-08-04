@@ -90,7 +90,7 @@ if __name__ == "__main__":
     json_dump(data=elements, fp="src/compas_assembly2/data_sets/1_block_beam_plate.json", pretty=True)
     #elements_loaded_from_json = json_load(fp="src/compas_assembly2/data_sets/1_block_beam_plate.json")
     elements_loaded_from_json = json_load(fp="src/compas_assembly2/rhino_commands/rhino_command_convert_to_assembly.json")
-
+    elements_loaded_from_json.sort(key=lambda element: element.element_type, reverse = True)
 
 
 
@@ -122,16 +122,17 @@ if __name__ == "__main__":
         center = center + elem.local_frame.point
     center = center/len(elements_loaded_from_json)
 
+
+    # width["BLOCK"] = 0
+    # width["FRAME"] = 0
+    # width["PLATE"] = 0
     for elem in elements_loaded_from_json:
         width[elem.element_type] = 0
-    width["BLOCK"] = 0
-    width["FRAME"] = 0
-    width["PLATE"] = 0
     
     for index, (key, value) in enumerate(width.items()):
-        height[key] = index*height_step
-    print(width)
-    print(height)
+        height[key] = index*height_step*0
+    # print(width)
+    # print(height)
 
 
 
@@ -146,6 +147,7 @@ if __name__ == "__main__":
             # aabb linear nesting
             # --------------------------------------------------------------------------
             temp_width = elem.get_aabb()[6][0]-elem.get_aabb()[0][0]
+            height[elem.element_type] = max(height[elem.element_type], elem.get_aabb()[6][1]-elem.get_aabb()[0][1]) # get the maximum height
             source_frame = Frame(
                 elem.get_aabb()[0],
                 [elem.get_aabb()[1][0]-elem.get_aabb()[0][0],elem.get_aabb()[1][1]-elem.get_aabb()[0][1],elem.get_aabb()[1][2]-elem.get_aabb()[0][2]],
@@ -159,6 +161,7 @@ if __name__ == "__main__":
             # oobb linear nesting
             # --------------------------------------------------------------------------
             temp_width = distance_point_point( elem.get_oobb()[0], elem.get_oobb()[1])
+            height[elem.element_type] = max(height[elem.element_type], distance_point_point( elem.get_oobb()[0], elem.get_oobb()[3])) # get the maximum height
             source_frame = Frame(
                 elem.get_oobb()[0],
                 [elem.get_oobb()[1][0]-elem.get_oobb()[0][0],elem.get_oobb()[1][1]-elem.get_oobb()[0][1],elem.get_oobb()[1][2]-elem.get_oobb()[0][2]],
@@ -187,9 +190,20 @@ if __name__ == "__main__":
     # --------------------------------------------------------------------------
     # center the frames
     # --------------------------------------------------------------------------
+    print(height)
+    last_height = 0
+    for index, (key, value) in enumerate(width.items()):
+        temp_height = height[key]
+        height[key] = last_height
+        last_height = last_height + temp_height
+         
+    print(height)
     for elem in elements_loaded_from_json:
         elem.fabrication[FABRICATION_TYPES.NESTING].frames[1].point.x = elem.fabrication[FABRICATION_TYPES.NESTING].frames[1].point.x - width[elem.element_type]*0.5
-        elem.fabrication[FABRICATION_TYPES.NESTING].frames[1].point.y = elem.fabrication[FABRICATION_TYPES.NESTING].frames[1].point.y - (len(height)-1)*height_step*0.5
+        elem.fabrication[FABRICATION_TYPES.NESTING].frames[1].point.y = height[elem.element_type] - last_height*0.5
+       
+    
+
 
 
     Viewer.run(elements=elements_loaded_from_json, viewer_type="view2", show_grid=False)

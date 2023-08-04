@@ -57,7 +57,7 @@ class Viewer:
             Color(0.929, 0.082, 0.498),
             Color(0.129, 0.572, 0.815),
             Color(0.5, 0.5, 0.5),
-            Color(0.75, 0.75, 0.75),
+            Color(0.95, 0.95, 0.95),
             Color(0, 0, 0),
         ],
     ):
@@ -74,11 +74,14 @@ class Viewer:
 
                 # initialize the viewer
                 viewer = App(
-                    viewmode="shaded",
+                    viewmode="lighted",
+                    version="120",
                     enable_sidebar=True,
                     width=width,
                     height=height,
                     show_grid=show_grid,
+  
+
                 )
                 
                 viewer_objects = {
@@ -267,7 +270,7 @@ class Viewer:
                                     linecolor=colors[4],
                                     facecolor=colors[3],#Viewer.string_to_color(element.element_type),#colors[3],
                                     linewidth=1,
-                                    opacity=0.333,  # type: ignore
+                                    opacity=0.9,  # type: ignore
                                     hide_coplanaredges=True,
                                 )
                             
@@ -313,7 +316,7 @@ class Viewer:
                     # add frames
                     # --------------------------------------------------------------------------
 
-                    local_frames_lines = [
+                    global_frames_lines = [
                         Line(
                             element.global_frame.point,
                             element.global_frame.point + element.global_frame.xaxis * display_axis_scale * 0.5,
@@ -328,7 +331,24 @@ class Viewer:
                         ),
                     ]
 
-                    global_frames_lines = [
+                    for i in range(len(global_frames_lines)):
+                        o = viewer.add(
+                                global_frames_lines[i],
+                                name=element_id,
+                                is_selected=False,
+                                is_visible=show_frames,
+                                show_points=False,
+                                show_lines=False,
+                                show_faces=True,
+                                pointcolor=Color(1, 0, 0),
+                                linecolor=colors[i % 3],
+                                facecolor=colors[i % 3],
+                                linewidth=line_width,
+                                # u=16,
+                            )
+                        viewer_objects["viewer_global_frames"].append( o)
+
+                    local_frames_lines = [
                         Line(
                             element.local_frame.point,
                             element.local_frame.point + element.local_frame.xaxis * display_axis_scale,
@@ -359,24 +379,6 @@ class Viewer:
                                 # u=16,
                             )
                         viewer_objects["viewer_local_frames"].append( o)
-
-
-                    for i in range(len(global_frames_lines)):
-                        o = viewer.add(
-                                global_frames_lines[i],
-                                name=element_id,
-                                is_selected=False,
-                                is_visible=show_frames,
-                                show_points=False,
-                                show_lines=False,
-                                show_faces=True,
-                                pointcolor=Color(1, 0, 0),
-                                linecolor=colors[i % 3],
-                                facecolor=colors[i % 3],
-                                linewidth=line_width,
-                                # u=16,
-                            )
-                        viewer_objects["viewer_global_frames"].append( o)
 
                     # --------------------------------------------------------------------------
                     # add aabb | oobb | convex hull
@@ -510,7 +512,7 @@ class Viewer:
 
 
                 @viewer.slider(title="fabrication_example", maxval=100, step=1, bgcolor=Color.white())
-                def slider(t):
+                def slider_nesting(t):
 
 
                     def interpolate_frames(frame0, frame1, t):
@@ -558,7 +560,7 @@ class Viewer:
                     for id, element in enumerate(elements):
                         for key, value in element.fabrication.items():
                             if (key == FABRICATION_TYPES.NESTING):
-                                target_frame = interpolate_frames(value.frames[0],value.frames[1], t / 100)
+                                target_frame = interpolate_frames(value.frames[0],value.frames[1], t/100 )
                                 compas_matrix = Transformation.from_frame_to_frame(value.frames[0], target_frame)
                                 dict_matrices[str(element.id)]=(compas_matrix.matrix)
 
@@ -571,7 +573,10 @@ class Viewer:
                     # update the viewer after all the matrices are changed
                     viewer.view.update()
 
-
+                @viewer.slider(title="opacity", maxval=100, step=1, bgcolor=Color.white(), value=95)
+                def slider_opacity(t):
+                    for o in viewer_objects["viewer_display_shapes"]:
+                            o.opacity = t/100.0
                 # --------------------------------------------------------------------------
                 # run
                 # --------------------------------------------------------------------------
