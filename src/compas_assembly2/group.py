@@ -2,12 +2,12 @@ from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import division
 
-from collections import OrderedDict
-
 from compas.datastructures import Datastructure
 from compas.geometry import Frame
-
 from compas_assembly2.element import Element
+
+# https://grantjenks.com/docs/sortedcontainers/sorteddict.html
+from compas_assembly2.sortedcontainers.sorteddict import SortedDict
 
 
 class Group(Datastructure):
@@ -29,7 +29,7 @@ class Group(Datastructure):
             group_elements = Group()
         """
 
-        self._elements = OrderedDict()
+        self._elements = SortedDict()
 
     # ==========================================================================
     # properties - operator overload [] and []=
@@ -178,10 +178,10 @@ class Group(Datastructure):
             group_elements.add(element2)
         """
 
-        if element.id in self._elements:
-            self._elements[element.id].append(element)
+        if tuple(element.id) in self._elements:
+            self._elements[tuple(element.id)].append(element)
         else:
-            self._elements[element.id] = [element]
+            self._elements[tuple(element.id)] = [element]
 
     def merge(self, other_elements):
         """
@@ -326,7 +326,7 @@ class Group(Datastructure):
     # collections - partitioning methods
     # ==========================================================================
 
-    def regroup_after_keeping_first_indices(self, num_indices_to_keep):
+    def regroup_by_keeping_first_indices(self, num_indices_to_keep):
         """
         Regroup the ordered dictionary _elements by keeping the first N indices of each key.
 
@@ -344,7 +344,7 @@ class Group(Datastructure):
             # Before regrouping: {(1, 2, 3): [Element1], (1, 2, 4): [Element2], (1, 3, 5): [Element3]}
             # After regrouping: {(1, 2): [Element1, Element2], (1, 3): [Element3]}
         """
-        new__elements = OrderedDict()
+        new__elements = SortedDict()  # ignore
         for key, value in self._elements.items():
             if len(key) >= num_indices_to_keep:
                 new_key = key[:num_indices_to_keep]
@@ -413,18 +413,18 @@ class Group(Datastructure):
 if __name__ == "__main__":
     group_elements = Group()
     group_elements.add(
-        Element(id=(1, 2, 3), l_frame=Frame.worldXY(), g_frame=Frame.worldXY(), attr={"t": "Block", "m": 30})
+        Element(id=[1, 2, 3], l_frame=Frame.worldXY(), g_frame=Frame.worldXY(), attr={"t": "Block", "m": 30})
     )
     group_elements.add(
-        Element(id=(3, 0, 3), l_frame=Frame.worldXY(), g_frame=Frame.worldXY(), attr={"t": "Beam", "m": 25})
+        Element(id=[3, 0, 3], l_frame=Frame.worldXY(), g_frame=Frame.worldXY(), attr={"t": "Beam", "m": 25})
     )
     group_elements.add(
-        Element(id=(0, 2, 4), l_frame=Frame.worldXY(), g_frame=Frame.worldXY(), attr={"t": "Block", "m": 25})
+        Element(id=[0, 2, 4], l_frame=Frame.worldXY(), g_frame=Frame.worldXY(), attr={"t": "Block", "m": 25})
     )
     group_elements.add(
-        Element(id=(1, 0, 3), l_frame=Frame.worldXY(), g_frame=Frame.worldXY(), attr={"t": "Plate", "m": 40})
+        Element(id=[1, 0, 3], l_frame=Frame.worldXY(), g_frame=Frame.worldXY(), attr={"t": "Plate", "m": 40})
     )
     group_elements.add(
-        Element(id=(2, 2), l_frame=Frame.worldXY(), g_frame=Frame.worldXY(), attr={"t": "Block", "m": 30})
+        Element(id=[2, 2], l_frame=Frame.worldXY(), g_frame=Frame.worldXY(), attr={"t": "Block", "m": 30})
     )
     print(group_elements)

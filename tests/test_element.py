@@ -1,7 +1,8 @@
 from compas.datastructures import Mesh
 from compas.geometry import Point, Polyline, Box, Translation, Frame, Line, Pointcloud, distance_point_point
 import random
-from compas_assembly2.element import Element, ELEMENT_TYPE
+import compas_assembly2
+from compas_assembly2.element import Element
 from compas_assembly2.viewer import Viewer
 from compas_assembly2.fabrication import Fabrication, FABRICATION_TYPES
 
@@ -45,7 +46,7 @@ if __name__ == "__main__":
     geo_2 = [box]
 
     elem_0 = Element(
-        element_type=ELEMENT_TYPE.BLOCK,
+        element_type=compas_assembly2.ELEMENT_NAME.BLOCK,
         id=[0, 1],
         simplex=[Point(-3, 0, 0)],
         display_shapes=geo_0,
@@ -54,7 +55,7 @@ if __name__ == "__main__":
     )
 
     elem_1 = Element(
-        element_type=ELEMENT_TYPE.FRAME,
+        element_type=compas_assembly2.ELEMENT_NAME.FRAME,
         id=[0, 2],
         simplex=[Line((0, -2, 0), (0, 2, 0))],
         display_shapes=geo_1,
@@ -63,7 +64,7 @@ if __name__ == "__main__":
     )
 
     elem_2 = Element(
-        element_type=ELEMENT_TYPE.PLATE,
+        element_type=compas_assembly2.ELEMENT_NAME.PLATE,
         id=[3, 0],
         simplex=[
             Polyline(
@@ -123,7 +124,7 @@ if __name__ == "__main__":
         source_frame = e.local_frame.copy()
         target_frame = Frame([0, 0, 0], source_frame.xaxis, source_frame.yaxis)
 
-        if nest_type == 0:
+        if nest_type == 0 and e.get_aabb() is not None:
             # --------------------------------------------------------------------------
             # aabb linear nesting
             # --------------------------------------------------------------------------
@@ -144,7 +145,7 @@ if __name__ == "__main__":
                 ],
             )
             target_frame = Frame([width[e.element_type], height[e.element_type], 0], [1, 0, 0], [0, 1, 0])
-        elif nest_type == 1:
+        elif nest_type == 1 and e.get_oobb() is not None:
             # --------------------------------------------------------------------------
             # oobb linear nesting
             # --------------------------------------------------------------------------
@@ -188,14 +189,12 @@ if __name__ == "__main__":
     # --------------------------------------------------------------------------
     # center the frames
     # --------------------------------------------------------------------------
-    print(height)
     last_height = 0
     for index, (key, value) in enumerate(width.items()):
         temp_height = height[key]
         height[key] = last_height
         last_height = last_height + temp_height
 
-    print(height)
     for e in elements_json:
         e.fabrication[FABRICATION_TYPES.NESTING].frames[1].point.x = (
             e.fabrication[FABRICATION_TYPES.NESTING].frames[1].point.x - width[e.element_type] * 0.5

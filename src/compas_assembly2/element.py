@@ -13,31 +13,10 @@ from compas.geometry import (
 from compas.datastructures import Mesh, mesh_bounding_box
 from compas.data import Data
 import copy
-
-
-class ELEMENT_TYPE:
-    BLOCK = "BLOCK"
-    BLOCK_CONCAVE = "BLOCK_CONCAVE"
-    BLOCK_X = "BLOCK_X"
-    FRAME = "FRAME"
-    FRAME_BENT = "FRAME_BENT"
-    FRAME_X = "FRAME_X"
-    PLATE = "PLATE"
-    SHELL = "SHELL"
-    SHELL_X = "SHELL_X"
-    CUSTOM = "CUSTOM"
-
-    @classmethod
-    def find_element_type(cls, input_string):
-        input_string = input_string.upper()  # Convert input to uppercase for case-insensitive comparison
-        if hasattr(ELEMENT_TYPE, input_string):
-            return getattr(ELEMENT_TYPE, input_string)
-        else:
-            return None
+import compas_assembly2
 
 
 class Element(Data):
-    """Class representing a structural object of an assembly."""
 
     # ==========================================================================
     # CONSTRUCTORS (INPUT)
@@ -50,7 +29,7 @@ class Element(Data):
 
     Parameters
     ----------
-        element_type (ElementType): The type of the element, e.g., ElementType.BLOCK, ElementType.BEAM and etc.
+        name (str): The name of the element, e.g., "BLOCK", "BEAM" and etc.
         id (list[int] or int): A unique identifier as a list, e.g.,[0] or [0, 1] or [1, 5, 9].
         attr (dict, optional): A dictionary containing attributes of the element. Defaults to an empty dictionary.
         simplex (list, optional): Supported types: Point, Polyline (for lines use two points), List(Polyline)
@@ -67,7 +46,7 @@ class Element(Data):
     -------
         if __name__ == "__main__":
             elem = Element(
-                element_type=ElementType.BLOCK,
+                name=compas_assembly2.ELEMENT_NAME.BLOCK,
                 id=[0, 1],
                 display_shapes =[],
                 local_frame=Frame(point=(0, 0, 0), xaxis=(1, 0, 0), yaxis=(0, 1, 0)),
@@ -95,8 +74,8 @@ class Element(Data):
 
     def __init__(
         self,
-        element_type=ELEMENT_TYPE.BLOCK,
-        id=(0, 1),
+        name=compas_assembly2.ELEMENT_NAME.BLOCK,
+        id=[0, 1],
         simplex=[],
         display_shapes=[],
         local_frame=Frame.worldXY,
@@ -114,7 +93,7 @@ class Element(Data):
             if isinstance(id, int)
             else id
         )  # tuple e.g. (0, 1) or (1, 5, 9)
-        self.element_type = element_type  # type of the element, e.g., block, beam, plate, node, etc.
+        self.name = name  # name of the element, e.g., block, beam, plate, node, etc.
         self.attributes = {}  # set the attributes of an object
         self.attributes.update(kwargs)  # update the attributes of with the kwargs
 
@@ -169,7 +148,7 @@ class Element(Data):
     def data(self):
         # call the inherited Data constructor for json serialization
         data = {
-            "element_type": self.element_type,
+            "name": self.name,
             "id": self.id,
             "simplex": self.simplex,
             "display_shapes": self.display_shapes,
@@ -198,7 +177,7 @@ class Element(Data):
         # call the inherited Data constructor for json serialization
 
         # main properties
-        self.element_type = data["element_type"]
+        self.name = data["name"]
         self.id = data["id"]
 
         self.simplex = data["simplex"]
@@ -222,7 +201,7 @@ class Element(Data):
     def from_data(cls, data):
         """Alternative to None default __init__ parameters."""
         obj = Element(
-            element_type=data["element_type"],
+            name=data["name"],
             id=data["id"],
             simplex=data["simplex"],
             display_shapes=data["display_shapes"],
@@ -255,7 +234,7 @@ class Element(Data):
         if self._aabb:
             return self._aabb
 
-        # iterate display_shapes  and get the bounding box by geometry type
+        # iterate display_shapes  and get the bounding box by geometry name
         # Mesh, Polyline, Box, Line
         points_bbox = []
 
@@ -297,7 +276,7 @@ class Element(Data):
         if self._oobb:
             return self._oobb
 
-        # iterate display_shapes and get the bounding box by geometry type
+        # iterate display_shapes and get the bounding box by geometry name
         # Mesh, Polyline, Box, Line
         points = []
 
@@ -355,7 +334,7 @@ class Element(Data):
         if self._convex_hull.is_empty() is False:
             return self._convex_hull
 
-        # iterate display_shapes and get the bounding box by geometry type
+        # iterate display_shapes and get the bounding box by geometry name
         # Mesh, Polyline, Box, Line
         points = []
 
@@ -386,34 +365,6 @@ class Element(Data):
             self._convex_hull = Mesh()
             return self._convex_hull
 
-    def __repr__(self):
-        """
-        Return a string representation of the Element.
-
-        Returns:
-            str: The string representation of the Element.
-        """
-        return """
-# (Type: {0},
-#  ID: {1},
-#  Minimal Representation Geometries: {2},
-#  Vizualization Geometries: {3},
-#  Local Frame: {4},
-#  Global Frame: {5},
-#  Fabrication: {6},
-#  Structure: {7},
-#  Attributes: {8})""".format(
-            self.element_type,
-            self.id,
-            self.simplex,
-            self.display_shapes,
-            self.local_frame,
-            self.global_frame,
-            self.fabrication,
-            self.structure,
-            self.attributes,
-        )
-
     # ==========================================================================
     # PROPERTIES FOR DIGITAL FABRICATION (OUTPUT)
     # ==========================================================================
@@ -431,7 +382,7 @@ class Element(Data):
     def copy(self):
         # copy main properties
         new_instance = self.__class__(
-            self.element_type, self.id, self.display_shapes, self.local_frame, self.global_frame, **self.attributes
+            self.name, self.id, self.display_shapes, self.local_frame, self.global_frame, **self.attributes
         )
 
         # deepcopy of the fabrication, and structural information
@@ -537,3 +488,35 @@ class Element(Data):
 
     def collide(self, other):
         pass
+
+    # ==========================================================================
+    # DESCRIPTION
+    # ==========================================================================
+
+    def __repr__(self):
+        """
+        Return a string representation of the Element.
+
+        Returns:
+            str: The string representation of the Element.
+        """
+        return """
+# (Type: {0},
+#  ID: {1},
+#  Minimal Representation Geometries: {2},
+#  Vizualization Geometries: {3},
+#  Local Frame: {4},
+#  Global Frame: {5},
+#  Fabrication: {6},
+#  Structure: {7},
+#  Attributes: {8})""".format(
+            self.name,
+            self.id,
+            self.simplex,
+            self.display_shapes,
+            self.local_frame,
+            self.global_frame,
+            self.fabrication,
+            self.structure,
+            self.attributes,
+        )

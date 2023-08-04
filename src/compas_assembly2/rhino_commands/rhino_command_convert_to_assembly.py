@@ -16,7 +16,9 @@ from compas.geometry import (
     distance_point_point,
     distance_point_plane_signed,
 )
-from compas_assembly2.element import Element, ELEMENT_TYPE
+
+import compas_assembly2
+from compas_assembly2.element import Element
 from compas.data import (
     json_dump,
 )  # https://compas.dev/compas/latest/reference/generated/compas.data.Data.html
@@ -422,7 +424,7 @@ class conversions:
 def process_string(input_string):
     # Convert the string to lowercase
     input_string = input_string.lower()
-    result = {"ELEMENT_TYPE": "warning_not_defined", "PROPERTY_TYPE": "warning_not_defined"}
+    result = {"ELEMENT_NAME": "warning_not_defined", "PROPERTY_TYPE": "warning_not_defined"}
     # Check if the string contains "::"
     if "::" in input_string:
         # Split the string into substrings using "::"
@@ -438,11 +440,11 @@ def process_string(input_string):
                 # Check if the string contains any of the specified substrings
 
                 if "block" in input_string:
-                    result["ELEMENT_TYPE"] = "block"
+                    result["ELEMENT_NAME"] = "block"
                 elif "frame" in input_string:
-                    result["ELEMENT_TYPE"] = "frame"
+                    result["ELEMENT_NAME"] = "frame"
                 elif "plate" in input_string:
-                    result["ELEMENT_TYPE"] = "plate"
+                    result["ELEMENT_NAME"] = "plate"
 
             elif "simplex" in input_string:
                 result["PROPERTY_TYPE"] = "simplex"
@@ -457,6 +459,8 @@ def process_string(input_string):
 
 elements = []
 counter = 0
+dict_id = {"BLOCK": 0, "FRAME": 1, "PLATE": 2}
+
 for group_id, subsequent_groups in grouped_objects.items():
 
     # --------------------------------------------------------------------------
@@ -473,8 +477,9 @@ for group_id, subsequent_groups in grouped_objects.items():
 
     # create element
     o = Element(
-        element_type=ELEMENT_TYPE.find_element_type(processed_layer_name["ELEMENT_TYPE"]),  # type: ignore
-        id=(counter, group_id),  # noqa: E231
+        # ensure that this name exists
+        element_name=compas_assembly2.ELEMENT_NAME.exists(processed_layer_name["ELEMENT_NAME"]),  # type: ignore
+        id=(dict_id[processed_layer_name["ELEMENT_NAME"].upper()], counter),  # noqa: E231
     )
     counter = counter + 1
 
@@ -562,8 +567,7 @@ for group_id, subsequent_groups in grouped_objects.items():
     # --------------------------------------------------------------------------
     # special case for plates, where the simpices must be sorted and split
     # --------------------------------------------------------------------------
-    # print(o.element_type)
-    if o.element_type == "PLATE":
+    if o.name == "PLATE":
         first_half, merged, frame = conversions.sort_polyline_pairs(o.simplex)
         o.simplex = first_half
         o.local_frame = frame
@@ -571,7 +575,7 @@ for group_id, subsequent_groups in grouped_objects.items():
     # --------------------------------------------------------------------------
     # collect the element instance
     # --------------------------------------------------------------------------
-    # print(o)
+    print(o)
     elements.append(o)
 
 

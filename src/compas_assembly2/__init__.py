@@ -70,7 +70,12 @@ __all_plugins__ = [
     "compas_assembly2",
 ]
 
-__all__ = ["HOME", "DATA", "DOCS", "TEMP"]
+__all__ = [
+    "HOME",
+    "DATA",
+    "DOCS",
+    "TEMP",
+]
 
 # Define the base URL for images based on the environment
 if os.getenv("READTHEDOCS") == "True":
@@ -82,3 +87,27 @@ else:
 html_context = {
     "base_url": base_url,
 }
+
+
+# Global variables relate to the assembly data-structure
+
+
+class ELEMENT_NAME:
+    BLOCK = "BLOCK"
+    BLOCK_CONCAVE = "BLOCK_CONCAVE"
+    BLOCK_X = "BLOCK_X"
+    FRAME = "FRAME"
+    FRAME_BENT = "FRAME_BENT"
+    FRAME_X = "FRAME_X"
+    PLATE = "PLATE"
+    SHELL = "SHELL"
+    SHELL_X = "SHELL_X"
+    CUSTOM = "CUSTOM"
+
+    @staticmethod
+    def exists(input_string):
+        input_string = input_string.upper()  # Convert input to uppercase for case-insensitive comparison
+        if hasattr(ELEMENT_NAME, input_string):
+            return getattr(ELEMENT_NAME, input_string)
+        else:
+            return "Invalid element type."

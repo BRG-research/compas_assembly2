@@ -11,13 +11,6 @@ from compas.datastructures import Mesh
 # select objects
 ids = rs.GetObjects("Select objects", preselect=True, select=True)
 
-# ==========================================================================
-# TODO
-# ==========================================================================
-# get object groups, sort objects in a tree based on group names
-# write objects information into json or xml
-# read in compas_assembly and display it in python
-# build display pipeline in rhino, where button acts as radio buttons in compas_assembly2
 
 # ==========================================================================
 # Get object groups indices as list
@@ -84,7 +77,6 @@ def partition_by_common_group_id(objects_list):
 
     # Create a dictionary to group the objects based on the most common integer IDs
     group_count = Rhino.RhinoDoc.ActiveDoc.Groups.Count
-    print(group_count)
 
     grouped_objects = {}
     for obj in objects_list:
@@ -390,7 +382,6 @@ def add_mesh_to_group(mesh, group_id):
 
     if mesh_id:
         rs.AddObjectToGroup(mesh_id, group_name)
-        print("Mesh added to Group.")
         return True
     else:
         print("Failed to create the mesh.")
@@ -409,4 +400,3 @@ for group_id, subsequent_groups in grouped_objects.items():
     if len(curves) == 2:
         mesh = polyline_lofter.loft_polylines_with_holes([curves[0].ToNurbsCurve()], [curves[1].ToNurbsCurve()])
         add_mesh_to_group(mesh, group_id)
-        print("two_curves", group_id)
