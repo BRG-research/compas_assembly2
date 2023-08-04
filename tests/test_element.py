@@ -4,6 +4,7 @@ import random
 from compas_assembly2.element import Element, ELEMENT_TYPE
 from compas_assembly2.viewer import Viewer
 from compas_assembly2.fabrication import Fabrication, FABRICATION_TYPES
+
 # https://compas.dev/compas/latest/reference/generated/compas.data.Data.html
 from compas.data import json_dump, json_load
 
@@ -108,13 +109,13 @@ if __name__ == "__main__":
     center = Point(0, 0, 0)
     for e in elements_json:
         center = center + e.local_frame.point
-    center = center/len(elements_json)
+    center = center / len(elements_json)
 
     for e in elements_json:
         width[e.element_type] = 0
 
     for index, (key, value) in enumerate(width.items()):
-        height[key] = index*height_step*0
+        height[key] = index * height_step * 0
 
     for i, e in enumerate(elements_json):
 
@@ -126,21 +127,23 @@ if __name__ == "__main__":
             # --------------------------------------------------------------------------
             # aabb linear nesting
             # --------------------------------------------------------------------------
-            temp_width = e.get_aabb()[6][0]-e.get_aabb()[0][0]
+            temp_width = e.get_aabb()[6][0] - e.get_aabb()[0][0]
             # get the maximum height of the elements
-            height[e.element_type] = max(height[e.element_type], e.get_aabb()[6][1]-e.get_aabb()[0][1])
+            height[e.element_type] = max(height[e.element_type], e.get_aabb()[6][1] - e.get_aabb()[0][1])
             source_frame = Frame(
                 e.get_aabb()[0],
-                [e.get_aabb()[1][0]-e.get_aabb()[0][0],
-                 e.get_aabb()[1][1]-e.get_aabb()[0][1],
-                 e.get_aabb()[1][2]-e.get_aabb()[0][2]],
-                [e.get_aabb()[3][0]-e.get_aabb()[0][0],
-                 e.get_aabb()[3][1]-e.get_aabb()[0][1],
-                 e.get_aabb()[3][2]-e.get_aabb()[0][2]])
-            target_frame = Frame(
-                [width[e.element_type], height[e.element_type], 0],
-                [1, 0, 0],
-                [0, 1, 0])
+                [
+                    e.get_aabb()[1][0] - e.get_aabb()[0][0],
+                    e.get_aabb()[1][1] - e.get_aabb()[0][1],
+                    e.get_aabb()[1][2] - e.get_aabb()[0][2],
+                ],
+                [
+                    e.get_aabb()[3][0] - e.get_aabb()[0][0],
+                    e.get_aabb()[3][1] - e.get_aabb()[0][1],
+                    e.get_aabb()[3][2] - e.get_aabb()[0][2],
+                ],
+            )
+            target_frame = Frame([width[e.element_type], height[e.element_type], 0], [1, 0, 0], [0, 1, 0])
         elif nest_type == 1:
             # --------------------------------------------------------------------------
             # oobb linear nesting
@@ -150,16 +153,18 @@ if __name__ == "__main__":
             height[e.element_type] = max(height[e.element_type], distance_point_point(e.get_oobb()[0], e.get_oobb()[3]))
             source_frame = Frame(
                 e.get_oobb()[0],
-                [e.get_oobb()[1][0]-e.get_oobb()[0][0],
-                 e.get_oobb()[1][1]-e.get_oobb()[0][1],
-                 e.get_oobb()[1][2]-e.get_oobb()[0][2]],
-                [e.get_oobb()[3][0]-e.get_oobb()[0][0],
-                 e.get_oobb()[3][1]-e.get_oobb()[0][1],
-                 e.get_oobb()[3][2]-e.get_oobb()[0][2]])
-            target_frame = Frame(
-                [width[e.element_type], height[e.element_type], 0],
-                [1, 0, 0],
-                [0, 1, 0])
+                [
+                    e.get_oobb()[1][0] - e.get_oobb()[0][0],
+                    e.get_oobb()[1][1] - e.get_oobb()[0][1],
+                    e.get_oobb()[1][2] - e.get_oobb()[0][2],
+                ],
+                [
+                    e.get_oobb()[3][0] - e.get_oobb()[0][0],
+                    e.get_oobb()[3][1] - e.get_oobb()[0][1],
+                    e.get_oobb()[3][2] - e.get_oobb()[0][2],
+                ],
+            )
+            target_frame = Frame([width[e.element_type], height[e.element_type], 0], [1, 0, 0], [0, 1, 0])
         elif nest_type == 3:
             # --------------------------------------------------------------------------
             # move of center
@@ -175,10 +180,9 @@ if __name__ == "__main__":
         # --------------------------------------------------------------------------
 
         fabrication = Fabrication(
-            fabrication_type=FABRICATION_TYPES.NESTING,
-            id=-1,
-            frames=[source_frame, target_frame])
-        e.fabrication[FABRICATION_TYPES.NESTING] = (fabrication)
+            fabrication_type=FABRICATION_TYPES.NESTING, id=-1, frames=[source_frame, target_frame]
+        )
+        e.fabrication[FABRICATION_TYPES.NESTING] = fabrication
         width[e.element_type] = width[e.element_type] + temp_width
 
     # --------------------------------------------------------------------------
@@ -193,10 +197,10 @@ if __name__ == "__main__":
 
     print(height)
     for e in elements_json:
-        e.fabrication[FABRICATION_TYPES.NESTING].frames[1].point.x = \
-            e.fabrication[FABRICATION_TYPES.NESTING].frames[1].point.x - \
-            width[e.element_type] * 0.5
-        e.fabrication[FABRICATION_TYPES.NESTING].frames[1].point.y = height[e.element_type] - last_height*0.5
+        e.fabrication[FABRICATION_TYPES.NESTING].frames[1].point.x = (
+            e.fabrication[FABRICATION_TYPES.NESTING].frames[1].point.x - width[e.element_type] * 0.5
+        )
+        e.fabrication[FABRICATION_TYPES.NESTING].frames[1].point.y = height[e.element_type] - last_height * 0.5
 
     Viewer.run(elements=elements_json, viewer_type="view2", show_grid=False)
 

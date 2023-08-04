@@ -16,6 +16,7 @@ class FABRICATION_TYPES:
 
 class Fabrication:
     """Fabrication data-structure for subtractive and additive processes"""
+
     def __init__(self, fabrication_type=None, id=None, frames=None, **kwargs):
         self.type = fabrication_type or FABRICATION_TYPES.CUSTOM
         self.id = id or (0)
@@ -84,16 +85,16 @@ class Fabrication:
     @staticmethod
     def from_line(polyline):
 
-        if (polyline):
+        if polyline:
             points = []
             counter = 0
             for p in polyline:
-                if (counter == 2):
+                if counter == 2:
                     break
-                counter = counter+1
+                counter = counter + 1
                 points.append(Point(p[0], p[1], p[2]))
 
-            if (counter == 2):
+            if counter == 2:
                 x_axis_vector, y_axis_vector = Fabrication.perpendicular_to(points[0], points[1])
                 return Frame(points[0], x_axis_vector, y_axis_vector)
             else:
@@ -105,7 +106,7 @@ class Fabrication:
     def create_insertion_sequence_from_polyline(cls, id=-1, polyline=None, xy_or_direction_orientation=True):
         """Create a fabrication sequence from a polyline"""
 
-        if (polyline is None):
+        if polyline is None:
             raise Exception("No polyline provided")
 
         frames = []
@@ -113,8 +114,8 @@ class Fabrication:
             for i in range(len(polyline.points)):
                 frames.append(Frame(polyline.points[i], [1, 0, 0], [0, 1, 0]))
         else:
-            for i in range(len(polyline.points)-1):
-                polyline_segment = Polyline([polyline.points[i], polyline.points[i+1]])
+            for i in range(len(polyline.points) - 1):
+                polyline_segment = Polyline([polyline.points[i], polyline.points[i + 1]])
                 frame = Fabrication.from_line(polyline_segment)
                 frames.append(frame)
 

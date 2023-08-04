@@ -1,7 +1,19 @@
-from compas.geometry import Frame, Geometry, Transformation, Polyline, Point, Box, Line, Pointcloud, bounding_box, convex_hull, distance_point_point
+from compas.geometry import (
+    Frame,
+    Geometry,
+    Transformation,
+    Polyline,
+    Point,
+    Box,
+    Line,
+    Pointcloud,
+    bounding_box,
+    convex_hull,
+)
 from compas.datastructures import Mesh, mesh_bounding_box
 from compas.data import Data
 import copy
+
 
 class ELEMENT_TYPE:
     BLOCK = "BLOCK"
@@ -24,9 +36,6 @@ class ELEMENT_TYPE:
             return None
 
 
-
-
-
 class Element(Data):
     """Class representing a structural object of an assembly."""
 
@@ -42,7 +51,7 @@ class Element(Data):
     Parameters
     ----------
         element_type (ElementType): The type of the element, e.g., ElementType.BLOCK, ElementType.BEAM and etc.
-        id (list[int] or int): A unique identifier for the element, represented as a list, e.g.,[0] or [0, 1] or [1, 5, 9].
+        id (list[int] or int): A unique identifier as a list, e.g.,[0] or [0, 1] or [1, 5, 9].
         attr (dict, optional): A dictionary containing attributes of the element. Defaults to an empty dictionary.
         simplex (list, optional): Supported types: Point, Polyline (for lines use two points), List(Polyline)
         display_shapes  (list, optional): Supported types: Mesh, Polyline, Box, Line, Pointcloud.
@@ -98,7 +107,13 @@ class Element(Data):
         super(Element, self).__init__()
 
         # indexing + attributes
-        self.id = [id,] if isinstance(id, int) else id  # tuple e.g. (0, 1) or (1, 5, 9)
+        self.id = (
+            [
+                id,
+            ]
+            if isinstance(id, int)
+            else id
+        )  # tuple e.g. (0, 1) or (1, 5, 9)
         self.element_type = element_type  # type of the element, e.g., block, beam, plate, node, etc.
         self.attributes = {}  # set the attributes of an object
         self.attributes.update(kwargs)  # update the attributes of with the kwargs
@@ -110,11 +125,11 @@ class Element(Data):
         self.simplex = []  # geometry, can be meshes, breps, curves, points, etc.
 
         for g in simplex:
-            if isinstance(g, Geometry) or isinstance(g, Mesh) :
+            if isinstance(g, Geometry) or isinstance(g, Mesh):
                 self.simplex.append(g.copy())
-            elif isinstance(g, list) :
+            elif isinstance(g, list):
                 if len(g) == 3:
-                    self.simplex.append(Point(g[0],g[1],g[2]))
+                    self.simplex.append(Point(g[0], g[1], g[2]))
 
         self.display_shapes = []  # geometry, can be meshes, breps, curves, points, etc.
         for g in display_shapes:
@@ -122,8 +137,12 @@ class Element(Data):
                 self.display_shapes.append(g.copy())
 
         # orientation frames
-        self.local_frame = Frame.copy(local_frame) if isinstance(local_frame, Frame) else Frame.worldXY()  # set the local frame of an object
-        self.global_frame = Frame.copy(global_frame) if isinstance(global_frame, Frame) else Frame.worldXY()   # set the global frame of an object
+        self.local_frame = (
+            Frame.copy(local_frame) if isinstance(local_frame, Frame) else Frame.worldXY()
+        )  # set the local frame of an object
+        self.global_frame = (
+            Frame.copy(global_frame) if isinstance(global_frame, Frame) else Frame.worldXY()
+        )  # set the global frame of an object
 
         # collision detection, these members are private access them using getters
         self._aabb = []  # XYZ coordinates of 8 points defining a box
@@ -181,7 +200,7 @@ class Element(Data):
         # main properties
         self.element_type = data["element_type"]
         self.id = data["id"]
-        
+
         self.simplex = data["simplex"]
         self.display_shapes = data["display_shapes"]
         self.local_frame = data["local_frame"]
@@ -220,7 +239,7 @@ class Element(Data):
         obj._outlines_frames = data["outlines_frames"]
 
         # fabrication | structure
-        
+
         obj.fabrication = data["fabrication"]
         obj.structure = data["structure"]
 
@@ -233,7 +252,7 @@ class Element(Data):
     def get_aabb(self, inflate=0.00):
 
         # if the aabb is already computed return it
-        if(self._aabb):
+        if self._aabb:
             return self._aabb
 
         # iterate display_shapes  and get the bounding box by geometry type
@@ -255,12 +274,12 @@ class Element(Data):
             elif isinstance(self.display_shapes[i], Pointcloud):
                 corners = bounding_box(self.display_shapes[i].points)
                 points_bbox.extend([corners[0], corners[6]])
-    
+
         # if no points found, return
         if len(points_bbox) < 2:
             return None
 
-        # compute axis-aligned-bounding-box of all objects 
+        # compute axis-aligned-bounding-box of all objects
         points_bbox = bounding_box(points_bbox)
         self._aabb = bounding_box(
             [
@@ -275,9 +294,9 @@ class Element(Data):
     def get_oobb(self, inflate=0.00):
 
         # if the oobb is already computed return it
-        if(self._oobb):
+        if self._oobb:
             return self._oobb
-        
+
         # iterate display_shapes and get the bounding box by geometry type
         # Mesh, Polyline, Box, Line
         points = []
@@ -333,7 +352,7 @@ class Element(Data):
     def get_convex_hull(self):
 
         # if the convex hull is already computed return it
-        if(self._convex_hull.is_empty() == False):
+        if self._convex_hull.is_empty() is False:
             return self._convex_hull
 
         # iterate display_shapes and get the bounding box by geometry type
@@ -362,7 +381,7 @@ class Element(Data):
         if len(points) > 2:
             faces = convex_hull(points)
             self._convex_hull = Mesh.from_vertices_and_faces(points, faces)
-            return self._convex_hull   
+            return self._convex_hull
         else:
             self._convex_hull = Mesh()
             return self._convex_hull
@@ -384,16 +403,16 @@ class Element(Data):
 #  Fabrication: {6},
 #  Structure: {7},
 #  Attributes: {8})""".format(
-        self.element_type,
-        self.id,
-        self.simplex,
-        self.display_shapes,
-        self.local_frame,
-        self.global_frame,
-        self.fabrication,
-        self.structure,
-        self.attributes
-    )
+            self.element_type,
+            self.id,
+            self.simplex,
+            self.display_shapes,
+            self.local_frame,
+            self.global_frame,
+            self.fabrication,
+            self.structure,
+            self.attributes,
+        )
 
     # ==========================================================================
     # PROPERTIES FOR DIGITAL FABRICATION (OUTPUT)
@@ -411,7 +430,9 @@ class Element(Data):
 
     def copy(self):
         # copy main properties
-        new_instance = self.__class__(self.element_type, self.id, self.display_shapes, self.local_frame, self.global_frame, **self.attributes)
+        new_instance = self.__class__(
+            self.element_type, self.id, self.display_shapes, self.local_frame, self.global_frame, **self.attributes
+        )
 
         # deepcopy of the fabrication, and structural information
         new_instance.fabrication = copy.deepcopy(self.fabrication)
@@ -495,7 +516,7 @@ class Element(Data):
         new_instance = self.copy()
         new_instance.transform_to_frame(frame)
         return new_instance
-    
+
     def transformed_from_frame_to_frame(self, source_frame, target_frame):
         """
         Creates an oriented copy of the Element.
