@@ -366,6 +366,31 @@ class Element(Data):
             return self._convex_hull
 
     # ==========================================================================
+    # GEOMETRIC FEATURES E.G. JOINERY. INTERFACES
+    # ==========================================================================
+    def clear_features(self, features_to_clear=None):
+        """Clear all features from this Part."""
+        # raise NotImplementedError
+        pass
+
+    def add_feature(self, feature, apply=False):
+        """Add a Feature to this Part.
+
+        Parameters
+        ----------
+        feature : :class:`~compas.assembly.Feature`
+            The feature to add
+        apply : :bool:
+            If True, feature is also applied. Otherwise, feature is only added and user must call `apply_features`.
+
+        Returns
+        -------
+        None
+        """
+        # raise NotImplementedError
+        pass
+
+    # ==========================================================================
     # PROPERTIES FOR DIGITAL FABRICATION (OUTPUT)
     # ==========================================================================
 

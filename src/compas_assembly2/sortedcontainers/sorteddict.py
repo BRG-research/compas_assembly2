@@ -21,8 +21,10 @@ import warnings
 
 from itertools import chain
 
-from .sortedlist import SortedList, recursive_repr
-from .sortedset import SortedSet
+
+import compas_assembly2.sortedcontainers.sortedlist as SortedList
+from compas_assembly2.sortedcontainers.sortedlist import recursive_repr
+import compas_assembly2.sortedcontainers.sortedset as SortedSet
 
 ###############################################################################
 # BEGIN Python 2/3 Shims
