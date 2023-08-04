@@ -1,14 +1,25 @@
-import rhinoscriptsyntax as rs  # noqa https://github.com/mcneel/rhinoscriptsyntax
-from rhinoscriptsyntax import rhutil  # noqa
-import Rhino
-import compas_rhino
+import rhinoscriptsyntax as rs  # type: ignore https://github.com/mcneel/rhinoscriptsyntax
+import Rhino  # type: ignore
 from compas.datastructures import Mesh
-from compas.geometry import Point, Polyline, Box, Translation, Frame, Line, Pointcloud, Polygon, Vector, Plane, Transformation
-from compas.geometry import centroid_points, cross_vectors, bounding_box, distance_point_point, distance_point_plane_signed
-import random
-from compas_assembly2.viewer import Viewer
+from compas.geometry import (
+    Polyline,
+    Frame,
+    Polygon,
+    Vector,
+    Plane,
+    Transformation,
+)
+from compas.geometry import (
+    centroid_points,
+    cross_vectors,
+    bounding_box,
+    distance_point_point,
+    distance_point_plane_signed,
+)
 from compas_assembly2.element import Element, ELEMENT_TYPE
-from compas.data import json_dump, json_load  # https://compas.dev/compas/latest/reference/generated/compas.data.Data.html
+from compas.data import (
+    json_dump,
+)  # https://compas.dev/compas/latest/reference/generated/compas.data.Data.html
 
 # select objects
 ids = rs.GetObjects("Select objects", preselect=True, select=True)
@@ -24,11 +35,12 @@ ids = rs.GetObjects("Select objects", preselect=True, select=True)
 
 
 def object_groups(object_id):
-    rhino_object = rhutil.coercerhinoobject(object_id, True, True)
+    rhino_object = rs.coercerhinoobject(object_id, True, True)
     if rhino_object.GroupCount < 1:
         return []
     group_indices = rhino_object.GetGroupList()
     return list(group_indices)
+
 
 # ==========================================================================
 # create a container to store geometry with attributes
@@ -50,6 +62,7 @@ class object_with_attributes:
             self.layer_name,
         )
 
+
 # ==========================================================================
 # populate the object_with_attributes with geometry guid and group ids
 # ==========================================================================
@@ -69,30 +82,30 @@ for i in ids:
 
 
 def partition_by_common_group_id(objects_list):
-    
+
     # Manually count the occurrences of each integer ID in group_ids of all objects
     group_id_counts = {}
     for obj in objects_list:
         for group_id in obj.group_ids:
             group_id_counts[group_id] = group_id_counts.get(group_id, 0) + 1
-    
+
     # Sort the objects based on the frequency of integer IDs in descending order
     objects_list.sort(key=lambda obj: sum(group_id_counts[group_id] for group_id in obj.group_ids), reverse=True)
-    
+
     # Create a dictionary to group the objects based on the most common integer IDs
     group_count = Rhino.RhinoDoc.ActiveDoc.Groups.Count
-    print("TOTAL GROUP_COUNT: ", group_count)
-    
+    # print("TOTAL GROUP_COUNT: ", group_count)
+
     grouped_objects = {}
     for obj in objects_list:
-        if(len(obj.group_ids) == 0):
+        if len(obj.group_ids) == 0:
             grouped_objects.setdefault(-group_count, []).append(obj)
             group_count = group_count + 1
             print("WARNING: object is not in a group")
         else:
             most_common_group_id = max(obj.group_ids, key=lambda group_id: group_id_counts[group_id])
             grouped_objects.setdefault(most_common_group_id, []).append(obj)
-        
+
     return grouped_objects
 
 
@@ -117,15 +130,15 @@ class compas_assembly_user_input:
             self.user_input_geometry,
         )
 
+
 # ==========================================================================
 # rhino to compas conversions
 # ==========================================================================
 class conversions:
-    
     @classmethod
-    def get_frame(cls, _polyline, _orientation_point = None):
-        """ create a frame from a polyline """
-        
+    def get_frame(cls, _polyline, _orientation_point=None):
+        """create a frame from a polyline"""
+
         # create a normal by averaging the cross-products of a polyline
         normal = Vector(0, 0, 0)
         count = len(_polyline)
@@ -137,89 +150,85 @@ class conversions:
             item2 = _polyline[i]
             normal += cross_vectors(item2 - point3d, point3d1 - item2)
         normal.unitize()
-        
+
         # get the longest edge
         longest_segment_length = 0.0
         longest_segment_start = None
         longest_segment_end = None
-    
-        for i in range(len(_polyline)-1):
+
+        for i in range(len(_polyline) - 1):
             point1 = _polyline[i]
-            point2 = _polyline[(i + 1) % len(_polyline)]  # To create a closed polyline, connect the last point to the first one.
-    
+            point2 = _polyline[
+                (i + 1) % len(_polyline)
+            ]  # To create a closed polyline, connect the last point to the first one.
+
             segment_length = distance_point_point(point1, point2)
-    
+
             if segment_length > longest_segment_length:
                 longest_segment_length = segment_length
                 longest_segment_start = point1
                 longest_segment_end = point2
-        
-        
+
         # create x and y-axes for the frame
-        x_axis = Vector.from_start_end(longest_segment_start, longest_segment_end)#Vector.from_start_end(_polyline[0], _polyline[1])
+        x_axis = Vector.from_start_end(
+            longest_segment_start, longest_segment_end
+        )  # Vector.from_start_end(_polyline[0], _polyline[1])
         x_axis.unitize()
-        y_axis = cross_vectors(normal,x_axis)
-        y_axis = Vector(y_axis[0],y_axis[1],y_axis[2])
+        y_axis = cross_vectors(normal, x_axis)
+        y_axis = Vector(y_axis[0], y_axis[1], y_axis[2])
         # create the frame
         center = centroid_points(_polyline.points)
         frame = Frame(center, x_axis, y_axis)
-        if(_orientation_point is not None):
-            signed_distance = distance_point_plane_signed(_orientation_point,Plane.from_frame(frame))
-            
-            if(signed_distance  < -0.001):
-                frame = Frame(frame.point,-x_axis,y_axis)
-        
+        if _orientation_point is not None:
+            signed_distance = distance_point_plane_signed(_orientation_point, Plane.from_frame(frame))
+
+            if signed_distance < -0.001:
+                frame = Frame(frame.point, -x_axis, y_axis)
+
         # output
         return frame
-    
+
     @staticmethod
     def is_clockwise_closed_polyline_on_xy_plane(polygon):
-        """ check if a polyline is oriented clockwise or anti-clockwise """
-        n = len(polygon)-1
+        """check if a polyline is oriented clockwise or anti-clockwise"""
+        n = len(polygon) - 1
         signed_area = 0
-    
+
         for i in range(n):
-            x1, y1 = polygon[i][0],polygon[i][1]
-            x2, y2 = polygon[(i + 1) % n][0],polygon[(i + 1) % n][1]  # Connect last vertex to the first vertex
-            signed_area += (x1 * y2 - x2 * y1)
-        
+            x1, y1 = polygon[i][0], polygon[i][1]
+            x2, y2 = polygon[(i + 1) % n][0], polygon[(i + 1) % n][1]  # Connect last vertex to the first vertex
+            signed_area += x1 * y2 - x2 * y1
+
         sum_val = 0
         for i in range(len(polygon) - 1):
             sum_val = sum_val + (polygon[i + 1][0] - polygon[i][0]) * (polygon[i + 1][1] + polygon[i][1])
-        
+
         return sum_val > 0
-    
-    
+
     @classmethod
     def sort_polyline_pairs(cls, plines):
-        """ given a list of polylines sort them into top and bottom lists """
-        #return plines, plines
+        """given a list of polylines sort them into top and bottom lists"""
+        # return plines, plines
         # considers types: LineCurve, NurbsCurve, PolylineCurve
         if len(plines) % 2 != 0:
-            return list_of_curves
-        
+            return plines
+
         # Sort polylines based on bounding box diagonal
         diagonals = []
         for i in range(len(plines)):
             pts = bounding_box(plines[i].points)
             diagonals.append(distance_point_point(pts[0], pts[6]))
-        
+
         diagonals, plines = zip(*sorted(zip(diagonals, plines), reverse=True))
         plines = list(plines)
-        
-        # orient all polylines to the first outline's plane       
-        frame_2d = Frame([0,0,0],[1,0,0],[0,1,0])
-        
-        
-        frame_3d = conversions.get_frame(plines[0],plines[1][0])
+
+        # orient all polylines to the first outline's plane
+        frame_2d = Frame([0, 0, 0], [1, 0, 0], [0, 1, 0])
+
+        frame_3d = conversions.get_frame(plines[0], plines[1][0])
         T = Transformation.from_frame_to_frame(frame_3d, frame_2d)
-        I = Transformation.from_frame_to_frame(frame_2d, frame_3d)
-        frame_3d_ = conversions.get_frame(plines[0],plines[0][0])
-        
-        #print(frame_3d_.point, plines[0][0])
-        point = plines[0][0]
-        #point = T * point
-        #point.transform(T)
+        T_INV = Transformation.from_frame_to_frame(frame_2d, frame_3d)
+
         for i in range(len(plines)):
             plines[i] = plines[i].transformed(T)
         # on the first outline's plane:
@@ -227,67 +236,65 @@ class conversions:
         # b) split the plines list into two lists: top and bottom, based on the distance to the first outline's plane
         # c) in these lists, make order the plines based on the longest bounding box diagonal
         # d) orient the not the first ones anticlockwise to indicate holes of polygons
-        
+
         # Orient bottom_polylines anticlockwise to indicate holes of polygons
         # Reverse the first two ones
         for i in range(1, len(plines)):
             is_clock_wise = conversions.is_clockwise_closed_polyline_on_xy_plane(plines[i])
-            
-            if (is_clock_wise):
+
+            if is_clock_wise:
                 plines[i] = Polyline(reversed(plines[i].points))
-        
+
         plines[0] = Polyline(reversed(plines[0].points))
         plines[1] = Polyline(reversed(plines[1].points))
-        
+
         # Split plines into top and bottom based on their distance to the origin point
         positions = []
         for i in range(len(plines)):
             positions.append(abs(plines[i][0][2]))
-        
+
         positions, plines = zip(*sorted(zip(positions, plines)))
-        
-        
-        first_half, second_half = plines[:len(plines)//2], plines[len(plines)//2:]
-        #first_half = plines[::2]
-        #second_half = plines[1::2]
-        
+
+        first_half, second_half = plines[: len(plines) // 2], plines[len(plines) // 2 :]  # noqa E203
+        # first_half = plines[::2]
+        # second_half = plines[1::2]
+
         # Sort the second list polyline based on the first list order
         second_half_sorted = []
-        
+
         for i in range(len(second_half)):
-            
+
             distances = []
-            
+
             for j in range(len(first_half)):
-                distances.append((i, distance_point_point(second_half[i][0],first_half[i][0])))
-            
+                distances.append((i, distance_point_point(second_half[i][0], first_half[i][0])))
+
             sorted_distances = sorted(distances, key=lambda x: x[1])
             second_half_sorted.append(second_half[sorted_distances[0][0]])
-        
+
         # merge the two lists into one
         merged = []
         merged.extend(first_half)
         merged.extend(second_half_sorted)
-        
+
         # Orient the plines back to their original position using the inverse matrix
         # the half is just a reference so no need to transform it twice
-        
+
         for i in range(len(merged)):
-            merged[i].transform(I)
+            merged[i].transform(T_INV)
         """
         for i in range(len(first_half)):
             first_half[i].transform(I)
         """
-        return first_half, merged, frame_3d #[first_half[0]] 
-    
-    
+        return first_half, merged, frame_3d  # [first_half[0]]
+
     @classmethod
     def perpendicular_to(cls, _o, _v):
         v = Vector.from_start_end(_o, _v)
         i, j, k = 0, 0, 0
         a, b = 0.0, 0.0
         k = 2
-        
+
         if abs(v.y) > abs(v.x):
             if abs(v.z) > abs(v.y):
                 # |v.z| > |v.y| > |v.x|
@@ -331,83 +338,81 @@ class conversions:
             k = 2
             a = v.x
             b = -v.y
-        
-        perp = Vector(0,0,0)
+
+        perp = Vector(0, 0, 0)
         perp[i] = b
         perp[j] = a
         perp[k] = 0.0
         return perp, v.cross(perp)
-        #return True if a != 0.0 else False
-    
+        # return True if a != 0.0 else False
+
     @classmethod
-    def from_rhino_frame(cls,line_nurbs_polyline_curve):
+    def from_rhino_frame(cls, line_nurbs_polyline_curve):
         # considers types: LineCurve, NurbsCurve, PolylineCurve
         curve = rs.coercecurve(line_nurbs_polyline_curve)
         result, polyline = curve.TryGetPolyline()
-        
-        if(result):
+
+        if result:
             points = []
             counter = 0
             for p in polyline:
-                if (counter == 2):
+                if counter == 2:
                     break
-                counter = counter+1
+                counter = counter + 1
                 points.append([p.X, p.Y, p.Z])
-                
-            if(counter == 2):
-                return Frame(points[0],points[1]-points[0],points[2]-points[0])
-            elif(counter == 1):
-                x_axis_vector, y_axis_vector, conversions.perpendicular_to(points[0],points[1])
-                return Frame(points[0],x_axis_vector, y_axis_vector)
+
+            if counter == 2:
+                return Frame(points[0], points[1] - points[0], points[2] - points[0])
+            elif counter == 1:
+                x_axis_vector, y_axis_vector = conversions.perpendicular_to(points[0], points[1])
+                return Frame(points[0], x_axis_vector, y_axis_vector)
             else:
                 return Frame([0, 0, 0], [1, 0, 0], [0, 1, 0])
         else:
             return Frame([0, 0, 0], [1, 0, 0], [0, 1, 0])
-    
+
     @classmethod
-    def from_rhino_polyline(cls,line_nurbs_polyline_curve):
+    def from_rhino_polyline(cls, line_nurbs_polyline_curve):
         # considers types: LineCurve, NurbsCurve, PolylineCurve
         curve = rs.coercecurve(line_nurbs_polyline_curve)
         result, polyline = curve.TryGetPolyline()
-        if(result):
+        if result:
             points = []
             for p in polyline:
                 points.append([p.X, p.Y, p.Z])
             return Polyline(points)
         else:
             return None
-    
+
     @classmethod
-    def from_rhino_mesh(cls,mesh):
-        
-        
+    def from_rhino_mesh(cls, mesh):
+
         compas_mesh = Mesh()
-        if(mesh.Ngons.Count == 0):
+        if mesh.Ngons.Count == 0:
             for vertex in mesh.Vertices:
                 compas_mesh.add_vertex(attr_dict=dict(x=float(vertex.X), y=float(vertex.Y), z=float(vertex.Z)))
-            
+
             for face in mesh.Faces:
                 if face.A == face.D or face.C == face.D:
                     compas_mesh.add_face([face.A, face.B, face.C])
                 else:
                     compas_mesh.add_face([face.A, face.B, face.C, face.D])
-            
+
         else:
             polygons = []
             for i in range(mesh.Ngons.Count):
                 vertices = mesh.Ngons.GetNgon(i).BoundaryVertexIndexList()
-                
-                points =  []
+
+                points = []
                 for v in vertices:
                     p = mesh.Vertices[v]
-                    points.append([p.X,p.Y,p.Z])
+                    points.append([p.X, p.Y, p.Z])
                 points.append(points[0])
                 polygons.append(Polygon(points))
-        
+
             compas_mesh = Mesh.from_polygons(polygons)
-        #compas_mesh = Mesh.from_polylines(polylines)
-        print(compas_mesh)
         return compas_mesh
+
 
 # ==========================================================================
 # fill the Element properties based on geometry and layer name information
@@ -417,29 +422,28 @@ class conversions:
 def process_string(input_string):
     # Convert the string to lowercase
     input_string = input_string.lower()
-    result = {"ELEMENT_TYPE":"warning_not_defined", "PROPERTY_TYPE":"warning_not_defined"}
+    result = {"ELEMENT_TYPE": "warning_not_defined", "PROPERTY_TYPE": "warning_not_defined"}
     # Check if the string contains "::"
     if "::" in input_string:
         # Split the string into substrings using "::"
         substrings = input_string.split("::")
-        #print(substrings)
+        # print(substrings)
         # Process each substring independently
         for substring in substrings:
             if "type" in substring:
                 # Remove the "type" substring and keep only letters in the substring
                 substring = substring.replace("type", "")
-                substring = ''.join(filter(str.isalpha, substring))
-                
-                
+                substring = "".join(filter(str.isalpha, substring))
+
                 # Check if the string contains any of the specified substrings
-                
+
                 if "block" in input_string:
                     result["ELEMENT_TYPE"] = "block"
                 elif "frame" in input_string:
                     result["ELEMENT_TYPE"] = "frame"
                 elif "plate" in input_string:
                     result["ELEMENT_TYPE"] = "plate"
-            
+
             elif "simplex" in input_string:
                 result["PROPERTY_TYPE"] = "simplex"
             elif "display_shapes" in input_string:
@@ -451,37 +455,38 @@ def process_string(input_string):
     return result  # Return None if none of the specified substrings are found
 
 
-
-
 elements = []
 counter = 0
 for group_id, subsequent_groups in grouped_objects.items():
-    
+
     # --------------------------------------------------------------------------
     # parse the layer infornate
     # --------------------------------------------------------------------------
     layer_name = subsequent_groups[0].layer_name
     processed_layer_name = process_string(layer_name)
-    print(processed_layer_name)
-    
+    # print(processed_layer_name)
+
     # --------------------------------------------------------------------------
     # create objects, the assignment of right properties is dependent on user
     # --------------------------------------------------------------------------
-    #TODO skip certain objects
-    
+    # TODO skip certain objects
+
     # create element
-    o = Element(element_type=ELEMENT_TYPE.find_element_type(processed_layer_name["ELEMENT_TYPE"]),id=(counter,group_id))
-    counter = counter+1
-    
+    o = Element(
+        element_type=ELEMENT_TYPE.find_element_type(processed_layer_name["ELEMENT_TYPE"]),  # type: ignore
+        id=(counter, group_id),  # noqa: E231
+    )
+    counter = counter + 1
+
     for obj in subsequent_groups:
         layer_name = obj.layer_name
         processed_layer_name = process_string(layer_name)
-        #print(processed_layer_name, layer_name)
+        # print(processed_layer_name, layer_name)
         # --------------------------------------------------------------------------
         # simplex
         # --------------------------------------------------------------------------
-        if(processed_layer_name["PROPERTY_TYPE"]=="simplex"):
-            #print("_____________simplex_________________", type(obj.geometry), layer_name)
+        if processed_layer_name["PROPERTY_TYPE"] == "simplex":
+            # print("_____________simplex_________________", type(obj.geometry), layer_name)
             if str(type(obj.geometry)) == "<type 'Mesh'>":
                 o.simplex.append(conversions.from_rhino_mesh(obj.geometry))
             elif (
@@ -493,8 +498,8 @@ for group_id, subsequent_groups in grouped_objects.items():
         # --------------------------------------------------------------------------
         # local_frame
         # --------------------------------------------------------------------------
-        elif(processed_layer_name["PROPERTY_TYPE"]=="local_frame"):
-            
+        elif processed_layer_name["PROPERTY_TYPE"] == "local_frame":
+
             if (
                 str(type(obj.geometry)) == "<type 'LineCurve'>"
                 or str(type(obj.geometry)) == "<type 'NurbsCurve'>"
@@ -504,7 +509,7 @@ for group_id, subsequent_groups in grouped_objects.items():
         # --------------------------------------------------------------------------
         # global_frame
         # --------------------------------------------------------------------------
-        elif(processed_layer_name["PROPERTY_TYPE"]=="global_frame"):
+        elif processed_layer_name["PROPERTY_TYPE"] == "global_frame":
             if (
                 str(type(obj.geometry)) == "<type 'LineCurve'>"
                 or str(type(obj.geometry)) == "<type 'NurbsCurve'>"
@@ -514,8 +519,8 @@ for group_id, subsequent_groups in grouped_objects.items():
         # --------------------------------------------------------------------------
         # display_shapes
         # --------------------------------------------------------------------------
-        elif(processed_layer_name["PROPERTY_TYPE"]=="display_shapes"):
-            #print("______________________________")
+        elif processed_layer_name["PROPERTY_TYPE"] == "display_shapes":
+            # print("______________________________")
             if str(type(obj.geometry)) == "<type 'Mesh'>":
                 o.display_shapes.append(conversions.from_rhino_mesh(obj.geometry))
             elif (
@@ -524,47 +529,49 @@ for group_id, subsequent_groups in grouped_objects.items():
                 or str(type(obj.geometry)) == "<type 'PolylineCurve'>"
             ):
                 o.display_shapes.append(conversions.from_rhino_polyline(obj.geometry))
-    
+
     # --------------------------------------------------------------------------
     # reassingn center incase local and global frames are not given
     # --------------------------------------------------------------------------
     frame_xy = Frame([0, 0, 0], [1, 0, 0], [0, 1, 0])
-    if(o.local_frame == frame_xy ):
-        if len(o.simplex)>0 :
+    if o.local_frame == frame_xy:
+        if len(o.simplex) > 0:
             if isinstance(o.simplex[0], Mesh):
-                o.local_frame = Frame(o.simplex[0].centroid(), [1,0,0], [0,1,0])
+                o.local_frame = Frame(o.simplex[0].centroid(), [1, 0, 0], [0, 1, 0])
             elif isinstance(o.simplex[0], Polyline):
-                    if(o.simplex[0].is_closed()):
-                        o.local_frame = Frame(o.simplex[0][0], [1,0,0], [0,1,0])
-                    else:
-                        x_axis_vector, y_axis_vector = conversions.perpendicular_to(o.simplex[0][0],o.simplex[0][1])
-                        #o.local_frame = Frame((o.simplex[0][0]+o.simplex[0][1])*0.5,x_axis_vector, y_axis_vector)
-                        o.local_frame = Frame(o.simplex[0][0],x_axis_vector, y_axis_vector)
-        elif len(o.display_shapes)>0:
+                if o.simplex[0].is_closed():
+                    o.local_frame = Frame(o.simplex[0][0], [1, 0, 0], [0, 1, 0])
+                else:
+                    x_axis_vector, y_axis_vector = conversions.perpendicular_to(o.simplex[0][0], o.simplex[0][1])
+                    # o.local_frame = Frame((o.simplex[0][0]+o.simplex[0][1])*0.5,x_axis_vector, y_axis_vector)
+                    o.local_frame = Frame(o.simplex[0][0], x_axis_vector, y_axis_vector)
+        elif len(o.display_shapes) > 0:
             if isinstance(o.display_shapes[0], Mesh):
                 center = o.display_shapes[0].centroid()
                 o.simplex.append(center)
-                o.local_frame = Frame(center, [1,0,0], [0 ,1,0])
+                o.local_frame = Frame(center, [1, 0, 0], [0, 1, 0])
             elif isinstance(o.display_shapes[0], Polyline):
-                    if(o.display_shapes[0].is_closed()):
-                        o.local_frame = Frame(o.display_shapes[0][0], [1,0,0], [0,1,0])
-                    else:
-                        x_axis_vector, y_axis_vector = conversions.perpendicular_to (o.display_shapes[0][0],o.display_shapes[0][1])
-                        o.local_frame = Frame(o.display_shapes[0][0],x_axis_vector, y_axis_vector)
-                        
+                if o.display_shapes[0].is_closed():
+                    o.local_frame = Frame(o.display_shapes[0][0], [1, 0, 0], [0, 1, 0])
+                else:
+                    x_axis_vector, y_axis_vector = conversions.perpendicular_to(
+                        o.display_shapes[0][0], o.display_shapes[0][1]
+                    )
+                    o.local_frame = Frame(o.display_shapes[0][0], x_axis_vector, y_axis_vector)
+
     # --------------------------------------------------------------------------
     # special case for plates, where the simpices must be sorted and split
     # --------------------------------------------------------------------------
-    #print(o.element_type)
-    if(o.element_type == "PLATE"):
+    # print(o.element_type)
+    if o.element_type == "PLATE":
         first_half, merged, frame = conversions.sort_polyline_pairs(o.simplex)
         o.simplex = first_half
         o.local_frame = frame
-    
+
     # --------------------------------------------------------------------------
     # collect the element instance
     # --------------------------------------------------------------------------
-    #print(o)
+    # print(o)
     elements.append(o)
 
 
