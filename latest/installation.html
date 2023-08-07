@@ -91,6 +91,18 @@
         
         <section id="installation">
 <h1>Installation</h1>
+<p><strong>Install</strong></p>
+<div class="language-bash notranslate"><div class="highlight"><pre><button class="btn copy"><i class="far fa-copy"></i></button><code><span></span>conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>assembly2<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>compas<span class="w"> </span>compas_view2
+pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements-dev.txt
+python<span class="w"> </span>-m<span class="w"> </span>compas_rhino.install
+python<span class="w"> </span>-m<span class="w"> </span>compas_rhino.install<span class="w"> </span>-p<span class="w"> </span>compas_assembly2
+</code></pre></div>
+</div>
+<p><strong>Remove</strong></p>
+<div class="language-bash notranslate"><div class="highlight"><pre><button class="btn copy"><i class="far fa-copy"></i></button><code><span></span>conda<span class="w"> </span>env<span class="w"> </span>remove<span class="w"> </span>--name<span class="w"> </span>assembly2
+</code></pre></div>
+</div>
 </section>
 
         
