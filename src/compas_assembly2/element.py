@@ -1,5 +1,7 @@
+import compas
 from compas.geometry import (
     Frame,
+    Vector,
     Geometry,
     Transformation,
     Polyline,
@@ -74,18 +76,22 @@ class Element(Data):
 
     def __init__(
         self,
-        name=compas_assembly2.ELEMENT_NAME.BLOCK,
-        id=[0, 1],
+        name=compas_assembly2.ELEMENT_NAME.CUSTOM,
+        id=[-1],
         simplex=[],
         display_shapes=[],
         local_frame=Frame.worldXY,
         global_frame=Frame.worldXY,
         **kwargs
     ):
+        # --------------------------------------------------------------------------
         # call the inherited Data constructor for json serialization
+        # --------------------------------------------------------------------------
         super(Element, self).__init__()
 
+        # --------------------------------------------------------------------------
         # indexing + attributes
+        # --------------------------------------------------------------------------
         self.id = (
             [
                 id,
@@ -97,40 +103,75 @@ class Element(Data):
         self.attributes = {}  # set the attributes of an object
         self.attributes.update(kwargs)  # update the attributes of with the kwargs
 
+        # --------------------------------------------------------------------------
         # minimal representation and geometrical shapes
         # iterate through the input geometry
         # check if they are valid geometry objects
         # duplicate them and add them geometry list to avoid transformation issues
+        # --------------------------------------------------------------------------
         self.simplex = []  # geometry, can be meshes, breps, curves, points, etc.
 
-        for g in simplex:
-            if isinstance(g, Geometry) or isinstance(g, Mesh):
-                self.simplex.append(g.copy())
-            elif isinstance(g, list):
-                if len(g) == 3:
-                    self.simplex.append(Point(g[0], g[1], g[2]))
+        if isinstance(simplex, list):
+            # list of numbers, means user gives a point
+            if isinstance(simplex[0], (int, float, complex)) and len(simplex) == 3:
+                self.simplex.append(Point(simplex[0], simplex[1], simplex[2]))
+            # else user gives geometries
+            else:
+                for g in simplex:
+                    if isinstance(g, Geometry) or isinstance(g, Mesh):
+                        self.simplex.append(g.copy())
+                    elif isinstance(g, list):
+                        if len(g) == 3:
+                            self.simplex.append(Point(g[0], g[1], g[2]))
+        else:
+            # one geometry object
+            if isinstance(simplex, Geometry):
+                self.simplex.append(simplex.copy())
 
-        self.display_shapes = []  # geometry, can be meshes, breps, curves, points, etc.
-        for g in display_shapes:
-            if isinstance(g, Geometry) or isinstance(g, Mesh):
-                self.display_shapes.append(g.copy())
+        if (len(simplex) == 0):
+            raise AssertionError("User must define a simple geometry")
 
+        # --------------------------------------------------------------------------
+        # display geometry - geometry, can be meshes, breps, curves, points, etc.
+        # --------------------------------------------------------------------------
+        self.display_shapes = []
+        if (display_shapes):
+            for g in display_shapes:
+                if isinstance(g, Geometry) or isinstance(g, Mesh):
+                    self.display_shapes.append(g.copy())
+
+        # --------------------------------------------------------------------------
         # orientation frames
-        self.local_frame = (
-            Frame.copy(local_frame) if isinstance(local_frame, Frame) else Frame.worldXY()
-        )  # set the local frame of an object
+        # if user does not give a frame, try to define it based on simplex
+        # --------------------------------------------------------------------------
+        if isinstance(local_frame, Frame):
+            self.local_frame = Frame.copy(local_frame)
+        else:
+            origin = [0, 0, 0]
+            if (isinstance(self.simplex[0], Point)):
+                origin = self.simplex[0]
+            elif (isinstance(self.simplex[0], Line)):
+                origin = self.simplex[0].start
+            elif (isinstance(self.simplex[0], Polyline)):
+                origin = self.simplex[0][0]
+            self.local_frame = Frame(origin, [1, 0, 0], [0, 1, 0])
+
         self.global_frame = (
-            Frame.copy(global_frame) if isinstance(global_frame, Frame) else Frame.worldXY()
+            Frame.copy(global_frame) if isinstance(global_frame, Frame) else Frame([0, 0, 0], [1, 0, 0], [0, 1, 0])
         )  # set the global frame of an object
 
+        # --------------------------------------------------------------------------
         # collision detection, these members are private access them using getters
+        # --------------------------------------------------------------------------
         self._aabb = []  # XYZ coordinates of 8 points defining a box
         self._oobb = []  # XYZ coordinates of 8 points defining a box
         self._convex_hull = Mesh()  # convex hull of the geometry
         self._outlines = []  # closed polylines - in majority of cases objects will have planar faces
         self._outlines_frames = []  # closed polylines planes - in majority of cases objects will have planar faces
 
+        # --------------------------------------------------------------------------
         # output for further processing
+        # --------------------------------------------------------------------------
         self.fabrication = {}
         self.structure = {}
 
@@ -256,7 +297,13 @@ class Element(Data):
 
         # if no points found, return
         if len(points_bbox) < 2:
-            return None
+            if (inflate > 0.00):
+                self._aabb = bounding_box([
+                    self.local_frame.point+Vector(inflate, inflate, inflate),
+                    self.local_frame.point-Vector(inflate, inflate, inflate)])
+                return self._oobb
+            else:
+                return None
 
         # compute axis-aligned-bounding-box of all objects
         points_bbox = bounding_box(points_bbox)
@@ -295,7 +342,13 @@ class Element(Data):
 
         # if no points found, return
         if len(points) < 2:
-            return None
+            if (inflate > 0.00):
+                self._oobb = bounding_box([
+                    self.local_frame.point+Vector(inflate, inflate, inflate),
+                    self.local_frame.point-Vector(inflate, inflate, inflate)])
+                return self._oobb
+            else:
+                return None
 
         # compute the object-oriented-bounding-box
         # transforming points from local frame to worldXY
@@ -399,6 +452,139 @@ class Element(Data):
 
     def get_structure(self, key):
         pass
+
+    # ==========================================================================
+    # CONVERSIONS
+    # ==========================================================================
+    @staticmethod
+    def to_elements(simplices=[], display_shapes=None, compute_nesting=1):
+        """ convert a list of geometries to elements, with assumtion that other property will be filled later """
+        elements = []
+        contains_display_shapes = display_shapes is list
+
+        for id, s in enumerate(simplices):
+            if (contains_display_shapes):
+                elements.append(Element.to_element(s, display_shapes[id % len(display_shapes)]))
+            else:
+                elements.append(Element.to_element(s))
+
+        if (compute_nesting > 0):
+            # nest elements linearly and add the the nest frame to the fabrication
+            # first compute the bounding box of the elements, get the horizontal length, and create frames
+            nest_type = compute_nesting
+            width = {}
+            height = {}
+            height_step = 4
+            inflate = 0.1
+
+            for e in elements:
+                e.get_aabb(inflate)
+                e.get_oobb(inflate)
+                e.get_convex_hull()
+
+            center = Point(0, 0, 0)
+            for e in elements:
+                center = center + e.local_frame.point
+            center = center / len(elements)
+
+            for e in elements:
+                width[e.name] = 0
+
+            for index, (key, value) in enumerate(width.items()):
+                height[key] = index * height_step * 0
+
+            for i, e in enumerate(elements):
+
+                temp_width = 0
+                source_frame = e.local_frame.copy()
+                target_frame = Frame([0, 0, 0], source_frame.xaxis, source_frame.yaxis)
+
+                if nest_type == 1 and e.get_aabb() is not None:
+                    # --------------------------------------------------------------------------
+                    # aabb linear nesting
+                    # --------------------------------------------------------------------------
+                    temp_width = e.get_aabb()[6][0] - e.get_aabb()[0][0]
+                    # get the maximum height of the elements
+                    height[e.name] = max(height[e.name], e.get_aabb()[6][1] - e.get_aabb()[0][1])
+                    source_frame = Frame(
+                        e.get_aabb()[0],
+                        [
+                            e.get_aabb()[1][0] - e.get_aabb()[0][0],
+                            e.get_aabb()[1][1] - e.get_aabb()[0][1],
+                            e.get_aabb()[1][2] - e.get_aabb()[0][2],
+                        ],
+                        [
+                            e.get_aabb()[3][0] - e.get_aabb()[0][0],
+                            e.get_aabb()[3][1] - e.get_aabb()[0][1],
+                            e.get_aabb()[3][2] - e.get_aabb()[0][2],
+                        ],
+                    )
+                    target_frame = Frame([width[e.name], height[e.name], 0], [1, 0, 0], [0, 1, 0])
+                elif nest_type == 2 and e.get_oobb() is not None:
+                    # --------------------------------------------------------------------------
+                    # oobb linear nesting
+                    # --------------------------------------------------------------------------
+                    temp_width = compas.geometry.distance_point_point(e.get_oobb()[0], e.get_oobb()[1])
+                    # get the maximum height of the elements
+                    height[e.name] = max(height[e.name],
+                                         compas.geometry.distance_point_point(e.get_oobb()[0], e.get_oobb()[3]))
+                    source_frame = Frame(
+                        e.get_oobb()[0],
+                        [
+                            e.get_oobb()[1][0] - e.get_oobb()[0][0],
+                            e.get_oobb()[1][1] - e.get_oobb()[0][1],
+                            e.get_oobb()[1][2] - e.get_oobb()[0][2],
+                        ],
+                        [
+                            e.get_oobb()[3][0] - e.get_oobb()[0][0],
+                            e.get_oobb()[3][1] - e.get_oobb()[0][1],
+                            e.get_oobb()[3][2] - e.get_oobb()[0][2],
+                        ],
+                    )
+                    target_frame = Frame([width[e.name], height[e.name], 0], [1, 0, 0], [0, 1, 0])
+                elif nest_type == 3:
+                    # --------------------------------------------------------------------------
+                    # move of center
+                    # --------------------------------------------------------------------------
+                    t = 1.25
+                    x = (1 - t) * center.x + t * source_frame.point.x
+                    y = (1 - t) * center.y + t * source_frame.point.y
+                    z = (1 - t) * center.z + t * source_frame.point.z
+                    target_frame = Frame([x, y, z], source_frame.xaxis, source_frame.yaxis)
+
+                # --------------------------------------------------------------------------
+                # assignment of fabrication data
+                # --------------------------------------------------------------------------
+
+                fabrication = compas_assembly2.Fabrication(
+                    fabrication_type=compas_assembly2.FABRICATION_TYPES.NESTING, id=-1,
+                    frames=[source_frame, target_frame]
+                )
+                e.fabrication[compas_assembly2.FABRICATION_TYPES.NESTING] = fabrication
+                width[e.name] = width[e.name] + temp_width
+
+            # --------------------------------------------------------------------------
+            # center the frames
+            # --------------------------------------------------------------------------
+            h = 0
+            for index, (key, value) in enumerate(width.items()):
+                temp_height = height[key]
+                height[key] = h
+                h = h + temp_height
+
+            for e in elements:
+                e.fabrication[compas_assembly2.FABRICATION_TYPES.NESTING].frames[1].point.x = (
+                    e.fabrication[compas_assembly2.FABRICATION_TYPES.NESTING].frames[1].point.x - width[e.name] * 0.5
+                )
+                e.fabrication[compas_assembly2.FABRICATION_TYPES.NESTING].frames[1].point.y = height[e.name] - h * 0.5
+
+        # output
+        return elements
+
+    @staticmethod
+    def to_element(simplex=None, display_shape=None):
+        """ convert a geometry to an lement, with assumtion that other property will be filled later """
+        return Element(simplex=simplex, display_shapes=display_shape)
 
     # ==========================================================================
     # COPY ALL GEOMETRY OBJECTS

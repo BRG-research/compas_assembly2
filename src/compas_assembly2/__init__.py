@@ -1,3 +1,6 @@
+from __future__ import print_function
+import os
+
 """
 
 .. currentmodule:: compas_assembly2
@@ -45,11 +48,6 @@ Group class
     group.Group
 
 """
-
-
-from __future__ import print_function
-
-import os
 
 
 __author__ = ["Petras Vestartas"]
@@ -111,3 +109,20 @@ class ELEMENT_NAME:
             return getattr(ELEMENT_NAME, input_string)
         else:
             return "Invalid element type."
+
+
+class FABRICATION_TYPES:
+    MOVEMENT = "MOVEMENT_LINEAR"
+    SUBTRACTION_DRILL = "SUBTRACTION_DRILL"
+    SUBTRACTION_CUT = "SUBTRACTION_CUT"
+    SUBTRACTION_MILL = "SUBTRACTION_MILL"
+    SUBTRACTION_SLICE = "SUBTRACTION_SLICE"
+    ADDITION_PRINT = "ADDITION_PRINT"
+    ADDITION_SPRAY = "ADDITION_SPRAY"
+    ADDITION_EXTRUDE = "ADDITION_EXTRUDE"
+    NESTING = "NESTING"
+    CUSTOM = "CUSTOM"
+
+from .element import Element # noqa
+from .viewer import Viewer # noqa
+from .fabrication import Fabrication # noqa

@@ -2,6 +2,7 @@ from compas.geometry import Polyline, Point, Box, Line, Vector, Pointcloud, Tran
 from compas.datastructures import Mesh
 from compas.colors import Color
 from compas_assembly2.fabrication import FABRICATION_TYPES
+from compas_assembly2 import Element
 
 # ==========================================================================
 # DISPLAY IN DIFFERENT VIEWERS
@@ -31,7 +32,60 @@ class Viewer:
         return compas_color
 
     @staticmethod
-    def run(
+    def show(
+        geometry=[],
+        viewer_type="view2-0_rhino-1_blender-2",
+        width=1920,
+        height=1200,
+        show_grid=True,
+        show_indices=False,
+        show_types=False,
+        show_simplices=True,
+        show_display_shapes=True,
+        show_aabbs=False,
+        show_oobbs=False,
+        show_convex_hulls=False,
+        show_frames=False,
+        show_fabrication=False,
+        show_structure=False,
+        text_height=30,  # type: ignore
+        display_axis_scale=0.5,
+        point_size=8,
+        line_width=2,
+        colors=[
+            Color(0.929, 0.082, 0.498),
+            Color(0.129, 0.572, 0.815),
+            Color(0.5, 0.5, 0.5),
+            Color(0.95, 0.95, 0.95),
+            Color(0, 0, 0),
+        ],
+    ):
+
+        Viewer.show_elements(
+            elements=Element.to_elements(geometry),
+            viewer_type=viewer_type,
+            width=width,
+            height=height,
+            show_grid=show_grid,
+            show_indices=show_indices,
+            show_types=show_types,
+            show_simplices=show_simplices,
+            show_display_shapes=show_display_shapes,
+            show_aabbs=show_aabbs,
+            show_oobbs=show_oobbs,
+            show_convex_hulls=show_convex_hulls,
+            show_frames=show_frames,
+            show_fabrication=show_fabrication,
+            show_structure=show_structure,
+            text_height=text_height,  # type: ignore
+            display_axis_scale=display_axis_scale,
+            point_size=point_size,
+            line_width=line_width,
+            colors=colors
+        )
+
+    @staticmethod
+    def show_elements(
         elements=[],
         viewer_type="view2-0_rhino-1_blender-2",
         width=1920,
@@ -98,7 +152,7 @@ class Viewer:
                     # --------------------------------------------------------------------------
                     # add text - indices
                     # --------------------------------------------------------------------------
-                    element_id = str(element.id)
+                    element_id = element.guid
 
                     text = Text(
                         ",".join(map(str, element.id)),
@@ -242,24 +296,24 @@ class Viewer:
 
                     for i in range(len(element.display_shapes)):
                         if isinstance(element.display_shapes[i], Mesh):
+                            if (element.display_shapes[i].number_of_vertices() > 0):
+                                o = viewer.add(
+                                    data=element.display_shapes[i],
+                                    name=element_id,
+                                    is_selected=False,
+                                    is_visible=show_display_shapes,
+                                    show_points=False,
+                                    show_lines=True,
+                                    show_faces=True,
+                                    pointcolor=Color(0, 0, 0),
+                                    linecolor=colors[4],
+                                    facecolor=colors[3],  # Viewer.string_to_color(element.name),#colors[3],
+                                    linewidth=1,
+                                    opacity=0.9,  # type: ignore
+                                    hide_coplanaredges=True,
+                                )
 
-                            o = viewer.add(
-                                data=element.display_shapes[i],
-                                name=element_id,
-                                is_selected=False,
-                                is_visible=show_display_shapes,
-                                show_points=False,
-                                show_lines=True,
-                                show_faces=True,
-                                pointcolor=Color(0, 0, 0),
-                                linecolor=colors[4],
-                                facecolor=colors[3],  # Viewer.string_to_color(element.name),#colors[3],
-                                linewidth=1,
-                                opacity=0.9,  # type: ignore
-                                hide_coplanaredges=True,
-                            )
-
-                            viewer_objects["viewer_display_shapes"].append(o)
+                                viewer_objects["viewer_display_shapes"].append(o)
 
                         elif (
                             isinstance(element.display_shapes[i], Polyline)
@@ -413,21 +467,22 @@ class Viewer:
                             viewer_objects["viewer_oobbs"].append(o)
 
                     if element._convex_hull:
-                        o = viewer.add(
-                            data=element._convex_hull,
-                            name=element_id,
-                            is_selected=False,
-                            is_visible=show_convex_hulls,
-                            show_points=False,
-                            show_lines=True,
-                            show_faces=True,
-                            pointcolor=Color(0, 0, 0),
-                            linecolor=Color(1, 1, 1),
-                            facecolor=colors[4],
-                            linewidth=1,
-                            pointsize=point_size,
-                        )
-                        viewer_objects["viewer_convex_hulls"].append(o)
+                        if (element._convex_hull.number_of_vertices() > 0):
+                            o = viewer.add(
+                                data=element._convex_hull,
+                                name=element_id,
+                                is_selected=False,
+                                is_visible=show_convex_hulls,
+                                show_points=False,
+                                show_lines=True,
+                                show_faces=True,
+                                pointcolor=Color(0, 0, 0),
+                                linecolor=Color(1, 1, 1),
+                                facecolor=colors[4],
+                                linewidth=1,
+                                pointsize=point_size,
+                            )
+                            viewer_objects["viewer_convex_hulls"].append(o)
 
                 # --------------------------------------------------------------------------
                 # add fabrication geometry
@@ -544,12 +599,13 @@ class Viewer:
                             if key == FABRICATION_TYPES.NESTING:
                                 target_frame = interpolate_frames(value.frames[0], value.frames[1], t / 100)
                                 compas_matrix = Transformation.from_frame_to_frame(value.frames[0], target_frame)
-                                dict_matrices[str(element.id)] = compas_matrix.matrix
+                                dict_matrices[element.guid] = compas_matrix.matrix
 
                     # change positions of elements
-                    for key, value in viewer_objects.items():
-                        for item in value:
-                            item.matrix = dict_matrices[item.name]
+                    if (dict_matrices):
+                        for key, value in viewer_objects.items():
+                            for item in value:
+                                item.matrix = dict_matrices[item.name]
 
                     # update the viewer after all the matrices are changed
                     viewer.view.update()
