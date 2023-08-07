@@ -474,11 +474,10 @@ for group_id, subsequent_groups in grouped_objects.items():
     # create objects, the assignment of right properties is dependent on user
     # --------------------------------------------------------------------------
     # TODO skip certain objects
-
     # create element
     o = Element(
         # ensure that this name exists
-        element_name=compas_assembly2.ELEMENT_NAME.exists(processed_layer_name["ELEMENT_NAME"]),  # type: ignore
+        name=compas_assembly2.ELEMENT_NAME.exists(processed_layer_name["ELEMENT_NAME"]),  # type: ignore
         id=(dict_id[processed_layer_name["ELEMENT_NAME"].upper()], counter),  # noqa: E231
     )
     counter = counter + 1
