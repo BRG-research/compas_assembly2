@@ -290,7 +290,6 @@ class Element(Data):
         points = []
 
         for i in range(len(self.complex)):
-
             if isinstance(self.complex[i], Mesh):
                 points.extend(list(self.complex[i].vertices_attributes("xyz")))
             elif isinstance(self.complex[i], Polyline):
@@ -348,7 +347,6 @@ class Element(Data):
 
     @property
     def convex_hull(self):
-
         """Compute convex hull from complex points"""
 
         # define this property dynamically in the class
@@ -759,7 +757,7 @@ class Element(Data):
         )
 
     @staticmethod
-    def from_frame(self,  width, height, depth):
+    def from_frame(self, width, height, depth):
         """method create a frame element at the origin point with the frame at worldXY"""
         return Element(
             name=compas_assembly2.ELEMENT_NAME.BLOCK,
