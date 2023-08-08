@@ -527,7 +527,7 @@ for group_id, subsequent_groups in grouped_objects.items():
             # print("______________________________")
             if str(type(obj.geometry)) == "<type 'Mesh'>":
                 o.complex.append(conversions.from_rhino_mesh(obj.geometry))
-                
+
             elif (
                 str(type(obj.geometry)) == "<type 'LineCurve'>"
                 or str(type(obj.geometry)) == "<type 'NurbsCurve'>"

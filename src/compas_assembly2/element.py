@@ -1,3 +1,4 @@
+from compas.data import Data
 from compas.geometry import (
     Frame,
     Vector,
@@ -13,7 +14,6 @@ from compas.geometry import (
     distance_point_point,
 )
 from compas.datastructures import Mesh, mesh_bounding_box
-from compas.data import Data
 import copy
 import compas_assembly2
 
@@ -192,6 +192,12 @@ class Element(Data):
         self.attributes = {}  # set the attributes of an object
         self.attributes.update(kwargs)  # update the attributes of with the kwargs
 
+        # --------------------------------------------------------------------------
+        # compute aabb and oobb, since most of the time they are used
+        # --------------------------------------------------------------------------
+        self.aabb(0.00)
+        self.oobb(0.00)
+
     # ==========================================================================
     # ATTRIBUTES
     # ==========================================================================
@@ -218,7 +224,8 @@ class Element(Data):
             self._aabb = []  # XYZ coordinates of 8 points defining a box
 
         # if the aabb is already computed return it
-        if self._aabb:
+        # and the user does not give another inflation value
+        if self._aabb and abs(inflate) < 0.001:
             return self._aabb
 
         # iterate complex  and get the bounding box by geometry name
@@ -274,7 +281,8 @@ class Element(Data):
             self._oobb = []  # XYZ coordinates of 8 points defining a box
 
         # if the oobb is already computed return it
-        if self._oobb:
+        # and the user does not give another inflation value
+        if self._oobb and abs(inflate) < 0.001:
             return self._oobb
 
         # iterate complex and get the bounding box by geometry name
@@ -513,7 +521,7 @@ class Element(Data):
     # CONVERSIONS
     # ==========================================================================
     @staticmethod
-    def to_elements(simplices=[], complexes=None, compute_nesting=1):
+    def to_elements(simplices=[], complexes=None):
         """convert a list of geometries to elements, with assumtion that other property will be filled later"""
         elements = []
         contains_complex = complexes is list
@@ -523,116 +531,6 @@ class Element(Data):
                 elements.append(Element.to_element(s, complexes[id % len(complexes)]))
             else:
                 elements.append(Element.to_element(s))
-
-        if compute_nesting > 0:
-            # nest elements linearly and add the the nest frame to the fabrication
-            # first compute the bounding box of the elements, get the horizontal length, and create frames
-            nest_type = compute_nesting
-            width = {}
-            height = {}
-            height_step = 4
-            inflate = 0.1
-
-            for e in elements:
-                e.aabb(inflate)
-                e.oobb(inflate)
-                e.convex_hull
-
-            center = Point(0, 0, 0)
-            for e in elements:
-                center = center + e.frame.point
-            center = center / len(elements)
-
-            for e in elements:
-                width[e.name] = 0
-
-            for index, (key, value) in enumerate(width.items()):
-                height[key] = index * height_step * 0
-
-            for i, e in enumerate(elements):
-
-                temp_width = 0
-                source_frame = e.frame.copy()
-                target_frame = Frame([0, 0, 0], source_frame.xaxis, source_frame.yaxis)
-
-                if nest_type == 1 and e.aabb() is not None:
-                    # --------------------------------------------------------------------------
-                    # aabb linear nesting
-                    # --------------------------------------------------------------------------
-                    temp_width = e.aabb()[6][0] - e.aabb()[0][0]
-                    # get the maximum height of the elements
-                    height[e.name] = max(height[e.name], e.aabb()[6][1] - e.aabb()[0][1])
-                    source_frame = Frame(
-                        e.aabb()[0],
-                        [
-                            e.aabb()[1][0] - e.aabb()[0][0],
-                            e.aabb()[1][1] - e.aabb()[0][1],
-                            e.aabb()[1][2] - e.aabb()[0][2],
-                        ],
-                        [
-                            e.aabb()[3][0] - e.aabb()[0][0],
-                            e.aabb()[3][1] - e.aabb()[0][1],
-                            e.aabb()[3][2] - e.aabb()[0][2],
-                        ],
-                    )
-                    target_frame = Frame([width[e.name], height[e.name], 0], [1, 0, 0], [0, 1, 0])
-                elif nest_type == 2 and e.oobb() is not None:
-                    # --------------------------------------------------------------------------
-                    # oobb linear nesting
-                    # --------------------------------------------------------------------------
-                    temp_width = distance_point_point(e.oobb()[0], e.oobb()[1])
-                    # get the maximum height of the elements
-                    height[e.name] = max(height[e.name], distance_point_point(e.oobb()[0], e.oobb()[3]))
-                    source_frame = Frame(
-                        e.oobb()[0],
-                        [
-                            e.oobb()[1][0] - e.oobb()[0][0],
-                            e.oobb()[1][1] - e.oobb()[0][1],
-                            e.oobb()[1][2] - e.oobb()[0][2],
-                        ],
-                        [
-                            e.oobb()[3][0] - e.oobb()[0][0],
-                            e.oobb()[3][1] - e.oobb()[0][1],
-                            e.oobb()[3][2] - e.oobb()[0][2],
-                        ],
-                    )
-                    target_frame = Frame([width[e.name], height[e.name], 0], [1, 0, 0], [0, 1, 0])
-                elif nest_type == 3:
-                    # --------------------------------------------------------------------------
-                    # move of center
-                    # --------------------------------------------------------------------------
-                    t = 1.25
-                    x = (1 - t) * center.x + t * source_frame.point.x
-                    y = (1 - t) * center.y + t * source_frame.point.y
-                    z = (1 - t) * center.z + t * source_frame.point.z
-                    target_frame = Frame([x, y, z], source_frame.xaxis, source_frame.yaxis)
-
-                # --------------------------------------------------------------------------
-                # assignment of fabrication data
-                # --------------------------------------------------------------------------
-
-                fabrication = compas_assembly2.Fabrication(
-                    fabrication_type=compas_assembly2.FABRICATION_TYPES.NESTING,
-                    id=-1,
-                    frames=[source_frame, target_frame],
-                )
-                e.fabrication[compas_assembly2.FABRICATION_TYPES.NESTING] = fabrication
-                width[e.name] = width[e.name] + temp_width
-
-            # --------------------------------------------------------------------------
-            # center the frames
-            # --------------------------------------------------------------------------
-            h = 0
-            for index, (key, value) in enumerate(width.items()):
-                temp_height = height[key]
-                height[key] = h
-                h = h + temp_height
-
-            for e in elements:
-                e.fabrication[compas_assembly2.FABRICATION_TYPES.NESTING].frames[1].point.x = (
-                    e.fabrication[compas_assembly2.FABRICATION_TYPES.NESTING].frames[1].point.x - width[e.name] * 0.5
-                )
-                e.fabrication[compas_assembly2.FABRICATION_TYPES.NESTING].frames[1].point.y = height[e.name] - h * 0.5
 
         # output
         return elements
@@ -653,11 +551,11 @@ class Element(Data):
         )
 
         # deepcopy of the fabrication, and structural information
-        new_instance._frame_global = self.frame_global.copy()
+        new_instance.frame_global = self.frame_global.copy()
         new_instance._aabb = copy.deepcopy(self.aabb())
         new_instance._oobb = copy.deepcopy(self.oobb())
         new_instance._convex_hull = copy.deepcopy(self.convex_hull)
-        new_instance._outlines = copy.deepcopy(self._outlines)
+        new_instance._outlines = copy.deepcopy(self.outlines)
         new_instance._fabrication = copy.deepcopy(self.fabrication)
         new_instance._structure = copy.deepcopy(self.structure)
 
@@ -677,14 +575,28 @@ class Element(Data):
         Returns:
             None
         """
+        self.frame.transform(transformation)
+        self.frame_global.transform(transformation)
+
         for i in range(len(self.simplex)):
             self.simplex[i].transform(transformation)
 
         for i in range(len(self.complex)):
             self.complex[i].transform(transformation)
 
-        self.frame.transform(transformation)
-        self.frame_global.transform(transformation)
+        self.aabb()
+        for i in range(len(self._aabb)):
+            p = Point(self._aabb[i][0], self._aabb[i][1], self._aabb[i][2]).transformed(transformation)
+            self._aabb[i] = [p.x, p.y, p.z]
+
+        self.oobb()
+        for i in range(len(self._oobb)):
+            p = Point(self._oobb[i][0], self._oobb[i][1], self._oobb[i][2]).transformed(transformation)
+            self._oobb[i] = [p.x, p.y, p.z]
+
+        if self.convex_hull:
+            if self.convex_hull.number_of_vertices() > 0:
+                self.convex_hull.transform(transformation)
 
     def transformed(self, transformation):
         """
@@ -835,6 +747,42 @@ class Element(Data):
         a) an element touch other element by a flat face
         b) an element simplex is close to another simplex e.g. line to line proxity"""
         pass
+
+    # ==========================================================================
+    # MOST COMMON CONVERSIONS
+    # ==========================================================================
+    @staticmethod
+    def from_block(self, block):
+        """ method create a block element at the origin point with the frame at worldXY"""
+        return Element(
+            name=compas_assembly2.ELEMENT_NAME.BLOCK,
+            id=0,
+            frame=Frame.worldXY,
+            simplex=Point(0, 0, 0),
+            complex=block
+        )
+
+    @staticmethod
+    def from_frame(self,  width, height, depth):
+        """ method create a frame element at the origin point with the frame at worldXY"""
+        return Element(
+            name=compas_assembly2.ELEMENT_NAME.BLOCK,
+            id=0,
+            frame=Frame.worldXY,
+            simplex=Line(Point(-width, 0, 0), Point(width, 0, 0)),
+            complex=Box.from_width_height_depth(width, height, depth)
+        )
+
+    @staticmethod
+    def from_plate(self, polylines):
+        """ method create a plate element at the origin point with the frame at worldXY"""
+        return Element(
+            name=compas_assembly2.ELEMENT_NAME.BLOCK,
+            id=0,
+            frame=Frame.worldXY,
+            simplex=polylines,
+            complex=polylines
+        )
 
     # ==========================================================================
     # DESCRIPTION

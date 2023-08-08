@@ -1,4 +1,4 @@
-from compas_assembly2 import Viewer, Element
+from compas_assembly2 import Viewer, Element, FabricationNest
 
 
 def get_arc_points(p1, p2, num_points, height):
@@ -110,5 +110,14 @@ arc_points1 = arc_points1 = move_points_by_normals(arc_points0, normals, 1)
 arc_points2 = move_points_to_target_z(arc_points0, normals, 2)
 arc_points = arc_points0 + arc_points2
 arc_points_moved = move_points_in_two_opposite_directions(arc_points, [0, 1, 0], 1)
-elements = Element.to_elements(arc_points_moved, compute_nesting=1)
+elements = Element.to_elements(arc_points_moved)
+
+# ==========================================================================
+# NEST ELEMENTS
+# ==========================================================================
+FabricationNest.pack_elements(elements=elements, nest_type=2, inflate=0.1, height_step=4)
+
+# ==========================================================================
+# VIEWER
+# ==========================================================================
 Viewer.show_elements(elements, show_grid=True)

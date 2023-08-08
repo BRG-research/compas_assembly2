@@ -1,9 +1,7 @@
 from compas.datastructures import Mesh
 from compas.geometry import Point, Polyline, Box, Translation, Frame, Line, Pointcloud
 import random
-import compas_assembly2
-from compas_assembly2.element import Element
-from compas_assembly2.viewer import Viewer
+from compas_assembly2 import Element, Viewer, FabricationNest, ELEMENT_NAME
 
 # https://compas.dev/compas/latest/reference/generated/compas.data.Data.html
 from compas.data import json_dump
@@ -46,7 +44,7 @@ if __name__ == "__main__":
     # INITIALIZE ELEMENTS
     # ==========================================================================
     elem_0 = Element(
-        name=compas_assembly2.ELEMENT_NAME.BLOCK,
+        name=ELEMENT_NAME.BLOCK,
         id=[0, 1],
         frame=Frame([-3, 0, 0], [0.866, 0.1, 0.0], [0.5, 0.866, 0.0]),
         simplex=[Point(-3, 0, 0)],
@@ -54,15 +52,15 @@ if __name__ == "__main__":
     )
 
     elem_1 = Element(
-        name=compas_assembly2.ELEMENT_NAME.FRAME,
+        name=ELEMENT_NAME.FRAME,
         id=[0, 2],
-        frame=Frame([0, 0, 0], [0.866, 0.1, 0.0], [0.5, 0.866, 0.0]),
+        frame=Frame([0, 0, 0], [0, 1, 0.0], [1, 0, 0.0]),
         simplex=[Line((0, -2, 0), (0, 2, 0))],
         complex=geo_1,
     )
 
     elem_2 = Element(
-        name=compas_assembly2.ELEMENT_NAME.PLATE,
+        name=ELEMENT_NAME.PLATE,
         id=[3, 0],
         frame=Frame([3, 0, 0], [0.866, 0.1, 0.0], [0.5, 0.866, 0.0]),
         simplex=[
@@ -94,9 +92,9 @@ if __name__ == "__main__":
         e.convex_hull
 
         # Update fabrication and structure information
-        e.fabrication["cut"] = True
-        e.fabrication["drill"] = False
-        e.structure["nodes"] = [(0, 0, 1), (0, 0, 0)]
+        # e.fabrication["cut"] = True
+        # e.fabrication["drill"] = False
+        # e.structure["nodes"] = [(0, 0, 1), (0, 0, 0)]
 
     # ==========================================================================
     # ELEMENT COPY
@@ -106,6 +104,11 @@ if __name__ == "__main__":
     elem_copy.fabrication["cut"] = False
     print(elem_copy)
 
+    # ==========================================================================
+    # FABRICATION NEST
+    # ==========================================================================
+    FabricationNest.pack_elements(elements=elements, nest_type=2, inflate=0.5)
+    print(elem_0)
     # ==========================================================================
     # compas_view2
     # ==========================================================================
