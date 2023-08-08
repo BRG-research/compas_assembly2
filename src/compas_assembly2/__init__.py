@@ -16,7 +16,7 @@ test module
     test.hello_compas_assembly2
 
 Assembly class
-===================
+==============
 
 .. autosummary::
     :toctree: generated/
@@ -28,12 +28,12 @@ Element class
 =============
 
 .. image:: ../_images/element.png
-   :width: 100%
+   :width: 50%
    :align: right
    :alt: compas_assembly2
 
 .. image:: ../_images/element_type.png
-   :width: 100%
+   :width: 50%
    :align: right
    :alt: compas_assembly2
 
@@ -65,6 +65,11 @@ Beam class
 Group class
 ===========
 
+.. image:: ../_images/group.png
+   :width: 50%
+   :align: right
+   :alt: compas_assembly2
+
 .. autosummary::
     :toctree: generated/
     :nosignatures:
@@ -73,6 +78,11 @@ Group class
 
 Viewer class
 ============
+
+.. image:: ../_images/log_0.gif
+   :width: 50%
+   :align: right
+   :alt: compas_assembly2
 
 .. autosummary::
     :toctree: generated/

@@ -28,7 +28,7 @@ Table of Contents
 
    Introduction <self>
    installation
-   tutorial
+   .. tutorial
    examples
    api
    license
@@ -40,20 +40,20 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 
-Development Notes
-=================
-**20-07-2023 Juli, Donnerstag**
+.. Development Notes
+.. =================
+.. **20-07-2023 Juli, Donnerstag**
 
-.. image:: _images/element.png
-   :width: 100%
+.. .. image:: _images/element.png
+..    :width: 100%
 
-.. image:: _images/element_type.png
-   :width: 100%
+.. .. image:: _images/element_type.png
+..    :width: 100%
 
-.. image:: _images/group.png
-   :width: 100%
+.. .. image:: _images/group.png
+..    :width: 100%
 
-**04-08-2023 August, Freitag**
+.. **04-08-2023 August, Freitag**
 
-.. image:: _images/log_0.gif
-   :width: 100%
+.. .. image:: _images/log_0.gif
+..    :width: 100%

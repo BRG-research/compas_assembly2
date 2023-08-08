@@ -1,6 +1,8 @@
-
 ********************************************************************************
-Examples
+test_3_panelized_timber_vaulted_floors
 ********************************************************************************
 
-.. automodule:: test
+
+.. literalinclude:: ../../tests/test_3_panelized_timber_vaulted_floors.py
+   :language: python
+
