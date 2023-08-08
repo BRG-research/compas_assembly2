@@ -1,4 +1,3 @@
-import compas
 from compas.geometry import (
     Frame,
     Vector,
@@ -11,7 +10,7 @@ from compas.geometry import (
     Pointcloud,
     bounding_box,
     convex_hull,
-    distance_point_point
+    distance_point_point,
 )
 from compas.datastructures import Mesh, mesh_bounding_box
 from compas.data import Data
@@ -28,7 +27,7 @@ class Element(Data):
         name : str
             e.g., "BLOCK", "BEAM", "FRAME"
             to be consistent majority of names are stored in compas_assembly2.ELEMENT_NAME class
-        id : int or list[int]
+        id : list[int] or int
             unique identifier/s , e.g.,0 or [0] or [0, 1] or [1, 5, 9].
             one object can have an index and belong to a group/s
         frame : :class:`~compas.geometry.Frame`
@@ -68,16 +67,7 @@ class Element(Data):
                             [Vector(0, 0, 1), 0])
     """
 
-    def __init__(
-        self,
-        name="block",
-        id=-1,
-        frame=Frame.worldXY(),
-        simplex=None,
-        complex=None,
-        insertion=None,
-        **kwargs
-    ):
+    def __init__(self, name="block", id=[0], frame=None, simplex=None, complex=None, insertion=None, **kwargs):
         # --------------------------------------------------------------------------
         # call the inherited Data constructor for json serialization
         # --------------------------------------------------------------------------
@@ -88,12 +78,16 @@ class Element(Data):
         # the string can be any string
         # but better use the existing container: compas_assembly2.ELEMENT_NAME.BLOCK
         # --------------------------------------------------------------------------
+        if name is None:
+            self.name = compas_assembly2.ELEMENT_NAME.CUSTOM
         self.name = name.upper()
 
         # --------------------------------------------------------------------------
         # indexing
         # indices are store as a list to keep grouping information e.g. [0,1]
         # --------------------------------------------------------------------------
+        if id is None:
+            self.id = [-1]
         self.id = [id] if isinstance(id, int) else id
 
         # --------------------------------------------------------------------------
@@ -104,12 +98,14 @@ class Element(Data):
             self.frame = Frame.copy(frame)
         else:
             origin = [0, 0, 0]
-            if (isinstance(self.simplex[0], Point)):
-                origin = self.simplex[0]
-            elif (isinstance(self.simplex[0], Line)):
-                origin = self.simplex[0].start
-            elif (isinstance(self.simplex[0], Polyline)):
-                origin = self.simplex[0][0]
+            if isinstance(simplex[0], Point):  # type: ignore
+                origin = simplex[0]  # type: ignore
+            elif isinstance(simplex[0], Line):  # type: ignore
+                origin = simplex[0].start  # type: ignore
+            elif isinstance(simplex[0], Polyline):  # type: ignore
+                origin = simplex[0][0]  # type: ignore
+            elif isinstance(simplex[0], (int, float)) and len(simplex) == 3:  # type: ignore
+                origin = simplex
             self.frame = Frame(origin, [1, 0, 0], [0, 1, 0])
 
         # --------------------------------------------------------------------------
@@ -120,42 +116,41 @@ class Element(Data):
         # geometry, can be meshes, breps, curves, points, etc.
         # --------------------------------------------------------------------------
         self.simplex = []
-        print(simplex)
-        print(simplex[0])
-        if isinstance(simplex, list):
-            # input - list of numbers, means user gives a point (most probably)
-            if isinstance(simplex[0], (type(int), type(float))) and len(simplex) == 3:
-                self.simplex.append(Point(simplex[0], simplex[1], simplex[2]))
-            # input - list of gometries
+        if simplex:
+            if isinstance(simplex, list):
+                # input - list of numbers, means user gives a point (most probably)
+                if isinstance(simplex[0], (int, float)) and len(simplex) == 3:
+                    self.simplex.append(Point(simplex[0], simplex[1], simplex[2]))
+                # input - list of gometries
+                else:
+                    for g in simplex:
+                        if isinstance(g, Geometry) or isinstance(g, Mesh):
+                            self.simplex.append(g.copy())
+                        elif isinstance(g, list):
+                            if len(g) == 3:
+                                self.simplex.append(Point(g[0], g[1], g[2]))
             else:
-                for g in simplex:
-                    if isinstance(g, Geometry) or isinstance(g, Mesh):
-                        self.simplex.append(g.copy())
-                    elif isinstance(g, list):
-                        if len(g) == 3:
-                            self.simplex.append(Point(g[0], g[1], g[2]))
-        else:
-            # input - one geometry
-            if isinstance(simplex, Geometry):
-                self.simplex.append(simplex.copy())
+                # input - one geometry
+                if isinstance(simplex, Geometry):
+                    self.simplex.append(simplex.copy())
 
-        if (len(simplex) == 0):
-            raise AssertionError("User must define a simple geometry")
+            if len(simplex) == 0:  # type: ignore
+                raise AssertionError("User must define a simple geometry")
 
         # --------------------------------------------------------------------------
         # display geometry - geometry, can be meshes, breps, curves, pointcloud, etc.
         # --------------------------------------------------------------------------
         self.complex = []
-        if (complex):
+        if complex:
             # input - list of gometries
-            if isinstance(simplex, list):
+            if isinstance(complex, list):
                 for g in complex:
                     if isinstance(g, Geometry) or isinstance(g, Mesh):
                         self.complex.append(g.copy())
             # input - one geometry
             else:
-                if isinstance(g, Geometry) or isinstance(g, Mesh):
-                    self.complex.append(g.copy())
+                if isinstance(complex, Geometry) or isinstance(complex, Mesh):
+                    self.complex.append(complex.copy())
 
         # --------------------------------------------------------------------------
         # insertion direction and index in a sequnece
@@ -163,33 +158,33 @@ class Element(Data):
         # the index is always integer
         # --------------------------------------------------------------------------
         is_insertion_valid = False
-        if (insertion):
-            if (isinstance(insertion, list)):
+        if insertion:
+            if isinstance(insertion, list):
                 # input - list of vector
-                if (len(insertion) == 1):
-                    if (isinstance(insertion[0], Vector)):
-                        self.insertion = [insertion[0], id[-1]]
+                if len(insertion) == 1:
+                    if isinstance(insertion[0], Vector):
+                        self.insertion = [insertion[0], self.id[-1]]
                         is_insertion_valid = True
                 # input - list of vector and index
-                elif (len(insertion) == 2):
-                    if (isinstance(insertion[0], Vector) and isinstance(insertion[1], (type(int), type(float)))):
+                elif len(insertion) == 2:
+                    if isinstance(insertion[0], Vector) and isinstance(insertion[1], (int, float)):
                         self.insertion = [insertion[0], insertion[1]]
                         is_insertion_valid = True
                 # input - list of vector coordinates in one list
-                elif (len(insertion) == 3):
-                    self.insertion = [Vector(insertion[0], insertion[1], insertion[2]), id[-1]]
+                elif len(insertion) == 3:
+                    self.insertion = [Vector(insertion[0], insertion[1], insertion[2]), self.id[-1]]
                     is_insertion_valid = True
                 # input - list of vector coordinates and id in one list
-                elif (len(insertion) == 4):
+                elif len(insertion) == 4:
                     self.insertion = [Vector(insertion[0], insertion[1], insertion[2]), insertion[3]]
                     is_insertion_valid = True
-            elif (isinstance(insertion, Vector)):
+            elif isinstance(insertion, Vector):
                 # input - vector
-                self.insertion = [insertion, id[-1]]
+                self.insertion = [insertion, self.id[-1]]
                 is_insertion_valid = True
 
-        if (not is_insertion_valid):
-            self.insertion = [Vector(0, 0, 1), id[-1]]
+        if not is_insertion_valid:
+            self.insertion = [Vector(0, 0, 1), self.id[-1]]
 
         # --------------------------------------------------------------------------
         # custom attributes given by the user
@@ -206,7 +201,7 @@ class Element(Data):
         """Frame that gives orientation of the element in the larger group of Elements"""
 
         # define this property dynamically in the class
-        if not hasattr(self, '_frame_global'):
+        if not hasattr(self, "_frame_global"):
             self._frame_global = Frame([0, 0, 0], [1, 0, 0], [0, 1, 0])
         return self._frame_global
 
@@ -219,7 +214,7 @@ class Element(Data):
         """Compute bounding box based on complex geometries points"""
 
         # define this property dynamically in the class
-        if not hasattr(self, '_aabb'):
+        if not hasattr(self, "_aabb"):
             self._aabb = []  # XYZ coordinates of 8 points defining a box
 
         # if the aabb is already computed return it
@@ -248,10 +243,13 @@ class Element(Data):
 
         # if no points found, return
         if len(points_bbox) < 2:
-            if (inflate > 0.00):
-                self._aabb = bounding_box([
-                    self.frame.point+Vector(inflate, inflate, inflate),
-                    self.frame.point-Vector(inflate, inflate, inflate)])
+            if inflate > 0.00:
+                self._aabb = bounding_box(
+                    [
+                        self.frame.point + Vector(inflate, inflate, inflate),  # type: ignore
+                        self.frame.point - Vector(inflate, inflate, inflate),  # type: ignore
+                    ]
+                )
                 return self._aabb
             else:
                 return None
@@ -272,7 +270,7 @@ class Element(Data):
         """Compute the oriented bounding box based on complex geometries points"""
 
         # define this property dynamically in the class
-        if not hasattr(self, '_oobb'):
+        if not hasattr(self, "_oobb"):
             self._oobb = []  # XYZ coordinates of 8 points defining a box
 
         # if the oobb is already computed return it
@@ -298,10 +296,13 @@ class Element(Data):
 
         # if no points found, return
         if len(points) < 2:
-            if (inflate > 0.00):
-                self._oobb = bounding_box([
-                    self.frame.point+Vector(inflate, inflate, inflate),
-                    self.frame.point-Vector(inflate, inflate, inflate)])
+            if inflate > 0.00:
+                self._oobb = bounding_box(
+                    [
+                        self.frame.point + Vector(inflate, inflate, inflate),  # type: ignore
+                        self.frame.point - Vector(inflate, inflate, inflate),  # type: ignore
+                    ]
+                )
                 return self._oobb
             else:
                 return None
@@ -343,7 +344,7 @@ class Element(Data):
         """Compute convex hull from complex points"""
 
         # define this property dynamically in the class
-        if not hasattr(self, '_convex_hull'):
+        if not hasattr(self, "_convex_hull"):
             self._convex_hull = Mesh()
 
         # if the convex hull is already computed return it
@@ -387,7 +388,7 @@ class Element(Data):
         they are often made from polylines and polyline planes"""
 
         # define this property dynamically in the class
-        if not hasattr(self, '_outlines'):
+        if not hasattr(self, "_outlines"):
             self._outlines = []
         return self._outlines
 
@@ -396,7 +397,7 @@ class Element(Data):
         """Fabrication information e.g. subtractive, additive, nesting and etc"""
 
         # define this property dynamically in the class
-        if not hasattr(self, '_fabrication'):
+        if not hasattr(self, "_fabrication"):
             self._fabrication = {}
         return self._fabrication
 
@@ -405,7 +406,7 @@ class Element(Data):
         """Structure information e.g. force vectors, minimal representation and etc"""
 
         # define this property dynamically in the class
-        if not hasattr(self, '_structure'):
+        if not hasattr(self, "_structure"):
             self._structure = {}
         return self._structure
 
@@ -512,18 +513,18 @@ class Element(Data):
     # CONVERSIONS
     # ==========================================================================
     @staticmethod
-    def to_elements(simplices=[], complex=None, compute_nesting=1):
-        """ convert a list of geometries to elements, with assumtion that other property will be filled later """
+    def to_elements(simplices=[], complexes=None, compute_nesting=1):
+        """convert a list of geometries to elements, with assumtion that other property will be filled later"""
         elements = []
-        contains_complex = complex is list
+        contains_complex = complexes is list
 
         for id, s in enumerate(simplices):
-            if (contains_complex):
-                elements.append(Element.to_element(s, complex[id % len(complex)]))
+            if contains_complex:
+                elements.append(Element.to_element(s, complexes[id % len(complexes)]))
             else:
                 elements.append(Element.to_element(s))
 
-        if (compute_nesting > 0):
+        if compute_nesting > 0:
             # nest elements linearly and add the the nest frame to the fabrication
             # first compute the bounding box of the elements, get the horizontal length, and create frames
             nest_type = compute_nesting
@@ -533,9 +534,9 @@ class Element(Data):
             inflate = 0.1
 
             for e in elements:
-                e.get_aabb(inflate)
-                e.get_oobb(inflate)
-                e.get_convex_hull()
+                e.aabb(inflate)
+                e.oobb(inflate)
+                e.convex_hull
 
             center = Point(0, 0, 0)
             for e in elements:
@@ -554,46 +555,45 @@ class Element(Data):
                 source_frame = e.frame.copy()
                 target_frame = Frame([0, 0, 0], source_frame.xaxis, source_frame.yaxis)
 
-                if nest_type == 1 and e.get_aabb() is not None:
+                if nest_type == 1 and e.aabb() is not None:
                     # --------------------------------------------------------------------------
                     # aabb linear nesting
                     # --------------------------------------------------------------------------
-                    temp_width = e.get_aabb()[6][0] - e.get_aabb()[0][0]
+                    temp_width = e.aabb()[6][0] - e.aabb()[0][0]
                     # get the maximum height of the elements
-                    height[e.name] = max(height[e.name], e.get_aabb()[6][1] - e.get_aabb()[0][1])
+                    height[e.name] = max(height[e.name], e.aabb()[6][1] - e.aabb()[0][1])
                     source_frame = Frame(
-                        e.get_aabb()[0],
+                        e.aabb()[0],
                         [
-                            e.get_aabb()[1][0] - e.get_aabb()[0][0],
-                            e.get_aabb()[1][1] - e.get_aabb()[0][1],
-                            e.get_aabb()[1][2] - e.get_aabb()[0][2],
+                            e.aabb()[1][0] - e.aabb()[0][0],
+                            e.aabb()[1][1] - e.aabb()[0][1],
+                            e.aabb()[1][2] - e.aabb()[0][2],
                         ],
                         [
-                            e.get_aabb()[3][0] - e.get_aabb()[0][0],
-                            e.get_aabb()[3][1] - e.get_aabb()[0][1],
-                            e.get_aabb()[3][2] - e.get_aabb()[0][2],
+                            e.aabb()[3][0] - e.aabb()[0][0],
+                            e.aabb()[3][1] - e.aabb()[0][1],
+                            e.aabb()[3][2] - e.aabb()[0][2],
                         ],
                     )
                     target_frame = Frame([width[e.name], height[e.name], 0], [1, 0, 0], [0, 1, 0])
-                elif nest_type == 2 and e.get_oobb() is not None:
+                elif nest_type == 2 and e.oobb() is not None:
                     # --------------------------------------------------------------------------
                     # oobb linear nesting
                     # --------------------------------------------------------------------------
-                    temp_width = compas.geometry.distance_point_point(e.get_oobb()[0], e.get_oobb()[1])
+                    temp_width = distance_point_point(e.oobb()[0], e.oobb()[1])
                     # get the maximum height of the elements
-                    height[e.name] = max(height[e.name],
-                                         compas.geometry.distance_point_point(e.get_oobb()[0], e.get_oobb()[3]))
+                    height[e.name] = max(height[e.name], distance_point_point(e.oobb()[0], e.oobb()[3]))
                     source_frame = Frame(
-                        e.get_oobb()[0],
+                        e.oobb()[0],
                         [
-                            e.get_oobb()[1][0] - e.get_oobb()[0][0],
-                            e.get_oobb()[1][1] - e.get_oobb()[0][1],
-                            e.get_oobb()[1][2] - e.get_oobb()[0][2],
+                            e.oobb()[1][0] - e.oobb()[0][0],
+                            e.oobb()[1][1] - e.oobb()[0][1],
+                            e.oobb()[1][2] - e.oobb()[0][2],
                         ],
                         [
-                            e.get_oobb()[3][0] - e.get_oobb()[0][0],
-                            e.get_oobb()[3][1] - e.get_oobb()[0][1],
-                            e.get_oobb()[3][2] - e.get_oobb()[0][2],
+                            e.oobb()[3][0] - e.oobb()[0][0],
+                            e.oobb()[3][1] - e.oobb()[0][1],
+                            e.oobb()[3][2] - e.oobb()[0][2],
                         ],
                     )
                     target_frame = Frame([width[e.name], height[e.name], 0], [1, 0, 0], [0, 1, 0])
@@ -612,8 +612,9 @@ class Element(Data):
                 # --------------------------------------------------------------------------
 
                 fabrication = compas_assembly2.Fabrication(
-                    fabrication_type=compas_assembly2.FABRICATION_TYPES.NESTING, id=-1,
-                    frames=[source_frame, target_frame]
+                    fabrication_type=compas_assembly2.FABRICATION_TYPES.NESTING,
+                    id=-1,
+                    frames=[source_frame, target_frame],
                 )
                 e.fabrication[compas_assembly2.FABRICATION_TYPES.NESTING] = fabrication
                 width[e.name] = width[e.name] + temp_width
@@ -637,9 +638,9 @@ class Element(Data):
         return elements
 
     @staticmethod
-    def to_element(simplex=None, display_shape=None):
-        """ convert a geometry to an element, with assumtion that other property will be filled later """
-        return Element(simplex=simplex, complex=display_shape)
+    def to_element(simplex=None, complex=None):
+        """convert a geometry to an element, with assumtion that other property will be filled later"""
+        return Element(simplex=simplex, complex=complex)
 
     # ==========================================================================
     # COPY ALL GEOMETRY OBJECTS
@@ -772,9 +773,9 @@ class Element(Data):
         # --------------------------------------------------------------------------
         # aabb collision
         # --------------------------------------------------------------------------
-        collision_x_axis = self.aabb[6][0] < other.aabb[0][0] or other.aabb[6][0] < self.aabb[0][0]
-        collision_y_axis = self.aabb[6][1] < other.aabb[0][1] or other.aabb[6][1] < self.aabb[0][1]
-        collision_z_axis = self.aabb[6][2] < other.aabb[0][2] or other.aabb[6][2] < self.aabb[0][2]
+        collision_x_axis = self.aabb()[6][0] < other.aabb[0][0] or other.aabb[6][0] < self.aabb()[0][0]  # type: ignore
+        collision_y_axis = self.aabb()[6][1] < other.aabb[0][1] or other.aabb[6][1] < self.aabb()[0][1]  # type: ignore
+        collision_z_axis = self.aabb()[6][2] < other.aabb[0][2] or other.aabb[6][2] < self.aabb()[0][2]  # type: ignore
         if collision_x_axis or collision_y_axis or collision_z_axis:
             return False
 
@@ -785,11 +786,11 @@ class Element(Data):
         # point, axis, size description
         class OBB:
             def __init__(self, box):
-                self.frame = Frame(box[0], box[1]-box[0], box[3]-box[0])
-                self.half_size = [0, 0, 0]
-                self.half_size[0] = distance_point_point(box[0], box[1])*0.5
-                self.half_size[1] = distance_point_point(box[0], box[3])*0.5
-                self.half_size[2] = distance_point_point(box[0], box[4])*0.5
+                self.frame = Frame(box[0], box[1] - box[0], box[3] - box[0])
+                self.half_size = [0.0, 0.0, 0.0]
+                self.half_size[0] = distance_point_point(box[0], box[1]) * 0.5
+                self.half_size[1] = distance_point_point(box[0], box[3]) * 0.5
+                self.half_size[2] = distance_point_point(box[0], box[4]) * 0.5
 
         # convert the eight points to a frame and half-size description
         box1 = OBB(self.oobb)
@@ -798,38 +799,38 @@ class Element(Data):
         # get sepratation plane
         def GetSeparatingPlane(RPos, axis, box1, box2):
             return abs(RPos * axis) > (
-                abs((box1.frame.xaxis * box1.half_size[0]).dot(axis)) +
-                abs((box1.frame.yaxis * box1.half_size[1]).dot(axis)) +
-                abs((box1.frame.zaxis * box1.half_size[2]).dot(axis)) +
-                abs((box2.frame.xaxis * box2.half_size[0]).dot(axis)) +
-                abs((box2.frame.yaxis * box2.half_size[1]).dot(axis)) +
-                abs((box2.frame.zaxis * box2.half_size[2]).dot(axis))
+                abs((box1.frame.xaxis * box1.half_size[0]).dot(axis))
+                + abs((box1.frame.yaxis * box1.half_size[1]).dot(axis))
+                + abs((box1.frame.zaxis * box1.half_size[2]).dot(axis))
+                + abs((box2.frame.xaxis * box2.half_size[0]).dot(axis))
+                + abs((box2.frame.yaxis * box2.half_size[1]).dot(axis))
+                + abs((box2.frame.zaxis * box2.half_size[2]).dot(axis))
             )
 
         # compute the oobb collision
-        RPos = box2.frame.point - box1.frame.point
+        RPos = box2.frame.point - box1.frame.point  # type: ignore
 
         result = not (
-            GetSeparatingPlane(RPos, box1.frame.xaxis, box1, box2) or
-            GetSeparatingPlane(RPos, box1.frame.yaxis, box1, box2) or
-            GetSeparatingPlane(RPos, box1.frame.zaxis, box1, box2) or
-            GetSeparatingPlane(RPos, box2.frame.xaxis, box1, box2) or
-            GetSeparatingPlane(RPos, box2.frame.yaxis, box1, box2) or
-            GetSeparatingPlane(RPos, box2.frame.zaxis, box1, box2) or
-            GetSeparatingPlane(RPos, box1.frame.xaxis.cross(box2.frame.xaxis), box1, box2) or
-            GetSeparatingPlane(RPos, box1.frame.xaxis.cross(box2.frame.yaxis), box1, box2) or
-            GetSeparatingPlane(RPos, box1.frame.xaxis.cross(box2.frame.zaxis), box1, box2) or
-            GetSeparatingPlane(RPos, box1.frame.yaxis.cross(box2.frame.xaxis), box1, box2) or
-            GetSeparatingPlane(RPos, box1.frame.yaxis.cross(box2.frame.yaxis), box1, box2) or
-            GetSeparatingPlane(RPos, box1.frame.yaxis.cross(box2.frame.zaxis), box1, box2) or
-            GetSeparatingPlane(RPos, box1.frame.zaxis.cross(box2.frame.xaxis), box1, box2) or
-            GetSeparatingPlane(RPos, box1.frame.zaxis.cross(box2.frame.yaxis), box1, box2) or
-            GetSeparatingPlane(RPos, box1.frame.zaxis.cross(box2.frame.zaxis), box1, box2)
+            GetSeparatingPlane(RPos, box1.frame.xaxis, box1, box2)
+            or GetSeparatingPlane(RPos, box1.frame.yaxis, box1, box2)
+            or GetSeparatingPlane(RPos, box1.frame.zaxis, box1, box2)
+            or GetSeparatingPlane(RPos, box2.frame.xaxis, box1, box2)
+            or GetSeparatingPlane(RPos, box2.frame.yaxis, box1, box2)
+            or GetSeparatingPlane(RPos, box2.frame.zaxis, box1, box2)
+            or GetSeparatingPlane(RPos, box1.frame.xaxis.cross(box2.frame.xaxis), box1, box2)  # type: ignore
+            or GetSeparatingPlane(RPos, box1.frame.xaxis.cross(box2.frame.yaxis), box1, box2)  # type: ignore
+            or GetSeparatingPlane(RPos, box1.frame.xaxis.cross(box2.frame.zaxis), box1, box2)  # type: ignore
+            or GetSeparatingPlane(RPos, box1.frame.yaxis.cross(box2.frame.xaxis), box1, box2)  # type: ignore
+            or GetSeparatingPlane(RPos, box1.frame.yaxis.cross(box2.frame.yaxis), box1, box2)  # type: ignore
+            or GetSeparatingPlane(RPos, box1.frame.yaxis.cross(box2.frame.zaxis), box1, box2)  # type: ignore
+            or GetSeparatingPlane(RPos, box1.frame.zaxis.cross(box2.frame.xaxis), box1, box2)  # type: ignore
+            or GetSeparatingPlane(RPos, box1.frame.zaxis.cross(box2.frame.yaxis), box1, box2)  # type: ignore
+            or GetSeparatingPlane(RPos, box1.frame.zaxis.cross(box2.frame.zaxis), box1, box2)  # type: ignore
         )
 
         return result
 
-    def find_interface(self, other,  **kwargs):
+    def find_interface(self, other, **kwargs):
         """there are few possible cases
         a) an element touch other element by a flat face
         b) an element simplex is close to another simplex e.g. line to line proxity"""

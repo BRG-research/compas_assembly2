@@ -13,8 +13,8 @@ def get_arc_points(p1, p2, num_points, height):
     arc_points = []
     for i in range(num_points):
         t = i / (num_points - 1)
-        px = (1 - t) ** 2 * x1 + 2 * (1 - t) * t * cx + t ** 2 * x2
-        py = (1 - t) ** 2 * y1 + 2 * (1 - t) * t * cy + t ** 2 * y2
+        px = (1 - t) ** 2 * x1 + 2 * (1 - t) * t * cx + t**2 * x2
+        py = (1 - t) ** 2 * y1 + 2 * (1 - t) * t * cy + t**2 * y2
         arc_points.append([px, 0, py])
 
     return arc_points
@@ -36,7 +36,7 @@ def calculate_normals_with_length(points, normal_scalar):
             delta_x = points[i + 1][0] - points[i - 1][0]
             delta_z = points[i + 1][2] - points[i - 1][2]
 
-        normal_length = (delta_x ** 2 + delta_z ** 2) ** 0.5
+        normal_length = (delta_x**2 + delta_z**2) ** 0.5
         if normal_length == 0:
             normal_x, normal_z = 0, 0
         else:
@@ -80,7 +80,7 @@ def move_points_to_target_z(arc_points, normals, target_z):
 
 def move_points_in_two_opposite_directions(points, direction, distance):
     new_points = []
-    direction_magnitude = sum(d ** 2 for d in direction) ** 0.5
+    direction_magnitude = sum(d**2 for d in direction) ** 0.5
     normalized_direction = [d / direction_magnitude for d in direction]
     movement_positive = [d * distance for d in normalized_direction]
     movement_negative = [-d * distance for d in normalized_direction]
@@ -107,7 +107,7 @@ def move_points_in_two_opposite_directions(points, direction, distance):
 arc_points0 = get_arc_points([-5.0, 0, 0], [5.0, 0, 0], 6, 3)
 normals = calculate_normals_with_length(arc_points0, 0.5)
 arc_points1 = arc_points1 = move_points_by_normals(arc_points0, normals, 1)
-arc_points2 = move_points_to_target_z(arc_points0, normals,  2)
+arc_points2 = move_points_to_target_z(arc_points0, normals, 2)
 arc_points = arc_points0 + arc_points2
 arc_points_moved = move_points_in_two_opposite_directions(arc_points, [0, 1, 0], 1)
 elements = Element.to_elements(arc_points_moved, compute_nesting=1)

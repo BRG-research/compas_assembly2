@@ -28,11 +28,11 @@ if __name__ == "__main__":
     for e in elements_json:
         e.aabb(inflate)
         e.oobb(inflate)
-        e.get_convex_hull()
+        e.convex_hull
 
     center = Point(0, 0, 0)
     for e in elements_json:
-        center = center + e.local_frame.point
+        center = center + e.frame.point
     center = center / len(elements_json)
 
     for e in elements_json:
@@ -44,7 +44,7 @@ if __name__ == "__main__":
     for i, e in enumerate(elements_json):
 
         temp_width = 0
-        source_frame = e.local_frame.copy()
+        source_frame = e.frame.copy()
         target_frame = Frame([0, 0, 0], source_frame.xaxis, source_frame.yaxis)
 
         if nest_type == 0 and e.aabb() is not None:
@@ -130,4 +130,4 @@ if __name__ == "__main__":
     # ==========================================================================
     # VIEW2
     # ==========================================================================
-    Viewer.run(elements=elements_json, viewer_type="view2", show_grid=False)
+    Viewer.show_elements(elements=elements_json, viewer_type="view2", show_grid=False)

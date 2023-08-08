@@ -448,12 +448,12 @@ def process_string(input_string):
 
             elif "simplex" in input_string:
                 result["PROPERTY_TYPE"] = "simplex"
-            elif "display_shapes" in input_string:
-                result["PROPERTY_TYPE"] = "display_shapes"
-            elif "local_frame" in input_string:
-                result["PROPERTY_TYPE"] = "local_frame"
-            elif "global_frame" in input_string:
-                result["PROPERTY_TYPE"] = "global_frame"
+            elif "complex" in input_string:
+                result["PROPERTY_TYPE"] = "complex"
+            elif "frame" in input_string:
+                result["PROPERTY_TYPE"] = "frame"
+            elif "frame_global" in input_string:
+                result["PROPERTY_TYPE"] = "frame_global"
     return result  # Return None if none of the specified substrings are found
 
 
@@ -478,7 +478,7 @@ for group_id, subsequent_groups in grouped_objects.items():
     o = Element(
         # ensure that this name exists
         name=compas_assembly2.ELEMENT_NAME.exists(processed_layer_name["ELEMENT_NAME"]),  # type: ignore
-        id=(dict_id[processed_layer_name["ELEMENT_NAME"].upper()], counter),  # noqa: E231
+        id=[dict_id[processed_layer_name["ELEMENT_NAME"].upper()], counter],  # noqa: E231
     )
     counter = counter + 1
 
@@ -500,68 +500,69 @@ for group_id, subsequent_groups in grouped_objects.items():
             ):
                 o.simplex.append(conversions.from_rhino_polyline(obj.geometry))
         # --------------------------------------------------------------------------
-        # local_frame
+        # frame
         # --------------------------------------------------------------------------
-        elif processed_layer_name["PROPERTY_TYPE"] == "local_frame":
+        elif processed_layer_name["PROPERTY_TYPE"] == "frame":
 
             if (
                 str(type(obj.geometry)) == "<type 'LineCurve'>"
                 or str(type(obj.geometry)) == "<type 'NurbsCurve'>"
                 or str(type(obj.geometry)) == "<type 'PolylineCurve'>"
             ):
-                o.local_frame = conversions.from_rhino_frame(obj.geometry)
+                o.frame = conversions.from_rhino_frame(obj.geometry)
         # --------------------------------------------------------------------------
-        # global_frame
+        # frame_global
         # --------------------------------------------------------------------------
-        elif processed_layer_name["PROPERTY_TYPE"] == "global_frame":
+        elif processed_layer_name["PROPERTY_TYPE"] == "frame_global":
             if (
                 str(type(obj.geometry)) == "<type 'LineCurve'>"
                 or str(type(obj.geometry)) == "<type 'NurbsCurve'>"
                 or str(type(obj.geometry)) == "<type 'PolylineCurve'>"
             ):
-                o.global_frame = conversions.from_rhino_frame(obj.geometry)
+                o.frame_global = conversions.from_rhino_frame(obj.geometry)
         # --------------------------------------------------------------------------
-        # display_shapes
+        # complex
         # --------------------------------------------------------------------------
-        elif processed_layer_name["PROPERTY_TYPE"] == "display_shapes":
+        elif processed_layer_name["PROPERTY_TYPE"] == "complex":
             # print("______________________________")
             if str(type(obj.geometry)) == "<type 'Mesh'>":
-                o.display_shapes.append(conversions.from_rhino_mesh(obj.geometry))
+                o.complex.append(conversions.from_rhino_mesh(obj.geometry))
+                
             elif (
                 str(type(obj.geometry)) == "<type 'LineCurve'>"
                 or str(type(obj.geometry)) == "<type 'NurbsCurve'>"
                 or str(type(obj.geometry)) == "<type 'PolylineCurve'>"
             ):
-                o.display_shapes.append(conversions.from_rhino_polyline(obj.geometry))
+                o.complex.append(conversions.from_rhino_polyline(obj.geometry))
 
     # --------------------------------------------------------------------------
-    # reassingn center incase local and global frames are not given
+    # reassign center incase local and global frames are not given
     # --------------------------------------------------------------------------
     frame_xy = Frame([0, 0, 0], [1, 0, 0], [0, 1, 0])
-    if o.local_frame == frame_xy:
+    if o.frame == frame_xy:
         if len(o.simplex) > 0:
             if isinstance(o.simplex[0], Mesh):
-                o.local_frame = Frame(o.simplex[0].centroid(), [1, 0, 0], [0, 1, 0])
+                o.frame = Frame(o.simplex[0].centroid(), [1, 0, 0], [0, 1, 0])
             elif isinstance(o.simplex[0], Polyline):
                 if o.simplex[0].is_closed():
-                    o.local_frame = Frame(o.simplex[0][0], [1, 0, 0], [0, 1, 0])
+                    o.frame = Frame(o.simplex[0][0], [1, 0, 0], [0, 1, 0])
                 else:
                     x_axis_vector, y_axis_vector = conversions.perpendicular_to(o.simplex[0][0], o.simplex[0][1])
-                    # o.local_frame = Frame((o.simplex[0][0]+o.simplex[0][1])*0.5,x_axis_vector, y_axis_vector)
-                    o.local_frame = Frame(o.simplex[0][0], x_axis_vector, y_axis_vector)
-        elif len(o.display_shapes) > 0:
-            if isinstance(o.display_shapes[0], Mesh):
-                center = o.display_shapes[0].centroid()
+                    # o.frame = Frame((o.simplex[0][0]+o.simplex[0][1])*0.5,x_axis_vector, y_axis_vector)
+                    o.frame = Frame(o.simplex[0][0], x_axis_vector, y_axis_vector)
+        elif len(o.complex) > 0:
+            if isinstance(o.complex[0], Mesh):
+                center = o.complex[0].centroid()
                 o.simplex.append(center)
-                o.local_frame = Frame(center, [1, 0, 0], [0, 1, 0])
-            elif isinstance(o.display_shapes[0], Polyline):
-                if o.display_shapes[0].is_closed():
-                    o.local_frame = Frame(o.display_shapes[0][0], [1, 0, 0], [0, 1, 0])
+                o.frame = Frame(center, [1, 0, 0], [0, 1, 0])
+            elif isinstance(o.complex[0], Polyline):
+                if o.complex[0].is_closed():
+                    o.frame = Frame(o.complex[0][0], [1, 0, 0], [0, 1, 0])
                 else:
                     x_axis_vector, y_axis_vector = conversions.perpendicular_to(
-                        o.display_shapes[0][0], o.display_shapes[0][1]
+                        o.complex[0][0], o.complex[0][1]
                     )
-                    o.local_frame = Frame(o.display_shapes[0][0], x_axis_vector, y_axis_vector)
+                    o.frame = Frame(o.complex[0][0], x_axis_vector, y_axis_vector)
 
     # --------------------------------------------------------------------------
     # special case for plates, where the simpices must be sorted and split
@@ -569,7 +570,7 @@ for group_id, subsequent_groups in grouped_objects.items():
     if o.name == "PLATE":
         first_half, merged, frame = conversions.sort_polyline_pairs(o.simplex)
         o.simplex = first_half
-        o.local_frame = frame
+        o.frame = frame
 
     # --------------------------------------------------------------------------
     # collect the element instance

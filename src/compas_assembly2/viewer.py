@@ -39,7 +39,7 @@ class Viewer:
         height=1200,
         show_grid=True,
         show_indices=False,
-        show_types=False,
+        show_names=False,
         show_simplices=True,
         show_complexes=True,
         show_aabbs=False,
@@ -68,7 +68,7 @@ class Viewer:
             height=height,
             show_grid=show_grid,
             show_indices=show_indices,
-            show_types=show_types,
+            show_names=show_names,
             show_simplices=show_simplices,
             show_complexes=show_complexes,
             show_aabbs=show_aabbs,
@@ -81,7 +81,7 @@ class Viewer:
             display_axis_scale=display_axis_scale,
             point_size=point_size,
             line_width=line_width,
-            colors=colors
+            colors=colors,
         )
 
     @staticmethod
@@ -92,7 +92,7 @@ class Viewer:
         height=1200,
         show_grid=False,
         show_indices=False,
-        show_types=False,
+        show_names=False,
         show_simplices=True,
         show_complexes=True,
         show_aabbs=False,
@@ -135,7 +135,7 @@ class Viewer:
 
                 viewer_objects = {
                     "viewer_indices": [],
-                    "viewer_types": [],
+                    "viewer_names": [],
                     "viewer_simplices": [],
                     "viewer_complexes": [],
                     "viewer_frames": [],
@@ -179,7 +179,7 @@ class Viewer:
                     viewer_objects["viewer_indices"].append(o)
 
                     # --------------------------------------------------------------------------
-                    # add text - types
+                    # add text - names
                     # --------------------------------------------------------------------------
 
                     text = Text(
@@ -192,7 +192,7 @@ class Viewer:
                         name=element_id,
                         color=colors[1],
                         is_selected=False,
-                        is_visible=show_types,
+                        is_visible=show_names,
                         show_points=True,
                         show_lines=True,
                         show_faces=False,
@@ -203,7 +203,7 @@ class Viewer:
                         pointsize=point_size,
                     )
 
-                    viewer_objects["viewer_types"].append(o)
+                    viewer_objects["viewer_names"].append(o)
 
                     # --------------------------------------------------------------------------
                     # add simplex
@@ -296,7 +296,7 @@ class Viewer:
 
                     for i in range(len(element.complex)):
                         if isinstance(element.complex[i], Mesh):
-                            if (element.complex[i].number_of_vertices() > 0):
+                            if element.complex[i].number_of_vertices() > 0:
                                 o = viewer.add(
                                     data=element.complex[i],
                                     name=element_id,
@@ -467,7 +467,7 @@ class Viewer:
                             viewer_objects["viewer_oobbs"].append(o)
 
                     if element._convex_hull:
-                        if (element._convex_hull.number_of_vertices() > 0):
+                        if element._convex_hull.number_of_vertices() > 0:
                             o = viewer.add(
                                 data=element._convex_hull,
                                 name=element_id,
@@ -500,9 +500,9 @@ class Viewer:
                         obj.is_visible = checked
                     viewer.view.update()
 
-                @viewer.checkbox(text="show_types", checked=show_types)
-                def check_display_types(checked):
-                    for obj in viewer_objects["viewer_types"]:
+                @viewer.checkbox(text="show_names", checked=show_names)
+                def check_display_names(checked):
+                    for obj in viewer_objects["viewer_names"]:
                         obj.is_visible = checked
                     viewer.view.update()
 
@@ -602,7 +602,7 @@ class Viewer:
                                 dict_matrices[element.guid] = compas_matrix.matrix
 
                     # change positions of elements
-                    if (dict_matrices):
+                    if dict_matrices:
                         for key, value in viewer_objects.items():
                             for item in value:
                                 item.matrix = dict_matrices[item.name]
