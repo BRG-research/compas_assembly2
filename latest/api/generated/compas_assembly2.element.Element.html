@@ -20,11 +20,11 @@
   <link rel="stylesheet" type="text/css" href="../../_static/css/compas-reference.css" />
 
   
-  <link rel="next" title="Element.add_feature" href="compas_assembly2.element.Element.add_feature.html" />
+  <link rel="next" title="Element.aabb" href="compas_assembly2.element.Element.aabb.html" />
   
 
   
-  <link rel="prev" title="hello_compas_assembly2" href="compas_assembly2.test.hello_compas_assembly2.html" />
+  <link rel="prev" title="Assembly.validate_json" href="compas_assembly2.assembly.Assembly.validate_json.html" />
   
 
   <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
@@ -97,56 +97,42 @@
 <h1>Element</h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="compas_assembly2.element.Element">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_assembly2.element.</span></span><span class="sig-name descname"><span class="pre">Element</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">name='BLOCK',</span> <span class="pre">id=[0,</span> <span class="pre">1],</span> <span class="pre">simplex=[],</span> <span class="pre">display_shapes=[],</span> <span class="pre">local_frame=&lt;bound</span> <span class="pre">method</span> <span class="pre">Frame.worldXY</span> <span class="pre">of</span> <span class="pre">&lt;class</span> <span class="pre">'compas.geometry.primitives.frame.Frame'&gt;&gt;,</span> <span class="pre">global_frame=&lt;bound</span> <span class="pre">method</span> <span class="pre">Frame.worldXY</span> <span class="pre">of</span> <span class="pre">&lt;class</span> <span class="pre">'compas.geometry.primitives.frame.Frame'&gt;&gt;,</span> <span class="pre">**kwargs</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BRG-research/compas_assembly2/blob/master/src/compas_assembly2/element.py#L19"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_assembly2.element.</span></span><span class="sig-name descname"><span class="pre">Element</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'block'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simplex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">complex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">insertion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BRG-research/compas_assembly2/blob/master/src/compas_assembly2/element.py#L21"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://compas.dev/compas/latest/reference/generated/compas.data.Data.html#compas.data.Data" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.data.data.Data</span></code></a></p>
 <p>Class representing a structural object of an assembly.</p>
-<p>This class defines structural elements used in an assembly.
-Each element is defined by inputs: an ID, attributes, geometrical shape, orientation frames.
-Additionally, it stores output dictionaries for fabrication, and structural information.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>name (str)</strong> (<em>The name of the element, e.g., &quot;BLOCK&quot;, &quot;BEAM&quot; and etc.</em>)</p></li>
-<li><p><strong>id (list[int] or int)</strong> (<em>A unique identifier as a list, e.g.,[0] or [0, 1] or [1, 5, 9].</em>)</p></li>
-<li><p><strong>attr (dict, optional)</strong> (<em>A dictionary containing attributes of the element. Defaults to an empty dictionary.</em>)</p></li>
-<li><p><strong>simplex (list, optional)</strong> (<em>Supported types: Point, Polyline (for lines use two points), List(Polyline)</em>)</p></li>
-<li><p><strong>display_shapes  (list, optional)</strong> (<em>Supported types: Mesh, Polyline, Box, Line, Pointcloud.</em>)</p></li>
-<li><p><strong>local_frame (Frame, optional)</strong> (<em>The local frame of the element.</em>)</p></li>
-<li><p><strong>global_frame (Frame, optional)</strong> (<em>The global frame of the element.</em>)</p></li>
-<li><p><strong>kwargs (dict, optional)</strong> (<em>Additional keyword arguments can be passed to the element.</em>)</p></li>
+<li><p><strong>name</strong> (<em>str</em>) -- e.g., &quot;BLOCK&quot;, &quot;BEAM&quot;, &quot;FRAME&quot;
+to be consistent majority of names are stored in compas_assembly2.ELEMENT_NAME class</p></li>
+<li><p><strong>id</strong> (<em>list[int] or int</em>) -- unique identifier/s , e.g.,0 or [0] or [0, 1] or [1, 5, 9].
+one object can have an index and belong to a group/s</p></li>
+<li><p><strong>frame</strong> (<a class="reference external" href="https://compas.dev/compas/latest/reference/generated/compas.geometry.Frame.html#compas.geometry.Frame" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Frame</span></code></a>) -- local frame of the element
+there is also a global frame stored as an attribute</p></li>
+<li><p><strong>simplex</strong> (list[<a class="reference external" href="https://compas.dev/compas/latest/reference/generated/compas.geometry.Polyline.html#compas.geometry.Polyline" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Polyline</span></code></a>]) -- minimal geometrical represetation of an object
+type is a polyline since it can represent: a point, a line or a polyline</p></li>
+<li><p><strong>complex</strong> (<em>list[any]</em>) -- a list of geometries used for the element visualization
+currently supported types: <code class="xref py py-class docutils literal notranslate"><span class="pre">geometry</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">Mesh</span></code></p></li>
+<li><p><strong>insertion</strong> (list[<a class="reference external" href="https://compas.dev/compas/latest/reference/generated/compas.geometry.Vector.html#compas.geometry.Vector" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vector</span></code></a>, int]) -- direction of the element, often defined by a single vector (can be also a sequence)
+and an index in an insertion sequence</p></li>
+<li><p><strong>kwargs (dict, optional)</strong> -- additional keyword arguments can be passed to the element.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Attributes</dt>
-<dd class="field-even"><p><strong>get_bbox (list)</strong> (<em>A list of XYZ coordinates defining the bounding box for collision detection.</em>)</p>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>frame_global</strong> (<a class="reference external" href="https://compas.dev/compas/latest/reference/generated/compas.geometry.Frame.html#compas.geometry.Frame" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Frame</span></code></a>) -- global plane that can be used for the element orientation in a larger assembly</p></li>
+<li><p><strong>aabb</strong> (list[<a class="reference external" href="https://compas.dev/compas/latest/reference/generated/compas.geometry.Point.html#compas.geometry.Point" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Point</span></code></a>]:) -- a list of XYZ coordinates defining the bounding box for collision detection.</p></li>
+<li><p><strong>oobb</strong> (list[<a class="reference external" href="https://compas.dev/compas/latest/reference/generated/compas.geometry.Point.html#compas.geometry.Point" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Point</span></code></a>]:) -- a list of XYZ coordinates defining the an oriented bounding box to the frame.</p></li>
+<li><p><strong>convex_hull</strong> (list[<code class="xref py py-class docutils literal notranslate"><span class="pre">Mesh</span></code>]:) -- a mesh computed from the complex geometries points</p></li>
+<li><p><strong>area</strong> (<em>float</em>) -- the surface are of an element based on complex geometry</p></li>
+<li><p><strong>volume</strong> (<em>float</em>) -- the volume of an element based on complex 3d geometry</p></li>
+</ul>
 </dd>
 </dl>
-<p class="rubric">Example</p>
-<dl>
-<dt>if __name__ == &quot;__main__&quot;:</dt><dd><dl class="simple">
-<dt>elem = Element(</dt><dd><p>name=compas_assembly2.ELEMENT_NAME.BLOCK,
-id=[0, 1],
-display_shapes =[],
-local_frame=Frame(point=(0, 0, 0), xaxis=(1, 0, 0), yaxis=(0, 1, 0)),
-global_frame=Frame.worldXY(),
-width=10,
-height=50,
-length=95,</p>
-</dd>
-</dl>
-<p>)</p>
-<p># print before updating the fabrication, and structural information
-print(elem)</p>
-<p># Update fabrication information
-elem.fabrication[&quot;cut&quot;] = True
-elem.fabrication[&quot;drill&quot;] = False
-elem.fabrication[&quot;insertion_sequence&quot;] = [1, 2, 3, 4]
-elem.fabrication[&quot;printing_toolpath&quot;] = [(0, 0, 1), (0, 0, 0)]</p>
-<p># Update structural information
-elem.structure[&quot;nodes&quot;] = [(0, 0, 1), (0, 0, 0)]</p>
-<p># print after updating the fabrication, and structural information
-print(elem)</p>
-</dd>
-</dl>
+<p class="rubric">Examples</p>
+<div class="doctest language-python notranslate"><div class="highlight"><pre><button class="btn copy"><i class="far fa-copy"></i></button><code><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">element</span> <span class="o">=</span> <span class="n">Element</span><span class="p">(</span><span class="s2">&quot;BLOCK&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">Frame</span><span class="o">.</span><span class="n">worldXY</span><span class="p">(),</span> <span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span>                             <span class="n">Box</span><span class="p">(</span><span class="n">Frame</span><span class="o">.</span><span class="n">worldXY</span><span class="p">(),</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">),</span>                             <span class="p">[</span><span class="n">Vector</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="mi">0</span><span class="p">])</span>
+</code></pre></div>
+</div>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable docutils align-default">
 <colgroup>
@@ -154,52 +140,61 @@ print(elem)</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element.Element.add_feature.html#compas_assembly2.element.Element.add_feature" title="compas_assembly2.element.Element.add_feature"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_feature</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element.Element.aabb.html#compas_assembly2.element.Element.aabb" title="compas_assembly2.element.Element.aabb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">aabb</span></code></a></p></td>
+<td><p>Compute bounding box based on complex geometries points</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element.Element.add_feature.html#compas_assembly2.element.Element.add_feature" title="compas_assembly2.element.Element.add_feature"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_feature</span></code></a></p></td>
 <td><p>Add a Feature to this Part.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element.Element.clear_features.html#compas_assembly2.element.Element.clear_features" title="compas_assembly2.element.Element.clear_features"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear_features</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element.Element.clear_features.html#compas_assembly2.element.Element.clear_features" title="compas_assembly2.element.Element.clear_features"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear_features</span></code></a></p></td>
 <td><p>Clear all features from this Part.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element.Element.collide.html#compas_assembly2.element.Element.collide" title="compas_assembly2.element.Element.collide"><code class="xref py py-obj docutils literal notranslate"><span class="pre">collide</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element.Element.collide.html#compas_assembly2.element.Element.collide" title="compas_assembly2.element.Element.collide"><code class="xref py py-obj docutils literal notranslate"><span class="pre">collide</span></code></a></p></td>
+<td><p>check collision using aabb and oobb this function is often intermediate between high-performance tree searches then this collision is computed and then the interface can be found</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element.Element.copy.html#compas_assembly2.element.Element.copy" title="compas_assembly2.element.Element.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element.Element.copy.html#compas_assembly2.element.Element.copy" title="compas_assembly2.element.Element.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a></p></td>
 <td><p>Make an independent copy of the data object.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element.Element.from_data.html#compas_assembly2.element.Element.from_data" title="compas_assembly2.element.Element.from_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_data</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element.Element.find_interface.html#compas_assembly2.element.Element.find_interface" title="compas_assembly2.element.Element.find_interface"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_interface</span></code></a></p></td>
+<td><p>there are few possible cases a) an element touch other element by a flat face b) an element simplex is close to another simplex e.g.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element.Element.from_block.html#compas_assembly2.element.Element.from_block" title="compas_assembly2.element.Element.from_block"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_block</span></code></a></p></td>
+<td><p>method create a block element at the origin point with the frame at worldXY</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element.Element.from_data.html#compas_assembly2.element.Element.from_data" title="compas_assembly2.element.Element.from_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_data</span></code></a></p></td>
 <td><p>Alternative to None default __init__ parameters.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element.Element.get_aabb.html#compas_assembly2.element.Element.get_aabb" title="compas_assembly2.element.Element.get_aabb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_aabb</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element.Element.from_frame.html#compas_assembly2.element.Element.from_frame" title="compas_assembly2.element.Element.from_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_frame</span></code></a></p></td>
+<td><p>method create a frame element at the origin point with the frame at worldXY</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element.Element.get_convex_hull.html#compas_assembly2.element.Element.get_convex_hull" title="compas_assembly2.element.Element.get_convex_hull"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_convex_hull</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element.Element.from_plate.html#compas_assembly2.element.Element.from_plate" title="compas_assembly2.element.Element.from_plate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_plate</span></code></a></p></td>
+<td><p>method create a plate element at the origin point with the frame at worldXY</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element.Element.get_fabrication.html#compas_assembly2.element.Element.get_fabrication" title="compas_assembly2.element.Element.get_fabrication"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_fabrication</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element.Element.oobb.html#compas_assembly2.element.Element.oobb" title="compas_assembly2.element.Element.oobb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">oobb</span></code></a></p></td>
+<td><p>Compute the oriented bounding box based on complex geometries points</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element.Element.get_oobb.html#compas_assembly2.element.Element.get_oobb" title="compas_assembly2.element.Element.get_oobb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_oobb</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element.Element.to_element.html#compas_assembly2.element.Element.to_element" title="compas_assembly2.element.Element.to_element"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_element</span></code></a></p></td>
+<td><p>convert a geometry to an element, with assumtion that other property will be filled later</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element.Element.get_structure.html#compas_assembly2.element.Element.get_structure" title="compas_assembly2.element.Element.get_structure"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_structure</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element.Element.to_elements.html#compas_assembly2.element.Element.to_elements" title="compas_assembly2.element.Element.to_elements"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_elements</span></code></a></p></td>
+<td><p>convert a list of geometries to elements, with assumtion that other property will be filled later</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element.Element.transform.html#compas_assembly2.element.Element.transform" title="compas_assembly2.element.Element.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a></p></td>
-<td><p>Transforms the display_shapes , local frame, and global frame of the Element.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element.Element.transform.html#compas_assembly2.element.Element.transform" title="compas_assembly2.element.Element.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a></p></td>
+<td><p>Transforms the complex , local frame, and global frame of the Element.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element.Element.transform_from_frame_to_frame.html#compas_assembly2.element.Element.transform_from_frame_to_frame" title="compas_assembly2.element.Element.transform_from_frame_to_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform_from_frame_to_frame</span></code></a></p></td>
-<td><p>Applies frame_to_frame transformation to the display_shapes , local frame, and global frame of the Element.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element.Element.transform_from_frame_to_frame.html#compas_assembly2.element.Element.transform_from_frame_to_frame" title="compas_assembly2.element.Element.transform_from_frame_to_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform_from_frame_to_frame</span></code></a></p></td>
+<td><p>Applies frame_to_frame transformation to the complex , local frame, and global frame of the Element.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element.Element.transform_to_frame.html#compas_assembly2.element.Element.transform_to_frame" title="compas_assembly2.element.Element.transform_to_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform_to_frame</span></code></a></p></td>
-<td><p>Applies frame_to_frame transformation to the display_shapes , local frame, and global frame of the Element.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element.Element.transform_to_frame.html#compas_assembly2.element.Element.transform_to_frame" title="compas_assembly2.element.Element.transform_to_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform_to_frame</span></code></a></p></td>
+<td><p>Applies frame_to_frame transformation to the complex , local frame, and global frame of the Element.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element.Element.transformed.html#compas_assembly2.element.Element.transformed" title="compas_assembly2.element.Element.transformed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transformed</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element.Element.transformed.html#compas_assembly2.element.Element.transformed" title="compas_assembly2.element.Element.transformed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transformed</span></code></a></p></td>
 <td><p>Creates a transformed copy of the Element.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element.Element.transformed_from_frame_to_frame.html#compas_assembly2.element.Element.transformed_from_frame_to_frame" title="compas_assembly2.element.Element.transformed_from_frame_to_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transformed_from_frame_to_frame</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element.Element.transformed_from_frame_to_frame.html#compas_assembly2.element.Element.transformed_from_frame_to_frame" title="compas_assembly2.element.Element.transformed_from_frame_to_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transformed_from_frame_to_frame</span></code></a></p></td>
 <td><p>Creates an oriented copy of the Element.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element.Element.transformed_to_frame.html#compas_assembly2.element.Element.transformed_to_frame" title="compas_assembly2.element.Element.transformed_to_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transformed_to_frame</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element.Element.transformed_to_frame.html#compas_assembly2.element.Element.transformed_to_frame" title="compas_assembly2.element.Element.transformed_to_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transformed_to_frame</span></code></a></p></td>
 <td><p>Creates an oriented copy of the Element.</p></td>
 </tr>
 </tbody>
@@ -271,8 +266,14 @@ print(elem)</p>
 <li class="toctree-l1 nav-item active"><a class="nav-link reference internal" href="../../api.html">API Reference</a><ul class="nav flex-column collapse show active">
 <li class="toctree-l2 nav-item active"><a class="nav-link reference internal" href="../compas_assembly2.html">compas_assembly2</a><ul class="nav flex-column collapse show active">
 <li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="compas_assembly2.test.hello_compas_assembly2.html">hello_compas_assembly2</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="compas_assembly2.assembly.Assembly.html">Assembly</a></li>
 <li class="toctree-l3 nav-item active"><a class="nav-link active reference internal" href="#">Element</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="compas_assembly2.element_block.Block.html">Block</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="compas_assembly2.element_beam.Beam.html">Beam</a></li>
 <li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="compas_assembly2.group.Group.html">Group</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="compas_assembly2.viewer.Viewer.html">Viewer</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="compas_assembly2.fabrication.Fabrication.html">Fabrication</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="compas_assembly2.fabrication_nest.FabricationNest.html">FabricationNest</a></li>
 </ul>
 </li>
 </ul>
@@ -302,20 +303,20 @@ print(elem)</p>
   <footer class="compas-footer">
     <nav class="nav p-2">
       
-      <a href="compas_assembly2.test.hello_compas_assembly2.html" title="hello_compas_assembly2" class="nav-link footer-link float-start text-left d-flex w-50" rel="prev">
+      <a href="compas_assembly2.assembly.Assembly.validate_json.html" title="Assembly.validate_json" class="nav-link footer-link float-start text-left d-flex w-50" rel="prev">
         <div class="nav-button p-2 m-2"><i class="fas fa-arrow-left"></i></div>
         <div class="nav-title flex-grow-1 align-self-center">
           <div class="nav-direction small font-weight-light">Previous</div>
-          hello_compas_assembly2
+          Assembly.validate_json
         </div>
       </a>
       
 
       
-      <a href="compas_assembly2.element.Element.add_feature.html" title="Element.add_feature" class="nav-link footer-link float-end text-right d-flex w-50" rel="next">
+      <a href="compas_assembly2.element.Element.aabb.html" title="Element.aabb" class="nav-link footer-link float-end text-right d-flex w-50" rel="next">
         <div class="nav-title footer-link flex-grow-1 align-self-center">
           <div class="nav-direction small font-weight-light">Next</div>
-          Element.add_feature
+          Element.aabb
         </div>
         <div class="nav-button p-2 m-2"><i class="fas fa-arrow-right"></i></div>
       </a>
