@@ -753,14 +753,14 @@ class Element(Data):
     # ==========================================================================
     @staticmethod
     def from_block(self, block):
-        """ method create a block element at the origin point with the frame at worldXY"""
+        """method create a block element at the origin point with the frame at worldXY"""
         return Element(
             name=compas_assembly2.ELEMENT_NAME.BLOCK, id=0, frame=Frame.worldXY, simplex=Point(0, 0, 0), complex=block
         )
 
     @staticmethod
     def from_frame(self,  width, height, depth):
-        """ method create a frame element at the origin point with the frame at worldXY"""
+        """method create a frame element at the origin point with the frame at worldXY"""
         return Element(
             name=compas_assembly2.ELEMENT_NAME.BLOCK,
             id=0,
@@ -771,7 +771,7 @@ class Element(Data):
 
     @staticmethod
     def from_plate(self, polylines):
-        """ method create a plate element at the origin point with the frame at worldXY"""
+        """method create a plate element at the origin point with the frame at worldXY"""
         return Element(
             name=compas_assembly2.ELEMENT_NAME.BLOCK, id=0, frame=Frame.worldXY, simplex=polylines, complex=polylines
         )
