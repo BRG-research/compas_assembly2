@@ -12,7 +12,7 @@ compas_assembly2
 
 .. rst-class:: lead
 
-The **compas_assembly2** represents a data-structure to manage **a collection of structural elements** such as **blocks, beams, nodes, and plates**. This data-structure helps to **find adjacency** and joinery information, as well as interfaces between these elements. Additionally, it should allow for the data-transfer between **the model, structural simulation, and fabrication processes**.
+The **compas_assembly2** represents a data-structure to work with **a collection of structural elements** such as **blocks, beams, nodes, and plates**. This data-structure helps to **find adjacency** and joinery information, as well as interfaces between these elements. Additionally, it should allow for the data-transfer between **the model, structural simulation, and fabrication processes**.
 
 .. .. figure:: /_images/
      :figclass: figure
