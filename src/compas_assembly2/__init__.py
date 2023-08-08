@@ -28,15 +28,19 @@ Element class
 =============
 
 .. image:: ../_images/element.png
-   :width: 50%
+   :width: 75%
+   :align: right
+   :alt: compas_assembly2
+
+.. image:: ../_images/element_collision.png
+   :width: 75%
    :align: right
    :alt: compas_assembly2
 
 .. image:: ../_images/element_type.png
-   :width: 50%
+   :width: 75%
    :align: right
    :alt: compas_assembly2
-
 
 .. autosummary::
     :toctree: generated/
@@ -66,7 +70,7 @@ Group class
 ===========
 
 .. image:: ../_images/group.png
-   :width: 50%
+   :width: 75%
    :align: right
    :alt: compas_assembly2
 
@@ -80,7 +84,7 @@ Viewer class
 ============
 
 .. image:: ../_images/log_0.gif
-   :width: 50%
+   :width: 75%
    :align: right
    :alt: compas_assembly2
 

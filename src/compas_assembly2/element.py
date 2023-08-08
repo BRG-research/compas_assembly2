@@ -573,6 +573,8 @@ class Element(Data):
         Returns:
             None
         """
+
+        # transorm the geometry
         self.frame.transform(transformation)
         self.frame_global.transform(transformation)
 
@@ -582,11 +584,11 @@ class Element(Data):
         for i in range(len(self.complex)):
             self.complex[i].transform(transformation)
 
+        # recompute the bounding-box
+        self._aabb.clear()
         self.aabb()
-        for i in range(len(self._aabb)):
-            p = Point(self._aabb[i][0], self._aabb[i][1], self._aabb[i][2]).transformed(transformation)
-            self._aabb[i] = [p.x, p.y, p.z]
 
+        # transform the oobb and convex-hull
         self.oobb()
         for i in range(len(self._oobb)):
             p = Point(self._oobb[i][0], self._oobb[i][1], self._oobb[i][2]).transformed(transformation)
@@ -677,38 +679,48 @@ class Element(Data):
         # --------------------------------------------------------------------------
         # sanity check
         # --------------------------------------------------------------------------
-        if (not self.aabb) or (not other.aabb):
+        if (not self.aabb()) or (not other.aabb()):
             return False
 
         # --------------------------------------------------------------------------
         # aabb collision
         # --------------------------------------------------------------------------
-        collision_x_axis = self.aabb()[6][0] < other.aabb[0][0] or other.aabb[6][0] < self.aabb()[0][0]  # type: ignore
-        collision_y_axis = self.aabb()[6][1] < other.aabb[0][1] or other.aabb[6][1] < self.aabb()[0][1]  # type: ignore
-        collision_z_axis = self.aabb()[6][2] < other.aabb[0][2] or other.aabb[6][2] < self.aabb()[0][2]  # type: ignore
-        if collision_x_axis or collision_y_axis or collision_z_axis:
+        collision_x_axis = self._aabb[6][0] < other._aabb[0][0] or other._aabb[6][0] < self._aabb[0][0]  # type: ignore
+        collision_y_axis = self._aabb[6][1] < other._aabb[0][1] or other._aabb[6][1] < self._aabb[0][1]  # type: ignore
+        collision_z_axis = self._aabb[6][2] < other._aabb[0][2] or other._aabb[6][2] < self._aabb[0][2]  # type: ignore
+        aabb_collision = not (collision_x_axis or collision_y_axis or collision_z_axis)
+        # print("aabb_collison", aabb_collision)
+        if not aabb_collision:
             return False
 
         # --------------------------------------------------------------------------
         # oobb collision
+        # https://discourse.mcneel.com/t/box-contains-box-check-for-coincident-boxes/59642/19
         # --------------------------------------------------------------------------
 
         # point, axis, size description
         class OBB:
-            def __init__(self, box):
-                self.frame = Frame(box[0], box[1] - box[0], box[3] - box[0])
+            def to_p(self, p):
+                return Point(p[0], p[1], p[2])
+
+            def __init__(self, box=[]):
+                origin = (self.to_p(box[0]) + self.to_p(box[6]))*0.5
+                x_axis = self.to_p(box[1]) - self.to_p(box[0])
+                y_axis = self.to_p(box[3]) - self.to_p(box[0])
+                self.frame = Frame(origin, x_axis, y_axis)
                 self.half_size = [0.0, 0.0, 0.0]
                 self.half_size[0] = distance_point_point(box[0], box[1]) * 0.5
                 self.half_size[1] = distance_point_point(box[0], box[3]) * 0.5
                 self.half_size[2] = distance_point_point(box[0], box[4]) * 0.5
 
         # convert the eight points to a frame and half-size description
-        box1 = OBB(self.oobb)
-        box2 = OBB(other.oobb)
+        box1 = OBB(self._oobb)
+        box2 = OBB(other._oobb)
 
         # get sepratation plane
         def GetSeparatingPlane(RPos, axis, box1, box2):
-            return abs(RPos * axis) > (
+            # print(RPos, axis)
+            return abs(RPos.dot(axis)) > (
                 abs((box1.frame.xaxis * box1.half_size[0]).dot(axis))
                 + abs((box1.frame.yaxis * box1.half_size[1]).dot(axis))
                 + abs((box1.frame.zaxis * box1.half_size[2]).dot(axis))
@@ -738,6 +750,7 @@ class Element(Data):
             or GetSeparatingPlane(RPos, box1.frame.zaxis.cross(box2.frame.zaxis), box1, box2)  # type: ignore
         )
 
+        # print("oobb_collison", result)
         return result
 
     def find_interface(self, other, **kwargs):

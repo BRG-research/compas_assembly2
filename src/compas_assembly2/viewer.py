@@ -112,6 +112,7 @@ class Viewer:
             Color(0.95, 0.95, 0.95),
             Color(0, 0, 0),
         ],
+        color_red=[],
     ):
         if viewer_type == "view" or "view2" or "compas_view2" or "0":
             try:
@@ -148,7 +149,9 @@ class Viewer:
                     "viewer_all": [],
                 }
 
-                for element in elements:
+                faces_colors = color_red if len(color_red) == len(elements) else [3] * len(elements)
+
+                for counter, element in enumerate(elements):
                     # --------------------------------------------------------------------------
                     # add text - indices
                     # --------------------------------------------------------------------------
@@ -307,7 +310,7 @@ class Viewer:
                                     show_faces=True,
                                     pointcolor=Color(0, 0, 0),
                                     linecolor=colors[4],
-                                    facecolor=colors[3],  # Viewer.string_to_color(element.name),#colors[3],
+                                    facecolor=colors[faces_colors[counter]],  # default 3
                                     linewidth=1,
                                     opacity=0.9,  # type: ignore
                                     hide_coplanaredges=True,
@@ -330,7 +333,7 @@ class Viewer:
                                 show_faces=True,
                                 pointcolor=Color(0, 0, 0),
                                 linecolor=colors[4],
-                                facecolor=colors[3],  # Viewer.string_to_color(element.name),#colors[3],
+                                facecolor=colors[faces_colors[counter]],  # colors[3],
                                 linewidth=1,
                             )
                             viewer_objects["viewer_complexes"].append(o)
