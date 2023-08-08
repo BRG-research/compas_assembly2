@@ -96,6 +96,7 @@
 <div class="language-python notranslate"><div class="highlight"><pre><button class="btn copy"><i class="far fa-copy"></i></button><code><span></span><span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">radians</span>
 <span class="kn">from</span> <span class="nn">compas.geometry</span> <span class="kn">import</span> <span class="n">Point</span><span class="p">,</span> <span class="n">Box</span><span class="p">,</span> <span class="n">Translation</span><span class="p">,</span> <span class="n">Rotation</span><span class="p">,</span> <span class="n">Frame</span>
 <span class="kn">from</span> <span class="nn">compas_assembly2</span> <span class="kn">import</span> <span class="n">Element</span><span class="p">,</span> <span class="n">ELEMENT_NAME</span><span class="p">,</span> <span class="n">Viewer</span><span class="p">,</span> <span class="n">FabricationNest</span>
+<span class="kn">import</span> <span class="nn">random</span>
 
 <span class="c1"># ==========================================================================</span>
 <span class="c1"># INIT ELEMENT</span>
@@ -105,29 +106,55 @@
     <span class="nb">id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
     <span class="n">frame</span><span class="o">=</span><span class="n">Frame</span><span class="o">.</span><span class="n">worldXY</span><span class="p">,</span>
     <span class="n">simplex</span><span class="o">=</span><span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
-    <span class="nb">complex</span><span class="o">=</span><span class="n">Box</span><span class="o">.</span><span class="n">from_width_height_depth</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="nb">complex</span><span class="o">=</span><span class="n">Box</span><span class="o">.</span><span class="n">from_width_height_depth</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
 <span class="p">)</span>
 
 <span class="c1"># ==========================================================================</span>
 <span class="c1"># TRANSFORM AND COPY ELEMENT</span>
 <span class="c1"># ==========================================================================</span>
-<span class="n">T</span> <span class="o">=</span> <span class="n">Translation</span><span class="o">.</span><span class="n">from_vector</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
-<span class="n">R</span> <span class="o">=</span> <span class="n">Rotation</span><span class="o">.</span><span class="n">from_axis_and_angle</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">radians</span><span class="p">(</span><span class="mi">45</span><span class="p">))</span>
-<span class="n">b2</span> <span class="o">=</span> <span class="n">b1</span><span class="o">.</span><span class="n">transformed</span><span class="p">(</span><span class="n">T</span> <span class="o">*</span> <span class="n">R</span><span class="p">)</span>
+<span class="n">num_copies</span> <span class="o">=</span> <span class="mi">200</span>
+<span class="n">max_translation</span> <span class="o">=</span> <span class="mi">8</span>  <span class="c1"># Maximum translation distance from the center</span>
+<span class="n">elements</span> <span class="o">=</span> <span class="p">[]</span>
+
+
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_copies</span><span class="p">):</span>
+    <span class="c1"># Generate random rotation and translation</span>
+    <span class="n">random_axis</span> <span class="o">=</span> <span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(),</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(),</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()]</span>
+    <span class="n">random_rotation</span> <span class="o">=</span> <span class="n">Rotation</span><span class="o">.</span><span class="n">from_axis_and_angle</span><span class="p">(</span><span class="n">random_axis</span><span class="p">,</span> <span class="n">radians</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">360</span><span class="p">)))</span>
+    <span class="n">vector</span> <span class="o">=</span> <span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="n">max_translation</span><span class="p">,</span> <span class="n">max_translation</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
+    <span class="n">vector</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">random_translation</span> <span class="o">=</span> <span class="n">Translation</span><span class="o">.</span><span class="n">from_vector</span><span class="p">(</span><span class="n">vector</span><span class="p">)</span>
+
+    <span class="c1"># Apply random rotation and translation</span>
+    <span class="n">transformed_element</span> <span class="o">=</span> <span class="n">b1</span><span class="o">.</span><span class="n">transformed</span><span class="p">(</span><span class="n">random_translation</span> <span class="o">*</span> <span class="n">random_rotation</span><span class="p">)</span>
+
+    <span class="n">elements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">transformed_element</span><span class="p">)</span>
+
 
 <span class="c1"># ==========================================================================</span>
 <span class="c1"># NEST ELEMENTS</span>
 <span class="c1"># ==========================================================================</span>
-<span class="n">FabricationNest</span><span class="o">.</span><span class="n">pack_elements</span><span class="p">(</span><span class="n">elements</span><span class="o">=</span><span class="p">[</span><span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">],</span> <span class="n">nest_type</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">inflate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">height_step</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">FabricationNest</span><span class="o">.</span><span class="n">pack_elements</span><span class="p">(</span><span class="n">elements</span><span class="o">=</span><span class="n">elements</span><span class="p">,</span> <span class="n">nest_type</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">inflate</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">height_step</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 
 <span class="c1"># ==========================================================================</span>
 <span class="c1"># CHECK COLLISION</span>
 <span class="c1"># ==========================================================================</span>
+<span class="n">collision_pairs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">element_collisions</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">elements</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">elements</span><span class="p">)):</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">elements</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">elements</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">collide</span><span class="p">(</span><span class="n">elements</span><span class="p">[</span><span class="n">j</span><span class="p">]):</span>
+            <span class="n">collision_pairs</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">])</span>
+            <span class="n">element_collisions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">element_collisions</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="c1"># print(&quot;Collision pairs:&quot;, collision_pairs)</span>
+<span class="c1"># print(&quot;Element collisions:&quot;, element_collisions)</span>
 
 <span class="c1"># ==========================================================================</span>
 <span class="c1"># VIEWER</span>
 <span class="c1"># ==========================================================================</span>
-<span class="n">Viewer</span><span class="o">.</span><span class="n">show_elements</span><span class="p">(</span><span class="n">elements</span><span class="o">=</span><span class="p">[</span><span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">])</span>
+<span class="n">Viewer</span><span class="o">.</span><span class="n">show_elements</span><span class="p">(</span><span class="n">elements</span><span class="o">=</span><span class="n">elements</span><span class="p">,</span> <span class="n">color_red</span><span class="o">=</span><span class="n">element_collisions</span><span class="p">,</span> <span class="n">show_grid</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </code></pre></div>
 </div>
 </section>
