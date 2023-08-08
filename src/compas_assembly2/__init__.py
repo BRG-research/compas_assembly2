@@ -1,6 +1,3 @@
-from __future__ import print_function
-import os
-
 """
 
 .. currentmodule:: compas_assembly2
@@ -17,6 +14,15 @@ test module
     :nosignatures:
 
     test.hello_compas_assembly2
+
+Assembly class
+===================
+
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
+
+    assembly.Assembly
 
 Element class
 =============
@@ -38,6 +44,24 @@ Element class
 
     element.Element
 
+Block class
+===================
+
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
+
+    element_block.Block
+
+Beam class
+===================
+
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
+
+    element_beam.Beam
+
 Group class
 ===========
 
@@ -47,7 +71,39 @@ Group class
 
     group.Group
 
+Viewer class
+============
+
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
+
+    viewer.Viewer
+
+Fabrication class
+=================
+
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
+
+    fabrication.Fabrication
+
+FabricationNest class
+=====================
+
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
+
+    fabrication_nest.FabricationNest
+
 """
+
+
+from __future__ import print_function
+
+import os
 
 
 __author__ = ["Petras Vestartas"]
