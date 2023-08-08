@@ -11,6 +11,7 @@ from compas.geometry import (
     Pointcloud,
     bounding_box,
     convex_hull,
+    distance_point_point
 )
 from compas.datastructures import Mesh, mesh_bounding_box
 from compas.data import Data
@@ -20,68 +21,61 @@ import compas_assembly2
 
 class Element(Data):
 
-    # ==========================================================================
-    # CONSTRUCTORS (INPUT)
-    # ==========================================================================
     """Class representing a structural object of an assembly.
-
-    This class defines structural elements used in an assembly.
-    Each element is defined by inputs: an ID, attributes, geometrical shape, orientation frames.
-    Additionally, it stores output dictionaries for fabrication, and structural information.
 
     Parameters
     ----------
-        name (str): The name of the element, e.g., "BLOCK", "BEAM" and etc.
-        id (list[int] or int): A unique identifier as a list, e.g.,[0] or [0, 1] or [1, 5, 9].
-        attr (dict, optional): A dictionary containing attributes of the element. Defaults to an empty dictionary.
-        simplex (list, optional): Supported types: Point, Polyline (for lines use two points), List(Polyline)
-        display_shapes  (list, optional): Supported types: Mesh, Polyline, Box, Line, Pointcloud.
-        local_frame (Frame, optional): The local frame of the element.
-        global_frame (Frame, optional): The global frame of the element.
-        kwargs (dict, optional): Additional keyword arguments can be passed to the element.
+        name : str
+            e.g., "BLOCK", "BEAM", "FRAME"
+            to be consistent majority of names are stored in compas_assembly2.ELEMENT_NAME class
+        id : int or list[int]
+            unique identifier/s , e.g.,0 or [0] or [0, 1] or [1, 5, 9].
+            one object can have an index and belong to a group/s
+        frame : :class:`~compas.geometry.Frame`
+            local frame of the element
+            there is also a global frame stored as an attribute
+        simplex : list[:class:`~compas.geometry.Polyline`]
+            minimal geometrical represetation of an object
+            type is a polyline since it can represent: a point, a line or a polyline
+        complex : list[any]
+            a list of geometries used for the element visualization
+            currently supported types: :class:`~compas.geometry` or :class:`~compas.datastrcutures.Mesh`
+        insertion : list[:class:`~compas.geometry.Vector`, int]
+            direction of the element, often defined by a single vector (can be also a sequence)
+            and an index in an insertion sequence
+        kwargs (dict, optional):
+            additional keyword arguments can be passed to the element.
 
     Attributes
     ----------
-        get_bbox (list): A list of XYZ coordinates defining the bounding box for collision detection.
+        frame_global : :class:`~compas.geometry.Frame`
+            global plane that can be used for the element orientation in a larger assembly
+        aabb : list[:class:`~compas.geometry.Point`]:
+            a list of XYZ coordinates defining the bounding box for collision detection.
+        oobb : list[:class:`~compas.geometry.Point`]:
+            a list of XYZ coordinates defining the an oriented bounding box to the frame.
+        convex_hull : list[:class:`~compas.datastrcutures.Mesh`]:
+            a mesh computed from the complex geometries points
+        area : float
+            the surface are of an element based on complex geometry
+        volume : float
+            the volume of an element based on complex 3d geometry
 
-    Example
-    -------
-        if __name__ == "__main__":
-            elem = Element(
-                name=compas_assembly2.ELEMENT_NAME.BLOCK,
-                id=[0, 1],
-                display_shapes =[],
-                local_frame=Frame(point=(0, 0, 0), xaxis=(1, 0, 0), yaxis=(0, 1, 0)),
-                global_frame=Frame.worldXY(),
-                width=10,
-                height=50,
-                length=95,
-            )
-
-            # print before updating the fabrication, and structural information
-            print(elem)
-
-            # Update fabrication information
-            elem.fabrication["cut"] = True
-            elem.fabrication["drill"] = False
-            elem.fabrication["insertion_sequence"] = [1, 2, 3, 4]
-            elem.fabrication["printing_toolpath"] = [(0, 0, 1), (0, 0, 0)]
-
-            # Update structural information
-            elem.structure["nodes"] = [(0, 0, 1), (0, 0, 0)]
-
-            # print after updating the fabrication, and structural information
-            print(elem)
+    Examples
+    --------
+        >>> element = Element("BLOCK", 0, Frame.worldXY(), Point(0,0,0), \
+                            Box(Frame.worldXY(), 1.0, 2.0, 3.0), \
+                            [Vector(0, 0, 1), 0])
     """
 
     def __init__(
         self,
-        name=compas_assembly2.ELEMENT_NAME.CUSTOM,
-        id=[-1],
-        simplex=[],
-        display_shapes=[],
-        local_frame=Frame.worldXY,
-        global_frame=Frame.worldXY,
+        name="block",
+        id=-1,
+        frame=Frame.worldXY(),
+        simplex=None,
+        complex=None,
+        insertion=None,
         **kwargs
     ):
         # --------------------------------------------------------------------------
@@ -90,62 +84,24 @@ class Element(Data):
         super(Element, self).__init__()
 
         # --------------------------------------------------------------------------
-        # indexing + attributes
+        # name
+        # the string can be any string
+        # but better use the existing container: compas_assembly2.ELEMENT_NAME.BLOCK
         # --------------------------------------------------------------------------
-        self.id = (
-            [
-                id,
-            ]
-            if isinstance(id, int)
-            else id
-        )  # tuple e.g. (0, 1) or (1, 5, 9)
-        self.name = name  # name of the element, e.g., block, beam, plate, node, etc.
-        self.attributes = {}  # set the attributes of an object
-        self.attributes.update(kwargs)  # update the attributes of with the kwargs
+        self.name = name.upper()
 
         # --------------------------------------------------------------------------
-        # minimal representation and geometrical shapes
-        # iterate through the input geometry
-        # check if they are valid geometry objects
-        # duplicate them and add them geometry list to avoid transformation issues
+        # indexing
+        # indices are store as a list to keep grouping information e.g. [0,1]
         # --------------------------------------------------------------------------
-        self.simplex = []  # geometry, can be meshes, breps, curves, points, etc.
-
-        if isinstance(simplex, list):
-            # list of numbers, means user gives a point
-            if isinstance(simplex[0], (int, float, complex)) and len(simplex) == 3:
-                self.simplex.append(Point(simplex[0], simplex[1], simplex[2]))
-            # else user gives geometries
-            else:
-                for g in simplex:
-                    if isinstance(g, Geometry) or isinstance(g, Mesh):
-                        self.simplex.append(g.copy())
-                    elif isinstance(g, list):
-                        if len(g) == 3:
-                            self.simplex.append(Point(g[0], g[1], g[2]))
-        else:
-            # one geometry object
-            if isinstance(simplex, Geometry):
-                self.simplex.append(simplex.copy())
-
-        if (len(simplex) == 0):
-            raise AssertionError("User must define a simple geometry")
-
-        # --------------------------------------------------------------------------
-        # display geometry - geometry, can be meshes, breps, curves, points, etc.
-        # --------------------------------------------------------------------------
-        self.display_shapes = []
-        if (display_shapes):
-            for g in display_shapes:
-                if isinstance(g, Geometry) or isinstance(g, Mesh):
-                    self.display_shapes.append(g.copy())
+        self.id = [id] if isinstance(id, int) else id
 
         # --------------------------------------------------------------------------
         # orientation frames
         # if user does not give a frame, try to define it based on simplex
         # --------------------------------------------------------------------------
-        if isinstance(local_frame, Frame):
-            self.local_frame = Frame.copy(local_frame)
+        if isinstance(frame, Frame):
+            self.frame = Frame.copy(frame)
         else:
             origin = [0, 0, 0]
             if (isinstance(self.simplex[0], Point)):
@@ -154,154 +110,149 @@ class Element(Data):
                 origin = self.simplex[0].start
             elif (isinstance(self.simplex[0], Polyline)):
                 origin = self.simplex[0][0]
-            self.local_frame = Frame(origin, [1, 0, 0], [0, 1, 0])
-
-        self.global_frame = (
-            Frame.copy(global_frame) if isinstance(global_frame, Frame) else Frame([0, 0, 0], [1, 0, 0], [0, 1, 0])
-        )  # set the global frame of an object
+            self.frame = Frame(origin, [1, 0, 0], [0, 1, 0])
 
         # --------------------------------------------------------------------------
-        # collision detection, these members are private access them using getters
+        # minimal representation and geometrical shapes
+        # iterate through the input geometry
+        # check if they are valid geometry objects
+        # duplicate them and add them geometry list to avoid transformation issues
+        # geometry, can be meshes, breps, curves, points, etc.
         # --------------------------------------------------------------------------
-        self._aabb = []  # XYZ coordinates of 8 points defining a box
-        self._oobb = []  # XYZ coordinates of 8 points defining a box
-        self._convex_hull = Mesh()  # convex hull of the geometry
-        self._outlines = []  # closed polylines - in majority of cases objects will have planar faces
-        self._outlines_frames = []  # closed polylines planes - in majority of cases objects will have planar faces
+        self.simplex = []
+        print(simplex)
+        print(simplex[0])
+        if isinstance(simplex, list):
+            # input - list of numbers, means user gives a point (most probably)
+            if isinstance(simplex[0], (type(int), type(float))) and len(simplex) == 3:
+                self.simplex.append(Point(simplex[0], simplex[1], simplex[2]))
+            # input - list of gometries
+            else:
+                for g in simplex:
+                    if isinstance(g, Geometry) or isinstance(g, Mesh):
+                        self.simplex.append(g.copy())
+                    elif isinstance(g, list):
+                        if len(g) == 3:
+                            self.simplex.append(Point(g[0], g[1], g[2]))
+        else:
+            # input - one geometry
+            if isinstance(simplex, Geometry):
+                self.simplex.append(simplex.copy())
+
+        if (len(simplex) == 0):
+            raise AssertionError("User must define a simple geometry")
 
         # --------------------------------------------------------------------------
-        # output for further processing
+        # display geometry - geometry, can be meshes, breps, curves, pointcloud, etc.
         # --------------------------------------------------------------------------
-        self.fabrication = {}
-        self.structure = {}
+        self.complex = []
+        if (complex):
+            # input - list of gometries
+            if isinstance(simplex, list):
+                for g in complex:
+                    if isinstance(g, Geometry) or isinstance(g, Mesh):
+                        self.complex.append(g.copy())
+            # input - one geometry
+            else:
+                if isinstance(g, Geometry) or isinstance(g, Mesh):
+                    self.complex.append(g.copy())
+
+        # --------------------------------------------------------------------------
+        # insertion direction and index in a sequnece
+        # the insertion direction can be a vector, but also a polyline, plane...
+        # the index is always integer
+        # --------------------------------------------------------------------------
+        is_insertion_valid = False
+        if (insertion):
+            if (isinstance(insertion, list)):
+                # input - list of vector
+                if (len(insertion) == 1):
+                    if (isinstance(insertion[0], Vector)):
+                        self.insertion = [insertion[0], id[-1]]
+                        is_insertion_valid = True
+                # input - list of vector and index
+                elif (len(insertion) == 2):
+                    if (isinstance(insertion[0], Vector) and isinstance(insertion[1], (type(int), type(float)))):
+                        self.insertion = [insertion[0], insertion[1]]
+                        is_insertion_valid = True
+                # input - list of vector coordinates in one list
+                elif (len(insertion) == 3):
+                    self.insertion = [Vector(insertion[0], insertion[1], insertion[2]), id[-1]]
+                    is_insertion_valid = True
+                # input - list of vector coordinates and id in one list
+                elif (len(insertion) == 4):
+                    self.insertion = [Vector(insertion[0], insertion[1], insertion[2]), insertion[3]]
+                    is_insertion_valid = True
+            elif (isinstance(insertion, Vector)):
+                # input - vector
+                self.insertion = [insertion, id[-1]]
+                is_insertion_valid = True
+
+        if (not is_insertion_valid):
+            self.insertion = [Vector(0, 0, 1), id[-1]]
+
+        # --------------------------------------------------------------------------
+        # custom attributes given by the user
+        # --------------------------------------------------------------------------
+        self.attributes = {}  # set the attributes of an object
+        self.attributes.update(kwargs)  # update the attributes of with the kwargs
 
     # ==========================================================================
-    # DATA
-    # element_type=ElementType.BLOCK,
-    # id=(0, 1),
-    # simplex=[],
-    # display_shapes=[],
-    # local_frame=Frame.worldXY,
-    # global_frame=Frame.worldXY,
+    # ATTRIBUTES
     # ==========================================================================
-    # create the data object from the class properties
+
     @property
-    def data(self):
-        # call the inherited Data constructor for json serialization
-        data = {
-            "name": self.name,
-            "id": self.id,
-            "simplex": self.simplex,
-            "display_shapes": self.display_shapes,
-            "local_frame": self.local_frame,
-            "global_frame": self.global_frame,
-            "attributes": self.attributes,
-        }
+    def frame_global(self):
+        """Frame that gives orientation of the element in the larger group of Elements"""
 
-        # custom properties
-        data["aabb"] = self._aabb
-        data["oobb"] = self._oobb
-        data["convex_hull"] = self._convex_hull
-        data["outlines"] = self._outlines
-        data["outlines_frames"] = self._outlines_frames
+        # define this property dynamically in the class
+        if not hasattr(self, '_frame_global'):
+            self._frame_global = Frame([0, 0, 0], [1, 0, 0], [0, 1, 0])
+        return self._frame_global
 
-        # fabrication | structure
-        data["fabrication"] = self.fabrication
-        data["structure"] = self.structure
+    @frame_global.setter
+    def frame_global(self, value):
+        """Frame that gives orientation of the element in the larger group of Elements"""
+        self._frame_global = value
 
-        # return the data object
-        return data
+    def aabb(self, inflate=0.00):
+        """Compute bounding box based on complex geometries points"""
 
-    # vice versa - create the class properties from the data object
-    @data.setter
-    def data(self, data):
-        # call the inherited Data constructor for json serialization
-
-        # main properties
-        self.name = data["name"]
-        self.id = data["id"]
-
-        self.simplex = data["simplex"]
-        self.display_shapes = data["display_shapes"]
-        self.local_frame = data["local_frame"]
-        self.global_frame = data["global_frame"]
-        self.attributes = data["attributes"]
-
-        # custom properties
-        self._aabb = data["aabb"]
-        self._oobb = data["oobb"]
-        self._convex_hull = data["convex_hull"]
-        self._outlines = data["outlines"]
-        self._outlines_frames = data["outlines_frames"]
-
-        # fabrication | structure
-        self.fabrication = data["fabrication"]
-        self.structure = data["structure"]
-
-    @classmethod
-    def from_data(cls, data):
-        """Alternative to None default __init__ parameters."""
-        obj = Element(
-            name=data["name"],
-            id=data["id"],
-            simplex=data["simplex"],
-            display_shapes=data["display_shapes"],
-            local_frame=data["local_frame"],
-            global_frame=data["global_frame"],
-            **data["attributes"],
-        )
-
-        # custom properties
-        obj._aabb = data["aabb"]
-        obj._oobb = data["oobb"]
-        obj._convex_hull = data["convex_hull"]
-        obj._outlines = data["outlines"]
-        obj._outlines_frames = data["outlines_frames"]
-
-        # fabrication | structure
-
-        obj.fabrication = data["fabrication"]
-        obj.structure = data["structure"]
-
-        # return the object
-        return obj
-
-    # ==========================================================================
-    # PROPERTIES
-    # ==========================================================================
-    def get_aabb(self, inflate=0.00):
+        # define this property dynamically in the class
+        if not hasattr(self, '_aabb'):
+            self._aabb = []  # XYZ coordinates of 8 points defining a box
 
         # if the aabb is already computed return it
         if self._aabb:
             return self._aabb
 
-        # iterate display_shapes  and get the bounding box by geometry name
+        # iterate complex  and get the bounding box by geometry name
         # Mesh, Polyline, Box, Line
         points_bbox = []
 
-        for i in range(len(self.display_shapes)):
-            if isinstance(self.display_shapes[i], Mesh):
-                corners = mesh_bounding_box(self.display_shapes[i])
+        for i in range(len(self.complex)):
+            if isinstance(self.complex[i], Mesh):
+                corners = mesh_bounding_box(self.complex[i])
                 points_bbox.extend([corners[0], corners[6]])
-            elif isinstance(self.display_shapes[i], Polyline):
-                corners = bounding_box(self.display_shapes[i])
+            elif isinstance(self.complex[i], Polyline):
+                corners = bounding_box(self.complex[i])
                 points_bbox.extend([corners[0], corners[6]])
-            elif isinstance(self.display_shapes[i], Line):
-                points_bbox.extend([self.display_shapes[i].start, self.display_shapes[i].end])
-            elif isinstance(self.display_shapes[i], Box):
-                corners = bounding_box(self.display_shapes[i].points)
+            elif isinstance(self.complex[i], Line):
+                points_bbox.extend([self.complex[i].start, self.complex[i].end])
+            elif isinstance(self.complex[i], Box):
+                corners = bounding_box(self.complex[i].points)
                 points_bbox.extend([corners[0], corners[6]])
-            elif isinstance(self.display_shapes[i], Pointcloud):
-                corners = bounding_box(self.display_shapes[i].points)
+            elif isinstance(self.complex[i], Pointcloud):
+                corners = bounding_box(self.complex[i].points)
                 points_bbox.extend([corners[0], corners[6]])
 
         # if no points found, return
         if len(points_bbox) < 2:
             if (inflate > 0.00):
                 self._aabb = bounding_box([
-                    self.local_frame.point+Vector(inflate, inflate, inflate),
-                    self.local_frame.point-Vector(inflate, inflate, inflate)])
-                return self._oobb
+                    self.frame.point+Vector(inflate, inflate, inflate),
+                    self.frame.point-Vector(inflate, inflate, inflate)])
+                return self._aabb
             else:
                 return None
 
@@ -317,35 +268,40 @@ class Element(Data):
         # return the aabb (8 points)
         return self._aabb
 
-    def get_oobb(self, inflate=0.00):
+    def oobb(self, inflate=0.00):
+        """Compute the oriented bounding box based on complex geometries points"""
+
+        # define this property dynamically in the class
+        if not hasattr(self, '_oobb'):
+            self._oobb = []  # XYZ coordinates of 8 points defining a box
 
         # if the oobb is already computed return it
         if self._oobb:
             return self._oobb
 
-        # iterate display_shapes and get the bounding box by geometry name
+        # iterate complex and get the bounding box by geometry name
         # Mesh, Polyline, Box, Line
         points = []
 
-        for i in range(len(self.display_shapes)):
+        for i in range(len(self.complex)):
 
-            if isinstance(self.display_shapes[i], Mesh):
-                points.extend(list(self.display_shapes[i].vertices_attributes("xyz")))
-            elif isinstance(self.display_shapes[i], Polyline):
-                points.extend(self.display_shapes[i])
-            elif isinstance(self.display_shapes[i], Line):
-                points.extend([self.display_shapes[i].start, self.display_shapes[i].end])
-            elif isinstance(self.display_shapes[i], Box):
-                points.extend(self.display_shapes[i].points)
-            elif isinstance(self.display_shapes[i], Pointcloud):
-                points.extend(self.display_shapes[i].points)
+            if isinstance(self.complex[i], Mesh):
+                points.extend(list(self.complex[i].vertices_attributes("xyz")))
+            elif isinstance(self.complex[i], Polyline):
+                points.extend(self.complex[i])
+            elif isinstance(self.complex[i], Line):
+                points.extend([self.complex[i].start, self.complex[i].end])
+            elif isinstance(self.complex[i], Box):
+                points.extend(self.complex[i].points)
+            elif isinstance(self.complex[i], Pointcloud):
+                points.extend(self.complex[i].points)
 
         # if no points found, return
         if len(points) < 2:
             if (inflate > 0.00):
                 self._oobb = bounding_box([
-                    self.local_frame.point+Vector(inflate, inflate, inflate),
-                    self.local_frame.point-Vector(inflate, inflate, inflate)])
+                    self.frame.point+Vector(inflate, inflate, inflate),
+                    self.frame.point-Vector(inflate, inflate, inflate)])
                 return self._oobb
             else:
                 return None
@@ -354,7 +310,7 @@ class Element(Data):
         # transforming points from local frame to worldXY
         # compute the bbox
         # orient the points back to the local frame
-        xform = Transformation.from_frame_to_frame(self.local_frame, Frame.worldXY())
+        xform = Transformation.from_frame_to_frame(self.frame, Frame.worldXY())
         xform_inv = xform.inverse()
 
         self._oobb = []
@@ -381,27 +337,34 @@ class Element(Data):
         # return the oobb  (8 points)
         return self._oobb
 
-    def get_convex_hull(self):
+    @property
+    def convex_hull(self):
+
+        """Compute convex hull from complex points"""
+
+        # define this property dynamically in the class
+        if not hasattr(self, '_convex_hull'):
+            self._convex_hull = Mesh()
 
         # if the convex hull is already computed return it
         if self._convex_hull.is_empty() is False:
             return self._convex_hull
 
-        # iterate display_shapes and get the bounding box by geometry name
+        # iterate complex and get the bounding box by geometry name
         # Mesh, Polyline, Box, Line
         points = []
 
-        for i in range(len(self.display_shapes)):
-            if isinstance(self.display_shapes[i], Mesh):
-                points.extend(list(self.display_shapes[i].vertices_attributes("xyz")))
-            elif isinstance(self.display_shapes[i], Polyline):
-                points.extend(self.display_shapes[i])
-            elif isinstance(self.display_shapes[i], Line):
-                points.extend([self.display_shapes[i].start, self.display_shapes[i].end])
-            elif isinstance(self.display_shapes[i], Box):
-                points.extend(self.display_shapes[i].points)
-            elif isinstance(self.display_shapes[i], Pointcloud):
-                points.extend(self.display_shapes[i].points)
+        for i in range(len(self.complex)):
+            if isinstance(self.complex[i], Mesh):
+                points.extend(list(self.complex[i].vertices_attributes("xyz")))
+            elif isinstance(self.complex[i], Polyline):
+                points.extend(self.complex[i])
+            elif isinstance(self.complex[i], Line):
+                points.extend([self.complex[i].start, self.complex[i].end])
+            elif isinstance(self.complex[i], Box):
+                points.extend(self.complex[i].points)
+            elif isinstance(self.complex[i], Pointcloud):
+                points.extend(self.complex[i].points)
 
         # if no points found, return
         if len(points) < 2:
@@ -417,6 +380,108 @@ class Element(Data):
         else:
             self._convex_hull = Mesh()
             return self._convex_hull
+
+    @property
+    def outlines(self):
+        """Outlines of polygonal complex shapes e.g. mesh face outlines
+        they are often made from polylines and polyline planes"""
+
+        # define this property dynamically in the class
+        if not hasattr(self, '_outlines'):
+            self._outlines = []
+        return self._outlines
+
+    @property
+    def fabrication(self):
+        """Fabrication information e.g. subtractive, additive, nesting and etc"""
+
+        # define this property dynamically in the class
+        if not hasattr(self, '_fabrication'):
+            self._fabrication = {}
+        return self._fabrication
+
+    @property
+    def structure(self):
+        """Structure information e.g. force vectors, minimal representation and etc"""
+
+        # define this property dynamically in the class
+        if not hasattr(self, '_structure'):
+            self._structure = {}
+        return self._structure
+
+    # ==========================================================================
+    # SERIALIZATION
+    # ==========================================================================
+    # create the data object from the class properties
+    @property
+    def data(self):
+        # call the inherited Data constructor for json serialization
+        data = {
+            "name": self.name,
+            "id": self.id,
+            "frame": self.frame,
+            "simplex": self.simplex,
+            "complex": self.complex,
+            "attributes": self.attributes,
+        }
+
+        # custom properties
+        data["frame_global"] = self.frame_global
+        data["aabb"] = self.aabb()
+        data["oobb"] = self.oobb()
+        data["convex_hull"] = self.convex_hull
+        data["outlines"] = self.outlines
+        data["fabrication"] = self.fabrication
+        data["structure"] = self.structure
+
+        # return the data object
+        return data
+
+    # vice versa - create the class properties from the data object
+    @data.setter
+    def data(self, data):
+        # call the inherited Data constructor for json serialization
+
+        # main properties
+        self.name = data["name"]
+        self.id = data["id"]
+        self.frame = data["frame"]
+        self.simplex = data["simplex"]
+        self.complex = data["complex"]
+        self.attributes = data["attributes"]
+
+        # custom properties
+        self._frame_global = data["frame_global"]
+        self._aabb = data["aabb"]
+        self._oobb = data["oobb"]
+        self._convex_hull = data["convex_hull"]
+        self._outlines = data["outlines"]
+        self._fabrication = data["fabrication"]
+        self._structure = data["structure"]
+
+    @classmethod
+    def from_data(cls, data):
+        """Alternative to None default __init__ parameters."""
+        obj = Element(
+            name=data["name"],
+            id=data["id"],
+            frame=data["frame"],
+            simplex=data["simplex"],
+            complex=data["complex"],
+            **data["attributes"],
+        )
+
+        # custom properties
+        obj._frame_global = data["frame_global"]
+        obj._aabb = data["aabb"]
+        obj._oobb = data["oobb"]
+        obj._convex_hull = data["convex_hull"]
+        obj._outlines = data["outlines"]
+        obj._fabrication = data["fabrication"]
+        obj._structure = data["structure"]
+
+        # return the object
+        return obj
 
     # ==========================================================================
     # GEOMETRIC FEATURES E.G. JOINERY. INTERFACES
@@ -444,27 +509,17 @@ class Element(Data):
         pass
 
     # ==========================================================================
-    # PROPERTIES FOR DIGITAL FABRICATION (OUTPUT)
-    # ==========================================================================
-
-    def get_fabrication(self, key):
-        pass
-
-    def get_structure(self, key):
-        pass
-
-    # ==========================================================================
     # CONVERSIONS
     # ==========================================================================
     @staticmethod
-    def to_elements(simplices=[], display_shapes=None, compute_nesting=1):
+    def to_elements(simplices=[], complex=None, compute_nesting=1):
         """ convert a list of geometries to elements, with assumtion that other property will be filled later """
         elements = []
-        contains_display_shapes = display_shapes is list
+        contains_complex = complex is list
 
         for id, s in enumerate(simplices):
-            if (contains_display_shapes):
-                elements.append(Element.to_element(s, display_shapes[id % len(display_shapes)]))
+            if (contains_complex):
+                elements.append(Element.to_element(s, complex[id % len(complex)]))
             else:
                 elements.append(Element.to_element(s))
 
@@ -484,7 +539,7 @@ class Element(Data):
 
             center = Point(0, 0, 0)
             for e in elements:
-                center = center + e.local_frame.point
+                center = center + e.frame.point
             center = center / len(elements)
 
             for e in elements:
@@ -496,7 +551,7 @@ class Element(Data):
             for i, e in enumerate(elements):
 
                 temp_width = 0
-                source_frame = e.local_frame.copy()
+                source_frame = e.frame.copy()
                 target_frame = Frame([0, 0, 0], source_frame.xaxis, source_frame.yaxis)
 
                 if nest_type == 1 and e.get_aabb() is not None:
@@ -583,8 +638,8 @@ class Element(Data):
 
     @staticmethod
     def to_element(simplex=None, display_shape=None):
-        """ convert a geometry to an lement, with assumtion that other property will be filled later """
-        return Element(simplex=simplex, display_shapes=display_shape)
+        """ convert a geometry to an element, with assumtion that other property will be filled later """
+        return Element(simplex=simplex, complex=display_shape)
 
     # ==========================================================================
     # COPY ALL GEOMETRY OBJECTS
@@ -593,12 +648,17 @@ class Element(Data):
     def copy(self):
         # copy main properties
         new_instance = self.__class__(
-            self.name, self.id, self.display_shapes, self.local_frame, self.global_frame, **self.attributes
+            name=self.name, id=self.id, frame=self.frame, simplex=self.simplex, complex=self.complex, **self.attributes
         )
 
         # deepcopy of the fabrication, and structural information
-        new_instance.fabrication = copy.deepcopy(self.fabrication)
-        new_instance.structure = copy.deepcopy(self.structure)
+        new_instance._frame_global = self.frame_global.copy()
+        new_instance._aabb = copy.deepcopy(self.aabb())
+        new_instance._oobb = copy.deepcopy(self.oobb())
+        new_instance._convex_hull = copy.deepcopy(self.convex_hull)
+        new_instance._outlines = copy.deepcopy(self._outlines)
+        new_instance._fabrication = copy.deepcopy(self.fabrication)
+        new_instance._structure = copy.deepcopy(self.structure)
 
         return new_instance
 
@@ -608,7 +668,7 @@ class Element(Data):
 
     def transform(self, transformation):
         """
-        Transforms the display_shapes , local frame, and global frame of the Element.
+        Transforms the complex , local frame, and global frame of the Element.
 
         Parameters:
             transformation (Transformation): The transformation to be applied to the Element's geometry and frames.
@@ -619,11 +679,11 @@ class Element(Data):
         for i in range(len(self.simplex)):
             self.simplex[i].transform(transformation)
 
-        for i in range(len(self.display_shapes)):
-            self.display_shapes[i].transform(transformation)
+        for i in range(len(self.complex)):
+            self.complex[i].transform(transformation)
 
-        self.local_frame.transform(transformation)
-        self.global_frame.transform(transformation)
+        self.frame.transform(transformation)
+        self.frame_global.transform(transformation)
 
     def transformed(self, transformation):
         """
@@ -641,7 +701,7 @@ class Element(Data):
 
     def transform_to_frame(self, frame):
         """
-        Applies frame_to_frame transformation to the display_shapes , local frame, and global frame of the Element.
+        Applies frame_to_frame transformation to the complex , local frame, and global frame of the Element.
 
         Parameters:
             frame (Frame): The target frame to which  the Element will be transformed.
@@ -649,12 +709,12 @@ class Element(Data):
         Returns:
             None
         """
-        xform = Transformation.from_frame_to_frame(self.local_frame, frame)
+        xform = Transformation.from_frame_to_frame(self.frame, frame)
         self.transform(xform)
 
     def transform_from_frame_to_frame(self, source_frame, target_frame):
         """
-        Applies frame_to_frame transformation to the display_shapes , local frame, and global frame of the Element.
+        Applies frame_to_frame transformation to the complex , local frame, and global frame of the Element.
 
         Parameters:
             frame (Frame): The target frame to which  the Element will be transformed.
@@ -697,7 +757,82 @@ class Element(Data):
     # COLLISION DETECTION
     # ==========================================================================
 
-    def collide(self, other):
+    def collide(self, other, **kwargs):
+        """check collision using aabb and oobb
+        this function is often intermediate between high-performance tree searches
+        then this collision is computed
+        and then the interface can be found"""
+
+        # --------------------------------------------------------------------------
+        # sanity check
+        # --------------------------------------------------------------------------
+        if (not self.aabb) or (not other.aabb):
+            return False
+
+        # --------------------------------------------------------------------------
+        # aabb collision
+        # --------------------------------------------------------------------------
+        collision_x_axis = self.aabb[6][0] < other.aabb[0][0] or other.aabb[6][0] < self.aabb[0][0]
+        collision_y_axis = self.aabb[6][1] < other.aabb[0][1] or other.aabb[6][1] < self.aabb[0][1]
+        collision_z_axis = self.aabb[6][2] < other.aabb[0][2] or other.aabb[6][2] < self.aabb[0][2]
+        if collision_x_axis or collision_y_axis or collision_z_axis:
+            return False
+
+        # --------------------------------------------------------------------------
+        # oobb collision
+        # --------------------------------------------------------------------------
+
+        # point, axis, size description
+        class OBB:
+            def __init__(self, box):
+                self.frame = Frame(box[0], box[1]-box[0], box[3]-box[0])
+                self.half_size = [0, 0, 0]
+                self.half_size[0] = distance_point_point(box[0], box[1])*0.5
+                self.half_size[1] = distance_point_point(box[0], box[3])*0.5
+                self.half_size[2] = distance_point_point(box[0], box[4])*0.5
+
+        # convert the eight points to a frame and half-size description
+        box1 = OBB(self.oobb)
+        box2 = OBB(other.oobb)
+
+        # get sepratation plane
+        def GetSeparatingPlane(RPos, axis, box1, box2):
+            return abs(RPos * axis) > (
+                abs((box1.frame.xaxis * box1.half_size[0]).dot(axis)) +
+                abs((box1.frame.yaxis * box1.half_size[1]).dot(axis)) +
+                abs((box1.frame.zaxis * box1.half_size[2]).dot(axis)) +
+                abs((box2.frame.xaxis * box2.half_size[0]).dot(axis)) +
+                abs((box2.frame.yaxis * box2.half_size[1]).dot(axis)) +
+                abs((box2.frame.zaxis * box2.half_size[2]).dot(axis))
+            )
+
+        # compute the oobb collision
+        RPos = box2.frame.point - box1.frame.point
+
+        result = not (
+            GetSeparatingPlane(RPos, box1.frame.xaxis, box1, box2) or
+            GetSeparatingPlane(RPos, box1.frame.yaxis, box1, box2) or
+            GetSeparatingPlane(RPos, box1.frame.zaxis, box1, box2) or
+            GetSeparatingPlane(RPos, box2.frame.xaxis, box1, box2) or
+            GetSeparatingPlane(RPos, box2.frame.yaxis, box1, box2) or
+            GetSeparatingPlane(RPos, box2.frame.zaxis, box1, box2) or
+            GetSeparatingPlane(RPos, box1.frame.xaxis.cross(box2.frame.xaxis), box1, box2) or
+            GetSeparatingPlane(RPos, box1.frame.xaxis.cross(box2.frame.yaxis), box1, box2) or
+            GetSeparatingPlane(RPos, box1.frame.xaxis.cross(box2.frame.zaxis), box1, box2) or
+            GetSeparatingPlane(RPos, box1.frame.yaxis.cross(box2.frame.xaxis), box1, box2) or
+            GetSeparatingPlane(RPos, box1.frame.yaxis.cross(box2.frame.yaxis), box1, box2) or
+            GetSeparatingPlane(RPos, box1.frame.yaxis.cross(box2.frame.zaxis), box1, box2) or
+            GetSeparatingPlane(RPos, box1.frame.zaxis.cross(box2.frame.xaxis), box1, box2) or
+            GetSeparatingPlane(RPos, box1.frame.zaxis.cross(box2.frame.yaxis), box1, box2) or
+            GetSeparatingPlane(RPos, box1.frame.zaxis.cross(box2.frame.zaxis), box1, box2)
+        )
+
+        return result
+
+    def find_interface(self, other,  **kwargs):
+        """there are few possible cases
+        a) an element touch other element by a flat face
+        b) an element simplex is close to another simplex e.g. line to line proxity"""
         pass
 
     # ==========================================================================
@@ -718,15 +853,17 @@ class Element(Data):
 #  Vizualization Geometries: {3},
 #  Local Frame: {4},
 #  Global Frame: {5},
-#  Fabrication: {6},
-#  Structure: {7},
-#  Attributes: {8})""".format(
+#  Outlines: {6},
+#  Fabrication: {7},
+#  Structure: {8},
+#  Attributes: {9})""".format(
             self.name,
             self.id,
             self.simplex,
-            self.display_shapes,
-            self.local_frame,
-            self.global_frame,
+            self.complex,
+            self.frame,
+            self.frame_global,
+            self.outlines,
             self.fabrication,
             self.structure,
             self.attributes,

@@ -41,7 +41,7 @@ class Viewer:
         show_indices=False,
         show_types=False,
         show_simplices=True,
-        show_display_shapes=True,
+        show_complexes=True,
         show_aabbs=False,
         show_oobbs=False,
         show_convex_hulls=False,
@@ -70,7 +70,7 @@ class Viewer:
             show_indices=show_indices,
             show_types=show_types,
             show_simplices=show_simplices,
-            show_display_shapes=show_display_shapes,
+            show_complexes=show_complexes,
             show_aabbs=show_aabbs,
             show_oobbs=show_oobbs,
             show_convex_hulls=show_convex_hulls,
@@ -94,7 +94,7 @@ class Viewer:
         show_indices=False,
         show_types=False,
         show_simplices=True,
-        show_display_shapes=True,
+        show_complexes=True,
         show_aabbs=False,
         show_oobbs=False,
         show_convex_hulls=False,
@@ -137,9 +137,9 @@ class Viewer:
                     "viewer_indices": [],
                     "viewer_types": [],
                     "viewer_simplices": [],
-                    "viewer_display_shapes": [],
-                    "viewer_local_frames": [],
-                    "viewer_global_frames": [],
+                    "viewer_complexes": [],
+                    "viewer_frames": [],
+                    "viewer_frame_globals": [],
                     "viewer_aabbs": [],
                     "viewer_oobbs": [],
                     "viewer_convex_hulls": [],
@@ -156,7 +156,7 @@ class Viewer:
 
                     text = Text(
                         ",".join(map(str, element.id)),
-                        element.local_frame.point + Vector(0, 0, 0.01),
+                        element.frame.point + Vector(0, 0, 0.01),
                         height=text_height,
                     )
 
@@ -184,7 +184,7 @@ class Viewer:
 
                     text = Text(
                         element.name,
-                        element.local_frame.point + Vector(0, 0, 0.01),
+                        element.frame.point + Vector(0, 0, 0.01),
                         height=text_height,
                     )
                     o = viewer.add(
@@ -294,14 +294,14 @@ class Viewer:
                     # add display shapes
                     # --------------------------------------------------------------------------
 
-                    for i in range(len(element.display_shapes)):
-                        if isinstance(element.display_shapes[i], Mesh):
-                            if (element.display_shapes[i].number_of_vertices() > 0):
+                    for i in range(len(element.complex)):
+                        if isinstance(element.complex[i], Mesh):
+                            if (element.complex[i].number_of_vertices() > 0):
                                 o = viewer.add(
-                                    data=element.display_shapes[i],
+                                    data=element.complex[i],
                                     name=element_id,
                                     is_selected=False,
-                                    is_visible=show_display_shapes,
+                                    is_visible=show_complexes,
                                     show_points=False,
                                     show_lines=True,
                                     show_faces=True,
@@ -313,18 +313,18 @@ class Viewer:
                                     hide_coplanaredges=True,
                                 )
 
-                                viewer_objects["viewer_display_shapes"].append(o)
+                                viewer_objects["viewer_complexes"].append(o)
 
                         elif (
-                            isinstance(element.display_shapes[i], Polyline)
-                            or isinstance(element.display_shapes[i], Line)
-                            or isinstance(element.display_shapes[i], Box)
+                            isinstance(element.complex[i], Polyline)
+                            or isinstance(element.complex[i], Line)
+                            or isinstance(element.complex[i], Box)
                         ):
                             o = viewer.add(
-                                data=element.display_shapes[i],
+                                data=element.complex[i],
                                 name=element_id,
                                 is_selected=False,
-                                is_visible=show_display_shapes,
+                                is_visible=show_complexes,
                                 show_points=False,
                                 show_lines=True,
                                 show_faces=True,
@@ -333,13 +333,13 @@ class Viewer:
                                 facecolor=colors[3],  # Viewer.string_to_color(element.name),#colors[3],
                                 linewidth=1,
                             )
-                            viewer_objects["viewer_display_shapes"].append(o)
-                        elif isinstance(element.display_shapes[i], Pointcloud):
+                            viewer_objects["viewer_complexes"].append(o)
+                        elif isinstance(element.complex[i], Pointcloud):
                             o = viewer.add(
-                                data=element.display_shapes[i],
+                                data=element.complex[i],
                                 name=element_id,
                                 is_selected=False,
-                                is_visible=show_display_shapes,
+                                is_visible=show_complexes,
                                 show_points=True,
                                 show_lines=False,
                                 show_faces=False,
@@ -350,30 +350,30 @@ class Viewer:
                                 pointsize=2,
                             )
 
-                            viewer_objects["viewer_display_shapes"].append(o)
+                            viewer_objects["viewer_complexes"].append(o)
 
                     # --------------------------------------------------------------------------
                     # add frames
                     # --------------------------------------------------------------------------
 
-                    global_frames_lines = [
+                    frame_globals_lines = [
                         Line(
-                            element.global_frame.point,
-                            element.global_frame.point + element.global_frame.xaxis * display_axis_scale * 0.5,
+                            element.frame_global.point,
+                            element.frame_global.point + element.frame_global.xaxis * display_axis_scale * 0.5,
                         ),
                         Line(
-                            element.global_frame.point,
-                            element.global_frame.point + element.global_frame.yaxis * display_axis_scale * 0.5,
+                            element.frame_global.point,
+                            element.frame_global.point + element.frame_global.yaxis * display_axis_scale * 0.5,
                         ),
                         Line(
-                            element.global_frame.point,
-                            element.global_frame.point + element.global_frame.zaxis * display_axis_scale * 0.5,
+                            element.frame_global.point,
+                            element.frame_global.point + element.frame_global.zaxis * display_axis_scale * 0.5,
                         ),
                     ]
 
-                    for i in range(len(global_frames_lines)):
+                    for i in range(len(frame_globals_lines)):
                         o = viewer.add(
-                            global_frames_lines[i],
+                            frame_globals_lines[i],
                             name=element_id,
                             is_selected=False,
                             is_visible=show_frames,
@@ -386,26 +386,26 @@ class Viewer:
                             linewidth=line_width,
                             # u=16,
                         )
-                        viewer_objects["viewer_global_frames"].append(o)
+                        viewer_objects["viewer_frame_globals"].append(o)
 
-                    local_frames_lines = [
+                    frames_lines = [
                         Line(
-                            element.local_frame.point,
-                            element.local_frame.point + element.local_frame.xaxis * display_axis_scale,
+                            element.frame.point,
+                            element.frame.point + element.frame.xaxis * display_axis_scale,
                         ),
                         Line(
-                            element.local_frame.point,
-                            element.local_frame.point + element.local_frame.yaxis * display_axis_scale,
+                            element.frame.point,
+                            element.frame.point + element.frame.yaxis * display_axis_scale,
                         ),
                         Line(
-                            element.local_frame.point,
-                            element.local_frame.point + element.local_frame.zaxis * display_axis_scale,
+                            element.frame.point,
+                            element.frame.point + element.frame.zaxis * display_axis_scale,
                         ),
                     ]
 
-                    for i in range(len(local_frames_lines)):
+                    for i in range(len(frames_lines)):
                         o = viewer.add(
-                            local_frames_lines[i],
+                            frames_lines[i],
                             name=element_id,
                             is_selected=False,
                             is_visible=show_frames,
@@ -418,7 +418,7 @@ class Viewer:
                             linewidth=line_width,
                             # u=16,
                         )
-                        viewer_objects["viewer_local_frames"].append(o)
+                        viewer_objects["viewer_frames"].append(o)
 
                     # --------------------------------------------------------------------------
                     # add aabb | oobb | convex hull
@@ -512,9 +512,9 @@ class Viewer:
                         obj.is_visible = checked
                     viewer.view.update()
 
-                @viewer.checkbox(text="show_display_shapes", checked=show_display_shapes)
-                def check_display_shapes(checked):
-                    for obj in viewer_objects["viewer_display_shapes"]:
+                @viewer.checkbox(text="show_complexes", checked=show_complexes)
+                def check_complexes(checked):
+                    for obj in viewer_objects["viewer_complexes"]:
                         obj.is_visible = checked
                     viewer.view.update()
 
@@ -536,15 +536,15 @@ class Viewer:
                         obj.is_visible = checked
                     viewer.view.update()
 
-                @viewer.checkbox(text="show_local_frames", checked=show_frames)
-                def check_local_frames(checked):
-                    for obj in viewer_objects["viewer_local_frames"]:
+                @viewer.checkbox(text="show_frames", checked=show_frames)
+                def check_frames(checked):
+                    for obj in viewer_objects["viewer_frames"]:
                         obj.is_visible = checked
                     viewer.view.update()
 
-                @viewer.checkbox(text="show_global_frames", checked=show_frames)
-                def check_global_frames(checked):
-                    for obj in viewer_objects["viewer_global_frames"]:
+                @viewer.checkbox(text="show_frame_globals", checked=show_frames)
+                def check_frame_globals(checked):
+                    for obj in viewer_objects["viewer_frame_globals"]:
                         obj.is_visible = checked
                     viewer.view.update()
 
@@ -612,7 +612,7 @@ class Viewer:
 
                 @viewer.slider(title="opacity", maxval=100, step=1, bgcolor=Color.white(), value=95)
                 def slider_opacity(t):
-                    for o in viewer_objects["viewer_display_shapes"]:
+                    for o in viewer_objects["viewer_complexes"]:
                         o.opacity = t / 100.0
 
                 # --------------------------------------------------------------------------
