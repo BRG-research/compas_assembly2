@@ -559,9 +559,7 @@ for group_id, subsequent_groups in grouped_objects.items():
                 if o.complex[0].is_closed():
                     o.frame = Frame(o.complex[0][0], [1, 0, 0], [0, 1, 0])
                 else:
-                    x_axis_vector, y_axis_vector = conversions.perpendicular_to(
-                        o.complex[0][0], o.complex[0][1]
-                    )
+                    x_axis_vector, y_axis_vector = conversions.perpendicular_to(o.complex[0][0], o.complex[0][1])
                     o.frame = Frame(o.complex[0][0], x_axis_vector, y_axis_vector)
 
     # --------------------------------------------------------------------------
