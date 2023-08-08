@@ -20,7 +20,7 @@ class FabricationNest:
 
     @classmethod
     def pack_elements(cls, elements=None, nest_type=1, inflate=0.1, height_step=4):
-        """ pack_elements - orient objects next to each other in a linear fashion """
+        """pack_elements - orient objects next to each other in a linear fashion"""
 
         cls._elements = elements
 
@@ -47,7 +47,6 @@ class FabricationNest:
             height[key] = index * height_step * 0
 
         for i, e in enumerate(cls._elements):
-
             temp_width = 0
             source_frame = e.frame.copy()
             target_frame = Frame([0, 0, 0], source_frame.xaxis, source_frame.yaxis)
