@@ -1,5 +1,11 @@
 # compas_assembly2
 
+## TODO
+
+- [ ] Element.py - Interface detection using compas_assembly shapely library for outlines for complex
+- [ ] Element.py - Interace detection using Line and Polyline proximity for simplex
+- [ ] Fast Tree search that is native to Python
+- [ ] Test and Viewer - Insertion vectors
 
 A data structure is needed to represent a model consisting of structural elements like blocks, beams, nodes, and plates, as well as fabrication elements for subtractive and additive processes. This data structure should also facilitate the computation and storage of adjacency and joinery information, as well as interfaces between these elements. Additionally, it should allow for the transfer of data between the model, structural simulation, and fabrication processes.
 
