@@ -704,7 +704,7 @@ class Element(Data):
                 return Point(p[0], p[1], p[2])
 
             def __init__(self, box=[]):
-                origin = (self.to_p(box[0]) + self.to_p(box[6]))*0.5
+                origin = (self.to_p(box[0]) + self.to_p(box[6])) * 0.5
                 x_axis = self.to_p(box[1]) - self.to_p(box[0])
                 y_axis = self.to_p(box[3]) - self.to_p(box[0])
                 self.frame = Frame(origin, x_axis, y_axis)
