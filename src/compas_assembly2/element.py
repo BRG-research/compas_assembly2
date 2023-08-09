@@ -667,7 +667,7 @@ class Element(Data):
         return new_instance
 
     # ==========================================================================
-    # COLLISION DETECTION
+    # COLLISION DETECTIONblock
     # ==========================================================================
 
     def collide(self, other, **kwargs):
@@ -763,14 +763,21 @@ class Element(Data):
     # MOST COMMON CONVERSIONS
     # ==========================================================================
     @staticmethod
-    def from_block(self, block):
+    def from_simplex_and_complex(simplex, complex, id=-1):
+        """method create a block element at the origin point with the frame at worldXY"""
+        return Element(
+            name=compas_assembly2.ELEMENT_NAME.BLOCK, id=id, frame=Frame.worldXY, simplex=simplex, complex=complex
+        )
+
+    @staticmethod
+    def from_block(block):
         """method create a block element at the origin point with the frame at worldXY"""
         return Element(
             name=compas_assembly2.ELEMENT_NAME.BLOCK, id=0, frame=Frame.worldXY, simplex=Point(0, 0, 0), complex=block
         )
 
     @staticmethod
-    def from_frame(self, width, height, depth):
+    def from_frame(width, height, depth):
         """method create a frame element at the origin point with the frame at worldXY"""
         return Element(
             name=compas_assembly2.ELEMENT_NAME.BLOCK,
@@ -781,7 +788,7 @@ class Element(Data):
         )
 
     @staticmethod
-    def from_plate(self, polylines):
+    def from_plate(polylines):
         """method create a plate element at the origin point with the frame at worldXY"""
         return Element(
             name=compas_assembly2.ELEMENT_NAME.BLOCK, id=0, frame=Frame.worldXY, simplex=polylines, complex=polylines

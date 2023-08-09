@@ -1,4 +1,6 @@
 from compas_assembly2 import Viewer, Element, FabricationNest
+from compas.datastructures import Mesh
+from compas.geometry import Point, Line
 
 
 def get_arc_points(p1, p2, num_points, height):
@@ -79,38 +81,99 @@ def move_points_to_target_z(arc_points, normals, target_z):
 
 
 def move_points_in_two_opposite_directions(points, direction, distance):
-    new_points = []
+    new_points_0 = []
+    new_points_1 = []
     direction_magnitude = sum(d**2 for d in direction) ** 0.5
     normalized_direction = [d / direction_magnitude for d in direction]
     movement_positive = [d * distance for d in normalized_direction]
     movement_negative = [-d * distance for d in normalized_direction]
     for point in points:
-        new_points.append(
+        new_points_0.append(
             [
                 point[0] + movement_positive[0],
                 point[1] + movement_positive[1],
                 point[2] + movement_positive[2],
             ]
         )
-        new_points.append(
+        new_points_1.append(
             [
                 point[0] + movement_negative[0],
                 point[1] + movement_negative[1],
                 point[2] + movement_negative[2],
             ]
         )
-    return new_points
+    return new_points_0, new_points_1
 
+
+# ==========================================================================
+# CREATE POINTES FOR THE ARC
+# ==========================================================================
 
 # Create the arc curve points
 # arc_points = create_arc_curve(center, radius, start_angle, end_angle, num_points)
-arc_points0 = get_arc_points([-5.0, 0, 0], [5.0, 0, 0], 6, 3)
-normals = calculate_normals_with_length(arc_points0, 0.5)
-arc_points1 = arc_points1 = move_points_by_normals(arc_points0, normals, 1)
-arc_points2 = move_points_to_target_z(arc_points0, normals, 2)
-arc_points = arc_points0 + arc_points2
-arc_points_moved = move_points_in_two_opposite_directions(arc_points, [0, 1, 0], 1)
-elements = Element.to_elements(arc_points_moved)
+n = 10
+length = 3.0
+height = 0.5
+offset = 0.5
+p_b_0 = get_arc_points([-length, 0, 0], [length, 0, 0], n, height)
+normals = calculate_normals_with_length(p_b_0, 0.5)
+# p_t_0  = move_points_by_normals(p_b_0, normals, 1)
+p_t_0 = move_points_to_target_z(p_b_0, normals, height)
+p_b_0, p_b_1 = move_points_in_two_opposite_directions(p_b_0, [0, 1, 0], offset)
+p_t_0, p_t_1 = move_points_in_two_opposite_directions(p_t_0, [0, 1, 0], offset)
+pts = p_b_0 + p_b_1 + p_t_0 + p_t_1
+elements = Element.to_elements(pts)
+
+# ==========================================================================
+# MEASUREMENT
+# ==========================================================================
+measurements = []
+arc_start = Point(p_b_1[0][0], p_b_1[0][1], p_b_1[0][2])
+arc_end = Point(p_b_1[-1][0], p_b_1[-1][1], p_b_1[-1][2])
+line = Line(arc_start, arc_end)
+measurements.append(line)
+
+# ==========================================================================
+# CREATE ELEMENTS
+# ==========================================================================
+elements = []
+for i in range(n - 1):
+    # --------------------------------------------------------------------------
+    # Create the mesh
+    # --------------------------------------------------------------------------
+
+    # define the vertices
+    vertices = [
+        p_b_0[0 + i],
+        p_b_0[1 + i],
+        p_b_1[1 + i],
+        p_b_1[0 + i],
+        p_t_0[0 + i],
+        p_t_0[1 + i],
+        p_t_1[1 + i],
+        p_t_1[0 + i],
+    ]
+
+    # define the faces with the ccw winding
+    faces = [
+        [0, 3, 2, 1],
+        [4, 5, 6, 7],
+        [0, 1, 5, 4],
+        [1, 2, 6, 5],
+        [2, 3, 7, 6],
+        [3, 0, 4, 7],
+    ]
+
+    mesh = Mesh.from_vertices_and_faces(vertices, faces)
+    p0 = Point(vertices[0][0], vertices[0][1], vertices[0][2])
+    p1 = Point(vertices[6][0], vertices[6][1], vertices[6][2])
+    center = (p0 + p1) * 0.5
+
+    # --------------------------------------------------------------------------
+    # Create the element
+    # --------------------------------------------------------------------------
+    element = Element.from_simplex_and_complex(center, mesh, i)
+    elements.append(element)
 
 # ==========================================================================
 # NEST ELEMENTS
@@ -120,4 +183,4 @@ FabricationNest.pack_elements(elements=elements, nest_type=2, inflate=0.1, heigh
 # ==========================================================================
 # VIEWER
 # ==========================================================================
-Viewer.show_elements(elements, show_grid=True)
+Viewer.show_elements(elements, show_grid=True, measurements=measurements)

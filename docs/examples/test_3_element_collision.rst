@@ -1,8 +1,8 @@
 ********************************************************************************
-test_4_element_collision
+test_3_element_collision
 ********************************************************************************
 
 
-.. literalinclude:: ../../tests/test_4_element_collision.py
+.. literalinclude:: ../../tests/test_3_element_collision.py
    :language: python
 

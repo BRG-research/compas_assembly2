@@ -60,7 +60,6 @@ class Viewer:
             Color(0, 0, 0),
         ],
     ):
-
         Viewer.show_elements(
             elements=Element.to_elements(geometry),
             viewer_type=viewer_type,
@@ -88,8 +87,8 @@ class Viewer:
     def show_elements(
         elements=[],
         viewer_type="view2-0_rhino-1_blender-2",
-        width=1920,
-        height=1200,
+        width=1280,
+        height=1600,
         show_grid=False,
         show_indices=False,
         show_names=False,
@@ -113,6 +112,7 @@ class Viewer:
             Color(0, 0, 0),
         ],
         color_red=[],
+        measurements=[],
     ):
         if viewer_type == "view" or "view2" or "compas_view2" or "0":
             try:
@@ -125,6 +125,8 @@ class Viewer:
                 # The code here will only be executed if the import was successful
 
                 # initialize the viewer
+                # modifications to the default viewer:
+                # def _init_sidebar ->  self.window.addToolBar(QtCore.Qt.RightToolBarArea, self.sidebar)
                 viewer = App(
                     viewmode="lighted",
                     version="120",
@@ -133,6 +135,9 @@ class Viewer:
                     height=height,
                     show_grid=show_grid,
                 )
+
+                # change the position of the window, accomodate the sidebar of OS
+                viewer.window.setGeometry(width + 35, 0, width - 35, height)
 
                 viewer_objects = {
                     "viewer_indices": [],
@@ -146,6 +151,7 @@ class Viewer:
                     "viewer_convex_hulls": [],
                     "viewer_fabrication": [],
                     "viewer_structure": [],
+                    "viewer_measurements": [],
                     "viewer_all": [],
                 }
 
@@ -212,7 +218,6 @@ class Viewer:
                     # add simplex
                     # --------------------------------------------------------------------------
                     for i in range(len(element.simplex)):
-
                         if isinstance(element.simplex[i], Polyline) or isinstance(element.simplex[i], Line):
                             o = viewer.add(
                                 data=element.simplex[i],
@@ -488,6 +493,50 @@ class Viewer:
                             viewer_objects["viewer_convex_hulls"].append(o)
 
                 # --------------------------------------------------------------------------
+                # measurements - lines with text
+                # --------------------------------------------------------------------------
+                for i in range(len(measurements)):
+                    text = Text(
+                        str(measurements[i].length),
+                        measurements[i].midpoint + Vector(0, 0, 0.1),
+                        height=text_height,
+                    )
+
+                    o = viewer.add(
+                        data=text,
+                        name="measurement",
+                        color=colors[0],
+                        is_selected=False,
+                        is_visible=True,
+                        show_points=True,
+                        show_lines=True,
+                        show_faces=False,
+                        pointcolor=Color(0, 0, 0),
+                        linecolor=Color(0, 0, 0),
+                        facecolor=Color(0.85, 0.85, 0.85),
+                        linewidth=line_width,
+                        pointsize=point_size,
+                    )
+
+                    line = viewer.add(
+                        data=measurements[i],
+                        name="measurement",
+                        is_selected=False,
+                        is_visible=True,
+                        show_points=True,
+                        show_lines=True,
+                        show_faces=False,
+                        pointcolor=Color(0, 0, 0),
+                        linecolor=Color(0, 0, 0),
+                        facecolor=Color(0.85, 0.85, 0.85),
+                        linewidth=line_width,
+                        pointsize=point_size,
+                    )
+
+                    viewer_objects["viewer_measurements"].append(o)
+                    viewer_objects["viewer_measurements"].append(line)
+
+                # --------------------------------------------------------------------------
                 # add fabrication geometry
                 # --------------------------------------------------------------------------
                 frames_original = []  # noqa: F841
@@ -551,6 +600,12 @@ class Viewer:
                         obj.is_visible = checked
                     viewer.view.update()
 
+                @viewer.checkbox(text="show_measurements", checked=True)
+                def check_measurements(checked):
+                    for obj in viewer_objects["viewer_measurements"]:
+                        obj.is_visible = checked
+                    viewer.view.update()
+
                 @viewer.slider(title="fabrication_example", maxval=100, step=1, bgcolor=Color.white())
                 def slider_nesting(t):
                     def interpolate_frames(frame0, frame1, t):
@@ -607,16 +662,13 @@ class Viewer:
                     # change positions of elements
                     if dict_matrices:
                         for key, value in viewer_objects.items():
+                            if key == "viewer_measurements":
+                                continue
                             for item in value:
                                 item.matrix = dict_matrices[item.name]
 
                     # update the viewer after all the matrices are changed
                     viewer.view.update()
-
-                @viewer.slider(title="opacity", maxval=100, step=1, bgcolor=Color.white(), value=95)
-                def slider_opacity(t):
-                    for o in viewer_objects["viewer_complexes"]:
-                        o.opacity = t / 100.0
 
                 # --------------------------------------------------------------------------
                 # run
