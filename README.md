@@ -1,5 +1,13 @@
 # compas_assembly2
 
+## TODO
+
+- [ ] Element.py - Interface detection using compas_assembly shapely library for outlines for complex
+- [ ] Element.py - Interace detection using Line and Polyline proximity for simplex
+- [ ] Fast Tree search that is native to Python
+- [ ] Test and Viewer - Insertion vectors
+- [ ] Assembly.py - start drafting the assembly data-strcuture, by including the collide method that otput collision pairs, for simple implementation use 2xfor loop, once you find fast tree, you will be able to enhance (do not forget serialozation)
+- [ ] implmement other assemblies to check how well the data structure is currently been developed.
 
 A data structure is needed to represent a model consisting of structural elements like blocks, beams, nodes, and plates, as well as fabrication elements for subtractive and additive processes. This data structure should also facilitate the computation and storage of adjacency and joinery information, as well as interfaces between these elements. Additionally, it should allow for the transfer of data between the model, structural simulation, and fabrication processes.
 
