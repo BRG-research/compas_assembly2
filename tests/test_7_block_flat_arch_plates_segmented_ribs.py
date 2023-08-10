@@ -6,7 +6,6 @@ from compas.geometry import (
     Line,
     Plane,
     Vector,
-    Polygon,
     intersection_plane_plane_plane,
 )
 
@@ -537,10 +536,9 @@ for i in range(n - 1):
     planes_bot.append(plane_bot)
     plane_side = Plane(Point(*box.face_centroid(5)), box.face_normal(5))
     planes_side.append(plane_side)
-    if (i == (n - 2)):
-        plane_side_last = Plane(Point(*box.face_centroid(3)),
-                                box.face_normal(3))
-        #planes_side.append(plane_side_last)
+    if i == (n - 2):
+        plane_side_last = Plane(Point(*box.face_centroid(3)), -Vector(*box.face_normal(3)))
+        planes_side.append(plane_side_last)
 
     # --------------------------------------------------------------------------
     # Create plates
@@ -590,13 +588,13 @@ def get_dual_planes(planes):
 
     planes_with_ends = list(planes)
     planes_with_ends.insert(0, planes[0])
-    planes_with_ends.append(planes[-1])
+    # planes_with_ends.append(planes[-1])
 
     dual_planes.append(planes[0])
 
-    for i in range(0, len(planes)-1):
-        origin = (planes_with_ends[i].point + planes_with_ends[i+1].point)*0.5
-        normal = (planes_with_ends[i].normal + planes_with_ends[i+1].normal)*0.5
+    for i in range(0, len(planes_with_ends) - 1):
+        origin = (planes_with_ends[i].point + planes_with_ends[i + 1].point) * 0.5
+        normal = (planes_with_ends[i].normal + planes_with_ends[i + 1].normal) * 0.5
         dual_planes.append(Plane(origin, normal))
 
     dual_planes.append(planes[-1])
@@ -604,38 +602,50 @@ def get_dual_planes(planes):
     return dual_planes
 
 
-
-plane_top = Plane(Point(0, 0, height), Vector(0, 0, 1))
 plane_top = Plane(Point(0, 0, height), Vector(0, 0, 1))
 
-
-
+geometry.clear()
 planes_dual = get_dual_planes(planes_side)
 
 # geometry.append(plane_top)
 # # geometry = geometry + planes_dual
 # geometry = geometry + [planes_side[0], planes_side[1], planes_bot[0], planes_bot[1]]
 
-for i in range(len(planes_dual)-1): # 
+for i in range(len(planes_dual) - 2):
     side_planes_for_ribs = []
-    if(i == 0):
-        side_planes_for_ribs = [plane_top, planes_dual[i+1], planes_bot[i],  planes_dual[i+2]]
-    elif(i == (len(planes_dual)-2)):
-        side_planes_for_ribs = [plane_top, planes_dual[i+1], planes_bot[i],  planes_dual[i+2]]
+    if i == 0:
+        side_planes_for_ribs = [
+            plane_top,
+            planes_dual[i + 1],
+            Plane(planes_bot[i].point + planes_bot[i].normal * plate_thickness, planes_bot[i].normal),
+            planes_dual[i + 2],
+        ]
+    elif i == (len(planes_dual) - 3):
+        # continue
+        id = min(i, (len(planes_bot) - 1))
+        side_planes_for_ribs = [
+            plane_top,
+            planes_dual[i + 1],
+            Plane(planes_bot[id].point + planes_bot[id].normal * plate_thickness, planes_bot[id].normal),
+            planes_dual[i + 2],
+        ]
     else:
-        continue
-        side_planes_for_ribs = [plane_top, planes_dual[i+1], planes_bot[i-1], planes_bot[i], planes_dual[i+2]]
-        geometry = geometry + side_planes_for_ribs
-    
-    rib_center = Point(0, 0, 0.5)
-    normal = Vector(0, 1, 0)
+        side_planes_for_ribs = [
+            plane_top,
+            planes_dual[i + 1],
+            Plane(planes_bot[i - 1].point + planes_bot[i - 1].normal * plate_thickness, planes_bot[i - 1].normal),
+            Plane(planes_bot[i].point + planes_bot[i].normal * plate_thickness, planes_bot[i].normal),
+            planes_dual[i + 2],
+        ]
+
+    rib_center = Point(0, (0 + 0.1 * (i % 2) - 0.05)*0, 0.5)
+    normal = Vector(0, 1, 0.1 * (i % 2) - 0.05)
     rib_plane0 = Plane(rib_center + normal * plate_thickness * -0.5, normal)
     rib_plane1 = Plane(rib_center + normal * plate_thickness * 0.5, normal)
     points0 = points_from_side_plane(rib_plane0, side_planes_for_ribs)
     points1 = points_from_side_plane(rib_plane1, side_planes_for_ribs)
-    print(points0)
     mesh_rib = _.Triagulator.from_loft_two_polygons(points0, points1)
-    element = Element.from_simplex_and_complex(center, mesh_rib, i)
+    element = Element.from_simplex_and_complex(rib_center, mesh_rib, i)
     elements.append(element)
 
 # first rib
