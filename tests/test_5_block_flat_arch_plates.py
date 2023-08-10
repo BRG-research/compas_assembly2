@@ -139,7 +139,6 @@ measurements.append(line)
 
 
 def mesh_box_from_eight_points(vertices):
-
     # define the faces with the ccw winding
     faces = [
         [0, 3, 2, 1],
@@ -195,14 +194,14 @@ for i in range(n - 1):
         p0 = intersection_plane_plane_plane(
             plane0,
             mesh.face_plane(f_n[j]),
-            mesh.face_plane(f_n[(j+1) % len(f_n)]),
-            )
+            mesh.face_plane(f_n[(j + 1) % len(f_n)]),
+        )
         outline.append(p0)
         p1 = intersection_plane_plane_plane(
             plane1,
             mesh.face_plane(f_n[j]),
-            mesh.face_plane(f_n[(j+1) % len(f_n)]),
-            )
+            mesh.face_plane(f_n[(j + 1) % len(f_n)]),
+        )
         outline_temp.append(p1)
     outline = outline + outline_temp
     mesh, center = mesh_box_from_eight_points(outline)
