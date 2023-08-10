@@ -113,6 +113,7 @@ class Viewer:
         ],
         color_red=[],
         measurements=[],
+        geometry=[],
     ):
         if viewer_type == "view" or "view2" or "compas_view2" or "0":
             try:
@@ -152,6 +153,7 @@ class Viewer:
                     "viewer_fabrication": [],
                     "viewer_structure": [],
                     "viewer_measurements": [],
+                    "viewer_geometry": [],
                     "viewer_all": [],
                 }
 
@@ -537,6 +539,28 @@ class Viewer:
                     viewer_objects["viewer_measurements"].append(line)
 
                 # --------------------------------------------------------------------------
+                # geometry to temporary visualize during the develipment
+                # --------------------------------------------------------------------------
+                for i in range(len(geometry)):
+
+                    o = viewer.add(
+                        data=geometry[i],
+                        name="geometry",
+                        is_selected=False,
+                        is_visible=True,
+                        show_points=True,
+                        show_lines=True,
+                        show_faces=False,
+                        pointcolor=Color(0, 0, 0),
+                        linecolor=Color(0, 0, 0),
+                        facecolor=Color(0.85, 0.85, 0.85),
+                        linewidth=line_width,
+                        pointsize=point_size,
+                    )
+
+                    viewer_objects["viewer_geometry"].append(o)
+
+                # --------------------------------------------------------------------------
                 # add fabrication geometry
                 # --------------------------------------------------------------------------
                 frames_original = []  # noqa: F841
@@ -662,7 +686,7 @@ class Viewer:
                     # change positions of elements
                     if dict_matrices:
                         for key, value in viewer_objects.items():
-                            if key == "viewer_measurements":
+                            if key == "viewer_measurements" or key == "viewer_geometry":
                                 continue
                             for item in value:
                                 item.matrix = dict_matrices[item.name]

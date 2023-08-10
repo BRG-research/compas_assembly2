@@ -1,6 +1,14 @@
 from compas_assembly2 import Viewer, Element, FabricationNest
 from compas.datastructures import Mesh
-from compas.geometry import Point, Line, Plane, Vector, intersection_plane_plane_plane
+from compas.geometry import (
+    Point,
+    Line,
+    Plane,
+    Vector,
+    intersection_plane_plane_plane,
+)
+
+from test_5_ear_clip import EarcutCompas
 
 
 def get_arc_points(p1, p2, num_points, height):
@@ -128,6 +136,7 @@ elements = Element.to_elements(pts)
 # MEASUREMENT
 # ==========================================================================
 measurements = []
+geometry = []
 arc_start = Point(p_b_1[0][0], p_b_1[0][1], p_b_1[0][2])
 arc_end = Point(p_b_1[-1][0], p_b_1[-1][1], p_b_1[-1][2])
 line = Line(arc_start, arc_end)
@@ -159,6 +168,12 @@ def mesh_box_from_eight_points(vertices):
 
 plate_thickness = 0.04
 elements = []
+side_planes_for_beams = [
+    Plane(Point(0, 0, height), Vector(0, 0, 1)),
+    Plane(Point(-length, 0, 0), Vector(-1, 0, 0)),
+    Plane(Point(length, 0, 0), Vector(1, 0, 0)),
+]
+
 for i in range(n - 1):
     # --------------------------------------------------------------------------
     # Create the mesh
@@ -187,6 +202,7 @@ for i in range(n - 1):
     mesh.unify_cycles()
     plane0 = Plane(mesh.face_centroid(f), mesh.face_normal(f))
     plane1 = Plane(Point(*mesh.face_centroid(f)) + Vector(*mesh.face_normal(f)) * plate_thickness, mesh.face_normal(f))
+    side_planes_for_beams.insert(-1, plane1)
 
     outline = []
     outline_temp = []
@@ -205,12 +221,38 @@ for i in range(n - 1):
         outline_temp.append(p1)
     outline = outline + outline_temp
     mesh, center = mesh_box_from_eight_points(outline)
+    elements.append(Element.from_simplex_and_complex(center, mesh))
 
-    # --------------------------------------------------------------------------
-    # Create the element
-    # --------------------------------------------------------------------------
-    element = Element.from_simplex_and_complex(center, mesh, i)
-    elements.append(element)
+
+def points_from_side_plane(plane, side_planes):
+    points = []
+    for i in range(len(side_planes)):
+        p0 = intersection_plane_plane_plane(plane, side_planes[i], side_planes[(i + 1) % len(side_planes)])
+        points.append(Point(p0[0], p0[1], p0[2]))
+    return points
+
+
+rib_center = Point(0, 0, 0)
+rib_plane0 = Plane(Point(0, -plate_thickness * 0.5, 0), Vector(0, 1, 0))
+rib_plane1 = Plane(Point(0, plate_thickness * 0.5, 0), Vector(0, 1, 0))
+# # print(side_planes_for_beams)
+
+points0 = points_from_side_plane(rib_plane0, side_planes_for_beams)
+
+# polygon0 = Polygon(points0)
+mesh_rib0 = EarcutCompas.triangulate_points(points0)
+# xform = Transformation.from_frame_to_frame(get_frame(polygon0), Frame.worldXY())
+# polygon0.transform(xform)
+# geometry.append(polygon0)
+# print(polygon0)
+# print(earclip_polygon(points0))
+# # points1 = points_from_side_plane(rib_plane0, side_planes_for_beams)
+
+# mesh_rib0 = Mesh.from_polygons([Polygon(points0)])
+element = Element.from_simplex_and_complex(rib_center, mesh_rib0, i)
+elements.append(element)
+# # print(points0)
+
 
 # ==========================================================================
 # NEST ELEMENTS
@@ -220,4 +262,4 @@ FabricationNest.pack_elements(elements=elements, nest_type=2, inflate=0.1, heigh
 # ==========================================================================
 # VIEWER
 # ==========================================================================
-Viewer.show_elements(elements, show_grid=True, measurements=measurements)
+Viewer.show_elements(elements, show_grid=True, measurements=measurements, geometry=geometry)

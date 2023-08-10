@@ -43,6 +43,11 @@ FabricationNest.pack_elements(elements=elements, nest_type=2, inflate=0.0, heigh
 
 # ==========================================================================
 # CHECK COLLISION
+# BVH https://github.com/lyd405121/ti-bvh
+# KDTREE https://github.com/tjkemper/knn
+# KDTREE NUMPY https://github.com/paradoxysm/kdtrees/issues/12
+# KDTREE SCIPY https://github.com/hamaskhan/3D-Nearest-Neighbor-Search-KD-Tree/blob/main/main.py
+# KDTREE PLANNER NUMPY https://github.com/Pradeep-Gopal/RRT_3D_python_KDtree
 # ==========================================================================
 collision_pairs = []
 element_collisions = [2] * len(elements)
