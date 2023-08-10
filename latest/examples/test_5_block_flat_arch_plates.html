@@ -95,7 +95,15 @@
 <h1>test_5_block_flat_arch_plates</h1>
 <div class="language-python notranslate"><div class="highlight"><pre><button class="btn copy"><i class="far fa-copy"></i></button><code><span></span><span class="kn">from</span> <span class="nn">compas_assembly2</span> <span class="kn">import</span> <span class="n">Viewer</span><span class="p">,</span> <span class="n">Element</span><span class="p">,</span> <span class="n">FabricationNest</span>
 <span class="kn">from</span> <span class="nn">compas.datastructures</span> <span class="kn">import</span> <span class="n">Mesh</span>
-<span class="kn">from</span> <span class="nn">compas.geometry</span> <span class="kn">import</span> <span class="n">Point</span><span class="p">,</span> <span class="n">Line</span><span class="p">,</span> <span class="n">Plane</span><span class="p">,</span> <span class="n">Vector</span><span class="p">,</span> <span class="n">intersection_plane_plane_plane</span>
+<span class="kn">from</span> <span class="nn">compas.geometry</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Point</span><span class="p">,</span>
+    <span class="n">Line</span><span class="p">,</span>
+    <span class="n">Plane</span><span class="p">,</span>
+    <span class="n">Vector</span><span class="p">,</span>
+    <span class="n">intersection_plane_plane_plane</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">test_5_ear_clip</span> <span class="kn">import</span> <span class="n">EarcutCompas</span>
 
 
 <span class="k">def</span> <span class="nf">get_arc_points</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">num_points</span><span class="p">,</span> <span class="n">height</span><span class="p">):</span>
@@ -223,6 +231,7 @@
 <span class="c1"># MEASUREMENT</span>
 <span class="c1"># ==========================================================================</span>
 <span class="n">measurements</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">geometry</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="n">arc_start</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="n">p_b_1</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">p_b_1</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">p_b_1</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span>
 <span class="n">arc_end</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="n">p_b_1</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">p_b_1</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">p_b_1</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span>
 <span class="n">line</span> <span class="o">=</span> <span class="n">Line</span><span class="p">(</span><span class="n">arc_start</span><span class="p">,</span> <span class="n">arc_end</span><span class="p">)</span>
@@ -254,6 +263,12 @@
 
 <span class="n">plate_thickness</span> <span class="o">=</span> <span class="mf">0.04</span>
 <span class="n">elements</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">side_planes_for_beams</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">Plane</span><span class="p">(</span><span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">height</span><span class="p">),</span> <span class="n">Vector</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span>
+    <span class="n">Plane</span><span class="p">(</span><span class="n">Point</span><span class="p">(</span><span class="o">-</span><span class="n">length</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">Vector</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span>
+    <span class="n">Plane</span><span class="p">(</span><span class="n">Point</span><span class="p">(</span><span class="n">length</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">Vector</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span>
+<span class="p">]</span>
+
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
     <span class="c1"># --------------------------------------------------------------------------</span>
     <span class="c1"># Create the mesh</span>
@@ -282,6 +297,7 @@
     <span class="n">mesh</span><span class="o">.</span><span class="n">unify_cycles</span><span class="p">()</span>
     <span class="n">plane0</span> <span class="o">=</span> <span class="n">Plane</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">face_centroid</span><span class="p">(</span><span class="n">f</span><span class="p">),</span> <span class="n">mesh</span><span class="o">.</span><span class="n">face_normal</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
     <span class="n">plane1</span> <span class="o">=</span> <span class="n">Plane</span><span class="p">(</span><span class="n">Point</span><span class="p">(</span><span class="o">*</span><span class="n">mesh</span><span class="o">.</span><span class="n">face_centroid</span><span class="p">(</span><span class="n">f</span><span class="p">))</span> <span class="o">+</span> <span class="n">Vector</span><span class="p">(</span><span class="o">*</span><span class="n">mesh</span><span class="o">.</span><span class="n">face_normal</span><span class="p">(</span><span class="n">f</span><span class="p">))</span> <span class="o">*</span> <span class="n">plate_thickness</span><span class="p">,</span> <span class="n">mesh</span><span class="o">.</span><span class="n">face_normal</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+    <span class="n">side_planes_for_beams</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">plane1</span><span class="p">)</span>
 
     <span class="n">outline</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">outline_temp</span> <span class="o">=</span> <span class="p">[]</span>
@@ -300,12 +316,38 @@
         <span class="n">outline_temp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p1</span><span class="p">)</span>
     <span class="n">outline</span> <span class="o">=</span> <span class="n">outline</span> <span class="o">+</span> <span class="n">outline_temp</span>
     <span class="n">mesh</span><span class="p">,</span> <span class="n">center</span> <span class="o">=</span> <span class="n">mesh_box_from_eight_points</span><span class="p">(</span><span class="n">outline</span><span class="p">)</span>
+    <span class="n">elements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Element</span><span class="o">.</span><span class="n">from_simplex_and_complex</span><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="n">mesh</span><span class="p">))</span>
 
-    <span class="c1"># --------------------------------------------------------------------------</span>
-    <span class="c1"># Create the element</span>
-    <span class="c1"># --------------------------------------------------------------------------</span>
-    <span class="n">element</span> <span class="o">=</span> <span class="n">Element</span><span class="o">.</span><span class="n">from_simplex_and_complex</span><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
-    <span class="n">elements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">points_from_side_plane</span><span class="p">(</span><span class="n">plane</span><span class="p">,</span> <span class="n">side_planes</span><span class="p">):</span>
+    <span class="n">points</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">side_planes</span><span class="p">)):</span>
+        <span class="n">p0</span> <span class="o">=</span> <span class="n">intersection_plane_plane_plane</span><span class="p">(</span><span class="n">plane</span><span class="p">,</span> <span class="n">side_planes</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">side_planes</span><span class="p">[(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">side_planes</span><span class="p">)])</span>
+        <span class="n">points</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Point</span><span class="p">(</span><span class="n">p0</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">p0</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">p0</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="n">points</span>
+
+
+<span class="n">rib_center</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">rib_plane0</span> <span class="o">=</span> <span class="n">Plane</span><span class="p">(</span><span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">plate_thickness</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">Vector</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="n">rib_plane1</span> <span class="o">=</span> <span class="n">Plane</span><span class="p">(</span><span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">plate_thickness</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">Vector</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="c1"># # print(side_planes_for_beams)</span>
+
+<span class="n">points0</span> <span class="o">=</span> <span class="n">points_from_side_plane</span><span class="p">(</span><span class="n">rib_plane0</span><span class="p">,</span> <span class="n">side_planes_for_beams</span><span class="p">)</span>
+
+<span class="c1"># polygon0 = Polygon(points0)</span>
+<span class="n">mesh_rib0</span> <span class="o">=</span> <span class="n">EarcutCompas</span><span class="o">.</span><span class="n">triangulate_points</span><span class="p">(</span><span class="n">points0</span><span class="p">)</span>
+<span class="c1"># xform = Transformation.from_frame_to_frame(get_frame(polygon0), Frame.worldXY())</span>
+<span class="c1"># polygon0.transform(xform)</span>
+<span class="c1"># geometry.append(polygon0)</span>
+<span class="c1"># print(polygon0)</span>
+<span class="c1"># print(earclip_polygon(points0))</span>
+<span class="c1"># # points1 = points_from_side_plane(rib_plane0, side_planes_for_beams)</span>
+
+<span class="c1"># mesh_rib0 = Mesh.from_polygons([Polygon(points0)])</span>
+<span class="n">element</span> <span class="o">=</span> <span class="n">Element</span><span class="o">.</span><span class="n">from_simplex_and_complex</span><span class="p">(</span><span class="n">rib_center</span><span class="p">,</span> <span class="n">mesh_rib0</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+<span class="n">elements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+<span class="c1"># # print(points0)</span>
+
 
 <span class="c1"># ==========================================================================</span>
 <span class="c1"># NEST ELEMENTS</span>
@@ -315,7 +357,7 @@
 <span class="c1"># ==========================================================================</span>
 <span class="c1"># VIEWER</span>
 <span class="c1"># ==========================================================================</span>
-<span class="n">Viewer</span><span class="o">.</span><span class="n">show_elements</span><span class="p">(</span><span class="n">elements</span><span class="p">,</span> <span class="n">show_grid</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">measurements</span><span class="o">=</span><span class="n">measurements</span><span class="p">)</span>
+<span class="n">Viewer</span><span class="o">.</span><span class="n">show_elements</span><span class="p">(</span><span class="n">elements</span><span class="p">,</span> <span class="n">show_grid</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">measurements</span><span class="o">=</span><span class="n">measurements</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">geometry</span><span class="p">)</span>
 </code></pre></div>
 </div>
 </section>
