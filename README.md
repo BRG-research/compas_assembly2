@@ -8,6 +8,7 @@
 - [ ] Test and Viewer - Insertion vectors
 - [ ] Assembly.py - start drafting the assembly data-strcuture, by including the collide method that otput collision pairs, for simple implementation use 2xfor loop, once you find fast tree, you will be able to enhance (do not forget serialozation)
 - [ ] implmement other assemblies to check how well the data structure is currently been developed.
+- [ ] test_6_block_flat_arch_plates_boxes.py example shows clearly the need of grouping into boxes e.g. (0,0) (0,1) ..., there can be in a viewer selection by group depending on an index -> hierarchy 0, 1, 2 that shows the partitioning thing, there can be groups of boxes too.
 
 A data structure is needed to represent a model consisting of structural elements like blocks, beams, nodes, and plates, as well as fabrication elements for subtractive and additive processes. This data structure should also facilitate the computation and storage of adjacency and joinery information, as well as interfaces between these elements. Additionally, it should allow for the transfer of data between the model, structural simulation, and fabrication processes.
 
