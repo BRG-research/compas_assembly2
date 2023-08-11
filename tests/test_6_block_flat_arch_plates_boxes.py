@@ -564,12 +564,13 @@ for i in range(n - 1):
         mesh, center = mesh_box_from_eight_points(outline)
         return center, mesh
 
-    meshes = [create_plate(box, f=0)[1],
-              create_plate(box, f=2)[1],
-              create_plate(box, f=3)[1],
-              create_plate(box, f=4)[1],
-              create_plate(box, f=5)[1],
-              ]
+    meshes = [
+        create_plate(box, f=0)[1],
+        create_plate(box, f=2)[1],
+        create_plate(box, f=3)[1],
+        create_plate(box, f=4)[1],
+        create_plate(box, f=5)[1],
+    ]
     elements.append(Element.from_simplex_and_complex(center, meshes))
 
 
@@ -581,29 +582,6 @@ def points_from_side_plane(plane, side_planes):
     return points
 
 
-# first rib
-# rib_center = Point(0, -0.25, 0)
-# normal = Vector(0, 1, 0.25)
-# rib_plane0 = Plane(rib_center + normal * plate_thickness * -0.5, normal)
-# rib_plane1 = Plane(rib_center + normal * plate_thickness * 0.5, normal)
-# points0 = points_from_side_plane(rib_plane0, side_planes_for_beams)
-# points1 = points_from_side_plane(rib_plane1, side_planes_for_beams)
-# mesh_rib = _.Triagulator.from_loft_two_polygons(points0, points1)
-# element = Element.from_simplex_and_complex(rib_center, mesh_rib, i)
-# elements.append(element)
-
-# # second rib
-# rib_center = Point(0, 0.25, 0)
-# normal = Vector(0, 1, -0.25)
-# rib_plane0 = Plane(rib_center + normal * plate_thickness * -0.5, normal)
-# rib_plane1 = Plane(rib_center + normal * plate_thickness * 0.5, normal)
-# points0 = points_from_side_plane(rib_plane0, side_planes_for_beams)
-# points1 = points_from_side_plane(rib_plane1, side_planes_for_beams)
-# mesh_rib = _.Triagulator.from_loft_two_polygons(points0, points1)
-# element = Element.from_simplex_and_complex(rib_center, mesh_rib, i)
-# elements.append(element)
-
-
 # ==========================================================================
 # NEST ELEMENTS
 # ==========================================================================
@@ -612,6 +590,6 @@ FabricationNest.pack_elements(elements=elements, nest_type=3, inflate=0.1, heigh
 # ==========================================================================
 # VIEWER
 # ==========================================================================
-color_red = [3]*len(elements)
+color_red = [3] * len(elements)
 color_red[0] = 0
 Viewer.show_elements(elements, show_grid=True, measurements=measurements, geometry=geometry, color_red=color_red)
