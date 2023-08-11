@@ -279,12 +279,14 @@ class _:
             frame = Frame(center, x_axis, y_axis)
 
             # orient the from the orientation point to the opposite direction
+            reversed = False
             if _orientation_point is not None:
                 signed_distance = distance_point_plane_signed(_orientation_point, Plane.from_frame(frame))
                 if signed_distance > 0.001:
                     frame = Frame(frame.point, -x_axis, y_axis)
+                    reversed = True
             # output
-            return frame
+            return frame, reversed
 
         @staticmethod
         def from_box_corners():
@@ -293,38 +295,59 @@ class _:
         @staticmethod
         def from_points(points):
             polygon = Polygon(points=points)
-            xform = Transformation.from_frame_to_frame(_.Triagulator._get_frame(points), Frame.worldXY())
+            frame = _.Triagulator._get_frame(points)
+            xform, reversed = Transformation.from_frame_to_frame(frame, Frame.worldXY())
             polygon.transform(xform)
             ear_cut = _.Earcut(polygon.points)
             ear_cut.triangulate()
-            polygon.transform(xform.inverse())
+
             return compas.datastructures.Mesh.from_vertices_and_faces(polygon.points, ear_cut.triangles)
 
         @staticmethod
-        def from_loft_two_polygons(points0, points1):
-            n = len(points0)
+        def from_loft_two_polygons(_points0, _points1):
+            n = len(_points0)
 
-            is_closed = distance_point_point(Point(*points0[0]), Point(*points0[-1])) < 0.01
+            is_closed = distance_point_point(Point(*_points0[0]), Point(*_points0[-1])) < 0.01
             sign = 1 if is_closed else 0
             n = n - sign
 
             # create a polygon from the first set of points
             # orient to worldXY
             # triangulate
+
+            # points0.reverse()
+            frame, reversed = _.Triagulator._get_frame(_points0, _points1[0])
+            points0 = list(_points0)
+            points1 = list(_points1)
+            xform = Transformation.from_frame_to_frame(frame, Frame.worldXY())
+            if reversed:
+                points0.reverse()
+                points1.reverse()
             polygon = Polygon(points=points0)
-            xform = Transformation.from_frame_to_frame(_.Triagulator._get_frame(points0, points1[0]), Frame.worldXY())
             polygon.transform(xform)
             ear_cut = _.Earcut(polygon.points)
             ear_cut.triangulate()
+            polygon.transform(xform.inverse())
             triangles = ear_cut.triangles
 
             # create mesh loft
             vertices = points0[:n] + points1[0:n]
-            faces = triangles.copy()
+            faces = []
 
             # top and bottom faces
-            for triangle in triangles:
-                faces.append([triangle[2] + n, triangle[1] + n, triangle[0] + n])
+            triangles = ear_cut.triangles
+            if reversed:
+                for triangle in triangles:
+                    faces.append([triangle[0] + n, triangle[1] + n, triangle[2] + n])
+
+                for triangle in triangles:
+                    faces.append([triangle[2], triangle[1], triangle[0]])
+            else:
+                for triangle in triangles:
+                    faces.append([triangle[0], triangle[1], triangle[2]])
+
+                for triangle in triangles:
+                    faces.append([triangle[2] + n, triangle[1] + n, triangle[0] + n])
 
             # side faces
             for i in range(n):
@@ -619,20 +642,20 @@ for i, group in enumerate(planes_groups):
 
     _plane_polygon = Plane([0, 0, 0], [0, 1, 0])
     _points0 = _.MyScribble.points_from_side_plane(_plane_polygon, _side_planes, 0.5)  # add offset
-    print(_points0)
+    # print(_points0)
     _points1 = _.MyScribble.points_from_side_plane(_plane_polygon, _side_planes, 0.5 - plate_thickness)  # add offset
     mesh = _.Triagulator.from_loft_two_polygons(_points0, _points1)
     center = mesh.centroid()
-    # elements.append(Element.from_simplex_and_complex(center, [mesh]))
-    print(_.Triagulator.from_points(_points0))
-    geometry.append(_.Triagulator.from_points(_points0))
-    geometry.append(_.Triagulator.from_points(_points1))
+    elements.append(Element.from_simplex_and_complex(center, [mesh]))
+    # print(_.Triagulator.from_points(_points0))
+    # geometry.append(_.Triagulator.from_points(_points0))
+    # geometry.append(_.Triagulator.from_points(_points1))
     # geometry.append(_.Triagulator.from_loft_two_polygons(_points0, _points1))
     # geometry.append(Polygon(_points0))
     # geometry.append(Polygon(_points1))
 
 
-# for i in range(len(planes_dual) - 2):
+# for i in             print(triangles)            print(triangles)range(len(planes_dual) - 2):
 #     side_planes_for_ribs = []
 #     if i == 0:
 #         side_planes_for_ribs = [
