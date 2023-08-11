@@ -278,7 +278,9 @@
 <span class="c1"># ==========================================================================</span>
 <span class="c1"># VIEWER</span>
 <span class="c1"># ==========================================================================</span>
-<span class="n">Viewer</span><span class="o">.</span><span class="n">show_elements</span><span class="p">(</span><span class="n">elements</span><span class="p">,</span> <span class="n">show_grid</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">measurements</span><span class="o">=</span><span class="n">measurements</span><span class="p">)</span>
+<span class="n">color_red</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">elements</span><span class="p">)</span>
+<span class="n">color_red</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">Viewer</span><span class="o">.</span><span class="n">show_elements</span><span class="p">(</span><span class="n">elements</span><span class="p">,</span> <span class="n">show_grid</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">measurements</span><span class="o">=</span><span class="n">measurements</span><span class="p">,</span> <span class="n">color_red</span><span class="o">=</span><span class="n">color_red</span><span class="p">)</span>
 </code></pre></div>
 </div>
 </section>
