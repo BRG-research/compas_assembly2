@@ -572,7 +572,7 @@ for i in range(n - 1):
         return center, mesh
 
     meshes = [create_plate(box, f=0)[1]]
-    elements.append(Element.from_simplex_and_complex(center, meshes))
+    elements.append(Element.from_simplex_and_complex(meshes[0].centroid(), meshes))
 
 
 def points_from_side_plane(plane, side_planes):
@@ -638,38 +638,18 @@ for i in range(len(planes_dual) - 2):
             planes_dual[i + 2],
         ]
 
-    rib_center = Point(0, (0 + 0.1 * (i % 2) - 0.05)*0, 0.5)
-    normal = Vector(0, 1, 0.1 * (i % 2) - 0.05)
+    rib_center = Point(0, (0 + 0.1 * (i % 2) - 0.05) * 0.0, 0.5)
+    normal = Vector(
+        0,
+        1,
+    )
     rib_plane0 = Plane(rib_center + normal * plate_thickness * -0.5, normal)
     rib_plane1 = Plane(rib_center + normal * plate_thickness * 0.5, normal)
     points0 = points_from_side_plane(rib_plane0, side_planes_for_ribs)
     points1 = points_from_side_plane(rib_plane1, side_planes_for_ribs)
     mesh_rib = _.Triagulator.from_loft_two_polygons(points0, points1)
-    element = Element.from_simplex_and_complex(rib_center, mesh_rib, i)
+    element = Element.from_simplex_and_complex(mesh_rib.centroid(), mesh_rib, i)
     elements.append(element)
-
-# first rib
-# rib_center = Point(0, 0, 0.5)
-# normal = Vector(0, 1, 0)
-# rib_plane0 = Plane(rib_center + normal * plate_thickness * -0.5, normal)
-# rib_plane1 = Plane(rib_center + normal * plate_thickness * 0.5, normal)
-# points0 = points_from_side_plane(rib_plane0, side_planes_for_beams)
-# points1 = points_from_side_plane(rib_plane1, side_planes_for_beams)
-# mesh_rib = _.Triagulator.from_loft_two_polygons(points0, points1)
-# element = Element.from_simplex_and_complex(rib_center, mesh_rib, i)
-# elements.append(element)
-
-# # second rib
-# rib_center = Point(0, 0.25, 0)
-# normal = Vector(0, 1, -0.25)
-# rib_plane0 = Plane(rib_center + normal * plate_thickness * -0.5, normal)
-# rib_plane1 = Plane(rib_center + normal * plate_thickness * 0.5, normal)
-# points0 = points_from_side_plane(rib_plane0, side_planes_for_beams)
-# points1 = points_from_side_plane(rib_plane1, side_planes_for_beams)
-# mesh_rib = _.Triagulator.from_loft_two_polygons(points0, points1)
-# element = Element.from_simplex_and_complex(rib_center, mesh_rib, i)
-# elements.append(element)
-
 
 # ==========================================================================
 # NEST ELEMENTS
@@ -679,4 +659,7 @@ FabricationNest.pack_elements(elements=elements, nest_type=3, inflate=0.1, heigh
 # ==========================================================================
 # VIEWER
 # ==========================================================================
-Viewer.show_elements(elements, show_grid=True, measurements=measurements, geometry=geometry)
+color_red = [3] * len(elements)
+color_red[0] = 0
+color_red[10] = 0
+Viewer.show_elements(elements, show_grid=True, measurements=measurements, geometry=geometry, color_red=color_red)

@@ -587,7 +587,7 @@ rib_plane1 = Plane(rib_center + normal * plate_thickness * 0.5, normal)
 points0 = points_from_side_plane(rib_plane0, side_planes_for_beams)
 points1 = points_from_side_plane(rib_plane1, side_planes_for_beams)
 mesh_rib = _.Triagulator.from_loft_two_polygons(points0, points1)
-element = Element.from_simplex_and_complex(rib_center, mesh_rib, i)
+element = Element.from_simplex_and_complex(mesh_rib.centroid(), mesh_rib, i)
 elements.append(element)
 
 # second rib
@@ -598,7 +598,7 @@ rib_plane1 = Plane(rib_center + normal * plate_thickness * 0.5, normal)
 points0 = points_from_side_plane(rib_plane0, side_planes_for_beams)
 points1 = points_from_side_plane(rib_plane1, side_planes_for_beams)
 mesh_rib = _.Triagulator.from_loft_two_polygons(points0, points1)
-element = Element.from_simplex_and_complex(rib_center, mesh_rib, i)
+element = Element.from_simplex_and_complex(mesh_rib.centroid(), mesh_rib, i)
 elements.append(element)
 
 
@@ -610,4 +610,7 @@ FabricationNest.pack_elements(elements=elements, nest_type=3, inflate=0.1, heigh
 # ==========================================================================
 # VIEWER
 # ==========================================================================
-Viewer.show_elements(elements, show_grid=True, measurements=measurements, geometry=geometry)
+color_red = [3] * len(elements)
+color_red[0] = 0
+color_red[10] = 0
+Viewer.show_elements(elements, show_grid=True, measurements=measurements, geometry=geometry, color_red=color_red)

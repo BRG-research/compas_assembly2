@@ -694,6 +694,11 @@ class Viewer:
                     # update the viewer after all the matrices are changed
                     viewer.view.update()
 
+                @viewer.slider(title="opacity", maxval=100, step=1, bgcolor=Color.white(), value=95)
+                def slider_opacity(t):
+                    for o in viewer_objects["viewer_complexes"]:
+                        o.opacity = t / 100.0
+
                 # --------------------------------------------------------------------------
                 # run
                 # --------------------------------------------------------------------------

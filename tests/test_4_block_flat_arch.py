@@ -183,4 +183,6 @@ FabricationNest.pack_elements(elements=elements, nest_type=2, inflate=0.1, heigh
 # ==========================================================================
 # VIEWER
 # ==========================================================================
-Viewer.show_elements(elements, show_grid=True, measurements=measurements)
+color_red = [3] * len(elements)
+color_red[0] = 0
+Viewer.show_elements(elements, show_grid=True, measurements=measurements, color_red=color_red)
