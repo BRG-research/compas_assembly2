@@ -96,6 +96,7 @@
 <div class="language-python notranslate"><div class="highlight"><pre><button class="btn copy"><i class="far fa-copy"></i></button><code><span></span><span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">radians</span>
 <span class="kn">from</span> <span class="nn">compas.geometry</span> <span class="kn">import</span> <span class="n">Point</span><span class="p">,</span> <span class="n">Box</span><span class="p">,</span> <span class="n">Translation</span><span class="p">,</span> <span class="n">Rotation</span><span class="p">,</span> <span class="n">Frame</span>
 <span class="kn">from</span> <span class="nn">compas_assembly2</span> <span class="kn">import</span> <span class="n">Element</span><span class="p">,</span> <span class="n">ELEMENT_NAME</span><span class="p">,</span> <span class="n">Viewer</span><span class="p">,</span> <span class="n">FabricationNest</span>
+<span class="kn">from</span> <span class="nn">compas_assembly2.collisions.kdtree</span> <span class="kn">import</span> <span class="n">KDTree</span>
 <span class="kn">import</span> <span class="nn">random</span>
 
 <span class="c1"># ==========================================================================</span>
@@ -155,6 +156,39 @@
 
 <span class="c1"># print(&quot;Collision pairs:&quot;, collision_pairs)</span>
 <span class="c1"># print(&quot;Element collisions:&quot;, element_collisions)</span>
+<span class="c1"># ==========================================================================</span>
+<span class="c1"># KDTREE https://github.com/tjkemper/knn</span>
+<span class="c1"># knn - number of closest point</span>
+<span class="c1"># kdn - closest points by distance</span>
+<span class="c1"># kdn_bounding_box - closest bounding boxes given a distance</span>
+<span class="c1"># check the closest distance between min and max</span>
+<span class="c1"># ==========================================================================</span>
+<span class="n">list3d_2</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="p">[</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+    <span class="p">[</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span>
+    <span class="p">[</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">],</span>
+    <span class="p">[</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+    <span class="p">[</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">],</span>
+    <span class="p">[</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+    <span class="p">[</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">],</span>
+<span class="p">]</span>
+
+<span class="n">num_dims</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">tree</span> <span class="o">=</span> <span class="n">KDTree</span><span class="p">(</span><span class="n">list3d_2</span><span class="p">,</span> <span class="n">num_dims</span><span class="p">)</span>
+<span class="n">k</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">kdn</span><span class="p">([</span><span class="mi">7</span><span class="p">,</span> <span class="o">-</span><span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">],</span> <span class="mf">0.1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+<span class="c1"># print(result[0][0])</span>
+<span class="c1"># tree.visualize(visual_type=VisualType.graphical)</span>
+<span class="c1"># tree.visualize_knn(point, result)</span>
 
 <span class="c1"># ==========================================================================</span>
 <span class="c1"># VIEWER</span>
