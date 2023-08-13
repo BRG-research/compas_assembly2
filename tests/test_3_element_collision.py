@@ -1,6 +1,7 @@
 from math import radians
 from compas.geometry import Point, Box, Translation, Rotation, Frame
 from compas_assembly2 import Element, ELEMENT_NAME, Viewer, FabricationNest
+from compas_assembly2.collisions.kdtree import KDTree
 import random
 
 # ==========================================================================
@@ -60,6 +61,39 @@ for i in range(len(elements)):
 
 # print("Collision pairs:", collision_pairs)
 # print("Element collisions:", element_collisions)
+# ==========================================================================
+# KDTREE https://github.com/tjkemper/knn
+# knn - number of closest point
+# kdn - closest points by distance
+# kdn_bounding_box - closest bounding boxes given a distance
+# check the closest distance between min and max
+# ==========================================================================
+list3d_2 = [
+    [0, 0, 0],
+    [5, 1, 0],
+    [-5, 2, 0],
+    [5, 5, 1],
+    [5, -5, 2],
+    [-5, -5, 3],
+    [-5, 5, 4],
+    [5, 5, 5],
+    [5, 5, -5],
+    [5, -5, 5],
+    [5, -5, -5],
+    [-5, 5, 5],
+    [-5, 5, -5],
+    [-5, -5, 5],
+    [-5, -5, -5],
+]
+
+num_dims = 3
+tree = KDTree(list3d_2, num_dims)
+k = 2
+result = tree.kdn([7, -7, 7], 0.1)
+print(result)
+# print(result[0][0])
+# tree.visualize(visual_type=VisualType.graphical)
+# tree.visualize_knn(point, result)
 
 # ==========================================================================
 # VIEWER

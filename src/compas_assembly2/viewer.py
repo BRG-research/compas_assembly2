@@ -550,7 +550,7 @@ class Viewer:
                         is_visible=True,
                         show_points=True,
                         show_lines=True,
-                        show_faces=False,
+                        show_faces=True,
                         pointcolor=Color(0, 0, 0),
                         linecolor=Color(0, 0, 0),
                         facecolor=Color(0.85, 0.85, 0.85),
