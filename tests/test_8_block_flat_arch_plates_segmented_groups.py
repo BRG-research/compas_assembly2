@@ -642,7 +642,6 @@ for i, group in enumerate(planes_groups):
 
     _plane_polygon = Plane([0, 0, 0], [0, 1, 0])
     _points0 = _.MyScribble.points_from_side_plane(_plane_polygon, _side_planes, 0.5)  # add offset
-    # print(_points0)
     _points1 = _.MyScribble.points_from_side_plane(_plane_polygon, _side_planes, 0.5 - plate_thickness)  # add offset
     mesh = _.Triagulator.from_loft_two_polygons(_points0, _points1)
     center = mesh.centroid()

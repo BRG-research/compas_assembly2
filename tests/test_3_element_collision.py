@@ -46,6 +46,7 @@ FabricationNest.pack_elements(elements=elements, nest_type=2, inflate=0.0, heigh
 
 # ==========================================================================
 # CHECK COLLISION
+# Compile my own RTree from C++ and run it via CTypes to be compatible with ironpython
 # BVH https://github.com/lyd405121/ti-bvh
 # KDTREE https://github.com/tjkemper/knn
 # KDTREE NUMPY https://github.com/paradoxysm/kdtrees/issues/12
