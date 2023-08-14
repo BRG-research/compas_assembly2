@@ -1,4 +1,3 @@
-import enum
 import math
 
 
@@ -23,11 +22,6 @@ class Node:
         else:
             string += "\t" * (level + 1) + "None" + "\n"
         return string
-
-
-class VisualType(enum.Enum):
-    textual = 1
-    graphical = 2
 
 
 # https://en.wikipedia.org/wiki/K-d_tree
@@ -194,6 +188,42 @@ class KDTree:
         # Check if the current node's data is within the bounding box
         in_bounding_box = all(lower_corner[i] <= curr_node.data[i] <= upper_corner[i] for i in range(self.num_dims))
         if in_bounding_box:
+            closest_points.append(curr_node.data)
+
+    def kdn_bounding_box_with_additional_check(self, lower_corner, upper_corner, additional_check=None):
+        # # Example additional check function based on node.id
+        # def custom_check(id):
+        #     # Perform your custom check logic using the provided id
+        #     return id % 2 == 0  # For example, add nodes with even IDs
+
+        closest_points = []
+        self._kdn_bounding_box_helper(self.root, lower_corner, upper_corner, closest_points, additional_check)
+        return closest_points
+
+    def _kdn_bounding_box_helper_with_additional_check(
+        self, curr_node, lower_corner, upper_corner, closest_points, additional_check=None
+    ):
+        if not curr_node:
+            return
+
+        axis = curr_node.axis
+        node_value = curr_node.data[axis]
+
+        # Determine whether to explore the left or right subtree based on the current node's axis value
+        if lower_corner[axis] <= node_value <= upper_corner[axis]:
+            # Recurse into both subtrees if the splitting plane is within the bounding box
+            self._kdn_bounding_box_helper(curr_node.left, lower_corner, upper_corner, closest_points, additional_check)
+            self._kdn_bounding_box_helper(curr_node.right, lower_corner, upper_corner, closest_points, additional_check)
+        elif node_value < lower_corner[axis]:
+            # Recurse into the right subtree if the splitting plane is to the left of the bounding box
+            self._kdn_bounding_box_helper(curr_node.right, lower_corner, upper_corner, closest_points, additional_check)
+        else:
+            # Recurse into the left subtree if the splitting plane is to the right of the bounding box
+            self._kdn_bounding_box_helper(curr_node.left, lower_corner, upper_corner, closest_points, additional_check)
+
+        # Check if the current node's data is within the bounding box and satisfies the additional check
+        in_bounding_box = all(lower_corner[i] <= curr_node.data[i] <= upper_corner[i] for i in range(self.num_dims))
+        if in_bounding_box and (additional_check is None or additional_check(curr_node.id)):
             closest_points.append(curr_node.data)
 
 

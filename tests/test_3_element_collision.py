@@ -1,8 +1,10 @@
 from math import radians
 from compas.geometry import Point, Box, Translation, Rotation, Frame
 from compas_assembly2 import Element, ELEMENT_NAME, Viewer, FabricationNest
-from compas_assembly2.collisions.kdtree import KDTree
+
+# from compas_assembly2.collisions.kdtree import KDTree
 import random
+import time
 
 # ==========================================================================
 # INIT ELEMENT
@@ -50,6 +52,7 @@ FabricationNest.pack_elements(elements=elements, nest_type=2, inflate=0.0, heigh
 # KDTREE SCIPY https://github.com/hamaskhan/3D-Nearest-Neighbor-Search-KD-Tree/blob/main/main.py
 # KDTREE PLANNER NUMPY https://github.com/Pradeep-Gopal/RRT_3D_python_KDtree
 # ==========================================================================
+start_time = time.time()
 collision_pairs = []
 element_collisions = [2] * len(elements)
 for i in range(len(elements)):
@@ -58,42 +61,9 @@ for i in range(len(elements)):
             collision_pairs.append([i, j])
             element_collisions[i] = 0
             element_collisions[j] = 0
-
-# print("Collision pairs:", collision_pairs)
-# print("Element collisions:", element_collisions)
-# ==========================================================================
-# KDTREE https://github.com/tjkemper/knn
-# knn - number of closest point
-# kdn - closest points by distance
-# kdn_bounding_box - closest bounding boxes given a distance
-# check the closest distance between min and max
-# ==========================================================================
-list3d_2 = [
-    [0, 0, 0],
-    [5, 1, 0],
-    [-5, 2, 0],
-    [5, 5, 1],
-    [5, -5, 2],
-    [-5, -5, 3],
-    [-5, 5, 4],
-    [5, 5, 5],
-    [5, 5, -5],
-    [5, -5, 5],
-    [5, -5, -5],
-    [-5, 5, 5],
-    [-5, 5, -5],
-    [-5, -5, 5],
-    [-5, -5, -5],
-]
-
-num_dims = 3
-tree = KDTree(list3d_2, num_dims)
-k = 2
-result = tree.kdn([7, -7, 7], 0.1)
-print(result)
-# print(result[0][0])
-# tree.visualize(visual_type=VisualType.graphical)
-# tree.visualize_knn(point, result)
+end_time = time.time()
+execution_time = end_time - start_time
+print(f"Execution time: {execution_time:.6f} seconds")
 
 # ==========================================================================
 # VIEWER
