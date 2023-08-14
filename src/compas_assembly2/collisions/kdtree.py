@@ -64,7 +64,7 @@ class KDTree:
         node.data = split_point.xyz
         node.id = split_point.id
         node.left = self._build(point_sorted_list[:split_index], depth + 1, node)
-        node.right = self._build(point_sorted_list[split_index + 1 :], depth + 1, node) # noqa
+        node.right = self._build(point_sorted_list[split_index + 1 :], depth + 1, node)  # noqa
         node.parent = parent
         node.axis = axis
         node.depth = depth
