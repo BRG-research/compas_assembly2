@@ -158,12 +158,18 @@ class Viewer:
                 }
 
                 faces_colors = color_red if len(color_red) == len(elements) else [3] * len(elements)
+                
 
                 for counter, element in enumerate(elements):
                     # --------------------------------------------------------------------------
                     # add text - indices
                     # --------------------------------------------------------------------------
                     element_id = element.guid
+                    custom_kwargs = {
+                        'element_id': str(element.id),
+                        # Add more custom kwargs as needed
+                    }
+
 
                     text = Text(
                         ",".join(map(str, element.id)),
@@ -542,7 +548,6 @@ class Viewer:
                 # geometry to temporary visualize during the develipment
                 # --------------------------------------------------------------------------
                 for i in range(len(geometry)):
-
                     o = viewer.add(
                         data=geometry[i],
                         name="geometry",
@@ -698,6 +703,15 @@ class Viewer:
                 def slider_opacity(t):
                     for o in viewer_objects["viewer_complexes"]:
                         o.opacity = t / 100.0
+
+                @viewer.slider(title="insertion", maxval=len(elements) * 1, step=1, bgcolor=Color.white(), value=0)
+                def slider_insertion(t):
+                    for id, o in enumerate(viewer_objects["viewer_complexes"]):
+                        print(o.name)
+                        if id > t:
+                            o.opacity = 0
+                        else:
+                            o.opacity = 1
 
                 # --------------------------------------------------------------------------
                 # run

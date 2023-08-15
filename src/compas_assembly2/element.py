@@ -801,7 +801,7 @@ class Element(Data):
         )
 
     @staticmethod
-    def from_plate_points(points0, points1):
+    def from_plate_points(points0, points1, id=0):
         """method create a plate element at the origin point with the frame at worldXY"""
 
         # --------------------------------------------------------------------------
@@ -817,21 +817,21 @@ class Element(Data):
         # --------------------------------------------------------------------------
         # create mesh by lofting two outlines
         # --------------------------------------------------------------------------
-        mesh = _.Triagulator.from_loft_two_point_lists(points0_copy, points1_copy)
+        mesh, frame = _.Triagulator.from_loft_two_point_lists(points0_copy, points1_copy)
 
         # --------------------------------------------------------------------------
         # return the element
         # --------------------------------------------------------------------------
         return Element(
             name=compas_assembly2.ELEMENT_NAME.PLATE,
-            id=0,
-            frame=Frame.worldXY,
+            id=id,
+            frame=frame,
             simplex=[Polyline(points0_copy), Polyline(points1_copy)],
             complex=mesh,
         )
 
     @staticmethod
-    def from_plate_planes(base_plane, side_planes, thickness):
+    def from_plate_planes(base_plane, side_planes, thickness, id=0):
         """method create a plate element at the origin point with the frame at worldXY"""
 
         # --------------------------------------------------------------------------
@@ -843,15 +843,15 @@ class Element(Data):
         # --------------------------------------------------------------------------
         # create mesh by lofting two outlines
         # --------------------------------------------------------------------------
-        mesh = _.Triagulator.from_loft_two_point_lists(points0, points1)
+        mesh, frame = _.Triagulator.from_loft_two_point_lists(points0, points1)
 
         # --------------------------------------------------------------------------
         # return the element
         # --------------------------------------------------------------------------
         return Element(
             name=compas_assembly2.ELEMENT_NAME.PLATE,
-            id=0,
-            frame=Frame.worldXY,
+            id=id,
+            frame=frame,
             simplex=[Polyline(points0), Polyline(points1)],
             complex=mesh,
         )
@@ -867,28 +867,30 @@ class Element(Data):
         Returns:
             str: The string representation of the Element.
         """
-        return """
-# (Type: {0},
-#  ID: {1},
-#  Minimal Representation Geometries: {2},
-#  Vizualization Geometries: {3},
-#  Local Frame: {4},
-#  Global Frame: {5},
-#  Outlines: {6},
-#  Fabrication: {7},
-#  Structure: {8},
-#  Attributes: {9})""".format(
-            self.name,
-            self.id,
-            self.simplex,
-            self.complex,
-            self.frame,
-            self.frame_global,
-            self.outlines,
-            self.fabrication,
-            self.structure,
-            self.attributes,
-        )
+        return """(Type: {0}, #  ID: {1})""".format(self.name, self.id)
+
+
+# # (Type: {0},
+# #  ID: {1},
+# #  Minimal Representation Geometries: {2},
+# #  Vizualization Geometries: {3},
+# #  Local Frame: {4},
+# #  Global Frame: {5},
+# #  Outlines: {6},
+# #  Fabrication: {7},
+# #  Structure: {8},
+# #  Attributes: {9})""".format(
+#             self.name,
+#             self.id,
+#             self.simplex,
+#             self.complex,
+#             self.frame,
+#             self.frame_global,
+#             self.outlines,
+#             self.fabrication,
+#             self.structure,
+#             self.attributes,
+#         )
 
 
 class _:
@@ -1242,7 +1244,7 @@ class _:
             # check cycles
             mesh = Mesh.from_vertices_and_faces(vertices, faces)
             # print(mesh.face_neighbors(1))
-            return mesh
+            return mesh, frame
 
         @staticmethod
         def mesh_box_from_eight_points(vertices):

@@ -1,4 +1,4 @@
-from compas_assembly2 import Viewer, Element, FabricationNest
+from compas_assembly2 import Viewer, Element, FabricationNest, Group
 from compas.datastructures import Mesh
 import compas
 from compas.geometry import (
@@ -519,8 +519,10 @@ class _:
 # ==========================================================================
 
 # Create the arc curve points
-# arc_points = create_arc_curve(center, radius, start_angle, end_angle, num_points)
+# arc_poi,nts = create_arc_curve(center, radius, start_angle, end_angle, num_points)
 n = 11
+n = max(5, n - (n % 2) + 1)
+
 length = 3.0
 height = 0.5
 offset = 0.5
@@ -548,7 +550,7 @@ measurements.append(line)
 # ==========================================================================
 
 plate_thickness = 0.04
-elements = []
+group = Group()
 side_planes_for_beams = [
     Plane(Point(0, 0, height - plate_thickness), Vector(0, 0, 1)),
     Plane(Point(-length, 0, 0), Vector(-1, 0, 0)),
@@ -557,6 +559,7 @@ side_planes_for_beams = [
 side_planes_for_ribs_sequentialy = []
 planes_bot = []
 planes_side = []
+
 
 boxes = []
 
@@ -595,7 +598,11 @@ plane_top = Plane(Point(0, 0, height), Vector(0, 0, 1))
 # ==========================================================================
 # GET BOTTOM PLATES --.--.--.--.--
 # ==========================================================================
-planes_groups = [[0, 1], [2, 3], [4, 5], [6, 7], [8, 9]]
+planes_groups = []
+for i in range(0, n - 1, 2):
+    planes_groups.append([i, i + 1])
+print(planes_groups)
+
 for i in range(len(planes_groups)):
     bottom_plate_planes = [
         Plane(Point(*boxes[planes_groups[i][0]].face_centroid(5)), -Vector(*boxes[planes_groups[i][0]].face_normal(5))),
@@ -612,13 +619,20 @@ for i in range(len(planes_groups)):
         (Point(*boxes[planes_groups[i][0]].face_normal(0)) + Point(*boxes[planes_groups[i][-1]].face_normal(0))) * 0.5,
     )
 
-    elements.append(Element.from_plate_planes(bottom_plate_base_plane, bottom_plate_planes, -plate_thickness))
+    group.add(Element.from_plate_planes(bottom_plate_base_plane, bottom_plate_planes, -plate_thickness, [0, i]))
 
 
 # ==========================================================================
 # GET TOP PLATES -.--.--.--.--.-
 # ==========================================================================
 planes_groups = [[0], [1, 2], [3, 4], [5, 6], [7, 8], [9]]
+
+planes_groups = [[0]]
+for i in range(1, n - 3, 2):
+    planes_groups.append([i, i + 1])
+planes_groups.append([n - 2])
+print(planes_groups)
+
 for i in range(len(planes_groups)):
     top_plate_planes = [
         Plane(Point(*boxes[planes_groups[i][0]].face_centroid(5)), -Vector(*boxes[planes_groups[i][0]].face_normal(5))),
@@ -631,7 +645,7 @@ for i in range(len(planes_groups)):
 
     top_plate_base_plane = Plane(Point(0, 0, height), Vector(0, 0, 1))
 
-    elements.append(Element.from_plate_planes(top_plate_base_plane, top_plate_planes, plate_thickness))
+    group.add(Element.from_plate_planes(top_plate_base_plane, top_plate_planes, plate_thickness, [1, i]))
 
 # ==========================================================================
 # XREATE WEB PLATES ALTERNATING IN U and V directions
@@ -642,6 +656,12 @@ for i in range(len(planes_groups)):
 # WEB PLATES0
 # ==========================================================================
 planes_groups = [[0, 1], [2, 3], [4, 5], [6, 7], [8, 9]]
+planes_groups = []
+for i in range(0, n - 1, 2):
+    planes_groups.append([i, i + 1])
+print(planes_groups)
+
+
 for i in range(len(planes_groups)):
     bottom_plate_planes = [
         Plane(
@@ -658,8 +678,10 @@ for i in range(len(planes_groups)):
     ]
 
     web_base_plane = Plane(Point(0, 0.25, 0), Vector(0, 1, 0))
-    elements.append(Element.from_plate_planes(web_base_plane, bottom_plate_planes, -plate_thickness))
-    elements.append(Element.from_plate_planes(web_base_plane.offset(-0.5), bottom_plate_planes, -plate_thickness))
+    group.add(Element.from_plate_planes(web_base_plane, bottom_plate_planes, -plate_thickness, [0, i]))
+    group.add(
+        Element.from_plate_planes(web_base_plane.offset(-0.5), bottom_plate_planes, -plate_thickness, [0, i])
+    )
 
 # ==========================================================================
 # WEB PLATES1
@@ -667,6 +689,24 @@ for i in range(len(planes_groups)):
 centroid_groups = [[0], [1, 2], [3, 4], [5, 6], [7, 8], [9]]
 planes_groups0 = [[0, 1], [0, 1], [2, 3], [4, 5], [6, 7], [8, 9]]
 planes_groups1 = [[0, 1], [2, 3], [4, 5], [6, 7], [8, 9], [8, 9]]
+
+centroid_groups = [[0]]
+for i in range(1, n - 3, 2):
+    centroid_groups.append([i, i + 1])
+centroid_groups.append([n - 2])
+
+planes_groups0 = [[0, 1]]
+for i in range(0, n - 1, 2):
+    planes_groups0.append([i, i + 1])
+print(planes_groups0)
+
+planes_groups1 = []
+for i in range(0, n - 1, 2):
+    planes_groups1.append([i, i + 1])
+planes_groups1.append([(n - 3), (n - 2)])
+print(planes_groups1)
+inclined_webs = True
+
 for i in range(len(planes_groups0)):
     p0 = Point(*boxes[centroid_groups[i][0]].face_centroid(5))
     p1 = Point(*boxes[centroid_groups[i][-1]].face_centroid(3))
@@ -675,7 +715,7 @@ for i in range(len(planes_groups0)):
         interpolated_x = p0[0] + t * (p1[0] - p0[0])
         interpolated_y = p0[1] + t * (p1[1] - p0[1])
         interpolated_z = p0[2] + t * (p1[2] - p0[2])
-        interpolated_point = (interpolated_x, interpolated_y, interpolated_z)
+        interpolated_point = Point(interpolated_x, interpolated_y, interpolated_z)
         return interpolated_point
 
     p_web0 = Plane(linear_interpolation(p0, p1, 0.25), Vector(1, 0, 0))
@@ -688,7 +728,7 @@ for i in range(len(planes_groups0)):
                 + Point(*boxes[planes_groups0[i][-1]].face_centroid(0))
             )
             * 0.5,
-            (Point(*boxes[planes_groups0[i][0]].face_normal(0)) + Point(*boxes[planes_groups0[i][-1]].face_normal(0)))
+            (Vector(*boxes[planes_groups0[i][0]].face_normal(0)) + Vector(*boxes[planes_groups0[i][-1]].face_normal(0)))
             * 0.5,
         ),
         Plane(Point(0, -offset, 0), Vector(0, -1, 0)),
@@ -696,9 +736,23 @@ for i in range(len(planes_groups0)):
         Plane(Point(0, offset, 0), Vector(0, 1, 0)),
     ]
 
-    top_plate_base_plane = Plane(Point(0, 0, height), Vector(0, 0, 1))
+    p_web0 = (
+        Plane(linear_interpolation(p0, p1, 0.25), Vector(1, 0, 0))
+        if not inclined_webs
+        else Plane(
+            linear_interpolation(p0, p1, 0.25),
+            cross_vectors(
+                Vector(0, 1, 0),
+                (Vector(*boxes[planes_groups0[i][-1]].face_normal(0))) * 0.5,
+            ),
+        )
+    )
 
-    elements.append(Element.from_plate_planes(p_web0, top_plate_planes, plate_thickness))
+    p_web1 = Plane(linear_interpolation(p0, p1, 0.75), p_web0.normal)
+
+    print(top_plate_base_plane)
+
+    group.add(Element.from_plate_planes(p_web0, top_plate_planes, plate_thickness, [1, i]))
 
     top_plate_planes = [
         Plane(
@@ -707,26 +761,33 @@ for i in range(len(planes_groups0)):
                 + Point(*boxes[planes_groups1[i][-1]].face_centroid(0))
             )
             * 0.5,
-            (Point(*boxes[planes_groups1[i][0]].face_normal(0)) + Point(*boxes[planes_groups1[i][-1]].face_normal(0)))
+            (Vector(*boxes[planes_groups1[i][0]].face_normal(0)) + Vector(*boxes[planes_groups1[i][-1]].face_normal(0)))
             * 0.5,
         ),
         Plane(Point(0, -offset, 0), Vector(0, -1, 0)),
         Plane(Point(0, 0, height), Vector(0, 0, 1)),
         Plane(Point(0, offset, 0), Vector(0, 1, 0)),
     ]
-    elements.append(Element.from_plate_planes(p_web1, top_plate_planes, plate_thickness))
+
+    group.add(Element.from_plate_planes(p_web1, top_plate_planes, -plate_thickness, [1, i]))
 
 
 # ==========================================================================
 # NEST ELEMENTS
 # ==========================================================================
-FabricationNest.pack_elements(elements=elements, nest_type=3, inflate=0.1, height_step=4)
+elements = group.regroup_by_keeping_first_indices(0)
+elements_flat = []
+print(elements)
+for e in group._elements.values():
+    elements_flat = elements_flat + e
+print(len(elements_flat))
+FabricationNest.pack_elements(elements=elements_flat, nest_type=3, inflate=0.1, height_step=4)
 
 # ==========================================================================
 # VIEWER
 # ==========================================================================
-color_red = [3] * len(elements)
+color_red = [3] * len(elements_flat)
 color_red[0] = 0
-color_red[11] = 0
-color_red[12] = 0
-Viewer.show_elements(elements, show_grid=True, measurements=measurements, geometry=geometry, color_red=color_red)
+color_red[1] = 0
+color_red[2] = 0
+Viewer.show_elements(elements_flat, show_grid=True, measurements=measurements, geometry=geometry, color_red=color_red)

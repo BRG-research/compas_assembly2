@@ -349,7 +349,7 @@ class Group(Datastructure):
             if len(key) >= num_indices_to_keep:
                 new_key = key[:num_indices_to_keep]
                 new__elements.setdefault(new_key, []).append(value)
-        self._elements = new__elements
+        return new__elements
 
     def regroup_by_key(self, key_t):
         """

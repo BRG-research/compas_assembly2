@@ -195,6 +195,7 @@ class FABRICATION_TYPES:
 
 
 from .element import Element  # noqa
+from .group import Group  # noqa
 from .viewer import Viewer  # noqa
 from .fabrication import Fabrication  # noqa
 from .fabrication_nest import FabricationNest  # noqa
