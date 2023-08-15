@@ -489,6 +489,8 @@ class _:
                 p0 = intersection_plane_plane_plane(
                     plane_offset, side_planes[i], side_planes[(i + 1) % len(side_planes)]
                 )
+                if p0 is None:
+                    raise Exception("Could not find intersection point")
                 points.append(Point(p0[0], p0[1], p0[2]))
             return points
 
@@ -518,11 +520,11 @@ class _:
 
 # Create the arc curve points
 # arc_points = create_arc_curve(center, radius, start_angle, end_angle, num_points)
-n = 10
+n = 11
 length = 3.0
 height = 0.5
 offset = 0.5
-p_b_0 = _.MyScribble.get_arc_points([-length, 0, 0], [length, 0, 0], n, height)
+p_b_0 = _.MyScribble.get_arc_points([-length, 0, 0], [length, 0, 0], n, height * 1.66)
 normals = _.MyScribble.calculate_normals_with_length(p_b_0, 0.5)
 # p_t_0  = move_points_by_normals(p_b_0, normals, 1)
 p_t_0 = _.MyScribble.move_points_to_target_z(p_b_0, normals, height)
@@ -556,6 +558,8 @@ side_planes_for_ribs_sequentialy = []
 planes_bot = []
 planes_side = []
 
+boxes = []
+
 for i in range(n - 1):
     # --------------------------------------------------------------------------
     # Create the mesh
@@ -572,6 +576,7 @@ for i in range(n - 1):
     ]
 
     box, center = _.Triagulator.mesh_box_from_eight_points(vertices)
+    boxes.append(box)
 
     # --------------------------------------------------------------------------
     # Collect planes for ribs
@@ -584,115 +589,133 @@ for i in range(n - 1):
         plane_side_last = Plane(Point(*box.face_centroid(3)), -Vector(*box.face_normal(3)))
         planes_side.append(plane_side_last)
 
-    # --------------------------------------------------------------------------
-    # Create plates
-    # --------------------------------------------------------------------------
-
-    def create_plate(mesh, f=0):
-        # plate
-        f_n = mesh.face_neighbors(f)
-        plane0 = Plane(mesh.face_centroid(f), mesh.face_normal(f))
-        plane1 = Plane(
-            Point(*mesh.face_centroid(f)) + Vector(*mesh.face_normal(f)) * plate_thickness, mesh.face_normal(f)
-        )
-
-        outline = []
-        outline_temp = []
-        for j in range(len(f_n)):
-            p0 = intersection_plane_plane_plane(
-                plane0,
-                mesh.face_plane(f_n[j]),
-                mesh.face_plane(f_n[(j + 1) % len(f_n)]),
-            )
-            outline.append(p0)
-            p1 = intersection_plane_plane_plane(
-                plane1,
-                mesh.face_plane(f_n[j]),
-                mesh.face_plane(f_n[(j + 1) % len(f_n)]),
-            )
-            outline_temp.append(p1)
-        outline = outline + outline_temp
-        mesh, center = _.Triagulator.mesh_box_from_eight_points(outline)
-        return center, mesh
-
-    meshes = [create_plate(box, f=0)[1]]
-    elements.append(Element.from_simplex_and_complex(meshes[0].centroid(), meshes))
-
 planes_dual = _.MyScribble.get_dual_planes(planes_side)
 plane_top = Plane(Point(0, 0, height), Vector(0, 0, 1))
+
 # ==========================================================================
-# CREATE GROUP PLATES
-# using planes_side, planes_bot, plane_top, planes_dual
+# GET BOTTOM PLATES --.--.--.--.--
 # ==========================================================================
-planes_groups = [[0, 3], [3, 6], [6, 9]]
-for i, group in enumerate(planes_groups):
-    _side_planes = []
-    # --------------------------------------------------------------------------
-    # add bottom planes
-    # --------------------------------------------------------------------------
-    for j in range(group[0], group[-1]):
-        _side_planes.append(planes_bot[j])
+planes_groups = [[0, 1], [2, 3], [4, 5], [6, 7], [8, 9]]
+for i in range(len(planes_groups)):
+    bottom_plate_planes = [
+        Plane(Point(*boxes[planes_groups[i][0]].face_centroid(5)), -Vector(*boxes[planes_groups[i][0]].face_normal(5))),
+        Plane(Point(0, -offset, 0), Vector(0, -1, 0)),
+        Plane(
+            Point(*boxes[planes_groups[i][-1]].face_centroid(3)), -Vector(*boxes[planes_groups[i][-1]].face_normal(3))
+        ),
+        Plane(Point(0, offset, 0), Vector(0, 1, 0)),
+    ]
 
-    # --------------------------------------------------------------------------
-    # add the rest of the planes
-    # --------------------------------------------------------------------------
-    _side_planes.append(planes_side[group[-1]])
-    _side_planes.append(plane_top)
-    _side_planes.append(planes_side[group[0]])
+    bottom_plate_base_plane = Plane(
+        (Point(*boxes[planes_groups[i][0]].face_centroid(0)) + Point(*boxes[planes_groups[i][-1]].face_centroid(0)))
+        * 0.5,
+        (Point(*boxes[planes_groups[i][0]].face_normal(0)) + Point(*boxes[planes_groups[i][-1]].face_normal(0))) * 0.5,
+    )
 
-    _plane_polygon = Plane([0, 0, 0], [0, 1, 0])
-    _points0 = _.MyScribble.points_from_side_plane(_plane_polygon, _side_planes, 0.5)  # add offset
-    _points1 = _.MyScribble.points_from_side_plane(_plane_polygon, _side_planes, 0.5 - plate_thickness)  # add offset
-    mesh = _.Triagulator.from_loft_two_polygons(_points0, _points1)
-    center = mesh.centroid()
-    elements.append(Element.from_simplex_and_complex(center, [mesh]))
-    # print(_.Triagulator.from_points(_points0))
-    # geometry.append(_.Triagulator.from_points(_points0))
-    # geometry.append(_.Triagulator.from_points(_points1))
-    # geometry.append(_.Triagulator.from_loft_two_polygons(_points0, _points1))
-    # geometry.append(Polygon(_points0))
-    # geometry.append(Polygon(_points1))
+    elements.append(Element.from_plate_planes(bottom_plate_base_plane, bottom_plate_planes, -plate_thickness))
 
 
-# for i in             print(triangles)            print(triangles)range(len(planes_dual) - 2):
-#     side_planes_for_ribs = []
-#     if i == 0:
-#         side_planes_for_ribs = [
-#             plane_top,
-#             planes_dual[i + 1],
-#             Plane(planes_bot[i].point + planes_bot[i].normal * plate_thickness, planes_bot[i].normal),
-#             planes_dual[i + 2],
-#         ]
-#     elif i == (len(planes_dual) - 3):
-#         # continue
-#         id = min(i, (len(planes_bot) - 1))
-#         side_planes_for_ribs = [
-#             plane_top,
-#             planes_dual[i + 1],
-#             Plane(planes_bot[id].point + planes_bot[id].normal * plate_thickness, planes_bot[id].normal),
-#             planes_dual[i + 2],
-#         ]
-#     else:
-#         side_planes_for_ribs = [
-#             plane_top,
-#             planes_dual[i + 1],
-#             Plane(planes_bot[i - 1].point + planes_bot[i - 1].normal * plate_thickness, planes_bot[i - 1].normal),
-#             Plane(planes_bot[i].point + planes_bot[i].normal * plate_thickness, planes_bot[i].normal),
-#             planes_dual[i + 2],
-#         ]
+# ==========================================================================
+# GET TOP PLATES -.--.--.--.--.-
+# ==========================================================================
+planes_groups = [[0], [1, 2], [3, 4], [5, 6], [7, 8], [9]]
+for i in range(len(planes_groups)):
+    top_plate_planes = [
+        Plane(Point(*boxes[planes_groups[i][0]].face_centroid(5)), -Vector(*boxes[planes_groups[i][0]].face_normal(5))),
+        Plane(Point(0, -offset, 0), Vector(0, -1, 0)),
+        Plane(
+            Point(*boxes[planes_groups[i][-1]].face_centroid(3)), -Vector(*boxes[planes_groups[i][-1]].face_normal(3))
+        ),
+        Plane(Point(0, offset, 0), Vector(0, 1, 0)),
+    ]
 
-#     rib_center = Point(0, (0 + 0.1 * (i % 2) - 0.05) * 0.0, 0.5)
-#     normal = Vector(
-#         0,
-#         1,
-#     )
-#     rib_plane0 = Plane(rib_center + normal * plate_thickness * -0.5, normal)
-#     rib_plane1 = Plane(rib_center + normal * plate_thickness * 0.5, normal)
-#     points0 = _.MyScribble.points_from_side_plane(rib_plane0, side_planes_for_ribs)
-#     points1 = _.MyScribble.points_from_side_plane(rib_plane1, side_planes_for_ribs)
-#     mesh_rib = _.Triagulator.from_loft_two_polygons(points0, points1)
-#     element = Element.from_simplex_and_complex(mesh_rib.centroid(), mesh_rib, i)
-#     elements.append(element)
+    top_plate_base_plane = Plane(Point(0, 0, height), Vector(0, 0, 1))
+
+    elements.append(Element.from_plate_planes(top_plate_base_plane, top_plate_planes, plate_thickness))
+
+# ==========================================================================
+# XREATE WEB PLATES ALTERNATING IN U and V directions
+# ==========================================================================
+
+
+# ==========================================================================
+# WEB PLATES0
+# ==========================================================================
+planes_groups = [[0, 1], [2, 3], [4, 5], [6, 7], [8, 9]]
+for i in range(len(planes_groups)):
+    bottom_plate_planes = [
+        Plane(
+            (Point(*boxes[planes_groups[i][0]].face_centroid(0)) + Point(*boxes[planes_groups[i][-1]].face_centroid(0)))
+            * 0.5,
+            (Point(*boxes[planes_groups[i][0]].face_normal(0)) + Point(*boxes[planes_groups[i][-1]].face_normal(0)))
+            * 0.5,
+        ),
+        Plane(Point(*boxes[planes_groups[i][0]].face_centroid(5)), -Vector(*boxes[planes_groups[i][0]].face_normal(5))),
+        plane_top,
+        Plane(
+            Point(*boxes[planes_groups[i][-1]].face_centroid(3)), -Vector(*boxes[planes_groups[i][-1]].face_normal(3))
+        ),
+    ]
+
+    web_base_plane = Plane(Point(0, 0.25, 0), Vector(0, 1, 0))
+    elements.append(Element.from_plate_planes(web_base_plane, bottom_plate_planes, -plate_thickness))
+    elements.append(Element.from_plate_planes(web_base_plane.offset(-0.5), bottom_plate_planes, -plate_thickness))
+
+# ==========================================================================
+# WEB PLATES1
+# ==========================================================================
+centroid_groups = [[0], [1, 2], [3, 4], [5, 6], [7, 8], [9]]
+planes_groups0 = [[0, 1], [0, 1], [2, 3], [4, 5], [6, 7], [8, 9]]
+planes_groups1 = [[0, 1], [2, 3], [4, 5], [6, 7], [8, 9], [8, 9]]
+for i in range(len(planes_groups0)):
+    p0 = Point(*boxes[centroid_groups[i][0]].face_centroid(5))
+    p1 = Point(*boxes[centroid_groups[i][-1]].face_centroid(3))
+
+    def linear_interpolation(p0, p1, t):
+        interpolated_x = p0[0] + t * (p1[0] - p0[0])
+        interpolated_y = p0[1] + t * (p1[1] - p0[1])
+        interpolated_z = p0[2] + t * (p1[2] - p0[2])
+        interpolated_point = (interpolated_x, interpolated_y, interpolated_z)
+        return interpolated_point
+
+    p_web0 = Plane(linear_interpolation(p0, p1, 0.25), Vector(1, 0, 0))
+    p_web1 = Plane(linear_interpolation(p0, p1, 0.75), Vector(1, 0, 0))
+
+    top_plate_planes = [
+        Plane(
+            (
+                Point(*boxes[planes_groups0[i][0]].face_centroid(0))
+                + Point(*boxes[planes_groups0[i][-1]].face_centroid(0))
+            )
+            * 0.5,
+            (Point(*boxes[planes_groups0[i][0]].face_normal(0)) + Point(*boxes[planes_groups0[i][-1]].face_normal(0)))
+            * 0.5,
+        ),
+        Plane(Point(0, -offset, 0), Vector(0, -1, 0)),
+        Plane(Point(0, 0, height), Vector(0, 0, 1)),
+        Plane(Point(0, offset, 0), Vector(0, 1, 0)),
+    ]
+
+    top_plate_base_plane = Plane(Point(0, 0, height), Vector(0, 0, 1))
+
+    elements.append(Element.from_plate_planes(p_web0, top_plate_planes, plate_thickness))
+
+    top_plate_planes = [
+        Plane(
+            (
+                Point(*boxes[planes_groups1[i][0]].face_centroid(0))
+                + Point(*boxes[planes_groups1[i][-1]].face_centroid(0))
+            )
+            * 0.5,
+            (Point(*boxes[planes_groups1[i][0]].face_normal(0)) + Point(*boxes[planes_groups1[i][-1]].face_normal(0)))
+            * 0.5,
+        ),
+        Plane(Point(0, -offset, 0), Vector(0, -1, 0)),
+        Plane(Point(0, 0, height), Vector(0, 0, 1)),
+        Plane(Point(0, offset, 0), Vector(0, 1, 0)),
+    ]
+    elements.append(Element.from_plate_planes(p_web1, top_plate_planes, plate_thickness))
+
 
 # ==========================================================================
 # NEST ELEMENTS
@@ -704,4 +727,6 @@ FabricationNest.pack_elements(elements=elements, nest_type=3, inflate=0.1, heigh
 # ==========================================================================
 color_red = [3] * len(elements)
 color_red[0] = 0
+color_red[11] = 0
+color_red[12] = 0
 Viewer.show_elements(elements, show_grid=True, measurements=measurements, geometry=geometry, color_red=color_red)
