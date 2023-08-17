@@ -3,8 +3,8 @@ from __future__ import absolute_import
 from __future__ import division
 
 from compas.datastructures import Datastructure
-from compas.geometry import Frame
-from compas_assembly2.element import Element
+from compas.geometry import Frame, Point, Line, Polyline
+from compas_assembly2 import Element
 
 # https://grantjenks.com/docs/sortedcontainers/sorteddict.html
 from compas_assembly2.sortedcontainers.sorteddict import SortedDict
@@ -34,12 +34,12 @@ class Group(Datastructure):
     # ==========================================================================
     # properties - operator overload [] and []=
     # ==========================================================================
-    def __getitem__(self, key_tuple):
+    def __getitem__(self, *args):
         """
         Get the list of Element objects associated with the given key (id).
 
         Parameters:
-            key_tuple (tuple): The id or key to access the _elements.
+            *args: The integers that make up the key to access the _elements.
 
         Returns:
             list: The list of Element objects associated with the given key.
@@ -51,21 +51,22 @@ class Group(Datastructure):
             group_elements.add(Element(id=(1, 2, 3), l_frame=None, g_frame=None, attr={'t': 'Block', 'm': 30}))
             group_elements.add(Element(id=(1, 3, 5), l_frame=None, g_frame=None, attr={'t': 'Beam', 'm': 25}))
 
-            result = group_elements[(1, 2, 3)]
+            result = group_elements[1, 2, 3]
             print(result)  # Output: [Element1]
         """
+        key_tuple = args[0]
         group_elements = []
         for key in self._elements.keys():
             if key[: len(key_tuple)] == key_tuple:
                 group_elements.extend(self._elements[key])
         return group_elements
 
-    def __setitem__(self, key_tuple, element):
+    def __setitem__(self, *args, element):
         """
         Set the value associated with the given key (id).
 
         Parameters:
-            key_tuple (tuple): The id or key to set the _elements.
+            *args: The integers that make up the key to set the _elements.
             element (Element): The Element object to be associated with the given key.
 
         Raises:
@@ -75,9 +76,10 @@ class Group(Datastructure):
             element1 = Element(id=(1, 2, 3), l_frame=None, g_frame=None, attr={'t': 'Block', 'm': 30})
             element2 = Element(id=(1, 3, 5), l_frame=None, g_frame=None, attr={'t': 'Beam', 'm': 25})
 
-            group_elements[(1, 2, 3)] = element1
-            group_elements[(1, 3, 5)] = element2
+            group_elements[1, 2, 3] = element1
+            group_elements[1, 3, 5] = element2
         """
+        key_tuple = tuple(args)
         if not isinstance(element, list):
             raise TypeError("Value must be a list of Element objects.")
         self._elements[key_tuple] = element
@@ -151,6 +153,21 @@ class Group(Datastructure):
             print(result)  # Output: [Element1, Element2]
         """
         return [element.value for element in self._elements if key in element.attr]
+
+    def get_elements_properties(self, property_name, flatten=True):
+        """Get properties of elements flattened (True) or in nested lists (False)."""
+        elements_properties = []
+
+        for element_list in self._elements.values():
+            for element in element_list:
+                if hasattr(element, property_name):
+                    property_value = getattr(element, property_name)
+                    if flatten:
+                        elements_properties.extend(property_value)
+                    else:
+                        elements_properties.append(property_value)
+
+        return elements_properties
 
     def get_fabrication_data(self, key):
         pass
@@ -233,6 +250,24 @@ class Group(Datastructure):
         """
         for element in group_elements:
             self.add(element)
+
+    def to_flat_list(self):
+        """A list of elements in a sorted way following the SortedDictionary"""
+        elements_as_list = []
+
+        for element_list in self._elements.values():
+            elements_as_list.extend(element_list)
+
+        return elements_as_list
+
+    def to_nested_list(self):
+        """Lists for each key of the dictionary"""
+        elements_as_list = []
+
+        for element_list in self._elements.values():
+            elements_as_list.append(element_list)
+
+        return elements_as_list
 
     # ==========================================================================
     # collections - remove methods
@@ -413,18 +448,26 @@ class Group(Datastructure):
 if __name__ == "__main__":
     group_elements = Group()
     group_elements.add(
-        Element(id=[1, 2, 3], l_frame=Frame.worldXY(), g_frame=Frame.worldXY(), attr={"t": "Block", "m": 30})
+        Element(id=[1, 2, 3], frame=Frame.worldXY(), simplex=Point(0, 0, 0), attr={"t": "Block", "m": 30})
     )
     group_elements.add(
-        Element(id=[3, 0, 3], l_frame=Frame.worldXY(), g_frame=Frame.worldXY(), attr={"t": "Beam", "m": 25})
+        Element(id=[1, 2, 3], frame=Frame.worldXY(), simplex=Point(1, 0, 0), attr={"t": "Block", "m": 30})
     )
     group_elements.add(
-        Element(id=[0, 2, 4], l_frame=Frame.worldXY(), g_frame=Frame.worldXY(), attr={"t": "Block", "m": 25})
+        Element(id=[3, 0, 3], frame=Frame.worldXY(), simplex=Point(0, 5, 0), attr={"t": "Beam", "m": 25})
     )
     group_elements.add(
-        Element(id=[1, 0, 3], l_frame=Frame.worldXY(), g_frame=Frame.worldXY(), attr={"t": "Plate", "m": 40})
+        Element(id=[0, 2, 4], frame=Frame.worldXY(), simplex=Point(7, 0, 0), attr={"t": "Block", "m": 25})
     )
     group_elements.add(
-        Element(id=[2, 2], l_frame=Frame.worldXY(), g_frame=Frame.worldXY(), attr={"t": "Block", "m": 30})
+        Element(id=[1, 0, 3], frame=Frame.worldXY(), simplex=Point(6, 0, 0), attr={"t": "Plate", "m": 40})
     )
-    print(group_elements)
+    group_elements.add(Element(id=[2, 2], frame=Frame.worldXY(), simplex=Point(0, 0, 8), attr={"t": "Block", "m": 30}))
+
+    # get the list of elements, instead of the dictionary (lists of lists with keys)
+    print(group_elements.to_flat_list())
+    print(group_elements.to_nested_list())
+
+    # get properties of the elements
+    print(group_elements.get_elements_properties("simplex", True))
+    print(group_elements.get_elements_properties("simplex", False))

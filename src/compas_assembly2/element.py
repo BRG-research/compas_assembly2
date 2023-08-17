@@ -169,28 +169,46 @@ class Element(Data):
                 # input - list of vector
                 if len(insertion) == 1:
                     if isinstance(insertion[0], Vector):
-                        self.insertion = [insertion[0], self.id[-1]]
-                        is_insertion_valid = True
-                # input - list of vector and index
-                elif len(insertion) == 2:
-                    if isinstance(insertion[0], Vector) and isinstance(insertion[1], (int, float)):
-                        self.insertion = [insertion[0], insertion[1]]
+                        self.insertion = insertion[0]
                         is_insertion_valid = True
                 # input - list of vector coordinates in one list
                 elif len(insertion) == 3:
-                    self.insertion = [Vector(insertion[0], insertion[1], insertion[2]), self.id[-1]]
-                    is_insertion_valid = True
-                # input - list of vector coordinates and id in one list
-                elif len(insertion) == 4:
-                    self.insertion = [Vector(insertion[0], insertion[1], insertion[2]), insertion[3]]
+                    self.insertion = Vector(insertion[0], insertion[1], insertion[2])
                     is_insertion_valid = True
             elif isinstance(insertion, Vector):
                 # input - vector
-                self.insertion = [insertion, self.id[-1]]
+                self.insertion = insertion
                 is_insertion_valid = True
 
         if not is_insertion_valid:
-            self.insertion = [Vector(0, 0, 1), self.id[-1]]
+            self.insertion = Vector(0, 0, 1)
+        # if insertion:
+        #     if isinstance(insertion, list):
+        #         # input - list of vector
+        #         if len(insertion) == 1:
+        #             if isinstance(insertion[0], Vector):
+        #                 self.insertion = [insertion[0], self.id[-1]]
+        #                 is_insertion_valid = True
+        #         # input - list of vector and index
+        #         elif len(insertion) == 2:
+        #             if isinstance(insertion[0], Vector) and isinstance(insertion[1], (int, float)):
+        #                 self.insertion = [insertion[0], insertion[1]]
+        #                 is_insertion_valid = True
+        #         # input - list of vector coordinates in one list
+        #         elif len(insertion) == 3:
+        #             self.insertion = [Vector(insertion[0], insertion[1], insertion[2]), self.id[-1]]
+        #             is_insertion_valid = True
+        #         # input - list of vector coordinates and id in one list
+        #         elif len(insertion) == 4:
+        #             self.insertion = [Vector(insertion[0], insertion[1], insertion[2]), insertion[3]]
+        #             is_insertion_valid = True
+        #     elif isinstance(insertion, Vector):
+        #         # input - vector
+        #         self.insertion = [insertion, self.id[-1]]
+        #         is_insertion_valid = True
+
+        # if not is_insertion_valid:
+        #     self.insertion = [Vector(0, 0, 1), self.id[-1]]
 
         # --------------------------------------------------------------------------
         # custom attributes given by the user
@@ -801,7 +819,7 @@ class Element(Data):
         )
 
     @staticmethod
-    def from_plate_points(points0, points1, id=0):
+    def from_plate_points(points0, points1, id=0, insertion=None):
         """method create a plate element at the origin point with the frame at worldXY"""
 
         # --------------------------------------------------------------------------
@@ -831,7 +849,7 @@ class Element(Data):
         )
 
     @staticmethod
-    def from_plate_planes(base_plane, side_planes, thickness, id=0):
+    def from_plate_planes(base_plane, side_planes, thickness, id=0, insertion=None):
         """method create a plate element at the origin point with the frame at worldXY"""
 
         # --------------------------------------------------------------------------
@@ -854,6 +872,7 @@ class Element(Data):
             frame=frame,
             simplex=[Polyline(points0), Polyline(points1)],
             complex=mesh,
+            insertion=insertion
         )
 
     # ==========================================================================
@@ -867,7 +886,7 @@ class Element(Data):
         Returns:
             str: The string representation of the Element.
         """
-        return """(Type: {0}, #  ID: {1})""".format(self.name, self.id)
+        return """Type: {0}, ID: {1}""".format(self.name, self.id)
 
 
 # # (Type: {0},

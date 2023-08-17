@@ -9,12 +9,16 @@ from compas.geometry import (
     Vector,
     Polygon,
     Transformation,
+    Scale,
     intersection_plane_plane_plane,
     distance_point_point,
     cross_vectors,
     centroid_points,
     distance_point_plane_signed,
 )
+import math
+from compas_wood.joinery import get_connection_zones
+from compas.data import json_dump
 
 
 class _:
@@ -285,7 +289,7 @@ class _:
                 if signed_distance > 0.001:
                     frame = Frame(frame.point, -x_axis, y_axis)
                     reversed = True
-            # output
+            # output0
             return frame, reversed
 
         @staticmethod
@@ -545,9 +549,22 @@ arc_end = Point(p_b_1[-1][0], p_b_1[-1][1], p_b_1[-1][2])
 line = Line(arc_start, arc_end)
 measurements.append(line)
 
+
 # ==========================================================================
 # CREATE PLATES
 # ==========================================================================
+def remap_sequence(i, n):
+    # original_sequence = list(range(n))
+    # remapped_sequence = [0] * n
+
+    # for i in original_sequence:
+    if i < math.ceil(n / 2.0):
+        return i * 2
+    else:
+        return n - i * 2 + n - 1
+
+
+# return remapped_sequence
 
 plate_thickness = 0.04
 group = Group()
@@ -601,7 +618,6 @@ plane_top = Plane(Point(0, 0, height), Vector(0, 0, 1))
 planes_groups = []
 for i in range(0, n - 1, 2):
     planes_groups.append([i, i + 1])
-print(planes_groups)
 
 for i in range(len(planes_groups)):
     bottom_plate_planes = [
@@ -619,7 +635,11 @@ for i in range(len(planes_groups)):
         (Point(*boxes[planes_groups[i][0]].face_normal(0)) + Point(*boxes[planes_groups[i][-1]].face_normal(0))) * 0.5,
     )
 
-    group.add(Element.from_plate_planes(bottom_plate_base_plane, bottom_plate_planes, -plate_thickness, [0, i]))
+    group.add(
+        Element.from_plate_planes(
+            bottom_plate_base_plane, bottom_plate_planes, -plate_thickness, [0, remap_sequence(i, len(planes_groups))]
+        )
+    )
 
 
 # ==========================================================================
@@ -631,7 +651,6 @@ planes_groups = [[0]]
 for i in range(1, n - 3, 2):
     planes_groups.append([i, i + 1])
 planes_groups.append([n - 2])
-print(planes_groups)
 
 for i in range(len(planes_groups)):
     top_plate_planes = [
@@ -645,10 +664,14 @@ for i in range(len(planes_groups)):
 
     top_plate_base_plane = Plane(Point(0, 0, height), Vector(0, 0, 1))
 
-    group.add(Element.from_plate_planes(top_plate_base_plane, top_plate_planes, plate_thickness, [1, i]))
+    group.add(
+        Element.from_plate_planes(
+            top_plate_base_plane, top_plate_planes, plate_thickness, [1, remap_sequence(i, len(planes_groups))]
+        )
+    )
 
 # ==========================================================================
-# XREATE WEB PLATES ALTERNATING IN U and V directions
+# CREATE WEB PLATES ALTERNATING IN U and V directions
 # ==========================================================================
 
 
@@ -659,7 +682,6 @@ planes_groups = [[0, 1], [2, 3], [4, 5], [6, 7], [8, 9]]
 planes_groups = []
 for i in range(0, n - 1, 2):
     planes_groups.append([i, i + 1])
-print(planes_groups)
 
 
 for i in range(len(planes_groups)):
@@ -678,9 +700,19 @@ for i in range(len(planes_groups)):
     ]
 
     web_base_plane = Plane(Point(0, 0.25, 0), Vector(0, 1, 0))
-    group.add(Element.from_plate_planes(web_base_plane, bottom_plate_planes, -plate_thickness, [0, i]))
+
     group.add(
-        Element.from_plate_planes(web_base_plane.offset(-0.5), bottom_plate_planes, -plate_thickness, [0, i])
+        Element.from_plate_planes(
+            web_base_plane, bottom_plate_planes, -plate_thickness, [0, remap_sequence(i, len(planes_groups))]
+        )
+    )
+    group.add(
+        Element.from_plate_planes(
+            web_base_plane.offset(-0.5),
+            bottom_plate_planes,
+            -plate_thickness,
+            [0, remap_sequence(i, len(planes_groups))],
+        )
     )
 
 # ==========================================================================
@@ -698,14 +730,13 @@ centroid_groups.append([n - 2])
 planes_groups0 = [[0, 1]]
 for i in range(0, n - 1, 2):
     planes_groups0.append([i, i + 1])
-print(planes_groups0)
 
 planes_groups1 = []
 for i in range(0, n - 1, 2):
     planes_groups1.append([i, i + 1])
 planes_groups1.append([(n - 3), (n - 2)])
-print(planes_groups1)
 inclined_webs = True
+
 
 for i in range(len(planes_groups0)):
     p0 = Point(*boxes[centroid_groups[i][0]].face_centroid(5))
@@ -750,9 +781,11 @@ for i in range(len(planes_groups0)):
 
     p_web1 = Plane(linear_interpolation(p0, p1, 0.75), p_web0.normal)
 
-    print(top_plate_base_plane)
-
-    group.add(Element.from_plate_planes(p_web0, top_plate_planes, plate_thickness, [1, i]))
+    group.add(
+        Element.from_plate_planes(
+            p_web0, top_plate_planes, plate_thickness, [1, remap_sequence(i, len(planes_groups0))]
+        )
+    )
 
     top_plate_planes = [
         Plane(
@@ -769,25 +802,90 @@ for i in range(len(planes_groups0)):
         Plane(Point(0, offset, 0), Vector(0, 1, 0)),
     ]
 
-    group.add(Element.from_plate_planes(p_web1, top_plate_planes, -plate_thickness, [1, i]))
+    group.add(
+        Element.from_plate_planes(
+            p_web1,
+            top_plate_planes,
+            -plate_thickness,
+            [1, remap_sequence(i, len(planes_groups0))],
+            top_plate_planes[0].normal,
+        )
+    )
+
+    for temp_element in group[1, i]:
+        temp_element.insertion = top_plate_planes[0].normal
 
 
 # ==========================================================================
 # NEST ELEMENTS
 # ==========================================================================
-elements = group.regroup_by_keeping_first_indices(0)
-elements_flat = []
-print(elements)
-for e in group._elements.values():
-    elements_flat = elements_flat + e
-print(len(elements_flat))
-FabricationNest.pack_elements(elements=elements_flat, nest_type=3, inflate=0.1, height_step=4)
+# group.to_nested_list
+# elements = group.regroup_by_keeping_first_indices(0)
+FabricationNest.pack_elements(elements=group.to_flat_list(), nest_type=3, inflate=0.1, height_step=4)
+
+# ==========================================================================
+# COMPAS_WOOD GET JOINTS
+# ==========================================================================
+division_length = 300
+joint_parameters = [
+    division_length,
+    0.5,
+    9,
+    division_length * 1.5,
+    0.65,
+    10,
+    division_length * 1.5,
+    0.5,
+    21,
+    division_length,
+    0.95,
+    30,
+    division_length,
+    0.95,
+    40,
+    division_length,
+    0.95,
+    50,
+]
+
+# print(result)
+
+simplices = group.get_elements_properties("simplex", True)
+json_dump(simplices, "tests/json_dumps/simplices.json")
+geometry = []
+scale = Scale.from_factors([10, 10, 10])
+for s in simplices:
+    s.transform(scale)
+# geometry.append(simplices[20].transformed(scale))
+# geometry.append(simplices[21].transformed(scale))
+# geometry.append(simplices[50].transformed(scale))
+# geometry.append(simplices[51].transformed(scale))
+# print(simplices[20])
+# print(simplices[21])
+# print(simplices[50])
+# print(simplices[51])
+
+simplices = get_connection_zones(simplices, None, None, None, None, joint_parameters, 2, [1, 1, 1], 4)
+
+
+simplices = [item for sublist in simplices for item in sublist]
+scale = Scale.from_factors([1 / 10, 1 / 10, 1 / 10])
+for pline in simplices:
+    pline.transform(scale)
+geometry = simplices
 
 # ==========================================================================
 # VIEWER
 # ==========================================================================
-color_red = [3] * len(elements_flat)
+color_red = [3] * group.size()
 color_red[0] = 0
 color_red[1] = 0
 color_red[2] = 0
-Viewer.show_elements(elements_flat, show_grid=True, measurements=measurements, geometry=geometry, color_red=color_red)
+Viewer.show_elements(
+    group.to_nested_list(),
+    show_simplices=False,
+    show_grid=True,
+    measurements=measurements,
+    geometry=geometry,
+    color_red=color_red,
+)

@@ -1,8 +1,20 @@
-from compas.geometry import Polyline, Point, Box, Line, Vector, Pointcloud, Transformation, Frame, Quaternion
+from compas.geometry import (
+    Polyline,
+    Point,
+    Box,
+    Line,
+    Vector,
+    Pointcloud,
+    Transformation,
+    Translation,
+    Frame,
+    Quaternion,
+)
 from compas.datastructures import Mesh
 from compas.colors import Color
 from compas_assembly2.fabrication import FABRICATION_TYPES
 from compas_assembly2 import Element
+import math
 
 # ==========================================================================
 # DISPLAY IN DIFFERENT VIEWERS
@@ -85,7 +97,7 @@ class Viewer:
 
     @staticmethod
     def show_elements(
-        elements=[],
+        groups=[],
         viewer_type="view2-0_rhino-1_blender-2",
         width=1280,
         height=1600,
@@ -157,19 +169,37 @@ class Viewer:
                     "viewer_all": [],
                 }
 
-                faces_colors = color_red if len(color_red) == len(elements) else [3] * len(elements)
-                
+                # --------------------------------------------------------------------------
+                # elements can be a lists of lists to define groups of elements
+                # the viewer will display only one level of grouping
+                # if you want to explore different nestingm the user must give such input
+                # iterate throu
+                # --------------------------------------------------------------------------
 
+                dict_elements_groups = {}
+                elements = []
+                for counter, group in enumerate(groups):
+                    if isinstance(group, list):
+                        for e in group:
+                            key = e.guid
+                            dict_elements_groups[key] = (e, counter)
+                            elements.append(e)
+                    else:
+                        # group is an element in this case
+                        key = group.guid
+                        dict_elements_groups[key] = (group, counter)
+                        elements.append(group)
+
+                faces_colors = color_red if len(color_red) == len(elements) else [3] * len(elements)
+
+                # --------------------------------------------------------------------------
+                # add text - indices
+                # --------------------------------------------------------------------------
                 for counter, element in enumerate(elements):
                     # --------------------------------------------------------------------------
                     # add text - indices
                     # --------------------------------------------------------------------------
                     element_id = element.guid
-                    custom_kwargs = {
-                        'element_id': str(element.id),
-                        # Add more custom kwargs as needed
-                    }
-
 
                     text = Text(
                         ",".join(map(str, element.id)),
@@ -328,7 +358,6 @@ class Viewer:
                                     opacity=0.9,  # type: ignore
                                     hide_coplanaredges=True,
                                 )
-
                                 viewer_objects["viewer_complexes"].append(o)
 
                         elif (
@@ -704,14 +733,21 @@ class Viewer:
                     for o in viewer_objects["viewer_complexes"]:
                         o.opacity = t / 100.0
 
-                @viewer.slider(title="insertion", maxval=len(elements) * 1, step=1, bgcolor=Color.white(), value=0)
+                @viewer.slider(title="insertion", maxval=len(groups) * 100, step=1, bgcolor=Color.white(), value=0)
                 def slider_insertion(t):
                     for id, o in enumerate(viewer_objects["viewer_complexes"]):
-                        print(o.name)
-                        if id > t:
+                        scale = 1-((t / 100.0) % 1)
+                        xform = Translation.from_vector(dict_elements_groups[o.name][0].insertion * scale)
+
+                        if dict_elements_groups[o.name][1] > t / 100:
                             o.opacity = 0
+                            o.matrix = xform = Translation.from_vector(dict_elements_groups[o.name][0].insertion).matrix
                         else:
                             o.opacity = 1
+                            if dict_elements_groups[o.name][1] == math.floor(t / 100):
+                                o.matrix = xform.matrix
+                            else:
+                                o.matrix = xform = Translation.from_vector(Vector(0, 0, 0)).matrix
 
                 # --------------------------------------------------------------------------
                 # run
