@@ -9,7 +9,6 @@
 
 # mesh.face_attribute(0, "holes", [hole])
 # mesh.face_attributes()
-import math
 
 
 def remap_sequence(n):

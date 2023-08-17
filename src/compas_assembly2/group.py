@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from __future__ import division
 
 from compas.datastructures import Datastructure
-from compas.geometry import Frame, Point, Line, Polyline
+from compas.geometry import Frame, Point
 from compas_assembly2 import Element
 
 # https://grantjenks.com/docs/sortedcontainers/sorteddict.html
