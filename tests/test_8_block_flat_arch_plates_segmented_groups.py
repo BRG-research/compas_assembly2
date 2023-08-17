@@ -17,6 +17,7 @@ from compas.geometry import (
     distance_point_plane_signed,
 )
 import math
+
 from compas_wood.joinery import get_connection_zones
 from compas.data import json_dump
 
@@ -305,7 +306,7 @@ class _:
             ear_cut = _.Earcut(polygon.points)
             ear_cut.triangulate()
 
-            return compas.datastructures.Mesh.from_vertices_and_faces(polygon.points, ear_cut.triangles)
+            return Mesh.from_vertices_and_faces(polygon.points, ear_cut.triangles)
 
         @staticmethod
         def from_loft_two_polygons(_points0, _points1):
@@ -699,18 +700,18 @@ for i in range(len(planes_groups)):
         ),
     ]
 
-    web_base_plane = Plane(Point(0, 0.25, 0), Vector(0, 1, 0))
+    web_base_plane = Plane(Point(0, 0.35, 0), Vector(0, 1, 0))
 
     group.add(
         Element.from_plate_planes(
-            web_base_plane, bottom_plate_planes, -plate_thickness, [0, remap_sequence(i, len(planes_groups))]
+            web_base_plane, bottom_plate_planes, plate_thickness, [0, remap_sequence(i, len(planes_groups))]
         )
     )
     group.add(
         Element.from_plate_planes(
-            web_base_plane.offset(-0.5),
+            web_base_plane.offset(-0.75),
             bottom_plate_planes,
-            -plate_thickness,
+            plate_thickness,
             [0, remap_sequence(i, len(planes_groups))],
         )
     )
@@ -749,8 +750,8 @@ for i in range(len(planes_groups0)):
         interpolated_point = Point(interpolated_x, interpolated_y, interpolated_z)
         return interpolated_point
 
-    p_web0 = Plane(linear_interpolation(p0, p1, 0.25), Vector(1, 0, 0))
-    p_web1 = Plane(linear_interpolation(p0, p1, 0.75), Vector(1, 0, 0))
+    p_web0 = Plane(linear_interpolation(p0, p1, 0.15), Vector(1, 0, 0))
+    p_web1 = Plane(linear_interpolation(p0, p1, 0.85), Vector(1, 0, 0))
 
     top_plate_planes = [
         Plane(
@@ -768,10 +769,10 @@ for i in range(len(planes_groups0)):
     ]
 
     p_web0 = (
-        Plane(linear_interpolation(p0, p1, 0.25), Vector(1, 0, 0))
+        Plane(linear_interpolation(p0, p1, 0.15), Vector(1, 0, 0))
         if not inclined_webs
         else Plane(
-            linear_interpolation(p0, p1, 0.25),
+            linear_interpolation(p0, p1, 0.15),
             cross_vectors(
                 Vector(0, 1, 0),
                 (Vector(*boxes[planes_groups0[i][-1]].face_normal(0))) * 0.5,
@@ -779,7 +780,7 @@ for i in range(len(planes_groups0)):
         )
     )
 
-    p_web1 = Plane(linear_interpolation(p0, p1, 0.75), p_web0.normal)
+    p_web1 = Plane(linear_interpolation(p0, p1, 0.85), p_web0.normal)
 
     group.add(
         Element.from_plate_planes(
@@ -848,31 +849,42 @@ joint_parameters = [
     50,
 ]
 
-# print(result)
+# # print(result)
 
 simplices = group.get_elements_properties("simplex", True)
 json_dump(simplices, "tests/json_dumps/simplices.json")
-geometry = []
-scale = Scale.from_factors([10, 10, 10])
+# geometry = []
+scale = Scale.from_factors([100, 100, 100])
 for s in simplices:
     s.transform(scale)
-# geometry.append(simplices[20].transformed(scale))
-# geometry.append(simplices[21].transformed(scale))
-# geometry.append(simplices[50].transformed(scale))
-# geometry.append(simplices[51].transformed(scale))
-# print(simplices[20])
-# print(simplices[21])
-# print(simplices[50])
-# print(simplices[51])
+# # geometry.append(simplices[20].transformed(scale))
+# # geometry.append(simplices[21].transformed(scale))
+# # geometry.append(simplices[50].transformed(scale))
+# # geometry.append(simplices[51].transformed(scale))
+# # print(simplices[20])
+# # print(simplices[21])
+# # print(simplices[50])
+# # print(simplices[51])
+simplices.reverse()
+simplices = get_connection_zones(simplices, None, None, None, None, joint_parameters, 1, [1, 1, 1.5], 4)
+simplices.reverse()
+nested_lists = group.to_nested_list()
 
-simplices = get_connection_zones(simplices, None, None, None, None, joint_parameters, 2, [1, 1, 1], 4)
 
 
 simplices = [item for sublist in simplices for item in sublist]
-scale = Scale.from_factors([1 / 10, 1 / 10, 1 / 10])
+scale = Scale.from_factors([1 / 100, 1 / 100, 1 / 100])
 for pline in simplices:
     pline.transform(scale)
-geometry = simplices
+
+counter = 0
+for element_list in nested_lists:
+    for element in element_list:
+        element.simplex = [simplices[counter*2+0], simplices[counter*2+1]]
+        element.complex = [_.Triagulator.from_loft_two_polygons(element.simplex[0], element.simplex[1])]
+        counter = counter + 1
+
+# geometry = simplices
 
 # ==========================================================================
 # VIEWER
