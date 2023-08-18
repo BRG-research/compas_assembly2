@@ -57,7 +57,7 @@ class Group(Datastructure):
         key_tuple = args[0]
         group_elements = []
         for key in self._elements.keys():
-            if key[: len(key_tuple)] == key_tuple:
+            if key == key_tuple:  # [: len(key_tuple)]
                 group_elements.extend(self._elements[key])
         return group_elements
 

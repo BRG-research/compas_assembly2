@@ -23,7 +23,7 @@ import math
 # add rhino and blender
 # ==========================================================================
 
-
+opacity = 0.9
 class Viewer:
     @staticmethod
     def string_to_color(input_string):
@@ -73,7 +73,7 @@ class Viewer:
         ],
     ):
         Viewer.show_elements(
-            elements=Element.to_elements(geometry),
+            Element.to_elements(geometry),
             viewer_type=viewer_type,
             width=width,
             height=height,
@@ -664,7 +664,7 @@ class Viewer:
                         obj.is_visible = checked
                     viewer.view.update()
 
-                @viewer.slider(title="fabrication_example", maxval=100, step=1, bgcolor=Color.white())
+                @viewer.slider(title="fabrication_example", maxval=100, step=1)  # type: ignore
                 def slider_nesting(t):
                     def interpolate_frames(frame0, frame1, t):
                         """
@@ -728,13 +728,20 @@ class Viewer:
                     # update the viewer after all the matrices are changed
                     viewer.view.update()
 
-                @viewer.slider(title="opacity", maxval=100, step=1, bgcolor=Color.white(), value=95)
+                # change opacity of elements
+                @viewer.slider(title="opacity", maxval=100, step=1, value=95)  # type: ignore
                 def slider_opacity(t):
-                    for o in viewer_objects["viewer_complexes"]:
-                        o.opacity = t / 100.0
 
-                @viewer.slider(title="insertion", maxval=len(groups) * 100, step=1, bgcolor=Color.white(), value=0)
+                    global opacity
+                    opacity = (t / 100.0)
+
+                    for o in viewer_objects["viewer_complexes"]:
+                        o.opacity = opacity
+
+                # insertion vector visualization following the order of elements
+                @viewer.slider(title="insertion", maxval=len(groups) * 100, step=1, value=0)  # type: ignore
                 def slider_insertion(t):
+                    print(opacity)
                     for id, o in enumerate(viewer_objects["viewer_complexes"]):
                         scale = 1-((t / 100.0) % 1)
                         xform = Translation.from_vector(dict_elements_groups[o.name][0].insertion * scale)
@@ -743,11 +750,51 @@ class Viewer:
                             o.opacity = 0
                             o.matrix = xform = Translation.from_vector(dict_elements_groups[o.name][0].insertion).matrix
                         else:
-                            o.opacity = 1
+                            o.opacity = opacity
                             if dict_elements_groups[o.name][1] == math.floor(t / 100):
                                 o.matrix = xform.matrix
                             else:
                                 o.matrix = xform = Translation.from_vector(Vector(0, 0, 0)).matrix
+
+                # color element by index
+                
+                @viewer.slider(title="color_index", maxval=len(viewer_objects["viewer_complexes"]), step=1, value=0)  # type: ignore
+                def slider_color(t):
+
+                    # instead of slider do somethign else for a list selection
+
+                    for id, o in enumerate(viewer_objects["viewer_complexes"]):
+                        if id == t:
+                            o.facecolor = Color(1, 0, 0)
+                        else:
+                            o.facecolor = Color(0.85, 0.85, 0.85)
+
+                # get the element index from selection
+                @viewer.button(text="see_index")
+                def click():
+                    selected_indices = []
+                    selected_indices_flattened = []
+                    for id, o in enumerate(viewer_objects["viewer_complexes"]):
+                        if (o.is_selected):
+                            selected_indices.append(str(dict_elements_groups[o.name][0].id))
+                            selected_indices_flattened.append(str(id))
+                    selected_indices_str = ', '.join(selected_indices)
+                    selected_indices_flattened_str = ', '.join(selected_indices_flattened)
+
+                    if (selected_indices_str == ""):
+                        info_message = ("""Nothing is selected.""")
+                        viewer.info(info_message)
+                    else:
+                        info_message = (
+                            "Element indices:\n"
+                            f"{selected_indices_str}\n"
+                            "Element indices flattened:\n"
+                            f"{selected_indices_flattened_str}"
+                        )
+                        print(selected_indices_str)
+                        print(selected_indices_flattened_str)
+                        viewer.info(info_message)
+
 
                 # --------------------------------------------------------------------------
                 # run

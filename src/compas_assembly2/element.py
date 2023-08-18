@@ -849,7 +849,7 @@ class Element(Data):
         )
 
     @staticmethod
-    def from_plate_planes(base_plane, side_planes, thickness, id=0, insertion=None):
+    def from_plate_planes(base_plane, side_planes, thickness, id=None, insertion=None):
         """method create a plate element at the origin point with the frame at worldXY"""
 
         # --------------------------------------------------------------------------

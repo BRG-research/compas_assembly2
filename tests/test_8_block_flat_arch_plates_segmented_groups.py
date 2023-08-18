@@ -1,6 +1,5 @@
 from compas_assembly2 import Viewer, Element, FabricationNest, Group
 from compas.datastructures import Mesh
-import compas
 from compas.geometry import (
     Point,
     Line,
@@ -361,7 +360,6 @@ class _:
 
             # check cycles
             mesh = Mesh.from_vertices_and_faces(vertices, faces)
-            # print(mesh.face_neighbors(1))
             return mesh
 
         @staticmethod
@@ -782,9 +780,10 @@ for i in range(len(planes_groups0)):
 
     p_web1 = Plane(linear_interpolation(p0, p1, 0.85), p_web0.normal)
 
+    id = [1, remap_sequence(i, len(planes_groups0))]
     group.add(
         Element.from_plate_planes(
-            p_web0, top_plate_planes, plate_thickness, [1, remap_sequence(i, len(planes_groups0))]
+            p_web0, top_plate_planes, plate_thickness, id
         )
     )
 
@@ -808,12 +807,12 @@ for i in range(len(planes_groups0)):
             p_web1,
             top_plate_planes,
             -plate_thickness,
-            [1, remap_sequence(i, len(planes_groups0))],
+            id,
             top_plate_planes[0].normal,
         )
     )
 
-    for temp_element in group[1, i]:
+    for temp_element in group[id[0], id[1]]:
         temp_element.insertion = top_plate_planes[0].normal
 
 
@@ -822,10 +821,68 @@ for i in range(len(planes_groups0)):
 # ==========================================================================
 # group.to_nested_list
 # elements = group.regroup_by_keeping_first_indices(0)
-FabricationNest.pack_elements(elements=group.to_flat_list(), nest_type=3, inflate=0.1, height_step=4)
+FabricationNest.pack_elements(elements=group.to_flat_list(), nest_type=2, inflate=0.1, height_step=4)
 
 # ==========================================================================
-# COMPAS_WOOD GET JOINTS
+# WRITE PLATE GEOMETRY TO JSON
+# ==========================================================================
+simplices = group.get_elements_properties("simplex", True)
+json_dump(simplices, "tests/json_dumps/simplices.json")
+
+# ==========================================================================
+# COMPAS_WOOD SCALE POLYLINES DUE TO TOLERANCE
+# ==========================================================================
+scale = Scale.from_factors([100, 100, 100])
+for s in simplices:
+    s.transform(scale)
+
+# ==========================================================================
+# COMPAS_WOOD CREATE ADJACENCY
+# ==========================================================================
+adjancency = []
+nested_lists = group.to_nested_list()
+for i in range(len(nested_lists)):
+    adjancency.append(0+3*i)
+    adjancency.append(2+3*i)
+    adjancency.append(-1)
+    adjancency.append(-1)
+    adjancency.append(0+3*i)
+    adjancency.append(1+3*i)
+    adjancency.append(-1)
+    adjancency.append(-1)
+
+adjancency.extend([16, 1, -1, -1])
+adjancency.extend([17, 1, -1, -1])
+adjancency.extend([22, 1, -1, -1])
+adjancency.extend([16, 2, -1, -1])
+adjancency.extend([17, 2, -1, -1])
+adjancency.extend([22, 2, -1, -1])
+
+adjancency.extend([19, 4, -1, -1])
+adjancency.extend([20, 4, -1, -1])
+adjancency.extend([26, 4, -1, -1])
+adjancency.extend([19, 5, -1, -1])
+adjancency.extend([20, 5, -1, -1])
+adjancency.extend([26, 5, -1, -1])
+
+adjancency.extend([23, 7, -1, -1])
+adjancency.extend([28, 7, -1, -1])
+adjancency.extend([23, 8, -1, -1])
+adjancency.extend([28, 8, -1, -1])
+
+adjancency.extend([25, 10, -1, -1])
+adjancency.extend([32, 10, -1, -1])
+adjancency.extend([25, 11, -1, -1])
+adjancency.extend([32, 11, -1, -1])
+
+adjancency.extend([29, 13, -1, -1])
+adjancency.extend([31, 13, -1, -1])
+adjancency.extend([29, 14, -1, -1])
+adjancency.extend([31, 14, -1, -1])
+
+
+# ==========================================================================
+# COMPAS_WOOD RUN
 # ==========================================================================
 division_length = 300
 joint_parameters = [
@@ -848,43 +905,40 @@ joint_parameters = [
     0.95,
     50,
 ]
-
-# # print(result)
-
-simplices = group.get_elements_properties("simplex", True)
-json_dump(simplices, "tests/json_dumps/simplices.json")
-# geometry = []
-scale = Scale.from_factors([100, 100, 100])
-for s in simplices:
-    s.transform(scale)
-# # geometry.append(simplices[20].transformed(scale))
-# # geometry.append(simplices[21].transformed(scale))
-# # geometry.append(simplices[50].transformed(scale))
-# # geometry.append(simplices[51].transformed(scale))
-# # print(simplices[20])
-# # print(simplices[21])
-# # print(simplices[50])
-# # print(simplices[51])
-simplices.reverse()
-simplices = get_connection_zones(simplices, None, None, None, None, joint_parameters, 1, [1, 1, 1.5], 4)
-simplices.reverse()
-nested_lists = group.to_nested_list()
+simplices = get_connection_zones(simplices, None, None, None, adjancency, joint_parameters, 2, [1, 1, 1.1], 4)
 
 
-
-simplices = [item for sublist in simplices for item in sublist]
+# ==========================================================================
+# COMPAS_WOOD SCALE BACK TO ORIGINAL SCALE THE OUTLINES
+# ==========================================================================
 scale = Scale.from_factors([1 / 100, 1 / 100, 1 / 100])
-for pline in simplices:
-    pline.transform(scale)
+for outlines in simplices:
+    for outline in outlines:
+        outline.transform(scale)
 
+# ==========================================================================
+# CHANGE SIMPLEX AND COMPLEX OF ELEMENTS
+# ==========================================================================
 counter = 0
 for element_list in nested_lists:
     for element in element_list:
-        element.simplex = [simplices[counter*2+0], simplices[counter*2+1]]
-        element.complex = [_.Triagulator.from_loft_two_polygons(element.simplex[0], element.simplex[1])]
+        element.simplex = simplices[counter]
+        element.complex = [_.Triagulator.from_loft_two_polygons(simplices[counter][-2], simplices[counter][-1])]
         counter = counter + 1
 
-# geometry = simplices
+
+# ==========================================================================
+# GROUP IN A DIFFERENT ASSEMBLY ORDER
+# ==========================================================================
+group_as_nested_list = group.to_nested_list()
+group_as_nested_list_reordered = []
+half = math.floor(len(group_as_nested_list)/2)
+for i in range(half):
+    group_as_nested_list_reordered.append(group_as_nested_list[i])
+    group_as_nested_list_reordered.append(group_as_nested_list[i+half])
+
+if (len(group_as_nested_list) % 2 == 1):
+    group_as_nested_list_reordered.append(group_as_nested_list[-1])
 
 # ==========================================================================
 # VIEWER
@@ -894,7 +948,7 @@ color_red[0] = 0
 color_red[1] = 0
 color_red[2] = 0
 Viewer.show_elements(
-    group.to_nested_list(),
+    group_as_nested_list_reordered,
     show_simplices=False,
     show_grid=True,
     measurements=measurements,
