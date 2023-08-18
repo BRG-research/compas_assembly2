@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  
+  <title>compas_assembly2 - test_7_block_flat_arch_plates_segmented_ribs</title>
+  
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+  <meta name="author" content="Petras Vestartas" />
+  <meta name="description" content="" />
+
+  <link rel="shortcut icon" href="../_static/images/compas.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/mono-blue.min.css">
+  <link rel="stylesheet" type="text/css" href="../_static/css/compas.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/compas-reference.css" />
+
+  
+  <link rel="next" title="test_8_block_flat_arch_plates_segmented_groups" href="test_8_block_flat_arch_plates_segmented_groups.html" />
+  
+
+  
+  <link rel="prev" title="test_6_block_flat_arch_plates_boxes" href="test_6_block_flat_arch_plates_boxes.html" />
+  
+
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body data-spy="scroll" data-target="#compas-toc">
+  <!-- header -->
+  <header id="header" class="compas-header d-flex align-items-center">
+    <nav class="navbar navbar-expand navbar-dark col flex-column flex-md-row text-center">
+      <!-- brand -->
+      <a class="navbar-brand" href="https://BRG-research.github.io/compas_assembly2/">
+        <img src="../_static/images/compas_icon_white.png" alt="compas_assembly2" width="48px" height="48px" />
+      </a>
+      <!-- brand -->
+      <!-- primary -->
+      <ul class="navbar-nav">
+        <li class="nav-item active"><a class="nav-link" href="https://BRG-research.github.io/compas_assembly2/">compas_assembly2</a></li>
+      </ul>
+      <!-- primary -->
+      <ul class="navbar-nav d-none d-md-flex ml-md-auto">
+        <!-- version -->
+        
+        <meta id="doc_versions" data-url="https://BRG-research.github.io/compas_assembly2/doc_versions.txt" data-docs="https://BRG-research.github.io/compas_assembly2/">
+        <li class="nav-item nav-versions dropdown">
+          <a class="nav-item nav-link dropdown-toggle mr-md-2" href="#" id="bd-versions" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            0.1.0
+          </a>
+          <div id="doc_version_list" class="dropdown-menu dropdown-menu-md-right" aria-labelledby="bd-versions"></div>
+        </li>
+        
+        <!-- version -->
+        <!-- social -->
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/BRG-research/compas_assembly2" target="_blank">
+            <span class="fab fa-github fa-1x"></span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="http://forum.compas-framework.org" target="_blank">
+            <span class="fab fa-discourse fa-1x"></span>
+          </a>
+        </li>
+        <!-- social -->
+      </ul>
+    </nav>
+  </header>
+  <!-- header -->
+  <!-- main -->
+  <div class="container-fluid">
+    <div class="row">
+      <!-- main -->
+      <main class="col-12 col-md-9 col-xl-7 px-4 px-md-5 pt-2 pb-5 compas-content" role="main">
+        
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb mb-3 bg-white px-0">
+            <li class="breadcrumb-item"><a href="../index.html">compas_assembly2</a></li>
+            
+            <li class="breadcrumb-item"><a href="../examples.html">Examples</a></li>
+            
+            <!-- <li class="breadcrumb-item active" aria-current="page">test_7_block_flat_arch_plates_segmented_ribs</li> -->
+          </ol>
+        </nav>
+        
+
+        
+        
+        <section id="test-7-block-flat-arch-plates-segmented-ribs">
+<h1>test_7_block_flat_arch_plates_segmented_ribs</h1>
+<a class="reference internal image-reference" href="../_images/test_7_block_flat_arch_plates_segmented_ribs.gif"><img alt="compas_assembly2" class="align-right" src="../_images/test_7_block_flat_arch_plates_segmented_ribs.gif" style="width: 100%;" /></a>
+<div class="language-python notranslate"><div class="highlight"><pre><button class="btn copy"><i class="far fa-copy"></i></button><code><span></span><span class="kn">from</span> <span class="nn">compas_assembly2</span> <span class="kn">import</span> <span class="n">Viewer</span><span class="p">,</span> <span class="n">Element</span><span class="p">,</span> <span class="n">FabricationNest</span>
+<span class="kn">from</span> <span class="nn">compas.datastructures</span> <span class="kn">import</span> <span class="n">Mesh</span>
+<span class="kn">import</span> <span class="nn">compas</span>
+<span class="kn">from</span> <span class="nn">compas.geometry</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Point</span><span class="p">,</span>
+    <span class="n">Line</span><span class="p">,</span>
+    <span class="n">Plane</span><span class="p">,</span>
+    <span class="n">Vector</span><span class="p">,</span>
+    <span class="n">intersection_plane_plane_plane</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">_</span><span class="p">:</span>
+    <span class="k">class</span> <span class="nc">Ear</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Represents an ear of a polygon. An ear is a triangle formed by three consecutive vertices of the polygon.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">points</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">ind</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Initialize an Ear instance.</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                points (list): List of vertex coordinates.</span>
+<span class="sd">                indexes (list): List of vertex indexes.</span>
+<span class="sd">                ind (int): Index of the current vertex.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">ind</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="n">points</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span>
+            <span class="n">length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">indexes</span><span class="p">)</span>
+            <span class="n">index_in_indexes_arr</span> <span class="o">=</span> <span class="n">indexes</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">next</span> <span class="o">=</span> <span class="n">indexes</span><span class="p">[(</span><span class="n">index_in_indexes_arr</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">length</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">index_in_indexes_arr</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">prew</span> <span class="o">=</span> <span class="n">indexes</span><span class="p">[</span><span class="n">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">prew</span> <span class="o">=</span> <span class="n">indexes</span><span class="p">[</span><span class="n">index_in_indexes_arr</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">neighbour_coords</span> <span class="o">=</span> <span class="p">[</span><span class="n">points</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">prew</span><span class="p">],</span> <span class="n">points</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">next</span><span class="p">]]</span>
+
+        <span class="k">def</span> <span class="nf">is_inside</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Check if a given point is inside the triangle formed by the ear.</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                point (list): Coordinates of the point to check.</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                bool: True if the point is inside the triangle, False otherwise.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">p1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span>
+            <span class="n">p2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">neighbour_coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">p3</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">neighbour_coords</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">p0</span> <span class="o">=</span> <span class="n">point</span>
+
+            <span class="n">d</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="p">(</span><span class="n">p1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">p0</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">p2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">p1</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">-</span> <span class="p">(</span><span class="n">p2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">p1</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">p1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">p0</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+                <span class="p">(</span><span class="n">p2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">p0</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">p3</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">p2</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">-</span> <span class="p">(</span><span class="n">p3</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">p2</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">p2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">p0</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+                <span class="p">(</span><span class="n">p3</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">p0</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">p1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">p3</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">-</span> <span class="p">(</span><span class="n">p1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">p3</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">p3</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">p0</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+            <span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">d</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">d</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">d</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">d</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">def</span> <span class="nf">is_ear_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Check if a given point is one of the vertices of the ear triangle.</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                p (list): Coordinates of the point to check.</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                bool: True if the point is a vertex of the ear triangle, False otherwise.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="ow">or</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">neighbour_coords</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">points</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">ears</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Validate if the ear triangle is a valid ear by checking its convexity and that no points lie inside.</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                points (list): List of vertex coordinates.</span>
+<span class="sd">                indexes (list): List of vertex indexes.</span>
+<span class="sd">                ears (list): List of other ear triangles.</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                bool: True if the ear triangle is valid, False otherwise.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">not_ear_points</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">points</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indexes</span> <span class="k">if</span> <span class="n">points</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="ow">and</span> <span class="n">points</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">neighbour_coords</span>
+            <span class="p">]</span>
+            <span class="n">insides</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">is_inside</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">not_ear_points</span><span class="p">]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_convex</span><span class="p">()</span> <span class="ow">and</span> <span class="kc">True</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">insides</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">ears</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">is_ear_point</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">):</span>
+                        <span class="k">return</span> <span class="kc">False</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">def</span> <span class="nf">is_convex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Check if the ear triangle is convex.</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                bool: True if the ear triangle is convex, False otherwise.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">neighbour_coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">neighbour_coords</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">ab</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+            <span class="n">bc</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+            <span class="k">if</span> <span class="n">ab</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">bc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">ab</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">bc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">def</span> <span class="nf">get_triangle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Get the indices of the vertices forming the ear triangle.</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                list: List of vertex indices forming the ear triangle.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">prew</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">next</span><span class="p">]</span>
+
+    <span class="k">class</span> <span class="nc">Earcut</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A class for triangulating a simple polygon using the ear-cutting algorithm.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">points</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Initialize an Earcut instance with the input points.</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                points (list): List of vertex coordinates forming the polygon.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span> <span class="o">=</span> <span class="n">points</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ears</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">neighbours</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">triangles</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">update_neighbours</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Update the list of neighboring vertices.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">neighbours</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">neighbours</span> <span class="o">=</span> <span class="n">neighbours</span>
+
+        <span class="k">def</span> <span class="nf">add_ear</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_ear</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Add a new ear to the list of ears and update neighboring vertices.</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                new_ear (Ear): The new ear triangle to be added.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ears</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_ear</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">neighbours</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_ear</span><span class="o">.</span><span class="n">prew</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">neighbours</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_ear</span><span class="o">.</span><span class="n">next</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">find_ears</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Find valid ear triangles among the vertices and add them to the ears list.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">indexes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">))</span>
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="n">new_ear</span> <span class="o">=</span> <span class="n">_</span><span class="o">.</span><span class="n">Ear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">new_ear</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ears</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">add_ear</span><span class="p">(</span><span class="n">new_ear</span><span class="p">)</span>
+                    <span class="n">indexes</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">new_ear</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">def</span> <span class="nf">triangulate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Triangulate the polygon using the ear-cutting algorithm.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">indexes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">find_ears</span><span class="p">()</span>
+
+            <span class="n">num_of_ears</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ears</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">num_of_ears</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No ears found for triangulation.&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">num_of_ears</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">triangles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ears</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_triangle</span><span class="p">())</span>
+                <span class="k">return</span>
+
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ears</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">indexes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">triangles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ears</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_triangle</span><span class="p">())</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">triangles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ears</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_triangle</span><span class="p">())</span>
+                    <span class="k">break</span>
+
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ears</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s2">&quot;Unable to find more ears for triangulation.&quot;</span><span class="p">)</span>
+                <span class="n">current</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ears</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+                <span class="n">indexes</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">current</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">neighbours</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">current</span><span class="o">.</span><span class="n">prew</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">neighbours</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">current</span><span class="o">.</span><span class="n">next</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">triangles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current</span><span class="o">.</span><span class="n">get_triangle</span><span class="p">())</span>
+
+                <span class="c1"># Check if prew and next vertices form new ears</span>
+                <span class="n">prew_ear_new</span> <span class="o">=</span> <span class="n">_</span><span class="o">.</span><span class="n">Ear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">current</span><span class="o">.</span><span class="n">prew</span><span class="p">)</span>
+                <span class="n">next_ear_new</span> <span class="o">=</span> <span class="n">_</span><span class="o">.</span><span class="n">Ear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">current</span><span class="o">.</span><span class="n">next</span><span class="p">)</span>
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="n">prew_ear_new</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ears</span><span class="p">)</span>
+                    <span class="ow">and</span> <span class="n">prew_ear_new</span><span class="o">.</span><span class="n">index</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">neighbours</span>
+                <span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">add_ear</span><span class="p">(</span><span class="n">prew_ear_new</span><span class="p">)</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="n">next_ear_new</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ears</span><span class="p">)</span>
+                    <span class="ow">and</span> <span class="n">next_ear_new</span><span class="o">.</span><span class="n">index</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">neighbours</span>
+                <span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">add_ear</span><span class="p">(</span><span class="n">next_ear_new</span><span class="p">)</span>
+                    <span class="k">continue</span>
+
+    <span class="k">class</span> <span class="nc">Triagulator</span><span class="p">:</span>
+        <span class="nd">@staticmethod</span>
+        <span class="k">def</span> <span class="nf">_get_frame</span><span class="p">(</span><span class="n">_points</span><span class="p">,</span> <span class="n">_orientation_point</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;create a frame from a polyline&quot;&quot;&quot;</span>
+
+            <span class="c1"># create a normal by averaging the cross-products of a polyline</span>
+            <span class="n">normal</span> <span class="o">=</span> <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">_points</span><span class="p">)</span>
+            <span class="n">center</span> <span class="o">=</span> <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">is_closed</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">distance_point_point</span><span class="p">(</span>
+                    <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">Point</span><span class="p">(</span><span class="o">*</span><span class="n">_points</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">Point</span><span class="p">(</span><span class="o">*</span><span class="n">_points</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="p">)</span>
+                <span class="o">&lt;</span> <span class="mf">0.01</span>
+            <span class="p">)</span>
+            <span class="n">sign</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">is_closed</span> <span class="k">else</span> <span class="mi">0</span>
+
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">count</span> <span class="o">-</span> <span class="n">sign</span><span class="p">):</span>
+                <span class="n">num</span> <span class="o">=</span> <span class="p">((</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">count</span> <span class="o">-</span> <span class="n">sign</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">count</span> <span class="o">-</span> <span class="n">sign</span><span class="p">)</span>
+                <span class="n">item1</span> <span class="o">=</span> <span class="p">((</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">count</span> <span class="o">-</span> <span class="n">sign</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">count</span> <span class="o">-</span> <span class="n">sign</span><span class="p">)</span>
+                <span class="n">point3d</span> <span class="o">=</span> <span class="n">_points</span><span class="p">[</span><span class="n">num</span><span class="p">]</span>
+                <span class="n">point3d1</span> <span class="o">=</span> <span class="n">_points</span><span class="p">[</span><span class="n">item1</span><span class="p">]</span>
+                <span class="n">item2</span> <span class="o">=</span> <span class="n">_points</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">normal</span> <span class="o">+=</span> <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">cross_vectors</span><span class="p">(</span><span class="n">item2</span> <span class="o">-</span> <span class="n">point3d</span><span class="p">,</span> <span class="n">point3d1</span> <span class="o">-</span> <span class="n">item2</span><span class="p">)</span>
+                <span class="n">center</span> <span class="o">=</span> <span class="n">center</span> <span class="o">+</span> <span class="n">point3d</span>
+            <span class="n">normal</span><span class="o">.</span><span class="n">unitize</span><span class="p">()</span>
+            <span class="n">center</span> <span class="o">=</span> <span class="n">center</span> <span class="o">/</span> <span class="n">count</span>
+
+            <span class="c1"># get the longest edge</span>
+            <span class="n">longest_segment_length</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="n">longest_segment_start</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">longest_segment_end</span> <span class="o">=</span> <span class="kc">None</span>
+
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">_points</span><span class="p">)</span> <span class="o">-</span> <span class="n">sign</span><span class="p">):</span>
+                <span class="n">point1</span> <span class="o">=</span> <span class="n">_points</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">point2</span> <span class="o">=</span> <span class="n">_points</span><span class="p">[</span>
+                    <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">_points</span><span class="p">)</span>
+                <span class="p">]</span>  <span class="c1"># To create a closed polyline, connect the last point to the first one.</span>
+
+                <span class="n">segment_length</span> <span class="o">=</span> <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">distance_point_point</span><span class="p">(</span><span class="n">point1</span><span class="p">,</span> <span class="n">point2</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">segment_length</span> <span class="o">&gt;</span> <span class="n">longest_segment_length</span><span class="p">:</span>
+                    <span class="n">longest_segment_length</span> <span class="o">=</span> <span class="n">segment_length</span>
+                    <span class="n">longest_segment_start</span> <span class="o">=</span> <span class="n">point1</span>
+                    <span class="n">longest_segment_end</span> <span class="o">=</span> <span class="n">point2</span>
+
+            <span class="c1"># create x and y-axes for the frame</span>
+            <span class="n">x_axis</span> <span class="o">=</span> <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">Vector</span><span class="o">.</span><span class="n">from_start_end</span><span class="p">(</span><span class="n">longest_segment_start</span><span class="p">,</span> <span class="n">longest_segment_end</span><span class="p">)</span>
+            <span class="n">x_axis</span><span class="o">.</span><span class="n">unitize</span><span class="p">()</span>
+            <span class="n">y_axis</span> <span class="o">=</span> <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">cross_vectors</span><span class="p">(</span><span class="n">normal</span><span class="p">,</span> <span class="n">x_axis</span><span class="p">)</span>
+            <span class="n">y_axis</span> <span class="o">=</span> <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="n">y_axis</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y_axis</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">y_axis</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+            <span class="c1"># create the frame</span>
+            <span class="n">center</span> <span class="o">=</span> <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">centroid_points</span><span class="p">(</span><span class="n">_points</span><span class="p">)</span>
+            <span class="n">frame</span> <span class="o">=</span> <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">Frame</span><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="n">x_axis</span><span class="p">,</span> <span class="n">y_axis</span><span class="p">)</span>
+
+            <span class="c1"># orient the from the orientation point to the opposite direction</span>
+            <span class="k">if</span> <span class="n">_orientation_point</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">signed_distance</span> <span class="o">=</span> <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">distance_point_plane_signed</span><span class="p">(</span>
+                    <span class="n">_orientation_point</span><span class="p">,</span> <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">Plane</span><span class="o">.</span><span class="n">from_frame</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">signed_distance</span> <span class="o">&gt;</span> <span class="mf">0.001</span><span class="p">:</span>
+                    <span class="n">frame</span> <span class="o">=</span> <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">Frame</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">point</span><span class="p">,</span> <span class="o">-</span><span class="n">x_axis</span><span class="p">,</span> <span class="n">y_axis</span><span class="p">)</span>
+            <span class="c1"># output</span>
+            <span class="k">return</span> <span class="n">frame</span>
+
+        <span class="nd">@staticmethod</span>
+        <span class="k">def</span> <span class="nf">from_box_corners</span><span class="p">():</span>
+            <span class="k">pass</span>
+
+        <span class="nd">@staticmethod</span>
+        <span class="k">def</span> <span class="nf">from_points</span><span class="p">(</span><span class="n">points</span><span class="p">):</span>
+            <span class="n">polygon</span> <span class="o">=</span> <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">Polygon</span><span class="p">(</span><span class="n">points</span><span class="o">=</span><span class="n">points</span><span class="p">)</span>
+            <span class="n">xform</span> <span class="o">=</span> <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">Transformation</span><span class="o">.</span><span class="n">from_frame_to_frame</span><span class="p">(</span>
+                <span class="n">_</span><span class="o">.</span><span class="n">Triagulator</span><span class="o">.</span><span class="n">_get_frame</span><span class="p">(</span><span class="n">points</span><span class="p">),</span> <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">Frame</span><span class="o">.</span><span class="n">worldXY</span><span class="p">()</span>
+            <span class="p">)</span>
+            <span class="n">polygon</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">xform</span><span class="p">)</span>
+            <span class="n">ear_cut</span> <span class="o">=</span> <span class="n">_</span><span class="o">.</span><span class="n">Earcut</span><span class="p">(</span><span class="n">polygon</span><span class="o">.</span><span class="n">points</span><span class="p">)</span>
+            <span class="n">ear_cut</span><span class="o">.</span><span class="n">triangulate</span><span class="p">()</span>
+            <span class="n">polygon</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">xform</span><span class="o">.</span><span class="n">inverse</span><span class="p">())</span>
+            <span class="k">return</span> <span class="n">compas</span><span class="o">.</span><span class="n">datastructures</span><span class="o">.</span><span class="n">Mesh</span><span class="o">.</span><span class="n">from_vertices_and_faces</span><span class="p">(</span><span class="n">polygon</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="n">ear_cut</span><span class="o">.</span><span class="n">triangles</span><span class="p">)</span>
+
+        <span class="nd">@staticmethod</span>
+        <span class="k">def</span> <span class="nf">from_loft_two_polygons</span><span class="p">(</span><span class="n">points0</span><span class="p">,</span> <span class="n">points1</span><span class="p">):</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">points0</span><span class="p">)</span>
+
+            <span class="n">is_closed</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">distance_point_point</span><span class="p">(</span>
+                    <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">Point</span><span class="p">(</span><span class="o">*</span><span class="n">points0</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">Point</span><span class="p">(</span><span class="o">*</span><span class="n">points0</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="p">)</span>
+                <span class="o">&lt;</span> <span class="mf">0.01</span>
+            <span class="p">)</span>
+            <span class="n">sign</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">is_closed</span> <span class="k">else</span> <span class="mi">0</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="n">n</span> <span class="o">-</span> <span class="n">sign</span>
+
+            <span class="c1"># create a polygon from the first set of points</span>
+            <span class="c1"># orient to worldXY</span>
+            <span class="c1"># triangulate</span>
+            <span class="n">polygon</span> <span class="o">=</span> <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">Polygon</span><span class="p">(</span><span class="n">points</span><span class="o">=</span><span class="n">points0</span><span class="p">)</span>
+            <span class="n">xform</span> <span class="o">=</span> <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">Transformation</span><span class="o">.</span><span class="n">from_frame_to_frame</span><span class="p">(</span>
+                <span class="n">_</span><span class="o">.</span><span class="n">Triagulator</span><span class="o">.</span><span class="n">_get_frame</span><span class="p">(</span><span class="n">points0</span><span class="p">,</span> <span class="n">points1</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">Frame</span><span class="o">.</span><span class="n">worldXY</span><span class="p">()</span>
+            <span class="p">)</span>
+            <span class="n">polygon</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">xform</span><span class="p">)</span>
+            <span class="n">ear_cut</span> <span class="o">=</span> <span class="n">_</span><span class="o">.</span><span class="n">Earcut</span><span class="p">(</span><span class="n">polygon</span><span class="o">.</span><span class="n">points</span><span class="p">)</span>
+            <span class="n">ear_cut</span><span class="o">.</span><span class="n">triangulate</span><span class="p">()</span>
+            <span class="n">triangles</span> <span class="o">=</span> <span class="n">ear_cut</span><span class="o">.</span><span class="n">triangles</span>
+
+            <span class="c1"># create mesh loft</span>
+            <span class="n">vertices</span> <span class="o">=</span> <span class="n">points0</span><span class="p">[:</span><span class="n">n</span><span class="p">]</span> <span class="o">+</span> <span class="n">points1</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">n</span><span class="p">]</span>
+            <span class="n">faces</span> <span class="o">=</span> <span class="n">triangles</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+            <span class="c1"># top and bottom faces</span>
+            <span class="k">for</span> <span class="n">triangle</span> <span class="ow">in</span> <span class="n">triangles</span><span class="p">:</span>
+                <span class="n">faces</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">triangle</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">n</span><span class="p">,</span> <span class="n">triangle</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">n</span><span class="p">,</span> <span class="n">triangle</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">n</span><span class="p">])</span>
+
+            <span class="c1"># side faces</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+                <span class="nb">next</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">n</span>
+                <span class="n">faces</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">i</span><span class="p">,</span> <span class="nb">next</span><span class="p">,</span> <span class="nb">next</span> <span class="o">+</span> <span class="n">n</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="n">n</span><span class="p">])</span>
+
+            <span class="c1"># check cycles</span>
+            <span class="n">mesh</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">from_vertices_and_faces</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span><span class="p">)</span>
+            <span class="c1"># print(mesh.face_neighbors(1))</span>
+            <span class="k">return</span> <span class="n">mesh</span>
+
+
+<span class="k">def</span> <span class="nf">get_arc_points</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">num_points</span><span class="p">,</span> <span class="n">height</span><span class="p">):</span>
+    <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">z1</span> <span class="o">=</span> <span class="n">p1</span>
+    <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">z2</span> <span class="o">=</span> <span class="n">p2</span>
+
+    <span class="c1"># Calculate control point</span>
+    <span class="n">cx</span> <span class="o">=</span> <span class="p">(</span><span class="n">x1</span> <span class="o">+</span> <span class="n">x2</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">cy</span> <span class="o">=</span> <span class="n">height</span>
+
+    <span class="c1"># Calculate arc points</span>
+    <span class="n">arc_points</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_points</span><span class="p">):</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">i</span> <span class="o">/</span> <span class="p">(</span><span class="n">num_points</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">px</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">t</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">x1</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">t</span><span class="p">)</span> <span class="o">*</span> <span class="n">t</span> <span class="o">*</span> <span class="n">cx</span> <span class="o">+</span> <span class="n">t</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">x2</span>
+        <span class="n">py</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">t</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">y1</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">t</span><span class="p">)</span> <span class="o">*</span> <span class="n">t</span> <span class="o">*</span> <span class="n">cy</span> <span class="o">+</span> <span class="n">t</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">y2</span>
+        <span class="n">arc_points</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">px</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">py</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">arc_points</span>
+
+
+<span class="k">def</span> <span class="nf">calculate_normals_with_length</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">normal_scalar</span><span class="p">):</span>
+    <span class="n">normals</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">points</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># Handle left boundary</span>
+            <span class="n">delta_x</span> <span class="o">=</span> <span class="n">points</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">points</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">delta_z</span> <span class="o">=</span> <span class="n">points</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">points</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">i</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">points</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># Handle right boundary</span>
+            <span class="n">delta_x</span> <span class="o">=</span> <span class="n">points</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">points</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">delta_z</span> <span class="o">=</span> <span class="n">points</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">points</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">delta_x</span> <span class="o">=</span> <span class="n">points</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">points</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">delta_z</span> <span class="o">=</span> <span class="n">points</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">points</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+
+        <span class="n">normal_length</span> <span class="o">=</span> <span class="p">(</span><span class="n">delta_x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">delta_z</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
+        <span class="k">if</span> <span class="n">normal_length</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">normal_x</span><span class="p">,</span> <span class="n">normal_z</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">normal_x</span> <span class="o">=</span> <span class="o">-</span><span class="n">delta_z</span> <span class="o">/</span> <span class="n">normal_length</span>
+            <span class="n">normal_z</span> <span class="o">=</span> <span class="n">delta_x</span> <span class="o">/</span> <span class="n">normal_length</span>
+
+        <span class="n">normals</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">normal_x</span> <span class="o">*</span> <span class="n">normal_scalar</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">normal_z</span> <span class="o">*</span> <span class="n">normal_scalar</span><span class="p">])</span>
+
+    <span class="n">normals</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">normals</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">normals</span>
+
+
+<span class="k">def</span> <span class="nf">move_points_by_normals</span><span class="p">(</span><span class="n">arc_points</span><span class="p">,</span> <span class="n">normals</span><span class="p">,</span> <span class="n">scale</span><span class="p">):</span>
+    <span class="n">moved_points</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">point</span><span class="p">,</span> <span class="n">normal</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">arc_points</span><span class="p">,</span> <span class="n">normals</span><span class="p">):</span>
+        <span class="n">moved_point</span> <span class="o">=</span> <span class="p">[</span><span class="n">point</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">normal</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">scale</span><span class="p">,</span> <span class="n">point</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">normal</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">scale</span><span class="p">,</span> <span class="n">point</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">normal</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">scale</span><span class="p">]</span>
+        <span class="n">moved_points</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">moved_point</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">moved_points</span>
+
+
+<span class="k">def</span> <span class="nf">move_points_to_target_z</span><span class="p">(</span><span class="n">arc_points</span><span class="p">,</span> <span class="n">normals</span><span class="p">,</span> <span class="n">target_z</span><span class="p">):</span>
+    <span class="n">moved_points</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">point</span><span class="p">,</span> <span class="n">normal</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">arc_points</span><span class="p">,</span> <span class="n">normals</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">normal</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># Avoid division by zero if normal is parallel to the xy-plane</span>
+            <span class="k">continue</span>
+
+        <span class="c1"># Calculate the parameter t where the normal line intersects the target z-coordinate line</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="p">(</span><span class="n">target_z</span> <span class="o">-</span> <span class="n">point</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">/</span> <span class="n">normal</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+        <span class="n">moved_point</span> <span class="o">=</span> <span class="p">[</span><span class="n">point</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">normal</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">t</span><span class="p">,</span> <span class="n">point</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">normal</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">t</span><span class="p">,</span> <span class="n">target_z</span><span class="p">]</span>
+        <span class="n">moved_points</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">moved_point</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">moved_points</span>
+
+
+<span class="k">def</span> <span class="nf">move_points_in_two_opposite_directions</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">direction</span><span class="p">,</span> <span class="n">distance</span><span class="p">):</span>
+    <span class="n">new_points_0</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">new_points_1</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">direction_magnitude</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">d</span><span class="o">**</span><span class="mi">2</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">direction</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
+    <span class="n">normalized_direction</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span> <span class="o">/</span> <span class="n">direction_magnitude</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">direction</span><span class="p">]</span>
+    <span class="n">movement_positive</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span> <span class="o">*</span> <span class="n">distance</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">normalized_direction</span><span class="p">]</span>
+    <span class="n">movement_negative</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="n">d</span> <span class="o">*</span> <span class="n">distance</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">normalized_direction</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">points</span><span class="p">:</span>
+        <span class="n">new_points_0</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">point</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">movement_positive</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">point</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">movement_positive</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">point</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">movement_positive</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">new_points_1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">point</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">movement_negative</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">point</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">movement_negative</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">point</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">movement_negative</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">new_points_0</span><span class="p">,</span> <span class="n">new_points_1</span>
+
+
+<span class="c1"># ==========================================================================</span>
+<span class="c1"># CREATE POINTES FOR THE ARC</span>
+<span class="c1"># ==========================================================================</span>
+
+<span class="c1"># Create the arc curve points</span>
+<span class="c1"># arc_points = create_arc_curve(center, radius, start_angle, end_angle, num_points)</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">length</span> <span class="o">=</span> <span class="mf">3.0</span>
+<span class="n">height</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="n">offset</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="n">p_b_0</span> <span class="o">=</span> <span class="n">get_arc_points</span><span class="p">([</span><span class="o">-</span><span class="n">length</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="n">length</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">n</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+<span class="n">normals</span> <span class="o">=</span> <span class="n">calculate_normals_with_length</span><span class="p">(</span><span class="n">p_b_0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+<span class="c1"># p_t_0  = move_points_by_normals(p_b_0, normals, 1)</span>
+<span class="n">p_t_0</span> <span class="o">=</span> <span class="n">move_points_to_target_z</span><span class="p">(</span><span class="n">p_b_0</span><span class="p">,</span> <span class="n">normals</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+<span class="n">p_b_0</span><span class="p">,</span> <span class="n">p_b_1</span> <span class="o">=</span> <span class="n">move_points_in_two_opposite_directions</span><span class="p">(</span><span class="n">p_b_0</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">offset</span><span class="p">)</span>
+<span class="n">p_t_0</span><span class="p">,</span> <span class="n">p_t_1</span> <span class="o">=</span> <span class="n">move_points_in_two_opposite_directions</span><span class="p">(</span><span class="n">p_t_0</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">offset</span><span class="p">)</span>
+<span class="n">pts</span> <span class="o">=</span> <span class="n">p_b_0</span> <span class="o">+</span> <span class="n">p_b_1</span> <span class="o">+</span> <span class="n">p_t_0</span> <span class="o">+</span> <span class="n">p_t_1</span>
+<span class="n">elements</span> <span class="o">=</span> <span class="n">Element</span><span class="o">.</span><span class="n">to_elements</span><span class="p">(</span><span class="n">pts</span><span class="p">)</span>
+
+<span class="c1"># ==========================================================================</span>
+<span class="c1"># MEASUREMENT</span>
+<span class="c1"># ==========================================================================</span>
+<span class="n">measurements</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">geometry</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">arc_start</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="n">p_b_1</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">p_b_1</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">p_b_1</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span>
+<span class="n">arc_end</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="n">p_b_1</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">p_b_1</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">p_b_1</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span>
+<span class="n">line</span> <span class="o">=</span> <span class="n">Line</span><span class="p">(</span><span class="n">arc_start</span><span class="p">,</span> <span class="n">arc_end</span><span class="p">)</span>
+<span class="n">measurements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+
+<span class="c1"># ==========================================================================</span>
+<span class="c1"># CREATE PLATES</span>
+<span class="c1"># ==========================================================================</span>
+
+
+<span class="k">def</span> <span class="nf">mesh_box_from_eight_points</span><span class="p">(</span><span class="n">vertices</span><span class="p">):</span>
+    <span class="c1"># define the faces with the ccw winding</span>
+    <span class="n">faces</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">7</span><span class="p">],</span>
+    <span class="p">]</span>
+
+    <span class="n">mesh</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">from_vertices_and_faces</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span><span class="p">)</span>
+    <span class="n">p0</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="n">vertices</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">vertices</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">vertices</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span>
+    <span class="n">p1</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="n">vertices</span><span class="p">[</span><span class="mi">6</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">vertices</span><span class="p">[</span><span class="mi">6</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">vertices</span><span class="p">[</span><span class="mi">6</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span>
+    <span class="n">center</span> <span class="o">=</span> <span class="p">(</span><span class="n">p0</span> <span class="o">+</span> <span class="n">p1</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.5</span>
+
+    <span class="k">return</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">center</span>
+
+
+<span class="n">plate_thickness</span> <span class="o">=</span> <span class="mf">0.04</span>
+<span class="n">elements</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">side_planes_for_beams</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">Plane</span><span class="p">(</span><span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">height</span> <span class="o">-</span> <span class="n">plate_thickness</span><span class="p">),</span> <span class="n">Vector</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span>
+    <span class="n">Plane</span><span class="p">(</span><span class="n">Point</span><span class="p">(</span><span class="o">-</span><span class="n">length</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">Vector</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span>
+    <span class="n">Plane</span><span class="p">(</span><span class="n">Point</span><span class="p">(</span><span class="n">length</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">Vector</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span>
+<span class="p">]</span>
+<span class="n">side_planes_for_ribs_sequentialy</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">planes_bot</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">planes_side</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="c1"># --------------------------------------------------------------------------</span>
+    <span class="c1"># Create the mesh</span>
+    <span class="c1"># --------------------------------------------------------------------------</span>
+    <span class="n">vertices</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">p_b_0</span><span class="p">[</span><span class="mi">0</span> <span class="o">+</span> <span class="n">i</span><span class="p">],</span>
+        <span class="n">p_b_0</span><span class="p">[</span><span class="mi">1</span> <span class="o">+</span> <span class="n">i</span><span class="p">],</span>
+        <span class="n">p_b_1</span><span class="p">[</span><span class="mi">1</span> <span class="o">+</span> <span class="n">i</span><span class="p">],</span>
+        <span class="n">p_b_1</span><span class="p">[</span><span class="mi">0</span> <span class="o">+</span> <span class="n">i</span><span class="p">],</span>
+        <span class="n">p_t_0</span><span class="p">[</span><span class="mi">0</span> <span class="o">+</span> <span class="n">i</span><span class="p">],</span>
+        <span class="n">p_t_0</span><span class="p">[</span><span class="mi">1</span> <span class="o">+</span> <span class="n">i</span><span class="p">],</span>
+        <span class="n">p_t_1</span><span class="p">[</span><span class="mi">1</span> <span class="o">+</span> <span class="n">i</span><span class="p">],</span>
+        <span class="n">p_t_1</span><span class="p">[</span><span class="mi">0</span> <span class="o">+</span> <span class="n">i</span><span class="p">],</span>
+    <span class="p">]</span>
+
+    <span class="n">box</span><span class="p">,</span> <span class="n">center</span> <span class="o">=</span> <span class="n">mesh_box_from_eight_points</span><span class="p">(</span><span class="n">vertices</span><span class="p">)</span>
+
+    <span class="c1"># --------------------------------------------------------------------------</span>
+    <span class="c1"># Collect planes for ribs</span>
+    <span class="c1"># --------------------------------------------------------------------------</span>
+    <span class="n">plane_bot</span> <span class="o">=</span> <span class="n">Plane</span><span class="p">(</span><span class="n">Point</span><span class="p">(</span><span class="o">*</span><span class="n">box</span><span class="o">.</span><span class="n">face_centroid</span><span class="p">(</span><span class="mi">0</span><span class="p">)),</span> <span class="n">box</span><span class="o">.</span><span class="n">face_normal</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+    <span class="n">planes_bot</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plane_bot</span><span class="p">)</span>
+    <span class="n">plane_side</span> <span class="o">=</span> <span class="n">Plane</span><span class="p">(</span><span class="n">Point</span><span class="p">(</span><span class="o">*</span><span class="n">box</span><span class="o">.</span><span class="n">face_centroid</span><span class="p">(</span><span class="mi">5</span><span class="p">)),</span> <span class="n">box</span><span class="o">.</span><span class="n">face_normal</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+    <span class="n">planes_side</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plane_side</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">2</span><span class="p">):</span>
+        <span class="n">plane_side_last</span> <span class="o">=</span> <span class="n">Plane</span><span class="p">(</span><span class="n">Point</span><span class="p">(</span><span class="o">*</span><span class="n">box</span><span class="o">.</span><span class="n">face_centroid</span><span class="p">(</span><span class="mi">3</span><span class="p">)),</span> <span class="o">-</span><span class="n">Vector</span><span class="p">(</span><span class="o">*</span><span class="n">box</span><span class="o">.</span><span class="n">face_normal</span><span class="p">(</span><span class="mi">3</span><span class="p">)))</span>
+        <span class="n">planes_side</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plane_side_last</span><span class="p">)</span>
+
+    <span class="c1"># --------------------------------------------------------------------------</span>
+    <span class="c1"># Create plates</span>
+    <span class="c1"># --------------------------------------------------------------------------</span>
+
+    <span class="k">def</span> <span class="nf">create_plate</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="c1"># plate</span>
+        <span class="n">f_n</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">face_neighbors</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">plane0</span> <span class="o">=</span> <span class="n">Plane</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">face_centroid</span><span class="p">(</span><span class="n">f</span><span class="p">),</span> <span class="n">mesh</span><span class="o">.</span><span class="n">face_normal</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+        <span class="n">plane1</span> <span class="o">=</span> <span class="n">Plane</span><span class="p">(</span>
+            <span class="n">Point</span><span class="p">(</span><span class="o">*</span><span class="n">mesh</span><span class="o">.</span><span class="n">face_centroid</span><span class="p">(</span><span class="n">f</span><span class="p">))</span> <span class="o">+</span> <span class="n">Vector</span><span class="p">(</span><span class="o">*</span><span class="n">mesh</span><span class="o">.</span><span class="n">face_normal</span><span class="p">(</span><span class="n">f</span><span class="p">))</span> <span class="o">*</span> <span class="n">plate_thickness</span><span class="p">,</span> <span class="n">mesh</span><span class="o">.</span><span class="n">face_normal</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="n">outline</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">outline_temp</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">f_n</span><span class="p">)):</span>
+            <span class="n">p0</span> <span class="o">=</span> <span class="n">intersection_plane_plane_plane</span><span class="p">(</span>
+                <span class="n">plane0</span><span class="p">,</span>
+                <span class="n">mesh</span><span class="o">.</span><span class="n">face_plane</span><span class="p">(</span><span class="n">f_n</span><span class="p">[</span><span class="n">j</span><span class="p">]),</span>
+                <span class="n">mesh</span><span class="o">.</span><span class="n">face_plane</span><span class="p">(</span><span class="n">f_n</span><span class="p">[(</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">f_n</span><span class="p">)]),</span>
+            <span class="p">)</span>
+            <span class="n">outline</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p0</span><span class="p">)</span>
+            <span class="n">p1</span> <span class="o">=</span> <span class="n">intersection_plane_plane_plane</span><span class="p">(</span>
+                <span class="n">plane1</span><span class="p">,</span>
+                <span class="n">mesh</span><span class="o">.</span><span class="n">face_plane</span><span class="p">(</span><span class="n">f_n</span><span class="p">[</span><span class="n">j</span><span class="p">]),</span>
+                <span class="n">mesh</span><span class="o">.</span><span class="n">face_plane</span><span class="p">(</span><span class="n">f_n</span><span class="p">[(</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">f_n</span><span class="p">)]),</span>
+            <span class="p">)</span>
+            <span class="n">outline_temp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p1</span><span class="p">)</span>
+        <span class="n">outline</span> <span class="o">=</span> <span class="n">outline</span> <span class="o">+</span> <span class="n">outline_temp</span>
+        <span class="n">mesh</span><span class="p">,</span> <span class="n">center</span> <span class="o">=</span> <span class="n">mesh_box_from_eight_points</span><span class="p">(</span><span class="n">outline</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">center</span><span class="p">,</span> <span class="n">mesh</span>
+
+    <span class="n">meshes</span> <span class="o">=</span> <span class="p">[</span><span class="n">create_plate</span><span class="p">(</span><span class="n">box</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="mi">0</span><span class="p">)[</span><span class="mi">1</span><span class="p">]]</span>
+    <span class="n">elements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Element</span><span class="o">.</span><span class="n">from_simplex_and_complex</span><span class="p">(</span><span class="n">meshes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">centroid</span><span class="p">(),</span> <span class="n">meshes</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">points_from_side_plane</span><span class="p">(</span><span class="n">plane</span><span class="p">,</span> <span class="n">side_planes</span><span class="p">):</span>
+    <span class="n">points</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">side_planes</span><span class="p">)):</span>
+        <span class="n">p0</span> <span class="o">=</span> <span class="n">intersection_plane_plane_plane</span><span class="p">(</span><span class="n">plane</span><span class="p">,</span> <span class="n">side_planes</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">side_planes</span><span class="p">[(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">side_planes</span><span class="p">)])</span>
+        <span class="n">points</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Point</span><span class="p">(</span><span class="n">p0</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">p0</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">p0</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="n">points</span>
+
+
+<span class="k">def</span> <span class="nf">get_dual_planes</span><span class="p">(</span><span class="n">planes</span><span class="p">):</span>
+    <span class="n">dual_planes</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">planes_with_ends</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">planes</span><span class="p">)</span>
+    <span class="n">planes_with_ends</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">planes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="c1"># planes_with_ends.append(planes[-1])</span>
+
+    <span class="n">dual_planes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">planes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">planes_with_ends</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">origin</span> <span class="o">=</span> <span class="p">(</span><span class="n">planes_with_ends</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">point</span> <span class="o">+</span> <span class="n">planes_with_ends</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">point</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.5</span>
+        <span class="n">normal</span> <span class="o">=</span> <span class="p">(</span><span class="n">planes_with_ends</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">normal</span> <span class="o">+</span> <span class="n">planes_with_ends</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">normal</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.5</span>
+        <span class="n">dual_planes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Plane</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">normal</span><span class="p">))</span>
+
+    <span class="n">dual_planes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">planes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">dual_planes</span>
+
+
+<span class="n">plane_top</span> <span class="o">=</span> <span class="n">Plane</span><span class="p">(</span><span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">height</span><span class="p">),</span> <span class="n">Vector</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+<span class="n">geometry</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+<span class="n">planes_dual</span> <span class="o">=</span> <span class="n">get_dual_planes</span><span class="p">(</span><span class="n">planes_side</span><span class="p">)</span>
+
+<span class="c1"># geometry.append(plane_top)</span>
+<span class="c1"># # geometry = geometry + planes_dual</span>
+<span class="c1"># geometry = geometry + [planes_side[0], planes_side[1], planes_bot[0], planes_bot[1]]</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">planes_dual</span><span class="p">)</span> <span class="o">-</span> <span class="mi">2</span><span class="p">):</span>
+    <span class="n">side_planes_for_ribs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">side_planes_for_ribs</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">plane_top</span><span class="p">,</span>
+            <span class="n">planes_dual</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span>
+            <span class="n">Plane</span><span class="p">(</span><span class="n">planes_bot</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">point</span> <span class="o">+</span> <span class="n">planes_bot</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">normal</span> <span class="o">*</span> <span class="n">plate_thickness</span><span class="p">,</span> <span class="n">planes_bot</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">normal</span><span class="p">),</span>
+            <span class="n">planes_dual</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">],</span>
+        <span class="p">]</span>
+    <span class="k">elif</span> <span class="n">i</span> <span class="o">==</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">planes_dual</span><span class="p">)</span> <span class="o">-</span> <span class="mi">3</span><span class="p">):</span>
+        <span class="c1"># continue</span>
+        <span class="nb">id</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">planes_bot</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">side_planes_for_ribs</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">plane_top</span><span class="p">,</span>
+            <span class="n">planes_dual</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span>
+            <span class="n">Plane</span><span class="p">(</span><span class="n">planes_bot</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span><span class="o">.</span><span class="n">point</span> <span class="o">+</span> <span class="n">planes_bot</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span><span class="o">.</span><span class="n">normal</span> <span class="o">*</span> <span class="n">plate_thickness</span><span class="p">,</span> <span class="n">planes_bot</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span><span class="o">.</span><span class="n">normal</span><span class="p">),</span>
+            <span class="n">planes_dual</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">],</span>
+        <span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">side_planes_for_ribs</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">plane_top</span><span class="p">,</span>
+            <span class="n">planes_dual</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span>
+            <span class="n">Plane</span><span class="p">(</span><span class="n">planes_bot</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">point</span> <span class="o">+</span> <span class="n">planes_bot</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">normal</span> <span class="o">*</span> <span class="n">plate_thickness</span><span class="p">,</span> <span class="n">planes_bot</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">normal</span><span class="p">),</span>
+            <span class="n">Plane</span><span class="p">(</span><span class="n">planes_bot</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">point</span> <span class="o">+</span> <span class="n">planes_bot</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">normal</span> <span class="o">*</span> <span class="n">plate_thickness</span><span class="p">,</span> <span class="n">planes_bot</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">normal</span><span class="p">),</span>
+            <span class="n">planes_dual</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">],</span>
+        <span class="p">]</span>
+
+    <span class="n">rib_center</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span> <span class="o">+</span> <span class="mf">0.1</span> <span class="o">*</span> <span class="p">(</span><span class="n">i</span> <span class="o">%</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.05</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+    <span class="n">normal</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span>
+        <span class="mi">0</span><span class="p">,</span>
+        <span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">rib_plane0</span> <span class="o">=</span> <span class="n">Plane</span><span class="p">(</span><span class="n">rib_center</span> <span class="o">+</span> <span class="n">normal</span> <span class="o">*</span> <span class="n">plate_thickness</span> <span class="o">*</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+    <span class="n">rib_plane1</span> <span class="o">=</span> <span class="n">Plane</span><span class="p">(</span><span class="n">rib_center</span> <span class="o">+</span> <span class="n">normal</span> <span class="o">*</span> <span class="n">plate_thickness</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>
+    <span class="n">points0</span> <span class="o">=</span> <span class="n">points_from_side_plane</span><span class="p">(</span><span class="n">rib_plane0</span><span class="p">,</span> <span class="n">side_planes_for_ribs</span><span class="p">)</span>
+    <span class="n">points1</span> <span class="o">=</span> <span class="n">points_from_side_plane</span><span class="p">(</span><span class="n">rib_plane1</span><span class="p">,</span> <span class="n">side_planes_for_ribs</span><span class="p">)</span>
+    <span class="n">mesh_rib</span> <span class="o">=</span> <span class="n">_</span><span class="o">.</span><span class="n">Triagulator</span><span class="o">.</span><span class="n">from_loft_two_polygons</span><span class="p">(</span><span class="n">points0</span><span class="p">,</span> <span class="n">points1</span><span class="p">)</span>
+    <span class="n">element</span> <span class="o">=</span> <span class="n">Element</span><span class="o">.</span><span class="n">from_simplex_and_complex</span><span class="p">(</span><span class="n">mesh_rib</span><span class="o">.</span><span class="n">centroid</span><span class="p">(),</span> <span class="n">mesh_rib</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+    <span class="n">elements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+
+<span class="c1"># ==========================================================================</span>
+<span class="c1"># NEST ELEMENTS</span>
+<span class="c1"># ==========================================================================</span>
+<span class="n">FabricationNest</span><span class="o">.</span><span class="n">pack_elements</span><span class="p">(</span><span class="n">elements</span><span class="o">=</span><span class="n">elements</span><span class="p">,</span> <span class="n">nest_type</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">inflate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">height_step</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+
+<span class="c1"># ==========================================================================</span>
+<span class="c1"># VIEWER</span>
+<span class="c1"># ==========================================================================</span>
+<span class="n">color_red</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">elements</span><span class="p">)</span>
+<span class="n">color_red</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">color_red</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">Viewer</span><span class="o">.</span><span class="n">show_elements</span><span class="p">(</span><span class="n">elements</span><span class="p">,</span> <span class="n">show_grid</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">measurements</span><span class="o">=</span><span class="n">measurements</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">geometry</span><span class="p">,</span> <span class="n">color_red</span><span class="o">=</span><span class="n">color_red</span><span class="p">)</span>
+</code></pre></div>
+</div>
+</section>
+
+        
+      </main>
+      <!-- content -->
+      <!-- sidebar -->
+      <div class="col-12 col-md-3 compas-sidebar" role="navigation">
+        <form id="search" class="d-flex align-items-center compas-searchbox" action="../search.html" method="get">
+          <input class="form-control" type="text" name="q" placeholder="Search docs" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+          <button class="navbar-toggler d-md-none" type="button" data-toggle="collapse" data-target="#compas-navigation" aria-controls="compas-navigation" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+        </form>
+        
+        
+        <div id="compas-navigation" class="collapse compas-navigation">
+          <ul class="nav flex-column collapse show active">
+<li class="toctree-l1 nav-item"><a class="nav-link reference internal" href="../index.html">Introduction</a></li>
+<li class="toctree-l1 nav-item"><a class="nav-link reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1 nav-item active"><a class="nav-link reference internal" href="../examples.html">Examples</a><ul class="nav flex-column collapse show active">
+<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="test_1_element_initialization.html">test_1_element_initialization</a></li>
+<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="test_2_element_using_json_and_view2.html">test_2_element_using_json_and_view2</a></li>
+<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="test_3_element_collision.html">test_3_element_collision</a></li>
+<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="test_4_block_flat_arch.html">test_4_block_flat_arch</a></li>
+<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="test_5_block_flat_arch_plates_two_ribs.html">test_5_block_flat_arch_plates_two_ribs</a></li>
+<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="test_6_block_flat_arch_plates_boxes.html">test_6_block_flat_arch_plates_boxes</a></li>
+<li class="toctree-l2 nav-item active"><a class="nav-link active reference internal" href="#">test_7_block_flat_arch_plates_segmented_ribs</a></li>
+<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="test_8_block_flat_arch_plates_segmented_groups.html">test_8_block_flat_arch_plates_segmented_groups</a></li>
+</ul>
+</li>
+<li class="toctree-l1 nav-item"><a class="nav-link reference internal" href="../api.html">API Reference</a><ul class="nav flex-column collapse">
+<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="../api/compas_assembly2.html">compas_assembly2</a><ul class="nav flex-column collapse">
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../api/generated/compas_assembly2.test.hello_compas_assembly2.html">hello_compas_assembly2</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../api/generated/compas_assembly2.assembly.Assembly.html">Assembly</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../api/generated/compas_assembly2.element.Element.html">Element</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../api/generated/compas_assembly2.element_block.Block.html">Block</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../api/generated/compas_assembly2.element_beam.Beam.html">Beam</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../api/generated/compas_assembly2.group.Group.html">Group</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../api/generated/compas_assembly2.viewer.Viewer.html">Viewer</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../api/generated/compas_assembly2.fabrication.Fabrication.html">Fabrication</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../api/generated/compas_assembly2.fabrication_nest.FabricationNest.html">FabricationNest</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+        
+      </div>
+      <!-- sidebar -->
+      <!-- toc -->
+      <div class="d-none d-xl-block col-xl-2 compas-toc" role="toc">
+        
+        <ul class="nav flex-column" id="compas-toc">
+<li class="nav-item"><a class="nav-link reference internal" href="#">test_7_block_flat_arch_plates_segmented_ribs</a></li>
+</ul>
+
+      </div>
+      <!-- toc -->
+    </div>
+  </div>
+  <!-- main -->
+  <!-- footer -->
+  <footer class="compas-footer">
+    <nav class="nav p-2">
+      
+      <a href="test_6_block_flat_arch_plates_boxes.html" title="test_6_block_flat_arch_plates_boxes" class="nav-link footer-link float-start text-left d-flex w-50" rel="prev">
+        <div class="nav-button p-2 m-2"><i class="fas fa-arrow-left"></i></div>
+        <div class="nav-title flex-grow-1 align-self-center">
+          <div class="nav-direction small font-weight-light">Previous</div>
+          test_6_block_flat_arch_plates_boxes
+        </div>
+      </a>
+      
+
+      
+      <a href="test_8_block_flat_arch_plates_segmented_groups.html" title="test_8_block_flat_arch_plates_segmented_groups" class="nav-link footer-link float-end text-right d-flex w-50" rel="next">
+        <div class="nav-title footer-link flex-grow-1 align-self-center">
+          <div class="nav-direction small font-weight-light">Next</div>
+          test_8_block_flat_arch_plates_segmented_groups
+        </div>
+        <div class="nav-button p-2 m-2"><i class="fas fa-arrow-right"></i></div>
+      </a>
+      
+    </nav>
+  </footer>
+  <!-- footer -->
+  <!-- below -->
+  <div class="below py-5" style="background-color: #222;">
+    <div class="container">
+      <div class="row flex-column">
+        <div class="col-12 col-md-6 mx-md-auto text-center">
+          <h4 class="pb-3 below-text">COMPAS</h4>
+          <p class="below-text">
+            A computational framework for collaboration and research
+            in Architecture, Engineering, Fabrication, and Construction.
+          </p>
+          <nav class="nav justify-content-center pb-3">
+            <a class="nav-link mx-2 px-0 below-link" href="http://github.com/compas-dev" target="_blank">
+              <span class="fab fa-github fa-1x"></span>
+            </a>
+            <a class="nav-link mx-2 px-0 below-link" href="http://forum.compas-framework.org" target="_blank">
+              <span class="fab fa-discourse fa-1x"></span>
+            </a>
+            <a class="nav-link mx-2 px-0 below-link" href="https://pypi.org/project/COMPAS/" target="_blank">
+              <span class="fab fa-python fa-1x"></span>
+            </a>
+          </nav>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col text-center">
+          <p class="p-0 m-0 below-text">Copyright &copy; 2017-2021 compas-dev</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- below -->
+  <!-- scripts -->
+  <script id="documentation_options" data-url_root="" src="../_static/documentation_options.js"></script>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.0.0/anchor.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.8/clipboard.min.js"></script>
+
+  <script src="../_static/underscore.js"></script>
+  <script src="../_static/doctools.js"></script>
+  <script src="../_static/searchtools.js"></script>
+  <script src="../_static/language_data.js"></script>
+
+  <script>
+    $(document).ready(function () {
+      $(".language-default code").addClass("python");
+      $(".language-python code").addClass("python");
+      $(".language-bash code").addClass("bash");
+      $(".language-cpp code").addClass("cpp");
+      $(".language-json code").addClass("json");
+      $(".language-none code").addClass("plaintext");
+
+      hljs.initHighlighting();
+      anchors.add();
+
+      new ClipboardJS(".btn.copy", {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+
+      $("#compas-navigation li.active > ul").each(function() {
+        var ul = $(this);
+        if (! ul.hasClass("show")) {
+          ul.addClass("show");
+        }
+      });
+
+      $("#compas-navigation li.toctree-l1").has("ul").each(function() {
+        var li = $(this);
+        li.addClass("has-children");
+        if (li.hasClass("active")) {
+          li.prepend('<span class="menu-toggle"><i class="fas fa-chevron-up"></i></span>');
+        }
+        else {
+          li.prepend('<span class="menu-toggle"><i class="fas fa-chevron-down"></i></span>');
+        }
+      });
+
+      $(".menu-toggle").click(function() {
+        var toggle = $(this);
+        toggle.siblings("ul").toggleClass("show");
+      });
+
+    });
+
+
+    var url = $("#doc_versions").data("url");
+    var docs_site = $("#doc_versions").data("docs");
+
+    if (url) {
+      $.get(url, res => {
+        var lines = res.match(/[^\r\n]+/g);
+        lines.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+        lines.reverse();
+        lines.forEach(version => {
+          $("#doc_version_list").append("<a class=\"dropdown-item\" href=\"" + docs_site + version + "\">" + version + "</a>");
+        });
+
+        var selected_version = $('.nav-versions .dropdown-item').filter(function (i, ver) {
+          return window.location.href.startsWith(ver.href);
+        });
+        selected_version.addClass('active');
+        $("#bd-versions").text(selected_version.text());
+
+      })
+    }
+  </script>
+  <!-- scripts -->
+  
+  
+</body>
+
+</html>
