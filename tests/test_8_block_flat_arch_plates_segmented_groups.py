@@ -16,9 +16,15 @@ from compas.geometry import (
     distance_point_plane_signed,
 )
 import math
-
-from compas_wood.joinery import get_connection_zones
 from compas.data import json_dump
+
+try:
+    from compas_wood.joinery import get_connection_zones
+
+    compas_wood_available = True
+except ImportError:
+    print("compas_wood package not available. Please install it.")
+    compas_wood_available = False
 
 
 class _:
@@ -857,101 +863,104 @@ simplices = assembly.get_elements_properties("simplex", True)
 json_dump(simplices, "tests/json_dumps/simplices.json")
 
 # ==========================================================================
-# COMPAS_WOOD SCALE POLYLINES DUE TO TOLERANCE
+# COMPAS_WOOD
 # ==========================================================================
-scale = Scale.from_factors([100, 100, 100])
-for s in simplices:
-    s.transform(scale)
+if compas_wood_available:
+    # ==========================================================================
+    # COMPAS_WOOD SCALE POLYLINES DUE TO TOLERANCE
+    # ==========================================================================
+    scale = Scale.from_factors([100, 100, 100])
+    for s in simplices:
+        s.transform(scale)
 
-# ==========================================================================
-# COMPAS_WOOD CREATE ADJACENCY
-# ==========================================================================
-adjancency = []
-nested_lists = assembly._elements.to_nested_list()
-for i in range(len(nested_lists)):
-    adjancency.append(0 + 3 * i)
-    adjancency.append(2 + 3 * i)
-    adjancency.append(-1)
-    adjancency.append(-1)
-    adjancency.append(0 + 3 * i)
-    adjancency.append(1 + 3 * i)
-    adjancency.append(-1)
-    adjancency.append(-1)
+    # ==========================================================================
+    # COMPAS_WOOD CREATE ADJACENCY
+    # ==========================================================================
+    adjancency = []
+    nested_lists = assembly._elements.to_nested_list()
+    for i in range(len(nested_lists)):
+        adjancency.append(0 + 3 * i)
+        adjancency.append(2 + 3 * i)
+        adjancency.append(-1)
+        adjancency.append(-1)
+        adjancency.append(0 + 3 * i)
+        adjancency.append(1 + 3 * i)
+        adjancency.append(-1)
+        adjancency.append(-1)
 
-adjancency.extend([16, 1, -1, -1])
-adjancency.extend([17, 1, -1, -1])
-adjancency.extend([22, 1, -1, -1])
-adjancency.extend([16, 2, -1, -1])
-adjancency.extend([17, 2, -1, -1])
-adjancency.extend([22, 2, -1, -1])
+    adjancency.extend([16, 1, -1, -1])
+    adjancency.extend([17, 1, -1, -1])
+    adjancency.extend([22, 1, -1, -1])
+    adjancency.extend([16, 2, -1, -1])
+    adjancency.extend([17, 2, -1, -1])
+    adjancency.extend([22, 2, -1, -1])
 
-adjancency.extend([19, 4, -1, -1])
-adjancency.extend([20, 4, -1, -1])
-adjancency.extend([26, 4, -1, -1])
-adjancency.extend([19, 5, -1, -1])
-adjancency.extend([20, 5, -1, -1])
-adjancency.extend([26, 5, -1, -1])
+    adjancency.extend([19, 4, -1, -1])
+    adjancency.extend([20, 4, -1, -1])
+    adjancency.extend([26, 4, -1, -1])
+    adjancency.extend([19, 5, -1, -1])
+    adjancency.extend([20, 5, -1, -1])
+    adjancency.extend([26, 5, -1, -1])
 
-adjancency.extend([23, 7, -1, -1])
-adjancency.extend([28, 7, -1, -1])
-adjancency.extend([23, 8, -1, -1])
-adjancency.extend([28, 8, -1, -1])
+    adjancency.extend([23, 7, -1, -1])
+    adjancency.extend([28, 7, -1, -1])
+    adjancency.extend([23, 8, -1, -1])
+    adjancency.extend([28, 8, -1, -1])
 
-adjancency.extend([25, 10, -1, -1])
-adjancency.extend([32, 10, -1, -1])
-adjancency.extend([25, 11, -1, -1])
-adjancency.extend([32, 11, -1, -1])
+    adjancency.extend([25, 10, -1, -1])
+    adjancency.extend([32, 10, -1, -1])
+    adjancency.extend([25, 11, -1, -1])
+    adjancency.extend([32, 11, -1, -1])
 
-adjancency.extend([29, 13, -1, -1])
-adjancency.extend([31, 13, -1, -1])
-adjancency.extend([29, 14, -1, -1])
-adjancency.extend([31, 14, -1, -1])
+    adjancency.extend([29, 13, -1, -1])
+    adjancency.extend([31, 13, -1, -1])
+    adjancency.extend([29, 14, -1, -1])
+    adjancency.extend([31, 14, -1, -1])
 
+    # ==========================================================================
+    # COMPAS_WOOD RUN
+    # ==========================================================================
+    division_length = 300
+    joint_parameters = [
+        division_length,
+        0.5,
+        9,
+        division_length * 1.5,
+        0.65,
+        10,
+        division_length * 1.5,
+        0.5,
+        21,
+        division_length,
+        0.95,
+        30,
+        division_length,
+        0.95,
+        40,
+        division_length,
+        0.95,
+        50,
+    ]
 
-# ==========================================================================
-# COMPAS_WOOD RUN
-# ==========================================================================
-division_length = 300
-joint_parameters = [
-    division_length,
-    0.5,
-    9,
-    division_length * 1.5,
-    0.65,
-    10,
-    division_length * 1.5,
-    0.5,
-    21,
-    division_length,
-    0.95,
-    30,
-    division_length,
-    0.95,
-    40,
-    division_length,
-    0.95,
-    50,
-]
-simplices = get_connection_zones(simplices, None, None, None, adjancency, joint_parameters, 2, [1, 1, 1.1], 4)
+    simplices = get_connection_zones(simplices, None, None, None, adjancency, joint_parameters, 2, [1, 1, 1.1], 4)
 
+    # ==========================================================================
+    # COMPAS_WOOD SCALE BACK TO ORIGINAL SCALE THE OUTLINES
+    # ==========================================================================
+    scale = Scale.from_factors([1 / 100, 1 / 100, 1 / 100])
+    for outlines in simplices:
+        for outline in outlines:
+            outline.transform(scale)
 
-# ==========================================================================
-# COMPAS_WOOD SCALE BACK TO ORIGINAL SCALE THE OUTLINES
-# ==========================================================================
-scale = Scale.from_factors([1 / 100, 1 / 100, 1 / 100])
-for outlines in simplices:
-    for outline in outlines:
-        outline.transform(scale)
-
-# ==========================================================================
-# CHANGE SIMPLEX AND COMPLEX OF ELEMENTS
-# ==========================================================================
-counter = 0
-for element_list in nested_lists:
-    for element in element_list:
-        element.simplex = simplices[counter]
-        element.complex = [_.Triagulator.from_loft_two_polygons(simplices[counter][-2], simplices[counter][-1])]
-        counter = counter + 1
+    # ==========================================================================
+    # CHANGE SIMPLEX AND COMPLEX OF ELEMENTS
+    # ==========================================================================
+    counter = 0
+    for element_list in nested_lists:
+        for element in element_list:
+            element.simplex = simplices[counter]
+            element.complex = [_.Triagulator.from_loft_two_polygons(simplices[counter][-2], simplices[counter][-1])]
+            counter = counter + 1
 
 
 # ==========================================================================
