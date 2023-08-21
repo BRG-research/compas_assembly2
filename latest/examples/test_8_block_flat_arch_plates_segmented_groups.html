@@ -94,7 +94,7 @@
         <section id="test-8-block-flat-arch-plates-segmented-groups">
 <h1>test_8_block_flat_arch_plates_segmented_groups</h1>
 <a class="reference internal image-reference" href="../_images/test_8_block_flat_arch_plates_segmented_groups.gif"><img alt="compas_assembly2" class="align-right" src="../_images/test_8_block_flat_arch_plates_segmented_groups.gif" style="width: 100%;" /></a>
-<div class="language-python notranslate"><div class="highlight"><pre><button class="btn copy"><i class="far fa-copy"></i></button><code><span></span><span class="kn">from</span> <span class="nn">compas_assembly2</span> <span class="kn">import</span> <span class="n">Viewer</span><span class="p">,</span> <span class="n">Element</span><span class="p">,</span> <span class="n">FabricationNest</span><span class="p">,</span> <span class="n">Group</span>
+<div class="language-python notranslate"><div class="highlight"><pre><button class="btn copy"><i class="far fa-copy"></i></button><code><span></span><span class="kn">from</span> <span class="nn">compas_assembly2</span> <span class="kn">import</span> <span class="n">Viewer</span><span class="p">,</span> <span class="n">Element</span><span class="p">,</span> <span class="n">FabricationNest</span><span class="p">,</span> <span class="n">Assembly</span>
 <span class="kn">from</span> <span class="nn">compas.datastructures</span> <span class="kn">import</span> <span class="n">Mesh</span>
 <span class="kn">from</span> <span class="nn">compas.geometry</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">Point</span><span class="p">,</span>
@@ -662,7 +662,7 @@
 <span class="c1"># return remapped_sequence</span>
 
 <span class="n">plate_thickness</span> <span class="o">=</span> <span class="mf">0.04</span>
-<span class="n">group</span> <span class="o">=</span> <span class="n">Group</span><span class="p">()</span>
+<span class="n">group</span> <span class="o">=</span> <span class="n">Assembly</span><span class="p">()</span>
 <span class="n">side_planes_for_beams</span> <span class="o">=</span> <span class="p">[</span>
     <span class="n">Plane</span><span class="p">(</span><span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">height</span> <span class="o">-</span> <span class="n">plate_thickness</span><span class="p">),</span> <span class="n">Vector</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span>
     <span class="n">Plane</span><span class="p">(</span><span class="n">Point</span><span class="p">(</span><span class="o">-</span><span class="n">length</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">Vector</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span>
@@ -877,11 +877,7 @@
     <span class="n">p_web1</span> <span class="o">=</span> <span class="n">Plane</span><span class="p">(</span><span class="n">linear_interpolation</span><span class="p">(</span><span class="n">p0</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="mf">0.85</span><span class="p">),</span> <span class="n">p_web0</span><span class="o">.</span><span class="n">normal</span><span class="p">)</span>
 
     <span class="nb">id</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">remap_sequence</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">planes_groups0</span><span class="p">))]</span>
-    <span class="n">group</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
-        <span class="n">Element</span><span class="o">.</span><span class="n">from_plate_planes</span><span class="p">(</span>
-            <span class="n">p_web0</span><span class="p">,</span> <span class="n">top_plate_planes</span><span class="p">,</span> <span class="n">plate_thickness</span><span class="p">,</span> <span class="nb">id</span>
-        <span class="p">)</span>
-    <span class="p">)</span>
+    <span class="n">group</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Element</span><span class="o">.</span><span class="n">from_plate_planes</span><span class="p">(</span><span class="n">p_web0</span><span class="p">,</span> <span class="n">top_plate_planes</span><span class="p">,</span> <span class="n">plate_thickness</span><span class="p">,</span> <span class="nb">id</span><span class="p">))</span>
 
     <span class="n">top_plate_planes</span> <span class="o">=</span> <span class="p">[</span>
         <span class="n">Plane</span><span class="p">(</span>
@@ -938,12 +934,12 @@
 <span class="n">adjancency</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="n">nested_lists</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">to_nested_list</span><span class="p">()</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">nested_lists</span><span class="p">)):</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="o">+</span><span class="mi">3</span><span class="o">*</span><span class="n">i</span><span class="p">)</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">2</span><span class="o">+</span><span class="mi">3</span><span class="o">*</span><span class="n">i</span><span class="p">)</span>
+    <span class="n">adjancency</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">i</span><span class="p">)</span>
+    <span class="n">adjancency</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">i</span><span class="p">)</span>
     <span class="n">adjancency</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">adjancency</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="o">+</span><span class="mi">3</span><span class="o">*</span><span class="n">i</span><span class="p">)</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">3</span><span class="o">*</span><span class="n">i</span><span class="p">)</span>
+    <span class="n">adjancency</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">i</span><span class="p">)</span>
+    <span class="n">adjancency</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">i</span><span class="p">)</span>
     <span class="n">adjancency</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">adjancency</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
@@ -1028,12 +1024,12 @@
 <span class="c1"># ==========================================================================</span>
 <span class="n">group_as_nested_list</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">to_nested_list</span><span class="p">()</span>
 <span class="n">group_as_nested_list_reordered</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="n">half</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">group_as_nested_list</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">half</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">group_as_nested_list</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">half</span><span class="p">):</span>
     <span class="n">group_as_nested_list_reordered</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">group_as_nested_list</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-    <span class="n">group_as_nested_list_reordered</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">group_as_nested_list</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="n">half</span><span class="p">])</span>
+    <span class="n">group_as_nested_list_reordered</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">group_as_nested_list</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="n">half</span><span class="p">])</span>
 
-<span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">group_as_nested_list</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">group_as_nested_list</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
     <span class="n">group_as_nested_list_reordered</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">group_as_nested_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 
 <span class="c1"># ==========================================================================</span>
@@ -1046,7 +1042,7 @@
 <span class="n">Viewer</span><span class="o">.</span><span class="n">show_elements</span><span class="p">(</span>
     <span class="n">group_as_nested_list_reordered</span><span class="p">,</span>
     <span class="n">show_simplices</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">show_grid</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">show_grid</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">measurements</span><span class="o">=</span><span class="n">measurements</span><span class="p">,</span>
     <span class="n">geometry</span><span class="o">=</span><span class="n">geometry</span><span class="p">,</span>
     <span class="n">color_red</span><span class="o">=</span><span class="n">color_red</span><span class="p">,</span>
@@ -1092,7 +1088,6 @@
 <li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../api/generated/compas_assembly2.element.Element.html">Element</a></li>
 <li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../api/generated/compas_assembly2.element_block.Block.html">Block</a></li>
 <li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../api/generated/compas_assembly2.element_beam.Beam.html">Beam</a></li>
-<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../api/generated/compas_assembly2.group.Group.html">Group</a></li>
 <li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../api/generated/compas_assembly2.viewer.Viewer.html">Viewer</a></li>
 <li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../api/generated/compas_assembly2.fabrication.Fabrication.html">Fabrication</a></li>
 <li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../api/generated/compas_assembly2.fabrication_nest.FabricationNest.html">FabricationNest</a></li>

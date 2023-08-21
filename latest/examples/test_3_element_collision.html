@@ -97,7 +97,11 @@
 <span class="kn">from</span> <span class="nn">compas.geometry</span> <span class="kn">import</span> <span class="n">Point</span><span class="p">,</span> <span class="n">Box</span><span class="p">,</span> <span class="n">Translation</span><span class="p">,</span> <span class="n">Rotation</span><span class="p">,</span> <span class="n">Frame</span>
 <span class="kn">from</span> <span class="nn">compas_assembly2</span> <span class="kn">import</span> <span class="n">Element</span><span class="p">,</span> <span class="n">ELEMENT_NAME</span><span class="p">,</span> <span class="n">Viewer</span><span class="p">,</span> <span class="n">FabricationNest</span>
 
-<span class="c1"># from compas_assembly2.collisions.kdtree import KDTree</span>
+<span class="kn">from</span> <span class="nn">compas_assembly2.r_tree.bounding_box</span> <span class="kn">import</span> <span class="n">BoundingBox</span>
+<span class="kn">from</span> <span class="nn">compas_assembly2.r_tree.r_tree</span> <span class="kn">import</span> <span class="n">Rtree</span>
+<span class="kn">from</span> <span class="nn">compas_assembly2.r_tree.utilities</span> <span class="kn">import</span> <span class="n">get_euclidean_distance</span>
+<span class="kn">from</span> <span class="nn">compas_assembly2.r_tree.configuration</span> <span class="kn">import</span> <span class="n">VECTOR_DIMENSION</span><span class="p">,</span> <span class="n">MAXIMUM_NUMBER_OF_CHILDREN</span>
+
 <span class="kn">import</span> <span class="nn">random</span>
 <span class="kn">import</span> <span class="nn">time</span>
 
@@ -148,6 +152,10 @@
 <span class="c1"># KDTREE SCIPY https://github.com/hamaskhan/3D-Nearest-Neighbor-Search-KD-Tree/blob/main/main.py</span>
 <span class="c1"># KDTREE PLANNER NUMPY https://github.com/Pradeep-Gopal/RRT_3D_python_KDtree</span>
 <span class="c1"># ==========================================================================</span>
+
+<span class="c1"># ==========================================================================</span>
+<span class="c1"># SIMPLE FOR LOOP</span>
+<span class="c1"># ==========================================================================</span>
 <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 <span class="n">collision_pairs</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="n">element_collisions</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">elements</span><span class="p">)</span>
@@ -162,9 +170,50 @@
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Execution time: </span><span class="si">{</span><span class="n">execution_time</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2"> seconds&quot;</span><span class="p">)</span>
 
 <span class="c1"># ==========================================================================</span>
+<span class="c1"># R-TREE</span>
+<span class="c1"># ==========================================================================</span>
+<span class="c1"># start_time = time.time()</span>
+
+<span class="c1"># r_tree = Rtree()</span>
+<span class="c1"># r_tree.set_logging(False)</span>
+<span class="c1"># INTERFACE_BORDER = 100</span>
+<span class="c1"># already_generated_vectors = set()</span>
+
+
+<span class="c1"># for i in range(len(elements)):</span>
+<span class="c1">#     box_corners = elements[i].aabb()</span>
+<span class="c1">#     p_min = (box_corners[0][0], box_corners[0][1], box_corners[0][2])</span>
+<span class="c1">#     p_max = (box_corners[6][0], box_corners[6][1], box_corners[6][2])</span>
+
+<span class="c1">#     if p_min not in already_generated_vectors:</span>
+<span class="c1">#         r_tree.insert(p_min)</span>
+<span class="c1">#         # data_list.append(vector)</span>
+<span class="c1">#         already_generated_vectors.add(p_min)</span>
+<span class="c1">#     else:</span>
+<span class="c1">#         print(&quot;Vector already added.&quot;)</span>
+
+<span class="c1">#     if p_max not in already_generated_vectors:</span>
+<span class="c1">#         r_tree.insert(p_max)</span>
+<span class="c1">#         # data_list.append(vector)</span>
+<span class="c1">#         already_generated_vectors.add(p_max)</span>
+<span class="c1">#     else:</span>
+<span class="c1">#         print(&quot;Vector already added.&quot;)</span>
+
+
+<span class="c1"># for i in range(len(elements)):</span>
+<span class="c1">#     id = i</span>
+<span class="c1">#     min_vec = (elements[id].aabb()[0][0], elements[id].aabb()[0][1], elements[id].aabb()[0][2])</span>
+<span class="c1">#     max_vec = (elements[id].aabb()[6][0], elements[id].aabb()[6][1], elements[id].aabb()[6][2])</span>
+<span class="c1">#     print(min_vec, max_vec)</span>
+<span class="c1">#     elapsed_time1 = r_tree.search_by_query_box(min_vec, max_vec)</span>
+
+<span class="c1"># execution_time = end_time - start_time</span>
+<span class="c1"># print(f&quot;Execution time: {execution_time:.6f} seconds&quot;)</span>
+
+<span class="c1"># ==========================================================================</span>
 <span class="c1"># VIEWER</span>
 <span class="c1"># ==========================================================================</span>
-<span class="n">Viewer</span><span class="o">.</span><span class="n">show_elements</span><span class="p">(</span><span class="n">elements</span><span class="o">=</span><span class="n">elements</span><span class="p">,</span> <span class="n">color_red</span><span class="o">=</span><span class="n">element_collisions</span><span class="p">,</span> <span class="n">show_grid</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">Viewer</span><span class="o">.</span><span class="n">show_elements</span><span class="p">(</span><span class="n">elements</span><span class="p">,</span> <span class="n">color_red</span><span class="o">=</span><span class="n">element_collisions</span><span class="p">,</span> <span class="n">show_grid</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </code></pre></div>
 </div>
 </section>
@@ -206,7 +255,6 @@
 <li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../api/generated/compas_assembly2.element.Element.html">Element</a></li>
 <li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../api/generated/compas_assembly2.element_block.Block.html">Block</a></li>
 <li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../api/generated/compas_assembly2.element_beam.Beam.html">Beam</a></li>
-<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../api/generated/compas_assembly2.group.Group.html">Group</a></li>
 <li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../api/generated/compas_assembly2.viewer.Viewer.html">Viewer</a></li>
 <li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../api/generated/compas_assembly2.fabrication.Fabrication.html">Fabrication</a></li>
 <li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../api/generated/compas_assembly2.fabrication_nest.FabricationNest.html">FabricationNest</a></li>
