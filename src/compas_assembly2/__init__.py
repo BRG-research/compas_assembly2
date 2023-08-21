@@ -6,6 +6,11 @@
 .. toctree::
     :maxdepth: 2
 
+.. image:: ../_images/overview.png
+   :width: 75%
+   :align: right
+   :alt: compas_assembly2
+
 test module
 ===========
 
@@ -17,6 +22,16 @@ test module
 
 Assembly class
 ==============
+
+.. image:: ../_images/assembly.png
+   :width: 75%
+   :align: right
+   :alt: compas_assembly2
+
+.. image:: ../_images/assembly_sorted_dict.png
+   :width: 75%
+   :align: right
+   :alt: compas_assembly2
 
 .. autosummary::
     :toctree: generated/
@@ -66,19 +81,13 @@ Beam class
 
     element_beam.Beam
 
-Group class
-===========
+Joints class
+=============
 
-.. image:: ../_images/group.png
+.. image:: ../_images/joints.png
    :width: 75%
    :align: right
    :alt: compas_assembly2
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    group.Group
 
 Viewer class
 ============
@@ -97,11 +106,24 @@ Viewer class
 Fabrication class
 =================
 
+.. image:: ../_images/fabrication.png
+   :width: 75%
+   :align: right
+   :alt: compas_assembly2
+
 .. autosummary::
     :toctree: generated/
     :nosignatures:
 
     fabrication.Fabrication
+
+Structure class
+=================
+
+.. image:: ../_images/structure.png
+   :width: 75%
+   :align: right
+   :alt: compas_assembly2
 
 FabricationNest class
 =====================
@@ -187,7 +209,7 @@ class FABRICATION_TYPES:
     SUBTRACTION_CUT = "SUBTRACTION_CUT"
     SUBTRACTION_MILL = "SUBTRACTION_MILL"
     SUBTRACTION_SLICE = "SUBTRACTION_SLICE"
-    ADDITION_PRINT = "ADDITION_PRINT"
+    SUBTRACTION_SAW = "SUBTRACTION_SAW"
     ADDITION_SPRAY = "ADDITION_SPRAY"
     ADDITION_EXTRUDE = "ADDITION_EXTRUDE"
     NESTING = "NESTING"
@@ -195,7 +217,7 @@ class FABRICATION_TYPES:
 
 
 from .element import Element  # noqa
-from .group import Group  # noqa
+from .assembly import Assembly  # noqa
 from .viewer import Viewer  # noqa
 from .fabrication import Fabrication  # noqa
 from .fabrication_nest import FabricationNest  # noqa

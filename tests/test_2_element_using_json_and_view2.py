@@ -25,4 +25,4 @@ if __name__ == "__main__":
     # ==========================================================================
     # VIEW2
     # ==========================================================================
-    Viewer.show_elements(elements=elements_json, viewer_type="view2", show_grid=False)
+    Viewer.show_elements(elements_json, viewer_type="view2", show_grid=False)

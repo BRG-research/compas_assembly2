@@ -1,4 +1,4 @@
-from compas_assembly2 import Viewer, Element, FabricationNest, Group
+from compas_assembly2 import Viewer, Element, FabricationNest, Assembly
 from compas.datastructures import Mesh
 from compas.geometry import (
     Point,
@@ -566,7 +566,7 @@ def remap_sequence(i, n):
 # return remapped_sequence
 
 plate_thickness = 0.04
-group = Group()
+group = Assembly()
 side_planes_for_beams = [
     Plane(Point(0, 0, height - plate_thickness), Vector(0, 0, 1)),
     Plane(Point(-length, 0, 0), Vector(-1, 0, 0)),
@@ -781,11 +781,7 @@ for i in range(len(planes_groups0)):
     p_web1 = Plane(linear_interpolation(p0, p1, 0.85), p_web0.normal)
 
     id = [1, remap_sequence(i, len(planes_groups0))]
-    group.add(
-        Element.from_plate_planes(
-            p_web0, top_plate_planes, plate_thickness, id
-        )
-    )
+    group.add(Element.from_plate_planes(p_web0, top_plate_planes, plate_thickness, id))
 
     top_plate_planes = [
         Plane(
@@ -842,12 +838,12 @@ for s in simplices:
 adjancency = []
 nested_lists = group.to_nested_list()
 for i in range(len(nested_lists)):
-    adjancency.append(0+3*i)
-    adjancency.append(2+3*i)
+    adjancency.append(0 + 3 * i)
+    adjancency.append(2 + 3 * i)
     adjancency.append(-1)
     adjancency.append(-1)
-    adjancency.append(0+3*i)
-    adjancency.append(1+3*i)
+    adjancency.append(0 + 3 * i)
+    adjancency.append(1 + 3 * i)
     adjancency.append(-1)
     adjancency.append(-1)
 
@@ -932,12 +928,12 @@ for element_list in nested_lists:
 # ==========================================================================
 group_as_nested_list = group.to_nested_list()
 group_as_nested_list_reordered = []
-half = math.floor(len(group_as_nested_list)/2)
+half = math.floor(len(group_as_nested_list) / 2)
 for i in range(half):
     group_as_nested_list_reordered.append(group_as_nested_list[i])
-    group_as_nested_list_reordered.append(group_as_nested_list[i+half])
+    group_as_nested_list_reordered.append(group_as_nested_list[i + half])
 
-if (len(group_as_nested_list) % 2 == 1):
+if len(group_as_nested_list) % 2 == 1:
     group_as_nested_list_reordered.append(group_as_nested_list[-1])
 
 # ==========================================================================
@@ -950,7 +946,7 @@ color_red[2] = 0
 Viewer.show_elements(
     group_as_nested_list_reordered,
     show_simplices=False,
-    show_grid=True,
+    show_grid=False,
     measurements=measurements,
     geometry=geometry,
     color_red=color_red,
