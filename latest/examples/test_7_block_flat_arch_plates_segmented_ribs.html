@@ -96,13 +96,19 @@
 <a class="reference internal image-reference" href="../_images/test_7_block_flat_arch_plates_segmented_ribs.gif"><img alt="compas_assembly2" class="align-right" src="../_images/test_7_block_flat_arch_plates_segmented_ribs.gif" style="width: 100%;" /></a>
 <div class="language-python notranslate"><div class="highlight"><pre><button class="btn copy"><i class="far fa-copy"></i></button><code><span></span><span class="kn">from</span> <span class="nn">compas_assembly2</span> <span class="kn">import</span> <span class="n">Viewer</span><span class="p">,</span> <span class="n">Element</span><span class="p">,</span> <span class="n">FabricationNest</span>
 <span class="kn">from</span> <span class="nn">compas.datastructures</span> <span class="kn">import</span> <span class="n">Mesh</span>
-<span class="kn">import</span> <span class="nn">compas</span>
 <span class="kn">from</span> <span class="nn">compas.geometry</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">Point</span><span class="p">,</span>
     <span class="n">Line</span><span class="p">,</span>
     <span class="n">Plane</span><span class="p">,</span>
     <span class="n">Vector</span><span class="p">,</span>
+    <span class="n">Polygon</span><span class="p">,</span>
+    <span class="n">Frame</span><span class="p">,</span>
+    <span class="n">Transformation</span><span class="p">,</span>
     <span class="n">intersection_plane_plane_plane</span><span class="p">,</span>
+    <span class="n">distance_point_point</span><span class="p">,</span>
+    <span class="n">cross_vectors</span><span class="p">,</span>
+    <span class="n">centroid_points</span><span class="p">,</span>
+    <span class="n">distance_point_plane_signed</span><span class="p">,</span>
 <span class="p">)</span>
 
 
@@ -323,15 +329,10 @@
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;create a frame from a polyline&quot;&quot;&quot;</span>
 
             <span class="c1"># create a normal by averaging the cross-products of a polyline</span>
-            <span class="n">normal</span> <span class="o">=</span> <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">normal</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
             <span class="n">count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">_points</span><span class="p">)</span>
-            <span class="n">center</span> <span class="o">=</span> <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-            <span class="n">is_closed</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">distance_point_point</span><span class="p">(</span>
-                    <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">Point</span><span class="p">(</span><span class="o">*</span><span class="n">_points</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">Point</span><span class="p">(</span><span class="o">*</span><span class="n">_points</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-                <span class="p">)</span>
-                <span class="o">&lt;</span> <span class="mf">0.01</span>
-            <span class="p">)</span>
+            <span class="n">center</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">is_closed</span> <span class="o">=</span> <span class="n">distance_point_point</span><span class="p">(</span><span class="n">Point</span><span class="p">(</span><span class="o">*</span><span class="n">_points</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">Point</span><span class="p">(</span><span class="o">*</span><span class="n">_points</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span> <span class="o">&lt;</span> <span class="mf">0.01</span>
             <span class="n">sign</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">is_closed</span> <span class="k">else</span> <span class="mi">0</span>
 
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">count</span> <span class="o">-</span> <span class="n">sign</span><span class="p">):</span>
@@ -340,7 +341,7 @@
                 <span class="n">point3d</span> <span class="o">=</span> <span class="n">_points</span><span class="p">[</span><span class="n">num</span><span class="p">]</span>
                 <span class="n">point3d1</span> <span class="o">=</span> <span class="n">_points</span><span class="p">[</span><span class="n">item1</span><span class="p">]</span>
                 <span class="n">item2</span> <span class="o">=</span> <span class="n">_points</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-                <span class="n">normal</span> <span class="o">+=</span> <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">cross_vectors</span><span class="p">(</span><span class="n">item2</span> <span class="o">-</span> <span class="n">point3d</span><span class="p">,</span> <span class="n">point3d1</span> <span class="o">-</span> <span class="n">item2</span><span class="p">)</span>
+                <span class="n">normal</span> <span class="o">+=</span> <span class="n">cross_vectors</span><span class="p">(</span><span class="n">item2</span> <span class="o">-</span> <span class="n">point3d</span><span class="p">,</span> <span class="n">point3d1</span> <span class="o">-</span> <span class="n">item2</span><span class="p">)</span>
                 <span class="n">center</span> <span class="o">=</span> <span class="n">center</span> <span class="o">+</span> <span class="n">point3d</span>
             <span class="n">normal</span><span class="o">.</span><span class="n">unitize</span><span class="p">()</span>
             <span class="n">center</span> <span class="o">=</span> <span class="n">center</span> <span class="o">/</span> <span class="n">count</span>
@@ -356,7 +357,7 @@
                     <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">_points</span><span class="p">)</span>
                 <span class="p">]</span>  <span class="c1"># To create a closed polyline, connect the last point to the first one.</span>
 
-                <span class="n">segment_length</span> <span class="o">=</span> <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">distance_point_point</span><span class="p">(</span><span class="n">point1</span><span class="p">,</span> <span class="n">point2</span><span class="p">)</span>
+                <span class="n">segment_length</span> <span class="o">=</span> <span class="n">distance_point_point</span><span class="p">(</span><span class="n">point1</span><span class="p">,</span> <span class="n">point2</span><span class="p">)</span>
 
                 <span class="k">if</span> <span class="n">segment_length</span> <span class="o">&gt;</span> <span class="n">longest_segment_length</span><span class="p">:</span>
                     <span class="n">longest_segment_length</span> <span class="o">=</span> <span class="n">segment_length</span>
@@ -364,21 +365,19 @@
                     <span class="n">longest_segment_end</span> <span class="o">=</span> <span class="n">point2</span>
 
             <span class="c1"># create x and y-axes for the frame</span>
-            <span class="n">x_axis</span> <span class="o">=</span> <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">Vector</span><span class="o">.</span><span class="n">from_start_end</span><span class="p">(</span><span class="n">longest_segment_start</span><span class="p">,</span> <span class="n">longest_segment_end</span><span class="p">)</span>
+            <span class="n">x_axis</span> <span class="o">=</span> <span class="n">Vector</span><span class="o">.</span><span class="n">from_start_end</span><span class="p">(</span><span class="n">longest_segment_start</span><span class="p">,</span> <span class="n">longest_segment_end</span><span class="p">)</span>
             <span class="n">x_axis</span><span class="o">.</span><span class="n">unitize</span><span class="p">()</span>
-            <span class="n">y_axis</span> <span class="o">=</span> <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">cross_vectors</span><span class="p">(</span><span class="n">normal</span><span class="p">,</span> <span class="n">x_axis</span><span class="p">)</span>
-            <span class="n">y_axis</span> <span class="o">=</span> <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="n">y_axis</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y_axis</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">y_axis</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+            <span class="n">y_axis</span> <span class="o">=</span> <span class="n">cross_vectors</span><span class="p">(</span><span class="n">normal</span><span class="p">,</span> <span class="n">x_axis</span><span class="p">)</span>
+            <span class="n">y_axis</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="n">y_axis</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y_axis</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">y_axis</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
             <span class="c1"># create the frame</span>
-            <span class="n">center</span> <span class="o">=</span> <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">centroid_points</span><span class="p">(</span><span class="n">_points</span><span class="p">)</span>
-            <span class="n">frame</span> <span class="o">=</span> <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">Frame</span><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="n">x_axis</span><span class="p">,</span> <span class="n">y_axis</span><span class="p">)</span>
+            <span class="n">center</span> <span class="o">=</span> <span class="n">centroid_points</span><span class="p">(</span><span class="n">_points</span><span class="p">)</span>
+            <span class="n">frame</span> <span class="o">=</span> <span class="n">Frame</span><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="n">x_axis</span><span class="p">,</span> <span class="n">y_axis</span><span class="p">)</span>
 
             <span class="c1"># orient the from the orientation point to the opposite direction</span>
             <span class="k">if</span> <span class="n">_orientation_point</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">signed_distance</span> <span class="o">=</span> <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">distance_point_plane_signed</span><span class="p">(</span>
-                    <span class="n">_orientation_point</span><span class="p">,</span> <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">Plane</span><span class="o">.</span><span class="n">from_frame</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
-                <span class="p">)</span>
+                <span class="n">signed_distance</span> <span class="o">=</span> <span class="n">distance_point_plane_signed</span><span class="p">(</span><span class="n">_orientation_point</span><span class="p">,</span> <span class="n">Plane</span><span class="o">.</span><span class="n">from_frame</span><span class="p">(</span><span class="n">frame</span><span class="p">))</span>
                 <span class="k">if</span> <span class="n">signed_distance</span> <span class="o">&gt;</span> <span class="mf">0.001</span><span class="p">:</span>
-                    <span class="n">frame</span> <span class="o">=</span> <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">Frame</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">point</span><span class="p">,</span> <span class="o">-</span><span class="n">x_axis</span><span class="p">,</span> <span class="n">y_axis</span><span class="p">)</span>
+                    <span class="n">frame</span> <span class="o">=</span> <span class="n">Frame</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">point</span><span class="p">,</span> <span class="o">-</span><span class="n">x_axis</span><span class="p">,</span> <span class="n">y_axis</span><span class="p">)</span>
             <span class="c1"># output</span>
             <span class="k">return</span> <span class="n">frame</span>
 
@@ -388,36 +387,27 @@
 
         <span class="nd">@staticmethod</span>
         <span class="k">def</span> <span class="nf">from_points</span><span class="p">(</span><span class="n">points</span><span class="p">):</span>
-            <span class="n">polygon</span> <span class="o">=</span> <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">Polygon</span><span class="p">(</span><span class="n">points</span><span class="o">=</span><span class="n">points</span><span class="p">)</span>
-            <span class="n">xform</span> <span class="o">=</span> <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">Transformation</span><span class="o">.</span><span class="n">from_frame_to_frame</span><span class="p">(</span>
-                <span class="n">_</span><span class="o">.</span><span class="n">Triagulator</span><span class="o">.</span><span class="n">_get_frame</span><span class="p">(</span><span class="n">points</span><span class="p">),</span> <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">Frame</span><span class="o">.</span><span class="n">worldXY</span><span class="p">()</span>
-            <span class="p">)</span>
+            <span class="n">polygon</span> <span class="o">=</span> <span class="n">Polygon</span><span class="p">(</span><span class="n">points</span><span class="o">=</span><span class="n">points</span><span class="p">)</span>
+            <span class="n">xform</span> <span class="o">=</span> <span class="n">Transformation</span><span class="o">.</span><span class="n">from_frame_to_frame</span><span class="p">(</span><span class="n">_</span><span class="o">.</span><span class="n">Triagulator</span><span class="o">.</span><span class="n">_get_frame</span><span class="p">(</span><span class="n">points</span><span class="p">),</span> <span class="n">Frame</span><span class="o">.</span><span class="n">worldXY</span><span class="p">())</span>
             <span class="n">polygon</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">xform</span><span class="p">)</span>
             <span class="n">ear_cut</span> <span class="o">=</span> <span class="n">_</span><span class="o">.</span><span class="n">Earcut</span><span class="p">(</span><span class="n">polygon</span><span class="o">.</span><span class="n">points</span><span class="p">)</span>
             <span class="n">ear_cut</span><span class="o">.</span><span class="n">triangulate</span><span class="p">()</span>
             <span class="n">polygon</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">xform</span><span class="o">.</span><span class="n">inverse</span><span class="p">())</span>
-            <span class="k">return</span> <span class="n">compas</span><span class="o">.</span><span class="n">datastructures</span><span class="o">.</span><span class="n">Mesh</span><span class="o">.</span><span class="n">from_vertices_and_faces</span><span class="p">(</span><span class="n">polygon</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="n">ear_cut</span><span class="o">.</span><span class="n">triangles</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">from_vertices_and_faces</span><span class="p">(</span><span class="n">polygon</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="n">ear_cut</span><span class="o">.</span><span class="n">triangles</span><span class="p">)</span>
 
         <span class="nd">@staticmethod</span>
         <span class="k">def</span> <span class="nf">from_loft_two_polygons</span><span class="p">(</span><span class="n">points0</span><span class="p">,</span> <span class="n">points1</span><span class="p">):</span>
             <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">points0</span><span class="p">)</span>
 
-            <span class="n">is_closed</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">distance_point_point</span><span class="p">(</span>
-                    <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">Point</span><span class="p">(</span><span class="o">*</span><span class="n">points0</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">Point</span><span class="p">(</span><span class="o">*</span><span class="n">points0</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-                <span class="p">)</span>
-                <span class="o">&lt;</span> <span class="mf">0.01</span>
-            <span class="p">)</span>
+            <span class="n">is_closed</span> <span class="o">=</span> <span class="n">distance_point_point</span><span class="p">(</span><span class="n">Point</span><span class="p">(</span><span class="o">*</span><span class="n">points0</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">Point</span><span class="p">(</span><span class="o">*</span><span class="n">points0</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span> <span class="o">&lt;</span> <span class="mf">0.01</span>
             <span class="n">sign</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">is_closed</span> <span class="k">else</span> <span class="mi">0</span>
             <span class="n">n</span> <span class="o">=</span> <span class="n">n</span> <span class="o">-</span> <span class="n">sign</span>
 
             <span class="c1"># create a polygon from the first set of points</span>
             <span class="c1"># orient to worldXY</span>
             <span class="c1"># triangulate</span>
-            <span class="n">polygon</span> <span class="o">=</span> <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">Polygon</span><span class="p">(</span><span class="n">points</span><span class="o">=</span><span class="n">points0</span><span class="p">)</span>
-            <span class="n">xform</span> <span class="o">=</span> <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">Transformation</span><span class="o">.</span><span class="n">from_frame_to_frame</span><span class="p">(</span>
-                <span class="n">_</span><span class="o">.</span><span class="n">Triagulator</span><span class="o">.</span><span class="n">_get_frame</span><span class="p">(</span><span class="n">points0</span><span class="p">,</span> <span class="n">points1</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">compas</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">Frame</span><span class="o">.</span><span class="n">worldXY</span><span class="p">()</span>
-            <span class="p">)</span>
+            <span class="n">polygon</span> <span class="o">=</span> <span class="n">Polygon</span><span class="p">(</span><span class="n">points</span><span class="o">=</span><span class="n">points0</span><span class="p">)</span>
+            <span class="n">xform</span> <span class="o">=</span> <span class="n">Transformation</span><span class="o">.</span><span class="n">from_frame_to_frame</span><span class="p">(</span><span class="n">_</span><span class="o">.</span><span class="n">Triagulator</span><span class="o">.</span><span class="n">_get_frame</span><span class="p">(</span><span class="n">points0</span><span class="p">,</span> <span class="n">points1</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">Frame</span><span class="o">.</span><span class="n">worldXY</span><span class="p">())</span>
             <span class="n">polygon</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">xform</span><span class="p">)</span>
             <span class="n">ear_cut</span> <span class="o">=</span> <span class="n">_</span><span class="o">.</span><span class="n">Earcut</span><span class="p">(</span><span class="n">polygon</span><span class="o">.</span><span class="n">points</span><span class="p">)</span>
             <span class="n">ear_cut</span><span class="o">.</span><span class="n">triangulate</span><span class="p">()</span>
