@@ -24,6 +24,8 @@ import math
 # ==========================================================================
 
 opacity = 0.9
+
+
 class Viewer:
     @staticmethod
     def string_to_color(input_string):
@@ -733,7 +735,7 @@ class Viewer:
                 def slider_opacity(t):
 
                     global opacity
-                    opacity = (t / 100.0)
+                    opacity = t / 100.0
 
                     for o in viewer_objects["viewer_complexes"]:
                         o.opacity = opacity
@@ -743,7 +745,7 @@ class Viewer:
                 def slider_insertion(t):
                     print(opacity)
                     for id, o in enumerate(viewer_objects["viewer_complexes"]):
-                        scale = 1-((t / 100.0) % 1)
+                        scale = 1 - ((t / 100.0) % 1)
                         xform = Translation.from_vector(dict_elements_groups[o.name][0].insertion * scale)
 
                         if dict_elements_groups[o.name][1] > t / 100:
@@ -757,8 +759,9 @@ class Viewer:
                                 o.matrix = xform = Translation.from_vector(Vector(0, 0, 0)).matrix
 
                 # color element by index
-                
-                @viewer.slider(title="color_index", maxval=len(viewer_objects["viewer_complexes"]), step=1, value=0)  # type: ignore
+                @viewer.slider(
+                    title="color_index", maxval=len(viewer_objects["viewer_complexes"]), step=1, value=0
+                )  # type: ignore
                 def slider_color(t):
 
                     # instead of slider do somethign else for a list selection
@@ -775,14 +778,14 @@ class Viewer:
                     selected_indices = []
                     selected_indices_flattened = []
                     for id, o in enumerate(viewer_objects["viewer_complexes"]):
-                        if (o.is_selected):
+                        if o.is_selected:
                             selected_indices.append(str(dict_elements_groups[o.name][0].id))
                             selected_indices_flattened.append(str(id))
-                    selected_indices_str = ', '.join(selected_indices)
-                    selected_indices_flattened_str = ', '.join(selected_indices_flattened)
+                    selected_indices_str = ", ".join(selected_indices)
+                    selected_indices_flattened_str = ", ".join(selected_indices_flattened)
 
-                    if (selected_indices_str == ""):
-                        info_message = ("""Nothing is selected.""")
+                    if selected_indices_str == "":
+                        info_message = """Nothing is selected."""
                         viewer.info(info_message)
                     else:
                         info_message = (
@@ -795,11 +798,9 @@ class Viewer:
                         print(selected_indices_flattened_str)
                         viewer.info(info_message)
 
-
                 # --------------------------------------------------------------------------
                 # run
                 # --------------------------------------------------------------------------
-
                 viewer.show()
 
         elif viewer_type == "rhino" or "1":

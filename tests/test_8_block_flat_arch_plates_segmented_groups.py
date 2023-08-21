@@ -566,7 +566,7 @@ def remap_sequence(i, n):
 # return remapped_sequence
 
 plate_thickness = 0.04
-group = Assembly()
+assembly = Assembly()
 side_planes_for_beams = [
     Plane(Point(0, 0, height - plate_thickness), Vector(0, 0, 1)),
     Plane(Point(-length, 0, 0), Vector(-1, 0, 0)),
@@ -614,29 +614,40 @@ plane_top = Plane(Point(0, 0, height), Vector(0, 0, 1))
 # ==========================================================================
 # GET BOTTOM PLATES --.--.--.--.--
 # ==========================================================================
-planes_groups = []
+planes_assemblys = []
 for i in range(0, n - 1, 2):
-    planes_groups.append([i, i + 1])
+    planes_assemblys.append([i, i + 1])
 
-for i in range(len(planes_groups)):
+for i in range(len(planes_assemblys)):
     bottom_plate_planes = [
-        Plane(Point(*boxes[planes_groups[i][0]].face_centroid(5)), -Vector(*boxes[planes_groups[i][0]].face_normal(5))),
+        Plane(
+            Point(*boxes[planes_assemblys[i][0]].face_centroid(5)),
+            -Vector(*boxes[planes_assemblys[i][0]].face_normal(5)),
+        ),
         Plane(Point(0, -offset, 0), Vector(0, -1, 0)),
         Plane(
-            Point(*boxes[planes_groups[i][-1]].face_centroid(3)), -Vector(*boxes[planes_groups[i][-1]].face_normal(3))
+            Point(*boxes[planes_assemblys[i][-1]].face_centroid(3)),
+            -Vector(*boxes[planes_assemblys[i][-1]].face_normal(3)),
         ),
         Plane(Point(0, offset, 0), Vector(0, 1, 0)),
     ]
 
     bottom_plate_base_plane = Plane(
-        (Point(*boxes[planes_groups[i][0]].face_centroid(0)) + Point(*boxes[planes_groups[i][-1]].face_centroid(0)))
+        (
+            Point(*boxes[planes_assemblys[i][0]].face_centroid(0))
+            + Point(*boxes[planes_assemblys[i][-1]].face_centroid(0))
+        )
         * 0.5,
-        (Point(*boxes[planes_groups[i][0]].face_normal(0)) + Point(*boxes[planes_groups[i][-1]].face_normal(0))) * 0.5,
+        (Point(*boxes[planes_assemblys[i][0]].face_normal(0)) + Point(*boxes[planes_assemblys[i][-1]].face_normal(0)))
+        * 0.5,
     )
 
-    group.add(
+    assembly._elements.add(
         Element.from_plate_planes(
-            bottom_plate_base_plane, bottom_plate_planes, -plate_thickness, [0, remap_sequence(i, len(planes_groups))]
+            bottom_plate_base_plane,
+            bottom_plate_planes,
+            -plate_thickness,
+            [0, remap_sequence(i, len(planes_assemblys))],
         )
     )
 
@@ -644,28 +655,32 @@ for i in range(len(planes_groups)):
 # ==========================================================================
 # GET TOP PLATES -.--.--.--.--.-
 # ==========================================================================
-planes_groups = [[0], [1, 2], [3, 4], [5, 6], [7, 8], [9]]
+planes_assemblys = [[0], [1, 2], [3, 4], [5, 6], [7, 8], [9]]
 
-planes_groups = [[0]]
+planes_assemblys = [[0]]
 for i in range(1, n - 3, 2):
-    planes_groups.append([i, i + 1])
-planes_groups.append([n - 2])
+    planes_assemblys.append([i, i + 1])
+planes_assemblys.append([n - 2])
 
-for i in range(len(planes_groups)):
+for i in range(len(planes_assemblys)):
     top_plate_planes = [
-        Plane(Point(*boxes[planes_groups[i][0]].face_centroid(5)), -Vector(*boxes[planes_groups[i][0]].face_normal(5))),
+        Plane(
+            Point(*boxes[planes_assemblys[i][0]].face_centroid(5)),
+            -Vector(*boxes[planes_assemblys[i][0]].face_normal(5)),
+        ),
         Plane(Point(0, -offset, 0), Vector(0, -1, 0)),
         Plane(
-            Point(*boxes[planes_groups[i][-1]].face_centroid(3)), -Vector(*boxes[planes_groups[i][-1]].face_normal(3))
+            Point(*boxes[planes_assemblys[i][-1]].face_centroid(3)),
+            -Vector(*boxes[planes_assemblys[i][-1]].face_normal(3)),
         ),
         Plane(Point(0, offset, 0), Vector(0, 1, 0)),
     ]
 
     top_plate_base_plane = Plane(Point(0, 0, height), Vector(0, 0, 1))
 
-    group.add(
+    assembly._elements.add(
         Element.from_plate_planes(
-            top_plate_base_plane, top_plate_planes, plate_thickness, [1, remap_sequence(i, len(planes_groups))]
+            top_plate_base_plane, top_plate_planes, plate_thickness, [1, remap_sequence(i, len(planes_assemblys))]
         )
     )
 
@@ -677,69 +692,79 @@ for i in range(len(planes_groups)):
 # ==========================================================================
 # WEB PLATES0
 # ==========================================================================
-planes_groups = [[0, 1], [2, 3], [4, 5], [6, 7], [8, 9]]
-planes_groups = []
+planes_assemblys = [[0, 1], [2, 3], [4, 5], [6, 7], [8, 9]]
+planes_assemblys = []
 for i in range(0, n - 1, 2):
-    planes_groups.append([i, i + 1])
+    planes_assemblys.append([i, i + 1])
 
 
-for i in range(len(planes_groups)):
+for i in range(len(planes_assemblys)):
     bottom_plate_planes = [
         Plane(
-            (Point(*boxes[planes_groups[i][0]].face_centroid(0)) + Point(*boxes[planes_groups[i][-1]].face_centroid(0)))
+            (
+                Point(*boxes[planes_assemblys[i][0]].face_centroid(0))
+                + Point(*boxes[planes_assemblys[i][-1]].face_centroid(0))
+            )
             * 0.5,
-            (Point(*boxes[planes_groups[i][0]].face_normal(0)) + Point(*boxes[planes_groups[i][-1]].face_normal(0)))
+            (
+                Point(*boxes[planes_assemblys[i][0]].face_normal(0))
+                + Point(*boxes[planes_assemblys[i][-1]].face_normal(0))
+            )
             * 0.5,
         ),
-        Plane(Point(*boxes[planes_groups[i][0]].face_centroid(5)), -Vector(*boxes[planes_groups[i][0]].face_normal(5))),
+        Plane(
+            Point(*boxes[planes_assemblys[i][0]].face_centroid(5)),
+            -Vector(*boxes[planes_assemblys[i][0]].face_normal(5)),
+        ),
         plane_top,
         Plane(
-            Point(*boxes[planes_groups[i][-1]].face_centroid(3)), -Vector(*boxes[planes_groups[i][-1]].face_normal(3))
+            Point(*boxes[planes_assemblys[i][-1]].face_centroid(3)),
+            -Vector(*boxes[planes_assemblys[i][-1]].face_normal(3)),
         ),
     ]
 
     web_base_plane = Plane(Point(0, 0.35, 0), Vector(0, 1, 0))
 
-    group.add(
+    assembly._elements.add(
         Element.from_plate_planes(
-            web_base_plane, bottom_plate_planes, plate_thickness, [0, remap_sequence(i, len(planes_groups))]
+            web_base_plane, bottom_plate_planes, plate_thickness, [0, remap_sequence(i, len(planes_assemblys))]
         )
     )
-    group.add(
+    assembly._elements.add(
         Element.from_plate_planes(
             web_base_plane.offset(-0.75),
             bottom_plate_planes,
             plate_thickness,
-            [0, remap_sequence(i, len(planes_groups))],
+            [0, remap_sequence(i, len(planes_assemblys))],
         )
     )
 
 # ==========================================================================
 # WEB PLATES1
 # ==========================================================================
-centroid_groups = [[0], [1, 2], [3, 4], [5, 6], [7, 8], [9]]
-planes_groups0 = [[0, 1], [0, 1], [2, 3], [4, 5], [6, 7], [8, 9]]
-planes_groups1 = [[0, 1], [2, 3], [4, 5], [6, 7], [8, 9], [8, 9]]
+centroid_assemblys = [[0], [1, 2], [3, 4], [5, 6], [7, 8], [9]]
+planes_assemblys0 = [[0, 1], [0, 1], [2, 3], [4, 5], [6, 7], [8, 9]]
+planes_assemblys1 = [[0, 1], [2, 3], [4, 5], [6, 7], [8, 9], [8, 9]]
 
-centroid_groups = [[0]]
+centroid_assemblys = [[0]]
 for i in range(1, n - 3, 2):
-    centroid_groups.append([i, i + 1])
-centroid_groups.append([n - 2])
+    centroid_assemblys.append([i, i + 1])
+centroid_assemblys.append([n - 2])
 
-planes_groups0 = [[0, 1]]
+planes_assemblys0 = [[0, 1]]
 for i in range(0, n - 1, 2):
-    planes_groups0.append([i, i + 1])
+    planes_assemblys0.append([i, i + 1])
 
-planes_groups1 = []
+planes_assemblys1 = []
 for i in range(0, n - 1, 2):
-    planes_groups1.append([i, i + 1])
-planes_groups1.append([(n - 3), (n - 2)])
+    planes_assemblys1.append([i, i + 1])
+planes_assemblys1.append([(n - 3), (n - 2)])
 inclined_webs = True
 
 
-for i in range(len(planes_groups0)):
-    p0 = Point(*boxes[centroid_groups[i][0]].face_centroid(5))
-    p1 = Point(*boxes[centroid_groups[i][-1]].face_centroid(3))
+for i in range(len(planes_assemblys0)):
+    p0 = Point(*boxes[centroid_assemblys[i][0]].face_centroid(5))
+    p1 = Point(*boxes[centroid_assemblys[i][-1]].face_centroid(3))
 
     def linear_interpolation(p0, p1, t):
         interpolated_x = p0[0] + t * (p1[0] - p0[0])
@@ -754,11 +779,14 @@ for i in range(len(planes_groups0)):
     top_plate_planes = [
         Plane(
             (
-                Point(*boxes[planes_groups0[i][0]].face_centroid(0))
-                + Point(*boxes[planes_groups0[i][-1]].face_centroid(0))
+                Point(*boxes[planes_assemblys0[i][0]].face_centroid(0))
+                + Point(*boxes[planes_assemblys0[i][-1]].face_centroid(0))
             )
             * 0.5,
-            (Vector(*boxes[planes_groups0[i][0]].face_normal(0)) + Vector(*boxes[planes_groups0[i][-1]].face_normal(0)))
+            (
+                Vector(*boxes[planes_assemblys0[i][0]].face_normal(0))
+                + Vector(*boxes[planes_assemblys0[i][-1]].face_normal(0))
+            )
             * 0.5,
         ),
         Plane(Point(0, -offset, 0), Vector(0, -1, 0)),
@@ -773,24 +801,27 @@ for i in range(len(planes_groups0)):
             linear_interpolation(p0, p1, 0.15),
             cross_vectors(
                 Vector(0, 1, 0),
-                (Vector(*boxes[planes_groups0[i][-1]].face_normal(0))) * 0.5,
+                (Vector(*boxes[planes_assemblys0[i][-1]].face_normal(0))) * 0.5,
             ),
         )
     )
 
     p_web1 = Plane(linear_interpolation(p0, p1, 0.85), p_web0.normal)
 
-    id = [1, remap_sequence(i, len(planes_groups0))]
-    group.add(Element.from_plate_planes(p_web0, top_plate_planes, plate_thickness, id))
+    id = [1, remap_sequence(i, len(planes_assemblys0))]
+    assembly._elements.add(Element.from_plate_planes(p_web0, top_plate_planes, plate_thickness, id))
 
     top_plate_planes = [
         Plane(
             (
-                Point(*boxes[planes_groups1[i][0]].face_centroid(0))
-                + Point(*boxes[planes_groups1[i][-1]].face_centroid(0))
+                Point(*boxes[planes_assemblys1[i][0]].face_centroid(0))
+                + Point(*boxes[planes_assemblys1[i][-1]].face_centroid(0))
             )
             * 0.5,
-            (Vector(*boxes[planes_groups1[i][0]].face_normal(0)) + Vector(*boxes[planes_groups1[i][-1]].face_normal(0)))
+            (
+                Vector(*boxes[planes_assemblys1[i][0]].face_normal(0))
+                + Vector(*boxes[planes_assemblys1[i][-1]].face_normal(0))
+            )
             * 0.5,
         ),
         Plane(Point(0, -offset, 0), Vector(0, -1, 0)),
@@ -798,7 +829,7 @@ for i in range(len(planes_groups0)):
         Plane(Point(0, offset, 0), Vector(0, 1, 0)),
     ]
 
-    group.add(
+    assembly._elements.add(
         Element.from_plate_planes(
             p_web1,
             top_plate_planes,
@@ -808,21 +839,21 @@ for i in range(len(planes_groups0)):
         )
     )
 
-    for temp_element in group[id[0], id[1]]:
+    for temp_element in assembly._elements[id[0], id[1]]:
         temp_element.insertion = top_plate_planes[0].normal
 
 
 # ==========================================================================
 # NEST ELEMENTS
 # ==========================================================================
-# group.to_nested_list
-# elements = group.regroup_by_keeping_first_indices(0)
-FabricationNest.pack_elements(elements=group.to_flat_list(), nest_type=2, inflate=0.1, height_step=4)
+# assembly.to_nested_list
+# elements = assembly.reassembly_by_keeping_first_indices(0)
+FabricationNest.pack_elements(elements=assembly._elements.to_flat_list(), nest_type=2, inflate=0.1, height_step=4)
 
 # ==========================================================================
 # WRITE PLATE GEOMETRY TO JSON
 # ==========================================================================
-simplices = group.get_elements_properties("simplex", True)
+simplices = assembly.get_elements_properties("simplex", True)
 json_dump(simplices, "tests/json_dumps/simplices.json")
 
 # ==========================================================================
@@ -836,7 +867,7 @@ for s in simplices:
 # COMPAS_WOOD CREATE ADJACENCY
 # ==========================================================================
 adjancency = []
-nested_lists = group.to_nested_list()
+nested_lists = assembly._elements.to_nested_list()
 for i in range(len(nested_lists)):
     adjancency.append(0 + 3 * i)
     adjancency.append(2 + 3 * i)
@@ -924,27 +955,27 @@ for element_list in nested_lists:
 
 
 # ==========================================================================
-# GROUP IN A DIFFERENT ASSEMBLY ORDER
+# assembly IN A DIFFERENT ASSEMBLY ORDER
 # ==========================================================================
-group_as_nested_list = group.to_nested_list()
-group_as_nested_list_reordered = []
-half = math.floor(len(group_as_nested_list) / 2)
+assembly_as_nested_list = assembly._elements.to_nested_list()
+assembly_as_nested_list_reordered = []
+half = math.floor(len(assembly_as_nested_list) / 2)
 for i in range(half):
-    group_as_nested_list_reordered.append(group_as_nested_list[i])
-    group_as_nested_list_reordered.append(group_as_nested_list[i + half])
+    assembly_as_nested_list_reordered.append(assembly_as_nested_list[i])
+    assembly_as_nested_list_reordered.append(assembly_as_nested_list[i + half])
 
-if len(group_as_nested_list) % 2 == 1:
-    group_as_nested_list_reordered.append(group_as_nested_list[-1])
+if len(assembly_as_nested_list) % 2 == 1:
+    assembly_as_nested_list_reordered.append(assembly_as_nested_list[-1])
 
 # ==========================================================================
 # VIEWER
 # ==========================================================================
-color_red = [3] * group.size()
+color_red = [3] * assembly._elements.size()
 color_red[0] = 0
 color_red[1] = 0
 color_red[2] = 0
 Viewer.show_elements(
-    group_as_nested_list_reordered,
+    assembly_as_nested_list_reordered,
     show_simplices=False,
     show_grid=False,
     measurements=measurements,

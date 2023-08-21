@@ -2,10 +2,10 @@ from math import radians
 from compas.geometry import Point, Box, Translation, Rotation, Frame
 from compas_assembly2 import Element, ELEMENT_NAME, Viewer, FabricationNest
 
-from compas_assembly2.r_tree.bounding_box import BoundingBox
-from compas_assembly2.r_tree.r_tree import Rtree
-from compas_assembly2.r_tree.utilities import get_euclidean_distance
-from compas_assembly2.r_tree.configuration import VECTOR_DIMENSION, MAXIMUM_NUMBER_OF_CHILDREN
+# from compas_assembly2.r_tree.bounding_box import BoundingBox
+# from compas_assembly2.r_tree.r_tree import Rtree
+# from compas_assembly2.r_tree.utilities import get_euclidean_distance
+# from compas_assembly2.r_tree.configuration import VECTOR_DIMENSION, MAXIMUM_NUMBER_OF_CHILDREN
 
 import random
 import time

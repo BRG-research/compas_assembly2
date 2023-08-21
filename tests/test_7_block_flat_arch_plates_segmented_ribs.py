@@ -1,12 +1,18 @@
 from compas_assembly2 import Viewer, Element, FabricationNest
 from compas.datastructures import Mesh
-import compas
 from compas.geometry import (
     Point,
     Line,
     Plane,
     Vector,
+    Polygon,
+    Frame,
+    Transformation,
     intersection_plane_plane_plane,
+    distance_point_point,
+    cross_vectors,
+    centroid_points,
+    distance_point_plane_signed,
 )
 
 
@@ -227,15 +233,10 @@ class _:
             """create a frame from a polyline"""
 
             # create a normal by averaging the cross-products of a polyline
-            normal = compas.geometry.Vector(0, 0, 0)
+            normal = Vector(0, 0, 0)
             count = len(_points)
-            center = compas.geometry.Point(0, 0, 0)
-            is_closed = (
-                compas.geometry.distance_point_point(
-                    compas.geometry.Point(*_points[0]), compas.geometry.Point(*_points[-1])
-                )
-                < 0.01
-            )
+            center = Point(0, 0, 0)
+            is_closed = distance_point_point(Point(*_points[0]), Point(*_points[-1])) < 0.01
             sign = 1 if is_closed else 0
 
             for i in range(count - sign):
@@ -244,7 +245,7 @@ class _:
                 point3d = _points[num]
                 point3d1 = _points[item1]
                 item2 = _points[i]
-                normal += compas.geometry.cross_vectors(item2 - point3d, point3d1 - item2)
+                normal += cross_vectors(item2 - point3d, point3d1 - item2)
                 center = center + point3d
             normal.unitize()
             center = center / count
@@ -260,7 +261,7 @@ class _:
                     (i + 1) % len(_points)
                 ]  # To create a closed polyline, connect the last point to the first one.
 
-                segment_length = compas.geometry.distance_point_point(point1, point2)
+                segment_length = distance_point_point(point1, point2)
 
                 if segment_length > longest_segment_length:
                     longest_segment_length = segment_length
@@ -268,21 +269,19 @@ class _:
                     longest_segment_end = point2
 
             # create x and y-axes for the frame
-            x_axis = compas.geometry.Vector.from_start_end(longest_segment_start, longest_segment_end)
+            x_axis = Vector.from_start_end(longest_segment_start, longest_segment_end)
             x_axis.unitize()
-            y_axis = compas.geometry.cross_vectors(normal, x_axis)
-            y_axis = compas.geometry.Vector(y_axis[0], y_axis[1], y_axis[2])
+            y_axis = cross_vectors(normal, x_axis)
+            y_axis = Vector(y_axis[0], y_axis[1], y_axis[2])
             # create the frame
-            center = compas.geometry.centroid_points(_points)
-            frame = compas.geometry.Frame(center, x_axis, y_axis)
+            center = centroid_points(_points)
+            frame = Frame(center, x_axis, y_axis)
 
             # orient the from the orientation point to the opposite direction
             if _orientation_point is not None:
-                signed_distance = compas.geometry.distance_point_plane_signed(
-                    _orientation_point, compas.geometry.Plane.from_frame(frame)
-                )
+                signed_distance = distance_point_plane_signed(_orientation_point, Plane.from_frame(frame))
                 if signed_distance > 0.001:
-                    frame = compas.geometry.Frame(frame.point, -x_axis, y_axis)
+                    frame = Frame(frame.point, -x_axis, y_axis)
             # output
             return frame
 
@@ -292,36 +291,27 @@ class _:
 
         @staticmethod
         def from_points(points):
-            polygon = compas.geometry.Polygon(points=points)
-            xform = compas.geometry.Transformation.from_frame_to_frame(
-                _.Triagulator._get_frame(points), compas.geometry.Frame.worldXY()
-            )
+            polygon = Polygon(points=points)
+            xform = Transformation.from_frame_to_frame(_.Triagulator._get_frame(points), Frame.worldXY())
             polygon.transform(xform)
             ear_cut = _.Earcut(polygon.points)
             ear_cut.triangulate()
             polygon.transform(xform.inverse())
-            return compas.datastructures.Mesh.from_vertices_and_faces(polygon.points, ear_cut.triangles)
+            return Mesh.from_vertices_and_faces(polygon.points, ear_cut.triangles)
 
         @staticmethod
         def from_loft_two_polygons(points0, points1):
             n = len(points0)
 
-            is_closed = (
-                compas.geometry.distance_point_point(
-                    compas.geometry.Point(*points0[0]), compas.geometry.Point(*points0[-1])
-                )
-                < 0.01
-            )
+            is_closed = distance_point_point(Point(*points0[0]), Point(*points0[-1])) < 0.01
             sign = 1 if is_closed else 0
             n = n - sign
 
             # create a polygon from the first set of points
             # orient to worldXY
             # triangulate
-            polygon = compas.geometry.Polygon(points=points0)
-            xform = compas.geometry.Transformation.from_frame_to_frame(
-                _.Triagulator._get_frame(points0, points1[0]), compas.geometry.Frame.worldXY()
-            )
+            polygon = Polygon(points=points0)
+            xform = Transformation.from_frame_to_frame(_.Triagulator._get_frame(points0, points1[0]), Frame.worldXY())
             polygon.transform(xform)
             ear_cut = _.Earcut(polygon.points)
             ear_cut.triangulate()
