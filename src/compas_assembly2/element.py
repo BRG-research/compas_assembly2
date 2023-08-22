@@ -18,10 +18,15 @@ from compas.geometry import (
     centroid_points,
     distance_point_plane_signed,
     intersection_plane_plane_plane,
+    centroid_polyhedron,
+    volume_polyhedron,
+    transform_points,
 )
 from compas.datastructures import Mesh, mesh_bounding_box
 import copy
 import compas_assembly2
+from shapely.geometry import Polygon as ShapelyPolygon
+from math import fabs
 
 
 class Element(Data):
@@ -73,7 +78,7 @@ class Element(Data):
                             [Vector(0, 0, 1), 0])
     """
 
-    def __init__(self, name="block", id=[0], frame=None, simplex=None, complex=None, insertion=None, **kwargs):
+    def __init__(self, name=None, id=None, frame=None, simplex=None, complex=None, insertion=None, **kwargs):
         # --------------------------------------------------------------------------
         # call the inherited Data constructor for json serialization
         # --------------------------------------------------------------------------
@@ -84,9 +89,9 @@ class Element(Data):
         # the string can be any string
         # but better use the existing container: compas_assembly2.ELEMENT_NAME.BLOCK
         # --------------------------------------------------------------------------
-        if name is None:
+        if not name:
             self.name = compas_assembly2.ELEMENT_NAME.CUSTOM
-        self.name = name.upper()
+        self.name = self.name.upper()
 
         # --------------------------------------------------------------------------
         # indexing
@@ -94,7 +99,8 @@ class Element(Data):
         # --------------------------------------------------------------------------
         if id is None:
             self.id = [-1]
-        self.id = [id] if isinstance(id, int) else id
+        else:
+            self.id = [id] if isinstance(id, int) else id
 
         # --------------------------------------------------------------------------
         # orientation frames
@@ -196,8 +202,365 @@ class Element(Data):
         self.oobb(0.00)
 
     # ==========================================================================
-    # ATTRIBUTES
+    # CONSTRUCTOR OVERLOADING
     # ==========================================================================
+    @classmethod
+    def from_simplex_and_complex(cls, simplex, complex=None):
+        """convert a geometry to element, when indexing and types are not important"""
+
+        if complex is not None:
+            return Element(simplex=simplex, complex=complex)
+        else:
+            return Element(simplex=simplex)
+
+    @classmethod
+    def from_simplices_and_complexes(cls, simplices=[], complexes=None):
+        """convert a list of geometries to elements, with assumtion that other property will be filled later"""
+        elements = []
+
+        for id, s in enumerate(simplices):
+            if complexes is list:
+                elements.append(Element(simplex=s, complex=complexes[id % len(complexes)]))
+            else:
+                elements.append(Element(simplex=s))
+
+        # output
+        return elements
+
+    @classmethod
+    def from_block(cls, mesh):
+        """method create a block element at the origin point with the frame at worldXY"""
+        return Element(
+            name=compas_assembly2.ELEMENT_NAME.BLOCK, id=-1, frame=Frame.worldXY, simplex=Point(0, 0, 0), complex=mesh
+        )
+
+    @classmethod
+    def from_frame(cls, width, height, depth):
+        """method create a frame element at the origin point with the frame at worldXY"""
+        return Element(
+            name=compas_assembly2.ELEMENT_NAME.BLOCK,
+            id=0,
+            frame=Frame.worldXY,
+            simplex=Line(Point(-width, 0, 0), Point(width, 0, 0)),
+            complex=Box.from_width_height_depth(width, height, depth),
+        )
+
+    @classmethod
+    def from_plate(cls, polylines):
+        """method create a plate element at the origin point with the frame at worldXY"""
+        return Element(
+            name=compas_assembly2.ELEMENT_NAME.PLATE, id=0, frame=Frame.worldXY, simplex=polylines, complex=polylines
+        )
+
+    @classmethod
+    def from_plate_points(cls, points0, points1, id=0, insertion=None):
+        """method create a plate element at the origin point with the frame at worldXY"""
+
+        # --------------------------------------------------------------------------
+        # close polyline
+        # --------------------------------------------------------------------------
+        points0_copy = [Point(*point) for point in points0]
+        points1_copy = [Point(*point) for point in points1]
+
+        if distance_point_point(points0_copy[0], points0_copy[-1]) > 1e-3:
+            points0_copy.append(points0_copy[0])
+            points1_copy.append(points1_copy[0])
+
+        # --------------------------------------------------------------------------
+        # create mesh by lofting two outlines
+        # --------------------------------------------------------------------------
+        mesh, frame = _.Triagulator.from_loft_two_point_lists(points0_copy, points1_copy)
+
+        # --------------------------------------------------------------------------
+        # return the element
+        # --------------------------------------------------------------------------
+        return Element(
+            name=compas_assembly2.ELEMENT_NAME.PLATE,
+            id=id,
+            frame=frame,
+            simplex=[Polyline(points0_copy), Polyline(points1_copy)],
+            complex=mesh,
+        )
+
+    @classmethod
+    def from_plate_planes(cls, base_plane, side_planes, thickness, id=None, insertion=None):
+        """method create a plate element at the origin point with the frame at worldXY"""
+
+        # --------------------------------------------------------------------------
+        # intersect side planes with base plane to get a polyline)
+        # --------------------------------------------------------------------------
+        points0 = _.PlaneUtil.points_from_side_plane(base_plane, side_planes, 0, True)
+        points1 = _.PlaneUtil.points_from_side_plane(base_plane, side_planes, thickness, True)
+
+        # --------------------------------------------------------------------------
+        # create mesh by lofting two outlines
+        # --------------------------------------------------------------------------
+        mesh, frame = _.Triagulator.from_loft_two_point_lists(points0, points1)
+
+        # --------------------------------------------------------------------------
+        # return the element
+        # --------------------------------------------------------------------------
+        return Element(
+            name=compas_assembly2.ELEMENT_NAME.PLATE,
+            id=id,
+            frame=frame,
+            simplex=[Polyline(points0), Polyline(points1)],
+            complex=mesh,
+            insertion=insertion,
+        )
+
+    # ==========================================================================
+    # SERIALIZATION
+    # ==========================================================================
+
+    @property
+    def data(self):
+        # create the data object from the class properties
+        # call the inherited Data constructor for json serialization
+        data = {
+            "name": self.name,
+            "id": self.id,
+            "frame": self.frame,
+            "simplex": self.simplex,
+            "complex": self.complex,
+            "attributes": self.attributes,
+        }
+
+        # custom properties
+        data["frame_global"] = self.frame_global
+        data["aabb"] = self.aabb()
+        data["oobb"] = self.oobb()
+        data["convex_hull"] = self.convex_hull
+        data["fabrication"] = self.fabrication
+        data["structure"] = self.structure
+
+        # return the data object
+        return data
+
+    @data.setter
+    def data(self, data):
+        # vice versa - create the class properties from the data object
+        # call the inherited Data constructor for json serialization
+
+        # main properties
+        self.name = data["name"]
+        self.id = data["id"]
+        self.frame = data["frame"]
+        self.simplex = data["simplex"]
+        self.complex = data["complex"]
+        self.attributes = data["attributes"]
+
+        # custom properties
+        self._frame_global = data["frame_global"]
+        self._aabb = data["aabb"]
+        self._oobb = data["oobb"]
+        self._convex_hull = data["convex_hull"]
+        self._fabrication = data["fabrication"]
+        self._structure = data["structure"]
+
+    @classmethod
+    def from_data(cls, data):
+        """Alternative to None default __init__ parameters."""
+        obj = Element(
+            name=data["name"],
+            id=data["id"],
+            frame=data["frame"],
+            simplex=data["simplex"],
+            complex=data["complex"],
+            **data["attributes"],
+        )
+
+        # custom properties
+        obj._frame_global = data["frame_global"]
+        obj._aabb = data["aabb"]
+        obj._oobb = data["oobb"]
+        obj._convex_hull = data["convex_hull"]
+        obj._fabrication = data["fabrication"]
+        obj._structure = data["structure"]
+
+        # return the object
+        return obj
+
+    # ==========================================================================
+    # OPTIONAL PROPERTIES - MEASUREMENTS
+    # ==========================================================================
+    @property
+    def dimensions(self):
+        """Compute the dimensions from oriented bounding-box.
+
+        Returns
+        -------
+        [float, float, float]
+
+        """
+        if not hasattr(self, "_dimensions"):
+            return self._dimensions
+        else:
+            eight_points = self.oobb()
+            width = distance_point_point(eight_points[0], eight_points[1])
+            length = distance_point_point(eight_points[0], eight_points[3])
+            height = distance_point_point(eight_points[0], eight_points[4])
+            self._dimensions = [width, length, height]
+        return self._dimensions
+
+    @property
+    def area(self):
+        """Compute the area of an element by multiplying the boundingbox width and height.
+        If you need surface area instead, refer to the surface_area method instead
+
+        Returns
+        -------
+        float
+
+        """
+        if not hasattr(self, "_area"):
+            return self._area
+        else:
+            eight_points = self.oobb()
+            width = distance_point_point(eight_points[0], eight_points[1])
+            length = distance_point_point(eight_points[0], eight_points[3])
+            self._area = width * length
+        return self._area
+
+    @property
+    def surface_area(self):
+        """Compute surface area of a complex geometry.
+
+        Returns
+        -------
+        float
+
+        """
+
+        # --------------------------------------------------------------------------
+        # sanity check
+        # --------------------------------------------------------------------------
+        if not hasattr(self, "_surface_area"):
+            return self._surface_area
+
+        if len(self.complex) == 0:
+            raise AssertionError("You must assign complex to the element")
+
+        if not isinstance(self.complex[0], Mesh):
+            raise AssertionError("The complex must be a mesh")
+
+        # --------------------------------------------------------------------------
+        # assign it to the class property and return it
+        # --------------------------------------------------------------------------
+        self._surface_area = self.complex[0].area()
+        return self._surface_area
+
+    @property
+    def volume(self):
+        """Compute the volume.
+
+        Returns
+        -------
+        float
+            The volume of the complex.
+
+        """
+        # --------------------------------------------------------------------------
+        # sanity check
+        # --------------------------------------------------------------------------
+        if not hasattr(self, "_surface_area"):
+            return self._volume
+
+        if len(self.complex) == 0:
+            raise AssertionError("You must assign complex to the element")
+
+        if not isinstance(self.complex[0], Mesh):
+            raise AssertionError("The complex must be a mesh")
+
+        # --------------------------------------------------------------------------
+        # compute the volume from the mesh
+        # --------------------------------------------------------------------------
+        vertex_index = {vertex: index for index, vertex in enumerate(self.complex[0].vertices())}
+        vertices = [self.complex[0].vertex_coordinates(vertex) for vertex in self.complex[0].vertices()]
+        faces = [
+            [vertex_index[vertex] for vertex in self.complex[0].face_vertices(face)] for face in self.complex[0].faces()
+        ]
+        self._volume = volume_polyhedron((vertices, faces))
+        return self._volume
+
+    # ==========================================================================
+    # OPTIONAL PROPERTIES - ORIENTATION
+    # ==========================================================================
+
+    @property
+    def center_of_mass(self):
+        """Compute the center of mass of the complex.
+
+        Returns
+        -------
+        :class:`compas.geometry.Point`
+
+        """
+
+        # --------------------------------------------------------------------------
+        # sanity check
+        # --------------------------------------------------------------------------
+        if not hasattr(self, "_centroid"):
+            return self._center
+
+        if len(self.complex) == 0:
+            raise AssertionError("You must assign complex geometry to the element")
+
+        if not isinstance(self.complex[0], Mesh):
+            raise AssertionError("The complex must be a mesh")
+
+        # --------------------------------------------------------------------------
+        # get vertices and faces of the first mesh
+        # --------------------------------------------------------------------------
+        vertex_index = {vertex: index for index, vertex in enumerate(self.complex[0].vertices())}
+        vertices = [self.complex[0].vertex_coordinates(vertex) for vertex in self.complex[0].vertices()]
+        faces = [
+            [vertex_index[vertex] for vertex in self.complex[0].face_vertices(face)] for face in self.complex[0].faces()
+        ]
+
+        # --------------------------------------------------------------------------
+        # compute the centroid
+        # --------------------------------------------------------------------------
+        x, y, z = centroid_polyhedron((vertices, faces))
+
+        # --------------------------------------------------------------------------
+        # assign it to the class property and return it
+        # --------------------------------------------------------------------------
+        self._center = Point(x, y, z)
+        return self._center
+
+    @property
+    def centroid(self):
+        """Compute the centroid of the complex.
+
+        Returns
+        -------
+        :class:`compas.geometry.Point`
+
+        """
+
+        # --------------------------------------------------------------------------
+        # sanity check
+        # --------------------------------------------------------------------------
+        if not hasattr(self, "_centroid"):
+            return self._centroid
+
+        if len(self.complex) == 0:
+            raise AssertionError("You must assign complex geometry to the element")
+
+        if not isinstance(self.complex[0], Mesh):
+            raise AssertionError("The complex must be a mesh")
+
+        # --------------------------------------------------------------------------
+        # compute the centroid
+        # --------------------------------------------------------------------------
+        x, y, z = centroid_points([self.complex[0].vertex_coordinates(key) for key in self.complex[0].vertices()])
+
+        # --------------------------------------------------------------------------
+        # assign it to the class property and return it
+        # --------------------------------------------------------------------------
+        self._centroid = Point(x, y, z)
+        return self._centroid
 
     @property
     def frame_global(self):
@@ -212,6 +575,10 @@ class Element(Data):
     def frame_global(self, value):
         """Frame that gives orientation of the element in the larger group of Elements"""
         self._frame_global = value
+
+    # ==========================================================================
+    # OPTIONAL PROPERTIES - COLLISION
+    # ==========================================================================
 
     def aabb(self, inflate=0.00):
         """Compute bounding box based on complex geometries points"""
@@ -385,15 +752,271 @@ class Element(Data):
             self._convex_hull = Mesh()
             return self._convex_hull
 
-    @property
-    def outlines(self):
-        """Outlines of polygonal complex shapes e.g. mesh face outlines
-        they are often made from polylines and polyline planes"""
+    def has_collision(self, other):
+        """check collision using aabb and oobb
+        this function is often intermediate between high-performance tree searches
+        then this collision is computed
+        and then the interface can be found"""
 
-        # define this property dynamically in the class
-        if not hasattr(self, "_outlines"):
-            self._outlines = []
-        return self._outlines
+        # --------------------------------------------------------------------------
+        # sanity check
+        # --------------------------------------------------------------------------
+        if (not self.aabb()) or (not other.aabb()):
+            return False
+
+        # --------------------------------------------------------------------------
+        # aabb collision
+        # --------------------------------------------------------------------------
+        collision_x_axis = self._aabb[6][0] < other._aabb[0][0] or other._aabb[6][0] < self._aabb[0][0]  # type: ignore
+        collision_y_axis = self._aabb[6][1] < other._aabb[0][1] or other._aabb[6][1] < self._aabb[0][1]  # type: ignore
+        collision_z_axis = self._aabb[6][2] < other._aabb[0][2] or other._aabb[6][2] < self._aabb[0][2]  # type: ignore
+        aabb_collision = not (collision_x_axis or collision_y_axis or collision_z_axis)
+        # print("aabb_collison", aabb_collision)
+        if not aabb_collision:
+            return False
+
+        # --------------------------------------------------------------------------
+        # oobb collision
+        # https://discourse.mcneel.com/t/box-contains-box-check-for-coincident-boxes/59642/19
+        # --------------------------------------------------------------------------
+
+        # point, axis, size description
+        class OBB:
+            def to_p(self, p):
+                return Point(p[0], p[1], p[2])
+
+            def __init__(self, box=[]):
+                origin = (self.to_p(box[0]) + self.to_p(box[6])) * 0.5
+                x_axis = self.to_p(box[1]) - self.to_p(box[0])
+                y_axis = self.to_p(box[3]) - self.to_p(box[0])
+                self.frame = Frame(origin, x_axis, y_axis)
+                self.half_size = [0.0, 0.0, 0.0]
+                self.half_size[0] = distance_point_point(box[0], box[1]) * 0.5
+                self.half_size[1] = distance_point_point(box[0], box[3]) * 0.5
+                self.half_size[2] = distance_point_point(box[0], box[4]) * 0.5
+
+        # convert the eight points to a frame and half-size description
+        box1 = OBB(self._oobb)
+        box2 = OBB(other._oobb)
+
+        # get sepratation plane
+        def GetSeparatingPlane(RPos, axis, box1, box2):
+            # print(RPos, axis)
+            return abs(RPos.dot(axis)) > (
+                abs((box1.frame.xaxis * box1.half_size[0]).dot(axis))
+                + abs((box1.frame.yaxis * box1.half_size[1]).dot(axis))
+                + abs((box1.frame.zaxis * box1.half_size[2]).dot(axis))
+                + abs((box2.frame.xaxis * box2.half_size[0]).dot(axis))
+                + abs((box2.frame.yaxis * box2.half_size[1]).dot(axis))
+                + abs((box2.frame.zaxis * box2.half_size[2]).dot(axis))
+            )
+
+        # compute the oobb collision
+        RPos = box2.frame.point - box1.frame.point  # type: ignore
+
+        result = not (
+            GetSeparatingPlane(RPos, box1.frame.xaxis, box1, box2)
+            or GetSeparatingPlane(RPos, box1.frame.yaxis, box1, box2)
+            or GetSeparatingPlane(RPos, box1.frame.zaxis, box1, box2)
+            or GetSeparatingPlane(RPos, box2.frame.xaxis, box1, box2)
+            or GetSeparatingPlane(RPos, box2.frame.yaxis, box1, box2)
+            or GetSeparatingPlane(RPos, box2.frame.zaxis, box1, box2)
+            or GetSeparatingPlane(RPos, box1.frame.xaxis.cross(box2.frame.xaxis), box1, box2)  # type: ignore
+            or GetSeparatingPlane(RPos, box1.frame.xaxis.cross(box2.frame.yaxis), box1, box2)  # type: ignore
+            or GetSeparatingPlane(RPos, box1.frame.xaxis.cross(box2.frame.zaxis), box1, box2)  # type: ignore
+            or GetSeparatingPlane(RPos, box1.frame.yaxis.cross(box2.frame.xaxis), box1, box2)  # type: ignore
+            or GetSeparatingPlane(RPos, box1.frame.yaxis.cross(box2.frame.yaxis), box1, box2)  # type: ignore
+            or GetSeparatingPlane(RPos, box1.frame.yaxis.cross(box2.frame.zaxis), box1, box2)  # type: ignore
+            or GetSeparatingPlane(RPos, box1.frame.zaxis.cross(box2.frame.xaxis), box1, box2)  # type: ignore
+            or GetSeparatingPlane(RPos, box1.frame.zaxis.cross(box2.frame.yaxis), box1, box2)  # type: ignore
+            or GetSeparatingPlane(RPos, box1.frame.zaxis.cross(box2.frame.zaxis), box1, box2)  # type: ignore
+        )
+
+        # print("oobb_collison", result)
+        return result
+
+    # ==========================================================================
+    # OPTIONAL PROPERTIES - FACE-TO-FACE DETECTION
+    # ==========================================================================
+
+    @property
+    def face_polygons(self):
+        """Get Polygons from the complex
+        WARNING: currently the face polygons do not consider elements with holes"""
+
+        # --------------------------------------------------------------------------
+        # sanity check
+        # --------------------------------------------------------------------------
+        if not hasattr(self, "_face_polygons"):
+            return self._face_polygons
+
+        if len(self.complex) == 0:
+            raise AssertionError("You must assign complex geometry to the element")
+
+        if not isinstance(self.complex[0], Mesh):
+            raise AssertionError("The complex must be a mesh")
+
+        # --------------------------------------------------------------------------
+        # get polylines from the mesh faces
+        # --------------------------------------------------------------------------
+        self._face_polygons = self.complex[0].to_polygos()
+        return self._face_polygons
+
+    @property
+    def face_frames(self):
+        """Get Frames from the complex
+        WARNING: currently the face polylines do not consider elements with holes
+        for this you need to add face attributes to conside the holes"""
+        # --------------------------------------------------------------------------
+        # sanity check
+        # --------------------------------------------------------------------------
+        if not hasattr(self, "_face_frames"):
+            return self._face_frames
+
+        if len(self.complex) == 0:
+            raise AssertionError("You must assign complex geometry to the element")
+
+        if not isinstance(self.complex[0], Mesh):
+            raise AssertionError("The complex must be a mesh")
+
+        # --------------------------------------------------------------------------
+        # compute the frames of each mesh face
+        # --------------------------------------------------------------------------
+        self._face_frames = []
+
+        for i in range(self.complex[0].number_of_faces()):
+            xyz = self.complex[0].face_coordinates(i)
+            o = self.complex[0].face_center(i)
+            w = self.complex[0].face_normal(i)
+            u = [xyz[1][i] - xyz[0][i] for i in range(3)]  # align with longest edge instead?
+            v = cross_vectors(w, u)
+            frame = Frame(o, u, v)
+            self._face_frames.append(frame)
+
+        return self._face_frames
+
+    def face_to_face_detection(self, other, tmax=1e-6, amin=1e-1):
+        """construct intefaces by intersecting coplanar mesh faces
+        Parameters
+        ----------
+        assembly : compas_assembly.datastructures.Assembly
+            An assembly of discrete blocks.
+        nmax : int, optional
+            Maximum number of neighbours per block.
+        tmax : float, optional
+            Maximum deviation from the perfectly flat interface plane.
+        amin : float, optional
+            Minimum area of a "face-face" interface.
+
+        Returns
+        -------
+        Polygon of the Interface - :class:`compas.geometry.Polygon`
+        Current Element ID - list[int]
+        Other Element ID - list[int]
+        Current Element Face Index - int
+        Other Element Face Index - int
+        """
+
+        # --------------------------------------------------------------------------
+        # sanity check
+        # --------------------------------------------------------------------------
+        if len(self.complex) == 0 or len(other.complex) == 0:
+            raise AssertionError("You must assign complex geometry to the element")
+
+        if not isinstance(self.complex[0], Mesh) or not isinstance(other.complex[0], Mesh):
+            raise AssertionError("The complex must be a mesh")
+
+        # --------------------------------------------------------------------------
+        # iterate face polygons and get intersection area
+        # DEPENDENCY: shapely library
+        # --------------------------------------------------------------------------
+
+        def to_shapely_polygon(matrix, polygon, tmax=1e-6, amin=1e-1):
+            """convert a compas polygon to shapely polygon on xy plane"""
+
+            # orient points to the xy plane
+            projected = transform_points(polygon.points, matrix)
+
+            # check if the oriented point is on the xy plane within the tolerance
+            # then return the shapely polygon
+            if not all(fabs(point[2]) < tmax for point in projected):
+                return None
+            elif polygon.area < amin:
+                return None
+            else:
+                return ShapelyPolygon(projected)
+
+        def to_compas_polygon(matrix, shapely_polygon):
+            """convert a shapely polygon to compas polygon back to the frame"""
+
+            # convert coordiantes to 3D by adding the z coordinate
+            coords = [[x, y, 0.0] for x, y, _ in intersection.exterior.coords]
+
+            # orient points to the original first mesh frame
+            coords = transform_points(coords, matrix.inverted())[:-1]
+
+            # convert to compas polygon
+            return Polygon(coords)
+
+        joints = []
+
+        for id_0, face_polygon_0 in enumerate(self.face_polygons):
+            # get the transformation matrix
+            matrix = Transformation.from_change_of_basis(Frame.worldXY(), self.face_frames[id_0])
+
+            # get the shapely polygon
+            shapely_polygon_0 = to_shapely_polygon(matrix, face_polygon_0)
+            if shapely_polygon_0 is None:
+                continue
+
+            for id_1, face_polygon_1 in enumerate(other.face_polygons):
+                # get the shapely polygon
+                shapely_polygon_1 = to_shapely_polygon(matrix, face_polygon_1)
+                if shapely_polygon_1 is None:
+                    continue
+
+                # check if polygons intersect
+                if not shapely_polygon_0.intersects(shapely_polygon_1):
+                    continue
+
+                # get intersection area and check if it is big enough within the given tolerance
+                intersection = shapely_polygon_0.intersection(shapely_polygon_1)
+                area = intersection.area
+                if area < amin:
+                    continue
+
+                # convert shapely polygon to compas polygon
+                polygon = to_compas_polygon(matrix, intersection)
+
+                # construct joint
+                joint = compas_assembly2.Joint(
+                    type=compas_assembly2.JOINT_NAME.FACE_TO_FACE,
+                    polygon=polygon,
+                    frame=self.face_frames[id_0],
+                    surface_area=area,
+                )
+
+                # there can be more than one interface so store them in a list
+                joints.append(joint)
+
+        # output
+        return joints
+
+    # ==========================================================================
+    # OPTIONAL PROPERTIES - AXIS-TO-AXIS DETECTION
+    # ==========================================================================
+
+    # ==========================================================================
+    # OPTIONAL PROPERTIES - FRAME-TO-FACE DETECTION
+    # ==========================================================================
+
+    # ==========================================================================
+    # OPTIONAL PROPERTIES - OBJECT-MINUS-OBJECT DETECTION
+    # ==========================================================================
+
+    # ==========================================================================
+    # OPTIONAL PROPERTIES - FABRICATION AND STRUCTUTRE
+    # ==========================================================================
 
     @property
     def fabrication(self):
@@ -414,81 +1037,7 @@ class Element(Data):
         return self._structure
 
     # ==========================================================================
-    # SERIALIZATION
-    # ==========================================================================
-    # create the data object from the class properties
-    @property
-    def data(self):
-        # call the inherited Data constructor for json serialization
-        data = {
-            "name": self.name,
-            "id": self.id,
-            "frame": self.frame,
-            "simplex": self.simplex,
-            "complex": self.complex,
-            "attributes": self.attributes,
-        }
-
-        # custom properties
-        data["frame_global"] = self.frame_global
-        data["aabb"] = self.aabb()
-        data["oobb"] = self.oobb()
-        data["convex_hull"] = self.convex_hull
-        data["outlines"] = self.outlines
-        data["fabrication"] = self.fabrication
-        data["structure"] = self.structure
-
-        # return the data object
-        return data
-
-    # vice versa - create the class properties from the data object
-    @data.setter
-    def data(self, data):
-        # call the inherited Data constructor for json serialization
-
-        # main properties
-        self.name = data["name"]
-        self.id = data["id"]
-        self.frame = data["frame"]
-        self.simplex = data["simplex"]
-        self.complex = data["complex"]
-        self.attributes = data["attributes"]
-
-        # custom properties
-        self._frame_global = data["frame_global"]
-        self._aabb = data["aabb"]
-        self._oobb = data["oobb"]
-        self._convex_hull = data["convex_hull"]
-        self._outlines = data["outlines"]
-        self._fabrication = data["fabrication"]
-        self._structure = data["structure"]
-
-    @classmethod
-    def from_data(cls, data):
-        """Alternative to None default __init__ parameters."""
-        obj = Element(
-            name=data["name"],
-            id=data["id"],
-            frame=data["frame"],
-            simplex=data["simplex"],
-            complex=data["complex"],
-            **data["attributes"],
-        )
-
-        # custom properties
-        obj._frame_global = data["frame_global"]
-        obj._aabb = data["aabb"]
-        obj._oobb = data["oobb"]
-        obj._convex_hull = data["convex_hull"]
-        obj._outlines = data["outlines"]
-        obj._fabrication = data["fabrication"]
-        obj._structure = data["structure"]
-
-        # return the object
-        return obj
-
-    # ==========================================================================
-    # GEOMETRIC FEATURES E.G. JOINERY. INTERFACES
+    # OPTIONAL PROPERTIES - JOINERY
     # ==========================================================================
     def clear_features(self, features_to_clear=None):
         """Clear all features from this Part."""
@@ -513,32 +1062,8 @@ class Element(Data):
         pass
 
     # ==========================================================================
-    # CONVERSIONS
+    # COPY
     # ==========================================================================
-    @staticmethod
-    def to_elements(simplices=[], complexes=None):
-        """convert a list of geometries to elements, with assumtion that other property will be filled later"""
-        elements = []
-        contains_complex = complexes is list
-
-        for id, s in enumerate(simplices):
-            if contains_complex:
-                elements.append(Element.to_element(s, complexes[id % len(complexes)]))
-            else:
-                elements.append(Element.to_element(s))
-
-        # output
-        return elements
-
-    @staticmethod
-    def to_element(simplex=None, complex=None):
-        """convert a geometry to an element, with assumtion that other property will be filled later"""
-        return Element(simplex=simplex, complex=complex)
-
-    # ==========================================================================
-    # COPY ALL GEOMETRY OBJECTS
-    # ==========================================================================
-
     def copy(self):
         # copy main properties
         new_instance = self.__class__(
@@ -550,7 +1075,6 @@ class Element(Data):
         new_instance._aabb = copy.deepcopy(self.aabb())
         new_instance._oobb = copy.deepcopy(self.oobb())
         new_instance._convex_hull = copy.deepcopy(self.convex_hull)
-        new_instance._outlines = copy.deepcopy(self.outlines)
         new_instance._fabrication = copy.deepcopy(self.fabrication)
         new_instance._structure = copy.deepcopy(self.structure)
 
@@ -664,191 +1188,6 @@ class Element(Data):
         return new_instance
 
     # ==========================================================================
-    # COLLISION DETECTIONblock
-    # ==========================================================================
-
-    def collide(self, other, **kwargs):
-        """check collision using aabb and oobb
-        this function is often intermediate between high-performance tree searches
-        then this collision is computed
-        and then the interface can be found"""
-
-        # --------------------------------------------------------------------------
-        # sanity check
-        # --------------------------------------------------------------------------
-        if (not self.aabb()) or (not other.aabb()):
-            return False
-
-        # --------------------------------------------------------------------------
-        # aabb collision
-        # --------------------------------------------------------------------------
-        collision_x_axis = self._aabb[6][0] < other._aabb[0][0] or other._aabb[6][0] < self._aabb[0][0]  # type: ignore
-        collision_y_axis = self._aabb[6][1] < other._aabb[0][1] or other._aabb[6][1] < self._aabb[0][1]  # type: ignore
-        collision_z_axis = self._aabb[6][2] < other._aabb[0][2] or other._aabb[6][2] < self._aabb[0][2]  # type: ignore
-        aabb_collision = not (collision_x_axis or collision_y_axis or collision_z_axis)
-        # print("aabb_collison", aabb_collision)
-        if not aabb_collision:
-            return False
-
-        # --------------------------------------------------------------------------
-        # oobb collision
-        # https://discourse.mcneel.com/t/box-contains-box-check-for-coincident-boxes/59642/19
-        # --------------------------------------------------------------------------
-
-        # point, axis, size description
-        class OBB:
-            def to_p(self, p):
-                return Point(p[0], p[1], p[2])
-
-            def __init__(self, box=[]):
-                origin = (self.to_p(box[0]) + self.to_p(box[6])) * 0.5
-                x_axis = self.to_p(box[1]) - self.to_p(box[0])
-                y_axis = self.to_p(box[3]) - self.to_p(box[0])
-                self.frame = Frame(origin, x_axis, y_axis)
-                self.half_size = [0.0, 0.0, 0.0]
-                self.half_size[0] = distance_point_point(box[0], box[1]) * 0.5
-                self.half_size[1] = distance_point_point(box[0], box[3]) * 0.5
-                self.half_size[2] = distance_point_point(box[0], box[4]) * 0.5
-
-        # convert the eight points to a frame and half-size description
-        box1 = OBB(self._oobb)
-        box2 = OBB(other._oobb)
-
-        # get sepratation plane
-        def GetSeparatingPlane(RPos, axis, box1, box2):
-            # print(RPos, axis)
-            return abs(RPos.dot(axis)) > (
-                abs((box1.frame.xaxis * box1.half_size[0]).dot(axis))
-                + abs((box1.frame.yaxis * box1.half_size[1]).dot(axis))
-                + abs((box1.frame.zaxis * box1.half_size[2]).dot(axis))
-                + abs((box2.frame.xaxis * box2.half_size[0]).dot(axis))
-                + abs((box2.frame.yaxis * box2.half_size[1]).dot(axis))
-                + abs((box2.frame.zaxis * box2.half_size[2]).dot(axis))
-            )
-
-        # compute the oobb collision
-        RPos = box2.frame.point - box1.frame.point  # type: ignore
-
-        result = not (
-            GetSeparatingPlane(RPos, box1.frame.xaxis, box1, box2)
-            or GetSeparatingPlane(RPos, box1.frame.yaxis, box1, box2)
-            or GetSeparatingPlane(RPos, box1.frame.zaxis, box1, box2)
-            or GetSeparatingPlane(RPos, box2.frame.xaxis, box1, box2)
-            or GetSeparatingPlane(RPos, box2.frame.yaxis, box1, box2)
-            or GetSeparatingPlane(RPos, box2.frame.zaxis, box1, box2)
-            or GetSeparatingPlane(RPos, box1.frame.xaxis.cross(box2.frame.xaxis), box1, box2)  # type: ignore
-            or GetSeparatingPlane(RPos, box1.frame.xaxis.cross(box2.frame.yaxis), box1, box2)  # type: ignore
-            or GetSeparatingPlane(RPos, box1.frame.xaxis.cross(box2.frame.zaxis), box1, box2)  # type: ignore
-            or GetSeparatingPlane(RPos, box1.frame.yaxis.cross(box2.frame.xaxis), box1, box2)  # type: ignore
-            or GetSeparatingPlane(RPos, box1.frame.yaxis.cross(box2.frame.yaxis), box1, box2)  # type: ignore
-            or GetSeparatingPlane(RPos, box1.frame.yaxis.cross(box2.frame.zaxis), box1, box2)  # type: ignore
-            or GetSeparatingPlane(RPos, box1.frame.zaxis.cross(box2.frame.xaxis), box1, box2)  # type: ignore
-            or GetSeparatingPlane(RPos, box1.frame.zaxis.cross(box2.frame.yaxis), box1, box2)  # type: ignore
-            or GetSeparatingPlane(RPos, box1.frame.zaxis.cross(box2.frame.zaxis), box1, box2)  # type: ignore
-        )
-
-        # print("oobb_collison", result)
-        return result
-
-    def find_interface(self, other, **kwargs):
-        """there are few possible cases
-        a) an element touch other element by a flat face
-        b) an element simplex is close to another simplex e.g. line to line proxity"""
-        pass
-
-    # ==========================================================================
-    # MOST COMMON CONVERSIONS
-    # ==========================================================================
-    @staticmethod
-    def from_simplex_and_complex(simplex, complex, id=-1):
-        """method create a block element at the origin point with the frame at worldXY"""
-        return Element(
-            name=compas_assembly2.ELEMENT_NAME.BLOCK, id=id, frame=Frame.worldXY, simplex=simplex, complex=complex
-        )
-
-    @staticmethod
-    def from_block(block):
-        """method create a block element at the origin point with the frame at worldXY"""
-        return Element(
-            name=compas_assembly2.ELEMENT_NAME.BLOCK, id=0, frame=Frame.worldXY, simplex=Point(0, 0, 0), complex=block
-        )
-
-    @staticmethod
-    def from_frame(width, height, depth):
-        """method create a frame element at the origin point with the frame at worldXY"""
-        return Element(
-            name=compas_assembly2.ELEMENT_NAME.BLOCK,
-            id=0,
-            frame=Frame.worldXY,
-            simplex=Line(Point(-width, 0, 0), Point(width, 0, 0)),
-            complex=Box.from_width_height_depth(width, height, depth),
-        )
-
-    @staticmethod
-    def from_plate(polylines):
-        """method create a plate element at the origin point with the frame at worldXY"""
-        return Element(
-            name=compas_assembly2.ELEMENT_NAME.PLATE, id=0, frame=Frame.worldXY, simplex=polylines, complex=polylines
-        )
-
-    @staticmethod
-    def from_plate_points(points0, points1, id=0, insertion=None):
-        """method create a plate element at the origin point with the frame at worldXY"""
-
-        # --------------------------------------------------------------------------
-        # close polyline
-        # --------------------------------------------------------------------------
-        points0_copy = [Point(*point) for point in points0]
-        points1_copy = [Point(*point) for point in points1]
-
-        if distance_point_point(points0_copy[0], points0_copy[-1]) > 1e-3:
-            points0_copy.append(points0_copy[0])
-            points1_copy.append(points1_copy[0])
-
-        # --------------------------------------------------------------------------
-        # create mesh by lofting two outlines
-        # --------------------------------------------------------------------------
-        mesh, frame = _.Triagulator.from_loft_two_point_lists(points0_copy, points1_copy)
-
-        # --------------------------------------------------------------------------
-        # return the element
-        # --------------------------------------------------------------------------
-        return Element(
-            name=compas_assembly2.ELEMENT_NAME.PLATE,
-            id=id,
-            frame=frame,
-            simplex=[Polyline(points0_copy), Polyline(points1_copy)],
-            complex=mesh,
-        )
-
-    @staticmethod
-    def from_plate_planes(base_plane, side_planes, thickness, id=None, insertion=None):
-        """method create a plate element at the origin point with the frame at worldXY"""
-
-        # --------------------------------------------------------------------------
-        # intersect side planes with base plane to get a polyline)
-        # --------------------------------------------------------------------------
-        points0 = _.PlaneUtil.points_from_side_plane(base_plane, side_planes, 0, True)
-        points1 = _.PlaneUtil.points_from_side_plane(base_plane, side_planes, thickness, True)
-
-        # --------------------------------------------------------------------------
-        # create mesh by lofting two outlines
-        # --------------------------------------------------------------------------
-        mesh, frame = _.Triagulator.from_loft_two_point_lists(points0, points1)
-
-        # --------------------------------------------------------------------------
-        # return the element
-        # --------------------------------------------------------------------------
-        return Element(
-            name=compas_assembly2.ELEMENT_NAME.PLATE,
-            id=id,
-            frame=frame,
-            simplex=[Polyline(points0), Polyline(points1)],
-            complex=mesh,
-            insertion=insertion,
-        )
-
-    # ==========================================================================
     # DESCRIPTION
     # ==========================================================================
 
@@ -860,29 +1199,6 @@ class Element(Data):
             str: The string representation of the Element.
         """
         return """Type: {0}, ID: {1}""".format(self.name, self.id)
-
-
-# # (Type: {0},
-# #  ID: {1},
-# #  Minimal Representation Geometries: {2},
-# #  Vizualization Geometries: {3},
-# #  Local Frame: {4},
-# #  Global Frame: {5},
-# #  Outlines: {6},
-# #  Fabrication: {7},
-# #  Structure: {8},
-# #  Attributes: {9})""".format(
-#             self.name,
-#             self.id,
-#             self.simplex,
-#             self.complex,
-#             self.frame,
-#             self.frame_global,
-#             self.outlines,
-#             self.fabrication,
-#             self.structure,
-#             self.attributes,
-#         )
 
 
 class _:

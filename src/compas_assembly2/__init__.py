@@ -203,6 +203,14 @@ class ELEMENT_NAME:
             return "Invalid element type."
 
 
+class JOINT_NAME:
+    FACE_TO_FACE = "FACE_TO_FACE"
+    AXIS_TO_AXIS = "AXIS_TO_AXIS"
+    FRAME_TO_FACE = "FRAME_TO_FACE"
+    OBJECT_MINUS_OBJECT = "OBJECT_MINUS_OBJECT"
+    CUSTOM = "CUSTOM"
+
+
 class FABRICATION_TYPES:
     MOVEMENT = "MOVEMENT_LINEAR"
     SUBTRACTION_DRILL = "SUBTRACTION_DRILL"
@@ -217,6 +225,7 @@ class FABRICATION_TYPES:
 
 
 from .element import Element  # noqa
+from .joint import Joint  # noqa
 from .assembly import Assembly  # noqa
 from .viewer import Viewer  # noqa
 from .fabrication import Fabrication  # noqa

@@ -112,7 +112,7 @@ if __name__ == "__main__":
     # ==========================================================================
     # compas_view2
     # ==========================================================================
-    Viewer.show_elements(elements=elements, viewer_type="view2")
+    Viewer.show_elements(elements, viewer_type="view2")
 
     # ==========================================================================
     # SERIALIZATION

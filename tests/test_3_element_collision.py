@@ -66,7 +66,7 @@ collision_pairs = []
 element_collisions = [2] * len(elements)
 for i in range(len(elements)):
     for j in range(i + 1, len(elements)):
-        if elements[i].collide(elements[j]):
+        if elements[i].has_collision(elements[j]):
             collision_pairs.append([i, j])
             element_collisions[i] = 0
             element_collisions[j] = 0

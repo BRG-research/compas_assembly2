@@ -465,7 +465,7 @@ p_t_0 = move_points_to_target_z(p_b_0, normals, height)
 p_b_0, p_b_1 = move_points_in_two_opposite_directions(p_b_0, [0, 1, 0], offset)
 p_t_0, p_t_1 = move_points_in_two_opposite_directions(p_t_0, [0, 1, 0], offset)
 pts = p_b_0 + p_b_1 + p_t_0 + p_t_1
-elements = Element.to_elements(pts)
+elements = Element.from_simplices_and_complexes(pts)
 
 # ==========================================================================
 # MEASUREMENT
@@ -571,7 +571,7 @@ for i in range(n - 1):
         create_plate(box, f=4)[1],
         create_plate(box, f=5)[1],
     ]
-    elements.append(Element.from_simplex_and_complex(center, meshes))
+    elements.append(Element(simplex=center, complex=meshes))
 
 
 def points_from_side_plane(plane, side_planes):

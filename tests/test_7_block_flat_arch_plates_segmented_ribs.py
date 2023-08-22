@@ -455,7 +455,7 @@ p_t_0 = move_points_to_target_z(p_b_0, normals, height)
 p_b_0, p_b_1 = move_points_in_two_opposite_directions(p_b_0, [0, 1, 0], offset)
 p_t_0, p_t_1 = move_points_in_two_opposite_directions(p_t_0, [0, 1, 0], offset)
 pts = p_b_0 + p_b_1 + p_t_0 + p_t_1
-elements = Element.to_elements(pts)
+elements = Element.from_simplices_and_complexes(pts)
 
 # ==========================================================================
 # MEASUREMENT
@@ -562,7 +562,7 @@ for i in range(n - 1):
         return center, mesh
 
     meshes = [create_plate(box, f=0)[1]]
-    elements.append(Element.from_simplex_and_complex(meshes[0].centroid(), meshes))
+    elements.append(Element(simplex=meshes[0].centroid(), complex=meshes))
 
 
 def points_from_side_plane(plane, side_planes):
@@ -638,7 +638,7 @@ for i in range(len(planes_dual) - 2):
     points0 = points_from_side_plane(rib_plane0, side_planes_for_ribs)
     points1 = points_from_side_plane(rib_plane1, side_planes_for_ribs)
     mesh_rib = _.Triagulator.from_loft_two_polygons(points0, points1)
-    element = Element.from_simplex_and_complex(mesh_rib.centroid(), mesh_rib, i)
+    element = Element(simplex=mesh_rib.centroid(), complex=mesh_rib, id=i)
     elements.append(element)
 
 # ==========================================================================

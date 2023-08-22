@@ -542,7 +542,7 @@ p_t_0 = _.MyScribble.move_points_to_target_z(p_b_0, normals, height)
 p_b_0, p_b_1 = _.MyScribble.move_points_in_two_opposite_directions(p_b_0, [0, 1, 0], offset)
 p_t_0, p_t_1 = _.MyScribble.move_points_in_two_opposite_directions(p_t_0, [0, 1, 0], offset)
 pts = p_b_0 + p_b_1 + p_t_0 + p_t_1
-elements = Element.to_elements(pts)
+elements = Element.from_simplices_and_complexes(pts, None)
 
 # ==========================================================================
 # MEASUREMENT

@@ -465,7 +465,7 @@ p_t_0 = move_points_to_target_z(p_b_0, normals, height)
 p_b_0, p_b_1 = move_points_in_two_opposite_directions(p_b_0, [0, 1, 0], offset)
 p_t_0, p_t_1 = move_points_in_two_opposite_directions(p_t_0, [0, 1, 0], offset)
 pts = p_b_0 + p_b_1 + p_t_0 + p_t_1
-elements = Element.to_elements(pts)
+elements = Element.from_simplices_and_complexes(pts)
 
 # ==========================================================================
 # MEASUREMENT
@@ -587,7 +587,7 @@ rib_plane1 = Plane(rib_center + normal * plate_thickness * 0.5, normal)
 points0 = points_from_side_plane(rib_plane0, side_planes_for_beams)
 points1 = points_from_side_plane(rib_plane1, side_planes_for_beams)
 mesh_rib = _.Triagulator.from_loft_two_polygons(points0, points1)
-element = Element.from_simplex_and_complex(mesh_rib.centroid(), mesh_rib, i)
+element = Element(id=i, simplex=mesh_rib.centroid(), complex=mesh_rib)
 elements.append(element)
 
 # second rib
@@ -598,7 +598,7 @@ rib_plane1 = Plane(rib_center + normal * plate_thickness * 0.5, normal)
 points0 = points_from_side_plane(rib_plane0, side_planes_for_beams)
 points1 = points_from_side_plane(rib_plane1, side_planes_for_beams)
 mesh_rib = _.Triagulator.from_loft_two_polygons(points0, points1)
-element = Element.from_simplex_and_complex(mesh_rib.centroid(), mesh_rib, i)
+element = Element(id=i, simplex=mesh_rib.centroid(), complex=mesh_rib)
 elements.append(element)
 
 

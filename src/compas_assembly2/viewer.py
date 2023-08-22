@@ -99,7 +99,7 @@ class Viewer:
 
     @staticmethod
     def show_elements(
-        groups=[],
+        lists_of_elements=[],
         viewer_type="view2-0_rhino-1_blender-2",
         width=1280,
         height=1600,
@@ -172,24 +172,24 @@ class Viewer:
                 }
 
                 # --------------------------------------------------------------------------
-                # elements can be a lists of lists to define groups of elements
+                # elements can be a lists of lists to define lists_of_elements of elements
                 # the viewer will display only one level of grouping
                 # if you want to explore different nestingm the user must give such input
                 # iterate throu
                 # --------------------------------------------------------------------------
 
-                dict_elements_groups = {}
+                dict_elements_lists_of_elements = {}
                 elements = []
-                for counter, group in enumerate(groups):
+                for counter, group in enumerate(lists_of_elements):
                     if isinstance(group, list):
                         for e in group:
                             key = e.guid
-                            dict_elements_groups[key] = (e, counter)
+                            dict_elements_lists_of_elements[key] = (e, counter)
                             elements.append(e)
                     else:
                         # group is an element in this case
                         key = group.guid
-                        dict_elements_groups[key] = (group, counter)
+                        dict_elements_lists_of_elements[key] = (group, counter)
                         elements.append(group)
 
                 faces_colors = color_red if len(color_red) == len(elements) else [3] * len(elements)
@@ -741,19 +741,18 @@ class Viewer:
                         o.opacity = opacity
 
                 # insertion vector visualization following the order of elements
-                @viewer.slider(title="insertion", maxval=len(groups) * 100, step=1, value=0)  # type: ignore
+                @viewer.slider(title="insertion", maxval=len(lists_of_elements) * 100, step=1, value=0)  # type: ignore
                 def slider_insertion(t):
-                    print(opacity)
                     for id, o in enumerate(viewer_objects["viewer_complexes"]):
                         scale = 1 - ((t / 100.0) % 1)
-                        xform = Translation.from_vector(dict_elements_groups[o.name][0].insertion * scale)
+                        xform = Translation.from_vector(dict_elements_lists_of_elements[o.name][0].insertion * scale)
 
-                        if dict_elements_groups[o.name][1] > t / 100:
+                        if dict_elements_lists_of_elements[o.name][1] > t / 100:
                             o.opacity = 0
-                            o.matrix = xform = Translation.from_vector(dict_elements_groups[o.name][0].insertion).matrix
+                            o.matrix = xform = Translation.from_vector(dict_elements_lists_of_elements[o.name][0].insertion).matrix
                         else:
                             o.opacity = opacity
-                            if dict_elements_groups[o.name][1] == math.floor(t / 100):
+                            if dict_elements_lists_of_elements[o.name][1] == math.floor(t / 100):
                                 o.matrix = xform.matrix
                             else:
                                 o.matrix = xform = Translation.from_vector(Vector(0, 0, 0)).matrix
@@ -779,7 +778,7 @@ class Viewer:
                     selected_indices_flattened = []
                     for id, o in enumerate(viewer_objects["viewer_complexes"]):
                         if o.is_selected:
-                            selected_indices.append(str(dict_elements_groups[o.name][0].id))
+                            selected_indices.append(str(dict_elements_lists_of_elements[o.name][0].id))
                             selected_indices_flattened.append(str(id))
                     selected_indices_str = ", ".join(selected_indices)
                     selected_indices_flattened_str = ", ".join(selected_indices_flattened)
