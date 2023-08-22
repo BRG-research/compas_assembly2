@@ -30,7 +30,7 @@ if __name__ == "__main__":
     print(joints)
     geometry = []
     for joint in joints:
-        geometry
+        geometry.append(joint.polygon)
 
     # print(collision_pairs)
 
@@ -46,4 +46,4 @@ if __name__ == "__main__":
     # ==========================================================================
     # VIEW2
     # ==========================================================================
-    Viewer.show_elements(assembly._elements.to_flat_list(), viewer_type="view2", show_grid=False)
+    Viewer.show_elements(assembly._elements.to_flat_list(), viewer_type="view2", show_grid=False, geometry=geometry)
