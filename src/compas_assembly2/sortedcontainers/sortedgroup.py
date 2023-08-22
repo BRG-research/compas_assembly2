@@ -2,8 +2,10 @@ from compas_assembly2.sortedcontainers.sorteddict import SortedDict
 
 
 class SortedGroup:
-    def __init__(self):
+    def __init__(self, objects=None):
         self._objects = SortedDict()
+        if objects:
+            self.add_range(objects)
 
     # ==========================================================================
     # properties - operator overload [] and []=
@@ -32,11 +34,16 @@ class SortedGroup:
         # elements by index
         # --------------------------------------------------------------------------
         key_tuple = args[0]
-        group_objects = []
-        for key in self._objects.keys():
-            if key == key_tuple:  # [: len(key_tuple)]
-                group_objects.extend(self._objects[key])
-        return group_objects
+        if isinstance(key_tuple, list):
+            key_tuple = tuple(key_tuple)
+
+        # group_objects = []
+
+        # for key in self._objects.keys():
+        #     print(key)
+        #     if key == key_tuple:  # [: len(key_tuple)]
+        #         group_objects.extend(self._objects[key])
+        return self._objects[key_tuple]
 
     def __setitem__(self, *args, element):
         """
@@ -173,7 +180,7 @@ class SortedGroup:
 
         return merged_objects
 
-    def add_range(self, *group_objects):
+    def add_range(self, group_objects):
         """
         Add multiple group_objects to the Group object.
 

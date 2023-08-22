@@ -9,12 +9,10 @@ from compas.datastructures import Graph
 
 # https://grantjenks.com/docs/sortedcontainers/sorteddict.html
 from compas_assembly2.sortedcontainers.sortedgroup import SortedGroup
+import time
 
 
 class Assembly(Data):
-    # ==========================================================================
-    # constructor
-    # ==========================================================================
     def __init__(self, name=None, elements=None, joints=None, frame=None, **kwargs):
         """
         Initialize an empty ordered dictionary of lists[Element].
@@ -36,10 +34,10 @@ class Assembly(Data):
         super(Assembly, self).__init__()
 
         # --------------------------------------------------------------------------
-        # declare main properties
+        # declare main properties: elements, joints
         # --------------------------------------------------------------------------
-        self._elements = SortedGroup()
-        self._joints = SortedGroup()
+        self._elements = SortedGroup(elements)
+        self._joints = SortedGroup(joints)
 
         # --------------------------------------------------------------------------
         # orientation frames
@@ -75,6 +73,18 @@ class Assembly(Data):
                 "joint_name": None,
             }
         )
+
+    # ==========================================================================
+    # CONSTRUCTOR OVERLOADING
+    # ==========================================================================
+
+    # ==========================================================================
+    # SERIALIZATION
+    # ==========================================================================
+
+    # ==========================================================================
+    # OPTIONAL PROPERTIES - ELEMENTS
+    # ==========================================================================
 
     def get_by_key(self, key):
         """
@@ -115,6 +125,53 @@ class Assembly(Data):
 
     def get_structure_data(self, key):
         pass
+
+    # ==========================================================================
+    # OPTIONAL PROPERTIES - ELEMENTS
+    # ==========================================================================
+
+    # ==========================================================================
+    # COLLISION DETECTION
+    # ==========================================================================
+    def find_collisions_brute_force(self):
+        # start measuring time
+        start_time = time.time()
+
+        # input
+        all_elements = self._elements.to_flat_list()
+
+        # output
+        collision_pairs = []
+
+        # only for display to check which elements are colliding
+        element_collisions = [2] * self._elements.size()
+        for i in range(self._elements.size()):
+            for j in range(i + 1, self._elements.size()):
+                if all_elements[i].has_collision(all_elements[j]):
+                    # collision_pairs.append([i, j])
+                    collision_pairs.append([all_elements[i].id, all_elements[j].id])
+                    # print(f"Collision between {all_elements[i].id} and {all_elements[j].id}")
+                    element_collisions[i] = 0
+                    element_collisions[j] = 0
+
+        # end measuring time
+        end_time = time.time()
+        execution_time = end_time - start_time
+        print(
+            f"Execution time: {execution_time:.6f} seconds\nnumber of elements: {self._elements.size()}\nnumber of \
+                collisions: {len(collision_pairs)}"
+        )
+        return collision_pairs
+
+    # ==========================================================================
+    # JOINT DETECTION
+    # ==========================================================================
+    def find_joints(self, collision_pairs_as_element_ids):
+        # it is assumed that keys are single element lists
+        joints = []
+        for pair in collision_pairs_as_element_ids:
+            joints.extend(self._elements[pair[0]][0].face_to_face_detection(self._elements[pair[1]][0]))
+        return joints
 
     # ==========================================================================
     # geometry - orient, copy, transform

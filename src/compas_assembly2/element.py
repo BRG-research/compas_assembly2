@@ -393,7 +393,7 @@ class Element(Data):
         [float, float, float]
 
         """
-        if not hasattr(self, "_dimensions"):
+        if hasattr(self, "_dimensions"):
             return self._dimensions
         else:
             eight_points = self.oobb()
@@ -413,7 +413,7 @@ class Element(Data):
         float
 
         """
-        if not hasattr(self, "_area"):
+        if hasattr(self, "_area"):
             return self._area
         else:
             eight_points = self.oobb()
@@ -435,7 +435,7 @@ class Element(Data):
         # --------------------------------------------------------------------------
         # sanity check
         # --------------------------------------------------------------------------
-        if not hasattr(self, "_surface_area"):
+        if hasattr(self, "_surface_area"):
             return self._surface_area
 
         if len(self.complex) == 0:
@@ -463,7 +463,7 @@ class Element(Data):
         # --------------------------------------------------------------------------
         # sanity check
         # --------------------------------------------------------------------------
-        if not hasattr(self, "_surface_area"):
+        if hasattr(self, "_surface_area"):
             return self._volume
 
         if len(self.complex) == 0:
@@ -500,7 +500,7 @@ class Element(Data):
         # --------------------------------------------------------------------------
         # sanity check
         # --------------------------------------------------------------------------
-        if not hasattr(self, "_centroid"):
+        if hasattr(self, "_centroid"):
             return self._center
 
         if len(self.complex) == 0:
@@ -542,7 +542,7 @@ class Element(Data):
         # --------------------------------------------------------------------------
         # sanity check
         # --------------------------------------------------------------------------
-        if not hasattr(self, "_centroid"):
+        if hasattr(self, "_centroid"):
             return self._centroid
 
         if len(self.complex) == 0:
@@ -847,7 +847,7 @@ class Element(Data):
         # --------------------------------------------------------------------------
         # sanity check
         # --------------------------------------------------------------------------
-        if not hasattr(self, "_face_polygons"):
+        if hasattr(self, "_face_polygons"):
             return self._face_polygons
 
         if len(self.complex) == 0:
@@ -859,7 +859,12 @@ class Element(Data):
         # --------------------------------------------------------------------------
         # get polylines from the mesh faces
         # --------------------------------------------------------------------------
-        self._face_polygons = self.complex[0].to_polygos()
+
+        temp = self.complex[0].to_polygons()
+        self._face_polygons = []
+        for point_list in temp:
+            self._face_polygons.append(Polygon(point_list))
+
         return self._face_polygons
 
     @property
@@ -870,7 +875,7 @@ class Element(Data):
         # --------------------------------------------------------------------------
         # sanity check
         # --------------------------------------------------------------------------
-        if not hasattr(self, "_face_frames"):
+        if hasattr(self, "_face_frames"):
             return self._face_frames
 
         if len(self.complex) == 0:

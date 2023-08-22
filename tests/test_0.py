@@ -1,4 +1,5 @@
 from compas.geometry import Frame
+import compas_assembly2
 
 
 def hello_compas_assembly2():
@@ -15,4 +16,5 @@ def hello_compas_assembly2():
 
     frame = Frame.worldXY()
     print(frame)
-    print("Hello compas and compas_assembly2 (file test.py)")
+    print("Hello compas and compas_assembly2")
+    print(compas_assembly2.__version__)

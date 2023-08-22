@@ -1,4 +1,4 @@
-from compas_assembly2 import Viewer, Element, FabricationNest
+from compas_assembly2 import Assembly, Viewer, Element, FabricationNest
 from compas.datastructures import Mesh
 from compas.geometry import Point, Line
 

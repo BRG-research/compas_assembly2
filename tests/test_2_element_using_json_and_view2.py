@@ -1,11 +1,10 @@
-from compas_assembly2 import Viewer, FabricationNest
+from compas_assembly2 import Viewer, FabricationNest, Assembly
 
 # https://compas.dev/compas/latest/reference/generated/compas.data.Data.html
 from compas.data import json_load
 
 
 if __name__ == "__main__":
-
     # ==========================================================================
     # ELEMENTS FROM JSON
     # ==========================================================================
@@ -18,11 +17,33 @@ if __name__ == "__main__":
     elements_json.sort(key=lambda element: element.name, reverse=True)
 
     # ==========================================================================
+    # COLLIDE ELEMENTS
+    # ==========================================================================
+    assembly = Assembly(name="elements_json", elements=elements_json)
+    collision_pairs = assembly.find_collisions_brute_force()
+    # pair0 = collision_pairs[0]
+
+    # print(assembly._elements._objects.keys()[0])
+    # print(assembly._elements._objects[tuple(pair0[0])])
+    # print(assembly._elements[pair0[0]])
+    joints = assembly.find_joints(collision_pairs)
+    print(joints)
+    geometry = []
+    for joint in joints:
+        geometry
+
+    # print(collision_pairs)
+
+    # ==========================================================================
+    # DETECT JOINTS
+    # ==========================================================================
+
+    # ==========================================================================
     # NEST ELEMENTS
     # ==========================================================================
-    FabricationNest.pack_elements(elements=elements_json, nest_type=2, inflate=0.1, height_step=4)
+    FabricationNest.pack_elements(elements=assembly._elements.to_flat_list(), nest_type=2, inflate=0.1, height_step=4)
 
     # ==========================================================================
     # VIEW2
     # ==========================================================================
-    Viewer.show_elements(elements_json, viewer_type="view2", show_grid=False)
+    Viewer.show_elements(assembly._elements.to_flat_list(), viewer_type="view2", show_grid=False)
