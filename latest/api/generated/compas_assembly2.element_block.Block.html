@@ -131,17 +131,17 @@
 <tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element_block.Block.aabb.html#compas_assembly2.element_block.Block.aabb" title="compas_assembly2.element_block.Block.aabb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">aabb</span></code></a></p></td>
 <td><p>Compute bounding box based on complex geometries points</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element_block.Block.add_feature.html#compas_assembly2.element_block.Block.add_feature" title="compas_assembly2.element_block.Block.add_feature"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_feature</span></code></a></p></td>
-<td><p>Add a Feature to this Part.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element_block.Block.axis_to_axis.html#compas_assembly2.element_block.Block.axis_to_axis" title="compas_assembly2.element_block.Block.axis_to_axis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">axis_to_axis</span></code></a></p></td>
+<td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element_block.Block.clear_features.html#compas_assembly2.element_block.Block.clear_features" title="compas_assembly2.element_block.Block.clear_features"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear_features</span></code></a></p></td>
-<td><p>Clear all features from this Part.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element_block.Block.copy.html#compas_assembly2.element_block.Block.copy" title="compas_assembly2.element_block.Block.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element_block.Block.copy.html#compas_assembly2.element_block.Block.copy" title="compas_assembly2.element_block.Block.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a></p></td>
 <td><p>Make an independent copy of the data object.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element_block.Block.face_to_face_detection.html#compas_assembly2.element_block.Block.face_to_face_detection" title="compas_assembly2.element_block.Block.face_to_face_detection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">face_to_face_detection</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element_block.Block.face_to_face.html#compas_assembly2.element_block.Block.face_to_face" title="compas_assembly2.element_block.Block.face_to_face"><code class="xref py py-obj docutils literal notranslate"><span class="pre">face_to_face</span></code></a></p></td>
 <td><p>construct intefaces by intersecting coplanar mesh faces :Parameters: * <strong>assembly</strong> (<em>compas_assembly.datastructures.Assembly</em>) -- An assembly of discrete blocks. * <strong>nmax</strong> (<em>int, optional</em>) -- Maximum number of neighbours per block. * <strong>tmax</strong> (<em>float, optional</em>) -- Maximum deviation from the perfectly flat interface plane. * <strong>amin</strong> (<em>float, optional</em>) -- Minimum area of a &quot;face-face&quot; interface.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element_block.Block.frame_to_face.html#compas_assembly2.element_block.Block.frame_to_face" title="compas_assembly2.element_block.Block.frame_to_face"><code class="xref py py-obj docutils literal notranslate"><span class="pre">frame_to_face</span></code></a></p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element_block.Block.from_block.html#compas_assembly2.element_block.Block.from_block" title="compas_assembly2.element_block.Block.from_block"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_block</span></code></a></p></td>
 <td><p>method create a block element at the origin point with the frame at worldXY</p></td>
@@ -176,43 +176,46 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element_block.Block.has_collision.html#compas_assembly2.element_block.Block.has_collision" title="compas_assembly2.element_block.Block.has_collision"><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_collision</span></code></a></p></td>
 <td><p>check collision using aabb and oobb this function is often intermediate between high-performance tree searches then this collision is computed and then the interface can be found</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element_block.Block.oobb.html#compas_assembly2.element_block.Block.oobb" title="compas_assembly2.element_block.Block.oobb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">oobb</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element_block.Block.object_minus_object.html#compas_assembly2.element_block.Block.object_minus_object" title="compas_assembly2.element_block.Block.object_minus_object"><code class="xref py py-obj docutils literal notranslate"><span class="pre">object_minus_object</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element_block.Block.oobb.html#compas_assembly2.element_block.Block.oobb" title="compas_assembly2.element_block.Block.oobb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">oobb</span></code></a></p></td>
 <td><p>Compute the oriented bounding box based on complex geometries points</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element_block.Block.sha256.html#compas_assembly2.element_block.Block.sha256" title="compas_assembly2.element_block.Block.sha256"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sha256</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element_block.Block.sha256.html#compas_assembly2.element_block.Block.sha256" title="compas_assembly2.element_block.Block.sha256"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sha256</span></code></a></p></td>
 <td><p>Compute a hash of the data for comparison during version control using the sha256 algorithm.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element_block.Block.to_data.html#compas_assembly2.element_block.Block.to_data" title="compas_assembly2.element_block.Block.to_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_data</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element_block.Block.to_data.html#compas_assembly2.element_block.Block.to_data" title="compas_assembly2.element_block.Block.to_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_data</span></code></a></p></td>
 <td><p>Convert an object to its native data representation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element_block.Block.to_json.html#compas_assembly2.element_block.Block.to_json" title="compas_assembly2.element_block.Block.to_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_json</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element_block.Block.to_json.html#compas_assembly2.element_block.Block.to_json" title="compas_assembly2.element_block.Block.to_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_json</span></code></a></p></td>
 <td><p>Serialize the data representation of an object to a JSON file.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element_block.Block.to_jsonstring.html#compas_assembly2.element_block.Block.to_jsonstring" title="compas_assembly2.element_block.Block.to_jsonstring"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_jsonstring</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element_block.Block.to_jsonstring.html#compas_assembly2.element_block.Block.to_jsonstring" title="compas_assembly2.element_block.Block.to_jsonstring"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_jsonstring</span></code></a></p></td>
 <td><p>Serialize the data representation of an object to a JSON string.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element_block.Block.transform.html#compas_assembly2.element_block.Block.transform" title="compas_assembly2.element_block.Block.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element_block.Block.transform.html#compas_assembly2.element_block.Block.transform" title="compas_assembly2.element_block.Block.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a></p></td>
 <td><p>Transforms the complex , local frame, and global frame of the Element.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element_block.Block.transform_from_frame_to_frame.html#compas_assembly2.element_block.Block.transform_from_frame_to_frame" title="compas_assembly2.element_block.Block.transform_from_frame_to_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform_from_frame_to_frame</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element_block.Block.transform_from_frame_to_frame.html#compas_assembly2.element_block.Block.transform_from_frame_to_frame" title="compas_assembly2.element_block.Block.transform_from_frame_to_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform_from_frame_to_frame</span></code></a></p></td>
 <td><p>Applies frame_to_frame transformation to the complex , local frame, and global frame of the Element.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element_block.Block.transform_to_frame.html#compas_assembly2.element_block.Block.transform_to_frame" title="compas_assembly2.element_block.Block.transform_to_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform_to_frame</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element_block.Block.transform_to_frame.html#compas_assembly2.element_block.Block.transform_to_frame" title="compas_assembly2.element_block.Block.transform_to_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform_to_frame</span></code></a></p></td>
 <td><p>Applies frame_to_frame transformation to the complex , local frame, and global frame of the Element.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element_block.Block.transformed.html#compas_assembly2.element_block.Block.transformed" title="compas_assembly2.element_block.Block.transformed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transformed</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element_block.Block.transformed.html#compas_assembly2.element_block.Block.transformed" title="compas_assembly2.element_block.Block.transformed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transformed</span></code></a></p></td>
 <td><p>Creates a transformed copy of the Element.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element_block.Block.transformed_from_frame_to_frame.html#compas_assembly2.element_block.Block.transformed_from_frame_to_frame" title="compas_assembly2.element_block.Block.transformed_from_frame_to_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transformed_from_frame_to_frame</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element_block.Block.transformed_from_frame_to_frame.html#compas_assembly2.element_block.Block.transformed_from_frame_to_frame" title="compas_assembly2.element_block.Block.transformed_from_frame_to_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transformed_from_frame_to_frame</span></code></a></p></td>
 <td><p>Creates an oriented copy of the Element.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element_block.Block.transformed_to_frame.html#compas_assembly2.element_block.Block.transformed_to_frame" title="compas_assembly2.element_block.Block.transformed_to_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transformed_to_frame</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element_block.Block.transformed_to_frame.html#compas_assembly2.element_block.Block.transformed_to_frame" title="compas_assembly2.element_block.Block.transformed_to_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transformed_to_frame</span></code></a></p></td>
 <td><p>Creates an oriented copy of the Element.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element_block.Block.validate_data.html#compas_assembly2.element_block.Block.validate_data" title="compas_assembly2.element_block.Block.validate_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_data</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element_block.Block.validate_data.html#compas_assembly2.element_block.Block.validate_data" title="compas_assembly2.element_block.Block.validate_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_data</span></code></a></p></td>
 <td><p>Validate the object's data against its data schema.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.element_block.Block.validate_json.html#compas_assembly2.element_block.Block.validate_json" title="compas_assembly2.element_block.Block.validate_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_json</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.element_block.Block.validate_json.html#compas_assembly2.element_block.Block.validate_json" title="compas_assembly2.element_block.Block.validate_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_json</span></code></a></p></td>
 <td><p>Validate the object's data against its json schema.</p></td>
 </tr>
 </tbody>
