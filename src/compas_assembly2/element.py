@@ -25,8 +25,15 @@ from compas.geometry import (
 from compas.datastructures import Mesh, mesh_bounding_box
 import copy
 import compas_assembly2
-from shapely.geometry import Polygon as ShapelyPolygon
 from math import fabs
+
+try:
+    from shapely.geometry import Polygon as ShapelyPolygon
+
+    shapely_available = True
+except ImportError:
+    print("shapely package not available. Please install it.")
+    shapely_available = False
 
 
 class Element(Data):
@@ -106,19 +113,22 @@ class Element(Data):
         # orientation frames
         # if user does not give a frame, try to define it based on simplex
         # --------------------------------------------------------------------------
-        if isinstance(frame, Frame):
-            self.frame = Frame.copy(frame)
+        if frame:
+            if isinstance(frame, Frame):
+                self.frame = Frame.copy(frame)
+            else:
+                origin = [0, 0, 0]
+                if isinstance(simplex[0], Point):  # type: ignore
+                    origin = simplex[0]  # type: ignore
+                elif isinstance(simplex[0], Line):  # type: ignore
+                    origin = simplex[0].start  # type: ignore
+                elif isinstance(simplex[0], Polyline):  # type: ignore
+                    origin = simplex[0][0]  # type: ignore
+                elif isinstance(simplex[0], (int, float)) and len(simplex) == 3:  # type: ignore
+                    origin = simplex
+                self.frame = Frame(origin, [1, 0, 0], [0, 1, 0])
         else:
-            origin = [0, 0, 0]
-            if isinstance(simplex[0], Point):  # type: ignore
-                origin = simplex[0]  # type: ignore
-            elif isinstance(simplex[0], Line):  # type: ignore
-                origin = simplex[0].start  # type: ignore
-            elif isinstance(simplex[0], Polyline):  # type: ignore
-                origin = simplex[0][0]  # type: ignore
-            elif isinstance(simplex[0], (int, float)) and len(simplex) == 3:  # type: ignore
-                origin = simplex
-            self.frame = Frame(origin, [1, 0, 0], [0, 1, 0])
+            self.frame = Frame([0, 0, 0], [1, 0, 0], [0, 1, 0])
 
         # --------------------------------------------------------------------------
         # minimal representation and geometrical shapes
@@ -200,6 +210,78 @@ class Element(Data):
         # --------------------------------------------------------------------------
         self.aabb(0.00)
         self.oobb(0.00)
+
+    # ==========================================================================
+    # SERIALIZATION
+    # ==========================================================================
+
+    @property
+    def data(self):
+        # create the data object from the class properties
+        # call the inherited Data constructor for json serialization
+        data = {
+            "name": self.name,
+            "id": self.id,
+            "frame": self.frame,
+            "simplex": self.simplex,
+            "complex": self.complex,
+            "attributes": self.attributes,
+        }
+
+        # custom properties
+        data["frame_global"] = self.frame_global
+        data["aabb"] = self.aabb()
+        data["oobb"] = self.oobb()
+        data["convex_hull"] = self.convex_hull
+        data["fabrication"] = self.fabrication
+        data["structure"] = self.structure
+
+        # return the data object
+        return data
+
+    @data.setter
+    def data(self, data):
+        # vice versa - create the class properties from the data object
+        # call the inherited Data constructor for json serialization
+
+        # main properties
+        self.name = data["name"]
+        self.id = data["id"]
+        self.frame = data["frame"]
+        self.simplex = data["simplex"]
+        self.complex = data["complex"]
+        self.attributes = data["attributes"]
+
+        # custom properties
+        self._frame_global = data["frame_global"]
+        self._aabb = data["aabb"]
+        self._oobb = data["oobb"]
+        self._convex_hull = data["convex_hull"]
+        self._fabrication = data["fabrication"]
+        self._structure = data["structure"]
+
+    @classmethod
+    def from_data(cls, data):
+        """Alternative to None default __init__ parameters."""
+        obj = Element(
+            name=data["name"],
+            id=data["id"],
+            frame=data["frame"],
+            simplex=data["simplex"],
+            complex=data["complex"],
+            **data["attributes"],
+        )
+
+        # custom properties
+        obj._frame_global = data["frame_global"]
+        obj._aabb = data["aabb"]
+        obj._oobb = data["oobb"]
+        obj._convex_hull = data["convex_hull"]
+        obj._fabrication = data["fabrication"]
+        obj._structure = data["structure"]
+
+        # return the object
+        return obj
 
     # ==========================================================================
     # CONSTRUCTOR OVERLOADING
@@ -310,79 +392,29 @@ class Element(Data):
         )
 
     # ==========================================================================
-    # SERIALIZATION
+    # OPTIONAL PROPERTIES - FABRICATION AND STRUCTUTRE
     # ==========================================================================
 
     @property
-    def data(self):
-        # create the data object from the class properties
-        # call the inherited Data constructor for json serialization
-        data = {
-            "name": self.name,
-            "id": self.id,
-            "frame": self.frame,
-            "simplex": self.simplex,
-            "complex": self.complex,
-            "attributes": self.attributes,
-        }
+    def fabrication(self):
+        """Fabrication information e.g. subtractive, additive, nesting and etc"""
 
-        # custom properties
-        data["frame_global"] = self.frame_global
-        data["aabb"] = self.aabb()
-        data["oobb"] = self.oobb()
-        data["convex_hull"] = self.convex_hull
-        data["fabrication"] = self.fabrication
-        data["structure"] = self.structure
+        # define this property dynamically in the class
+        if not hasattr(self, "_fabrication"):
+            self._fabrication = {}
+        return self._fabrication
 
-        # return the data object
-        return data
+    @property
+    def structure(self):
+        """Structure information e.g. force vectors, minimal representation and etc"""
 
-    @data.setter
-    def data(self, data):
-        # vice versa - create the class properties from the data object
-        # call the inherited Data constructor for json serialization
-
-        # main properties
-        self.name = data["name"]
-        self.id = data["id"]
-        self.frame = data["frame"]
-        self.simplex = data["simplex"]
-        self.complex = data["complex"]
-        self.attributes = data["attributes"]
-
-        # custom properties
-        self._frame_global = data["frame_global"]
-        self._aabb = data["aabb"]
-        self._oobb = data["oobb"]
-        self._convex_hull = data["convex_hull"]
-        self._fabrication = data["fabrication"]
-        self._structure = data["structure"]
-
-    @classmethod
-    def from_data(cls, data):
-        """Alternative to None default __init__ parameters."""
-        obj = Element(
-            name=data["name"],
-            id=data["id"],
-            frame=data["frame"],
-            simplex=data["simplex"],
-            complex=data["complex"],
-            **data["attributes"],
-        )
-
-        # custom properties
-        obj._frame_global = data["frame_global"]
-        obj._aabb = data["aabb"]
-        obj._oobb = data["oobb"]
-        obj._convex_hull = data["convex_hull"]
-        obj._fabrication = data["fabrication"]
-        obj._structure = data["structure"]
-
-        # return the object
-        return obj
+        # define this property dynamically in the class
+        if not hasattr(self, "_structure"):
+            self._structure = {}
+        return self._structure
 
     # ==========================================================================
-    # OPTIONAL PROPERTIES - MEASUREMENTS
+    # OPTIONAL PROPERTIES - MEASURE
     # ==========================================================================
     @property
     def dimensions(self):
@@ -577,7 +609,7 @@ class Element(Data):
         self._frame_global = value
 
     # ==========================================================================
-    # OPTIONAL PROPERTIES - COLLISION
+    # METHODS - COLLIDE
     # ==========================================================================
 
     def aabb(self, inflate=0.00):
@@ -836,7 +868,7 @@ class Element(Data):
         return result
 
     # ==========================================================================
-    # OPTIONAL PROPERTIES - FACE-TO-FACE DETECTION
+    # METHODS - FACE-TO-FACE DETECTION
     # ==========================================================================
 
     @property
@@ -900,7 +932,7 @@ class Element(Data):
 
         return self._face_frames
 
-    def face_to_face_detection(self, other, tmax=1e-6, amin=1e-1):
+    def face_to_face(self, other, tmax=1e-6, amin=1e-1):
         """construct intefaces by intersecting coplanar mesh faces
         Parameters
         ----------
@@ -925,6 +957,9 @@ class Element(Data):
         # --------------------------------------------------------------------------
         # sanity check
         # --------------------------------------------------------------------------
+        if shapely_available is False:
+            return []
+
         if len(self.complex) == 0 or len(other.complex) == 0:
             raise AssertionError("You must assign complex geometry to the element")
 
@@ -1008,62 +1043,23 @@ class Element(Data):
         return joints
 
     # ==========================================================================
-    # OPTIONAL PROPERTIES - AXIS-TO-AXIS DETECTION
+    # METHODS - AXIS-TO-AXIS DETECTION
     # ==========================================================================
 
-    # ==========================================================================
-    # OPTIONAL PROPERTIES - FRAME-TO-FACE DETECTION
-    # ==========================================================================
-
-    # ==========================================================================
-    # OPTIONAL PROPERTIES - OBJECT-MINUS-OBJECT DETECTION
-    # ==========================================================================
-
-    # ==========================================================================
-    # OPTIONAL PROPERTIES - FABRICATION AND STRUCTUTRE
-    # ==========================================================================
-
-    @property
-    def fabrication(self):
-        """Fabrication information e.g. subtractive, additive, nesting and etc"""
-
-        # define this property dynamically in the class
-        if not hasattr(self, "_fabrication"):
-            self._fabrication = {}
-        return self._fabrication
-
-    @property
-    def structure(self):
-        """Structure information e.g. force vectors, minimal representation and etc"""
-
-        # define this property dynamically in the class
-        if not hasattr(self, "_structure"):
-            self._structure = {}
-        return self._structure
-
-    # ==========================================================================
-    # OPTIONAL PROPERTIES - JOINERY
-    # ==========================================================================
-    def clear_features(self, features_to_clear=None):
-        """Clear all features from this Part."""
-        # raise NotImplementedError
+    def axis_to_axis(self, other, tmax=1e-6, amin=1e-1):
         pass
 
-    def add_feature(self, feature, apply=False):
-        """Add a Feature to this Part.
+    # ==========================================================================
+    # METHODS - FRAME-TO-FACE DETECTION
+    # ==========================================================================
 
-        Parameters
-        ----------
-        feature : :class:`~compas.assembly.Feature`
-            The feature to add
-        apply : :bool:
-            If True, feature is also applied. Otherwise, feature is only added and user must call `apply_features`.
+    def frame_to_face(self, other, tmax=1e-6, amin=1e-1):
+        pass
 
-        Returns
-        -------
-        None
-        """
-        # raise NotImplementedError
+    # ==========================================================================
+    # METHODS - OBJECT-MINUS-OBJECT DETECTION
+    # ==========================================================================
+    def object_minus_object(self, other, tmax=1e-6, amin=1e-1):
         pass
 
     # ==========================================================================
@@ -1207,20 +1203,7 @@ class Element(Data):
 
 
 class _:
-    """Internal geometry utilities
-    ⠀⠀⠀⠀⠀⠀⣠⣴⣶⣶⣦⣄⠀⠀⠀⠀⠀⠀
-    ⠀⠀⠀⠀⠀⢰⣿⡟⢻⡟⢻⣿⡆⠀⠀⠀⠀⠀
-    ⠀⣀⣀⠀⠀⠸⣿⣿⣻⣟⣿⣿⠇⠀⠀⣀⣀⠀
-    ⣾⣿⡟⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⢻⣿⣷
-    ⠘⠛⠁⠿⠿⣿⣿⣿⣇⣸⣿⣿⣿⡿⠿⠈⠛⠃
-    ⠀⠀⠀⠀⠀⠈⣿⣿⡟⢻⣿⣿⠁⠀⠀⠀⠀⠀
-    ⠀⠀⠀⠀⠀⣼⣿⣿⣷⣾⣿⣿⣧⠀⠀⠀⠀⠀
-    ⠀⠀⠀⠀⣸⣿⣿⣿⠇⠸⣿⣿⣿⣇⠀⠀⠀⠀
-    ⠀⠀⠀⢰⣦⣭⣉⠋⠀⠀⠙⣉⣭⣴⡆⠀⠀⠀
-    ⠀⠀⠀⠘⠿⠿⠟⠀⠀⠀⠀⠻⠿⠿⠃⠀⠀
-    all methods and datastructures that do not exist in compas
-    and needed ONLY for this module
-    must be self contained in one file"""
+    """Internal geometry utilities"""
 
     class Ear:
         """

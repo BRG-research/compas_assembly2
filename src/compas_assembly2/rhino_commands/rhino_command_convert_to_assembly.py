@@ -581,4 +581,4 @@ for group_id, subsequent_groups in grouped_objects.items():
 # fill the compas_assembly_user_input with geometry and types
 # ==========================================================================
 # write data to file
-json_dump(data=elements, fp="rhino_command_convert_to_assembly.json", pretty=True)
+json_dump(data=elements, fp="rhino_command_convert_to_assembly_0.json", pretty=True)

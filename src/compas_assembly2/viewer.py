@@ -13,7 +13,6 @@ from compas.geometry import (
 from compas.datastructures import Mesh
 from compas.colors import Color
 from compas_assembly2.fabrication import FABRICATION_TYPES
-from compas_assembly2 import Element
 import math
 
 # ==========================================================================
@@ -44,58 +43,6 @@ class Viewer:
         compas_color = Color(red / 255.0, green / 255.0, blue / 255.0)
 
         return compas_color
-
-    @staticmethod
-    def show(
-        geometry=[],
-        viewer_type="view2-0_rhino-1_blender-2",
-        width=1920,
-        height=1200,
-        show_grid=True,
-        show_indices=False,
-        show_names=False,
-        show_simplices=True,
-        show_complexes=True,
-        show_aabbs=False,
-        show_oobbs=False,
-        show_convex_hulls=False,
-        show_frames=False,
-        show_fabrication=False,
-        show_structure=False,
-        text_height=30,  # type: ignore
-        display_axis_scale=0.5,
-        point_size=8,
-        line_width=2,
-        colors=[
-            Color(0.929, 0.082, 0.498),
-            Color(0.129, 0.572, 0.815),
-            Color(0.5, 0.5, 0.5),
-            Color(0.95, 0.95, 0.95),
-            Color(0, 0, 0),
-        ],
-    ):
-        Viewer.show_elements(
-            Element.to_elements(geometry),
-            viewer_type=viewer_type,
-            width=width,
-            height=height,
-            show_grid=show_grid,
-            show_indices=show_indices,
-            show_names=show_names,
-            show_simplices=show_simplices,
-            show_complexes=show_complexes,
-            show_aabbs=show_aabbs,
-            show_oobbs=show_oobbs,
-            show_convex_hulls=show_convex_hulls,
-            show_frames=show_frames,
-            show_fabrication=show_fabrication,
-            show_structure=show_structure,
-            text_height=text_height,  # type: ignore
-            display_axis_scale=display_axis_scale,
-            point_size=point_size,
-            line_width=line_width,
-            colors=colors,
-        )
 
     @staticmethod
     def show_elements(
@@ -589,7 +536,7 @@ class Viewer:
                         show_faces=True,
                         pointcolor=Color(0, 0, 0),
                         linecolor=Color(0, 0, 0),
-                        facecolor=Color(0.85, 0.85, 0.85),
+                        facecolor=colors[1],  # Color(0.85, 0.85, 0.85),
                         linewidth=line_width,
                         pointsize=point_size,
                     )
@@ -749,7 +696,9 @@ class Viewer:
 
                         if dict_elements_lists_of_elements[o.name][1] > t / 100:
                             o.opacity = 0
-                            o.matrix = xform = Translation.from_vector(dict_elements_lists_of_elements[o.name][0].insertion).matrix
+                            o.matrix = xform = Translation.from_vector(
+                                dict_elements_lists_of_elements[o.name][0].insertion
+                            ).matrix
                         else:
                             o.opacity = opacity
                             if dict_elements_lists_of_elements[o.name][1] == math.floor(t / 100):
@@ -787,11 +736,8 @@ class Viewer:
                         info_message = """Nothing is selected."""
                         viewer.info(info_message)
                     else:
-                        info_message = (
-                            "Element indices:\n"
-                            f"{selected_indices_str}\n"
-                            "Element indices flattened:\n"
-                            f"{selected_indices_flattened_str}"
+                        info_message = ("Element indices:\n" "{0}\n" "Element indices flattened:\n" "{1}").format(
+                            selected_indices_str, selected_indices_flattened_str
                         )
                         print(selected_indices_str)
                         print(selected_indices_flattened_str)
