@@ -93,14 +93,13 @@
         
         <section id="test-2-element-using-json-and-view2">
 <h1>test_2_element_using_json_and_view2</h1>
-<div class="language-python notranslate"><div class="highlight"><pre><button class="btn copy"><i class="far fa-copy"></i></button><code><span></span><span class="kn">from</span> <span class="nn">compas_assembly2</span> <span class="kn">import</span> <span class="n">Viewer</span><span class="p">,</span> <span class="n">FabricationNest</span>
+<div class="language-python notranslate"><div class="highlight"><pre><button class="btn copy"><i class="far fa-copy"></i></button><code><span></span><span class="kn">from</span> <span class="nn">compas_assembly2</span> <span class="kn">import</span> <span class="n">Viewer</span><span class="p">,</span> <span class="n">FabricationNest</span><span class="p">,</span> <span class="n">Assembly</span>
 
 <span class="c1"># https://compas.dev/compas/latest/reference/generated/compas.data.Data.html</span>
 <span class="kn">from</span> <span class="nn">compas.data</span> <span class="kn">import</span> <span class="n">json_load</span>
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-
     <span class="c1"># ==========================================================================</span>
     <span class="c1"># ELEMENTS FROM JSON</span>
     <span class="c1"># ==========================================================================</span>
@@ -113,14 +112,36 @@
     <span class="n">elements_json</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">element</span><span class="p">:</span> <span class="n">element</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="c1"># ==========================================================================</span>
+    <span class="c1"># COLLIDE ELEMENTS</span>
+    <span class="c1"># ==========================================================================</span>
+    <span class="n">assembly</span> <span class="o">=</span> <span class="n">Assembly</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;elements_json&quot;</span><span class="p">,</span> <span class="n">elements</span><span class="o">=</span><span class="n">elements_json</span><span class="p">)</span>
+    <span class="n">collision_pairs</span> <span class="o">=</span> <span class="n">assembly</span><span class="o">.</span><span class="n">find_collisions_brute_force</span><span class="p">()</span>
+    <span class="c1"># pair0 = collision_pairs[0]</span>
+
+    <span class="c1"># print(assembly._elements._objects.keys()[0])</span>
+    <span class="c1"># print(assembly._elements._objects[tuple(pair0[0])])</span>
+    <span class="c1"># print(assembly._elements[pair0[0]])</span>
+    <span class="n">joints</span> <span class="o">=</span> <span class="n">assembly</span><span class="o">.</span><span class="n">find_joints</span><span class="p">(</span><span class="n">collision_pairs</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">joints</span><span class="p">)</span>
+    <span class="n">geometry</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">joint</span> <span class="ow">in</span> <span class="n">joints</span><span class="p">:</span>
+        <span class="n">geometry</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">joint</span><span class="o">.</span><span class="n">polygon</span><span class="p">)</span>
+
+    <span class="c1"># print(collision_pairs)</span>
+
+    <span class="c1"># ==========================================================================</span>
+    <span class="c1"># DETECT JOINTS</span>
+    <span class="c1"># ==========================================================================</span>
+
+    <span class="c1"># ==========================================================================</span>
     <span class="c1"># NEST ELEMENTS</span>
     <span class="c1"># ==========================================================================</span>
-    <span class="n">FabricationNest</span><span class="o">.</span><span class="n">pack_elements</span><span class="p">(</span><span class="n">elements</span><span class="o">=</span><span class="n">elements_json</span><span class="p">,</span> <span class="n">nest_type</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">inflate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">height_step</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">FabricationNest</span><span class="o">.</span><span class="n">pack_elements</span><span class="p">(</span><span class="n">elements</span><span class="o">=</span><span class="n">assembly</span><span class="o">.</span><span class="n">_elements</span><span class="o">.</span><span class="n">to_flat_list</span><span class="p">(),</span> <span class="n">nest_type</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">inflate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">height_step</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 
     <span class="c1"># ==========================================================================</span>
     <span class="c1"># VIEW2</span>
     <span class="c1"># ==========================================================================</span>
-    <span class="n">Viewer</span><span class="o">.</span><span class="n">show_elements</span><span class="p">(</span><span class="n">elements_json</span><span class="p">,</span> <span class="n">viewer_type</span><span class="o">=</span><span class="s2">&quot;view2&quot;</span><span class="p">,</span> <span class="n">show_grid</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">Viewer</span><span class="o">.</span><span class="n">show_elements</span><span class="p">(</span><span class="n">assembly</span><span class="o">.</span><span class="n">_elements</span><span class="o">.</span><span class="n">to_flat_list</span><span class="p">(),</span> <span class="n">viewer_type</span><span class="o">=</span><span class="s2">&quot;view2&quot;</span><span class="p">,</span> <span class="n">show_grid</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">geometry</span><span class="p">)</span>
 </code></pre></div>
 </div>
 </section>
@@ -157,7 +178,6 @@
 </li>
 <li class="toctree-l1 nav-item"><a class="nav-link reference internal" href="../api.html">API Reference</a><ul class="nav flex-column collapse">
 <li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="../api/compas_assembly2.html">compas_assembly2</a><ul class="nav flex-column collapse">
-<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../api/generated/compas_assembly2.test.hello_compas_assembly2.html">hello_compas_assembly2</a></li>
 <li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../api/generated/compas_assembly2.assembly.Assembly.html">Assembly</a></li>
 <li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../api/generated/compas_assembly2.element.Element.html">Element</a></li>
 <li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../api/generated/compas_assembly2.element_block.Block.html">Block</a></li>
