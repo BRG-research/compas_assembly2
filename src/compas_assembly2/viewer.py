@@ -53,7 +53,7 @@ class Viewer:
         show_grid=False,
         show_indices=False,
         show_names=False,
-        show_simplices=True,
+        show_simplices=False,
         show_complexes=True,
         show_aabbs=False,
         show_oobbs=False,

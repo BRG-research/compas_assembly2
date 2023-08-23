@@ -3,12 +3,13 @@ from __future__ import absolute_import
 from __future__ import division
 
 from compas.data import Data
-from compas.geometry import Frame, Point
-from compas_assembly2 import Element
+from compas.geometry import Frame
+
+# from compas_assembly2 import Element
 from compas.datastructures import Graph
 
 # https://grantjenks.com/docs/sortedcontainers/sorteddict.html
-from compas_assembly2.sortedcontainers.sortedgroup import SortedGroup
+from compas_assembly2.sortedgroup import SortedGroup
 import time
 
 
@@ -108,7 +109,6 @@ class Assembly(Data):
     def get_elements_properties(self, property_name, flatten=True):
         """Get properties of elements flattened (True) or in nested lists (False)."""
         elements_properties = []
-
         for element_list in self._elements._objects.values():
             for element in element_list:
                 if hasattr(element, property_name):
@@ -117,7 +117,6 @@ class Assembly(Data):
                         elements_properties.extend(property_value)
                     else:
                         elements_properties.append(property_value)
-
         return elements_properties
 
     def get_fabrication_data(self, key):
@@ -158,9 +157,11 @@ class Assembly(Data):
         end_time = time.time()
         execution_time = end_time - start_time
         print(
-            f"Execution time: {execution_time:.6f} seconds\nnumber of elements: {self._elements.size()}\nnumber of \
-                collisions: {len(collision_pairs)}"
+            "Execution time: {:.6f} seconds\nnumber of elements: {}\nnumber of collisions: {}".format(
+                execution_time, self._elements.size(), len(collision_pairs)
+            )
         )
+
         return collision_pairs
 
     # ==========================================================================
@@ -195,40 +196,40 @@ class Assembly(Data):
 # ==============================================================================
 # Example Usage:
 # ==============================================================================
-if __name__ == "__main__":
-    assembly = Assembly()
-    assembly._elements.add(
-        Element(id=[1, 2, 3], frame=Frame.worldXY(), simplex=Point(0, 0, 0), attr={"t": "Block", "m": 30})
-    )
-    assembly._elements.add(
-        Element(id=[1, 2, 3], frame=Frame.worldXY(), simplex=Point(1, 0, 0), attr={"t": "Block", "m": 30})
-    )
-    assembly._elements.add(
-        Element(id=[1, 2, 4], frame=Frame.worldXY(), simplex=Point(1, 0, 0), attr={"t": "Block", "m": 30})
-    )
-    assembly._elements.add(
-        Element(id=[3, 0, 3], frame=Frame.worldXY(), simplex=Point(0, 5, 0), attr={"t": "Beam", "m": 25})
-    )
-    assembly._elements.add(
-        Element(id=[3, 1, 3], frame=Frame.worldXY(), simplex=Point(0, 5, 0), attr={"t": "Beam", "m": 25})
-    )
-    assembly._elements.add(
-        Element(id=[0, 2, 4], frame=Frame.worldXY(), simplex=Point(7, 0, 0), attr={"t": "Block", "m": 25})
-    )
-    assembly._elements.add(
-        Element(id=[1, 0, 3], frame=Frame.worldXY(), simplex=Point(6, 0, 0), attr={"t": "Plate", "m": 40})
-    )
-    assembly._elements.add(
-        Element(id=[2, 2], frame=Frame.worldXY(), simplex=Point(0, 0, 8), attr={"t": "Block", "m": 30})
-    )
+# if __name__ == "__main__":
+#     assembly = Assembly()
+#     assembly._elements.add(
+#         Element(id=[1, 2, 3], frame=Frame.worldXY(), simplex=Point(0, 0, 0), attr={"t": "Block", "m": 30})
+#     )
+#     assembly._elements.add(
+#         Element(id=[1, 2, 3], frame=Frame.worldXY(), simplex=Point(1, 0, 0), attr={"t": "Block", "m": 30})
+#     )
+#     assembly._elements.add(
+#         Element(id=[1, 2, 4], frame=Frame.worldXY(), simplex=Point(1, 0, 0), attr={"t": "Block", "m": 30})
+#     )
+#     assembly._elements.add(
+#         Element(id=[3, 0, 3], frame=Frame.worldXY(), simplex=Point(0, 5, 0), attr={"t": "Beam", "m": 25})
+#     )
+#     assembly._elements.add(
+#         Element(id=[3, 1, 3], frame=Frame.worldXY(), simplex=Point(0, 5, 0), attr={"t": "Beam", "m": 25})
+#     )
+#     assembly._elements.add(
+#         Element(id=[0, 2, 4], frame=Frame.worldXY(), simplex=Point(7, 0, 0), attr={"t": "Block", "m": 25})
+#     )
+#     assembly._elements.add(
+#         Element(id=[1, 0, 3], frame=Frame.worldXY(), simplex=Point(6, 0, 0), attr={"t": "Plate", "m": 40})
+#     )
+#     assembly._elements.add(
+#         Element(id=[2, 2], frame=Frame.worldXY(), simplex=Point(0, 0, 8), attr={"t": "Block", "m": 30})
+#     )
 
-    # get the list of elements, instead of the dictionary (lists of lists with keys)
-    print(assembly._elements.to_flat_list())
-    print(assembly._elements.to_nested_list())
-    print(assembly)
-    print(assembly._elements.to_trimmed_dict("X"))
-    print(assembly._elements.to_trimmed_list(0))
+#     # get the list of elements, instead of the dictionary (lists of lists with keys)
+#     print(assembly._elements.to_flat_list())
+#     print(assembly._elements.to_nested_list())
+#     print(assembly)
+#     print(assembly._elements.to_trimmed_dict("X"))
+#     print(assembly._elements.to_trimmed_list(0))
 
-    # get properties of the elements
-    print(assembly.get_elements_properties("simplex", True))
-    print(assembly.get_elements_properties("simplex", False))
+#     # get properties of the elements
+#     print(assembly.get_elements_properties("simplex", True))
+#     print(assembly.get_elements_properties("simplex", False))

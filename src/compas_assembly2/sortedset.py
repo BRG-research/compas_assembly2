@@ -17,8 +17,8 @@ from itertools import chain
 from operator import eq, ne, gt, ge, lt, le
 from textwrap import dedent
 
-from compas_assembly2.sortedcontainers.sortedlist import SortedList
-from compas_assembly2.sortedcontainers.sortedlist import recursive_repr
+from compas_assembly2.sortedlist import SortedList
+from compas_assembly2.sortedlist import recursive_repr
 
 ###############################################################################
 # BEGIN Python 2/3 Shims

@@ -1,4 +1,4 @@
-from compas_assembly2.sortedcontainers.sorteddict import SortedDict
+from compas_assembly2.sorteddict import SortedDict
 
 
 class SortedGroup:
@@ -45,16 +45,16 @@ class SortedGroup:
         #         group_objects.extend(self._objects[key])
         return self._objects[key_tuple]
 
-    def __setitem__(self, *args, element):
+    def __setitem__(self, args, obj):
         """
         Set the value associated with the given key (id).
 
         Parameters:
             *args: The integers that make up the key to set the _objects.
-            element (Element): The Element object to be associated with the given key.
+            obj (Element): The Element object to be associated with the given key.
 
         Raises:
-            TypeError: If the element is not an instance of the Element class.
+            TypeError: If the obj is not an instance of the Element class.
 
         Example:
             element1 = Element(id=(1, 2, 3), l_frame=None, g_frame=None, attr={'t': 'Block', 'm': 30})
@@ -63,10 +63,10 @@ class SortedGroup:
             group_objects[1, 2, 3] = element1
             group_objects[1, 3, 5] = element2
         """
-        key_tuple = tuple(args)
-        if not isinstance(element, list):
+        key_tuple = args  # tuple(args)
+        if not isinstance(obj, list):
             raise TypeError("Value must be a list of Element objects.")
-        self._objects[key_tuple] = element
+        self._objects[key_tuple] = obj
 
     # ==========================================================================
     # properties - collection properties
@@ -124,13 +124,13 @@ class SortedGroup:
         """
         return len(self._objects)
 
-    def add(self, element):
+    def add(self, obj):
         """
-        Add an element with multiple keys to the ordered multi-key list.
-        If an element already exists with the same id, it will be appended to the list of _elements.
+        Add an obj with multiple keys to the ordered multi-key list.
+        If an obj already exists with the same id, it will be appended to the list of _elements.
 
         Parameters:
-            element (Element): An Element Data-Structure.
+            obj (Element): An Element Data-Structure.
 
         Example:
             element1 = Element(id=(1, 2, 3), l_frame=None, g_frame=None, attr={'t': 'Block', 'm': 30})
@@ -140,10 +140,10 @@ class SortedGroup:
             group_elements.add(element2)
         """
 
-        if tuple(element.id) in self._objects:
-            self._objects[tuple(element.id)].append(element)
+        if tuple(obj.id) in self._objects:
+            self._objects[tuple(obj.id)].append(obj)
         else:
-            self._objects[tuple(element.id)] = [element]
+            self._objects[tuple(obj.id)] = [obj]
 
     def merge(self, other_objects):
         """
@@ -175,8 +175,8 @@ class SortedGroup:
 
         for elements_dict in [self._objects, other_objects._objects]:
             for key, values in elements_dict.items():
-                for element in values:
-                    merged_objects.add(element)
+                for obj in values:
+                    merged_objects.add(obj)
 
         return merged_objects
 
@@ -193,8 +193,8 @@ class SortedGroup:
 
             group_objects.add_range(element1, element2)
         """
-        for element in group_objects:
-            self.add(element)
+        for obj in group_objects:
+            self.add(obj)
 
     def to_flat_list(self):
         """A list of elements in a sorted way following the SortedDictionary"""
@@ -253,12 +253,12 @@ class SortedGroup:
     # collections - remove methods
     # ==========================================================================
 
-    def remove_by_element(self, element):
+    def remove_by_element(self, obj):
         """
-        Remove an element from the ordered multi-key list if it exists.
+        Remove an obj from the ordered multi-key list if it exists.
 
         Parameters:
-            element (Element): The element to remove from the ordered multi-key list.
+            obj (Element): The obj to remove from the ordered multi-key list.
 
         Example:
             element1 = Element(id=(1, 2, 3), l_frame=None, g_frame=None, attr={'t': 'Block', 'm': 30})
@@ -266,22 +266,22 @@ class SortedGroup:
 
             group_objects.remove_by_element(element1)
         """
-        if element in self._objects:
-            id = element.id
-            self._objects[id].remove(element)
+        if obj in self._objects:
+            id = obj.id
+            self._objects[id].remove(obj)
             if not self._objects[id]:
                 del self._objects[id]
 
     def remove_by_id(self, id=None):
         """
-        Remove and return the element at the specified id or the last element if id is not provided.
+        Remove and return the obj at the specified id or the last obj if id is not provided.
 
         Parameters:
-            id (int, optional): The id of the element to remove.
-                                   If not provided, the last element will be removed.
+            id (int, optional): The id of the obj to remove.
+                                   If not provided, the last obj will be removed.
 
         Returns:
-            Element: The removed element.
+            Element: The removed obj.
 
         Example:
             group_objects.add(Element(id=(1, 2, 3), l_frame=None, g_frame=None, attr={'t': 'Block', 'm': 30}))
@@ -291,21 +291,21 @@ class SortedGroup:
             print(removed_element)  # Output: (1, 2, 3)
         """
         if id is None:
-            return self._objects.popitem()[0]  # Remove and return the last element
+            return self._objects.popitem()[0]  # Remove and return the last obj
         if 0 <= id < len(self._objects):
             return list(self._objects.keys())[id]
         raise IndexError("Index out of range")
 
     def remove_by_key(self, key):
         """
-        Remove and return the element at the specified id or the last element if id is not provided.
+        Remove and return the obj at the specified id or the last obj if id is not provided.
 
         Parameters:
-            id (int, optional): The id of the element to remove.
-                                   If not provided, the last element will be removed.
+            id (int, optional): The id of the obj to remove.
+                                   If not provided, the last obj will be removed.
 
         Returns:
-            Element: The removed element.
+            Element: The removed obj.
 
         Example:
             group_objects.add(Element(id=(1, 2, 3), l_frame=None, g_frame=None, attr={'t': 'Block', 'm': 30}))
@@ -314,9 +314,9 @@ class SortedGroup:
             removed_element = group_objects.remove_by_id(0)
             print(removed_element)  # Output: (1, 2, 3)
         """
-        _objects_to_remove = [element for element in self._objects if key in element.attr]
-        for element in _objects_to_remove:
-            del self._objects[element]
+        _objects_to_remove = [obj for obj in self._objects if key in obj.attr]
+        for obj in _objects_to_remove:
+            del self._objects[obj]
 
     # ==========================================================================
     # collections - iterators
@@ -389,16 +389,16 @@ class SortedGroup:
 
         # Check if the key is present in all _objects
         for element_list in self._objects.values():
-            for element in element_list:
-                if key_t not in element.keys:
-                    raise ValueError(f"The key '{key_t}' is not present in all _objects.")
+            for obj in element_list:
+                if key_t not in obj.keys:
+                    raise ValueError("The key '{}' is not present in all _objects.".format(key_t))
 
         # Group _objects based on the specified key
         for element_list in self._objects.values():
-            for element in element_list:
-                key_value = element.keys[key_t]
+            for obj in element_list:
+                key_value = obj.keys[key_t]
                 if key_value not in grouped_dict:
                     grouped_dict[key_value] = []
-                grouped_dict[key_value].append(element)
+                grouped_dict[key_value].append(obj)
 
         return grouped_dict

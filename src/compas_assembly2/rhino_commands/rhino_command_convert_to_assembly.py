@@ -113,7 +113,6 @@ def partition_by_common_group_id(objects_list):
 
 grouped_objects = partition_by_common_group_id(objects_with_attributes)
 
-
 # ==========================================================================
 # define a data-structure simplices
 # ==========================================================================
@@ -438,7 +437,7 @@ def process_string(input_string):
                 substring = "".join(filter(str.isalpha, substring))
 
                 # Check if the string contains any of the specified substrings
-
+                #print(substring)
                 if "block" in input_string:
                     result["ELEMENT_NAME"] = "block"
                 elif "frame" in input_string:
@@ -454,6 +453,8 @@ def process_string(input_string):
                 result["PROPERTY_TYPE"] = "frame"
             elif "frame_global" in input_string:
                 result["PROPERTY_TYPE"] = "frame_global"
+            elif "id" in input_string:
+                result["PROPERTY_TYPE"] = "id"
     return result  # Return None if none of the specified substrings are found
 
 
@@ -464,7 +465,7 @@ dict_id = {"BLOCK": 0, "FRAME": 1, "PLATE": 2}
 for group_id, subsequent_groups in grouped_objects.items():
 
     # --------------------------------------------------------------------------
-    # parse the layer infornate
+    # parse the layer information
     # --------------------------------------------------------------------------
     layer_name = subsequent_groups[0].layer_name
     processed_layer_name = process_string(layer_name)
@@ -477,12 +478,14 @@ for group_id, subsequent_groups in grouped_objects.items():
     # create element
     o = Element(
         # ensure that this name exists
-        name=compas_assembly2.ELEMENT_NAME.exists(processed_layer_name["ELEMENT_NAME"]),  # type: ignore
-        id=[dict_id[processed_layer_name["ELEMENT_NAME"].upper()], counter],  # noqa: E231
+        name=compas_assembly2.ELEMENT_NAME.exists(processed_layer_name["ELEMENT_NAME"].upper()),  # type: ignore
+        #id=[dict_id[processed_layer_name["ELEMENT_NAME"].upper()], counter],  # noqa: E231
+        id=[counter],  # noqa: E231
     )
     counter = counter + 1
 
     for obj in subsequent_groups:
+        #print(obj.layer_name)
         layer_name = obj.layer_name
         processed_layer_name = process_string(layer_name)
         # print(processed_layer_name, layer_name)
@@ -534,6 +537,29 @@ for group_id, subsequent_groups in grouped_objects.items():
                 or str(type(obj.geometry)) == "<type 'PolylineCurve'>"
             ):
                 o.complex.append(conversions.from_rhino_polyline(obj.geometry))
+        # --------------------------------------------------------------------------
+        # id
+        # --------------------------------------------------------------------------
+        elif processed_layer_name["PROPERTY_TYPE"] == "id":
+            if str(type(obj.geometry)) == "<type 'TextDot'>":
+                
+                def extract_integers_from_string(input_string):
+                    integers = []
+                    current_integer = ""
+                    
+                    for char in input_string:
+                        if char.isdigit():
+                            current_integer += char
+                        elif current_integer:
+                            integers.append(int(current_integer))
+                            current_integer = ""
+                    
+                    if current_integer:
+                        integers.append(int(current_integer))
+                    
+                    return integers
+                
+                o.id = extract_integers_from_string(obj.geometry.Text) + o.id
 
     # --------------------------------------------------------------------------
     # reassign center incase local and global frames are not given
@@ -567,7 +593,8 @@ for group_id, subsequent_groups in grouped_objects.items():
     # --------------------------------------------------------------------------
     if o.name == "PLATE":
         first_half, merged, frame = conversions.sort_polyline_pairs(o.simplex)
-        o.simplex = first_half
+        #print(merged)
+        #o.simplex = first_half
         o.frame = frame
 
     # --------------------------------------------------------------------------
@@ -581,4 +608,4 @@ for group_id, subsequent_groups in grouped_objects.items():
 # fill the compas_assembly_user_input with geometry and types
 # ==========================================================================
 # write data to file
-json_dump(data=elements, fp="rhino_command_convert_to_assembly_0.json", pretty=True)
+json_dump(data=elements, fp="rhino_command_convert_to_assembly_1.json", pretty=True)
