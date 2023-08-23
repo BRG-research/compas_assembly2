@@ -16,6 +16,7 @@ class Joint(Data):
     forces
     toolpaths
     """
+
     def __init__(self, polygon=None, type=None, frame=None, surface_area=None, forces=None, toolpaths=None):
         super(Joint, self).__init__()
 
@@ -46,7 +47,7 @@ class Joint(Data):
             "frame": self.frame,
             "surface_area": self.surface_area,
             "forces": self.forces,
-            "toolpaths": self.toolpaths
+            "toolpaths": self.toolpaths,
         }
 
     @data.setter
