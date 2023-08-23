@@ -46,7 +46,7 @@ class Joint(Data):
             "frame": self.frame,
             "surface_area": self.surface_area,
             "forces": self.forces,
-            "toolpaths": self.toolpaths
+            "toolpaths": self.toolpaths,
         }
 
     @data.setter
