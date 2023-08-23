@@ -98,7 +98,8 @@ class Element(Data):
         # --------------------------------------------------------------------------
         if not name:
             self.name = compas_assembly2.ELEMENT_NAME.CUSTOM
-        self.name = name.upper()
+        else:
+            self.name = name.upper()
 
         # --------------------------------------------------------------------------
         # indexing
