@@ -437,7 +437,7 @@ def process_string(input_string):
                 substring = "".join(filter(str.isalpha, substring))
 
                 # Check if the string contains any of the specified substrings
-                #print(substring)
+                # print(substring)
                 if "block" in input_string:
                     result["ELEMENT_NAME"] = "block"
                 elif "frame" in input_string:
@@ -479,13 +479,13 @@ for group_id, subsequent_groups in grouped_objects.items():
     o = Element(
         # ensure that this name exists
         name=compas_assembly2.ELEMENT_NAME.exists(processed_layer_name["ELEMENT_NAME"].upper()),  # type: ignore
-        #id=[dict_id[processed_layer_name["ELEMENT_NAME"].upper()], counter],  # noqa: E231
+        # id=[dict_id[processed_layer_name["ELEMENT_NAME"].upper()], counter],  # noqa: E231
         id=[counter],  # noqa: E231
     )
     counter = counter + 1
 
     for obj in subsequent_groups:
-        #print(obj.layer_name)
+        # print(obj.layer_name)
         layer_name = obj.layer_name
         processed_layer_name = process_string(layer_name)
         # print(processed_layer_name, layer_name)
@@ -542,23 +542,23 @@ for group_id, subsequent_groups in grouped_objects.items():
         # --------------------------------------------------------------------------
         elif processed_layer_name["PROPERTY_TYPE"] == "id":
             if str(type(obj.geometry)) == "<type 'TextDot'>":
-                
+
                 def extract_integers_from_string(input_string):
                     integers = []
                     current_integer = ""
-                    
+
                     for char in input_string:
                         if char.isdigit():
                             current_integer += char
                         elif current_integer:
                             integers.append(int(current_integer))
                             current_integer = ""
-                    
+
                     if current_integer:
                         integers.append(int(current_integer))
-                    
+
                     return integers
-                
+
                 o.id = extract_integers_from_string(obj.geometry.Text) + o.id
 
     # --------------------------------------------------------------------------
@@ -593,8 +593,8 @@ for group_id, subsequent_groups in grouped_objects.items():
     # --------------------------------------------------------------------------
     if o.name == "PLATE":
         first_half, merged, frame = conversions.sort_polyline_pairs(o.simplex)
-        #print(merged)
-        #o.simplex = first_half
+        # print(merged)
+        # o.simplex = first_half
         o.frame = frame
 
     # --------------------------------------------------------------------------
