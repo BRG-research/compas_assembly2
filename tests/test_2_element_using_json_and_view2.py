@@ -8,7 +8,7 @@ if __name__ == "__main__":
     # ==========================================================================
     # ELEMENTS FROM JSON
     # ==========================================================================
-    elements_json = json_load(fp="src/compas_assembly2/rhino_commands/rhino_command_convert_to_assembly.json")
+    elements_json = json_load(fp="src/compas_assembly2/rhino_commands/rhino_command_convert_to_assembly_0.json")
 
     # ==========================================================================
     # ELEMENTS NEST - TEST FABRICATION TYPE

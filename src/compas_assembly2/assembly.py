@@ -170,7 +170,7 @@ class Assembly(Data):
         # it is assumed that keys are single element lists
         joints = []
         for pair in collision_pairs_as_element_ids:
-            joints.extend(self._elements[pair[0]][0].face_to_face_detection(self._elements[pair[1]][0]))
+            joints.extend(self._elements[pair[0]][0].face_to_face(self._elements[pair[1]][0]))
         return joints
 
     # ==========================================================================

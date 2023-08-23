@@ -7,7 +7,7 @@
     :maxdepth: 2
 
 .. image:: ../_images/overview.png
-   :width: 75%
+   :width: 85%
    :align: right
    :alt: compas_assembly2
 
@@ -24,12 +24,12 @@ Assembly class
 ==============
 
 .. image:: ../_images/assembly.png
-   :width: 75%
+   :width: 85%
    :align: right
    :alt: compas_assembly2
 
 .. image:: ../_images/assembly_sorted_dict.png
-   :width: 75%
+   :width: 85%
    :align: right
    :alt: compas_assembly2
 
@@ -43,17 +43,17 @@ Element class
 =============
 
 .. image:: ../_images/element.png
-   :width: 75%
+   :width: 85%
    :align: right
    :alt: compas_assembly2
 
 .. image:: ../_images/element_collision.png
-   :width: 75%
+   :width: 85%
    :align: right
    :alt: compas_assembly2
 
 .. image:: ../_images/element_type.png
-   :width: 75%
+   :width: 85%
    :align: right
    :alt: compas_assembly2
 
@@ -85,7 +85,7 @@ Joints class
 =============
 
 .. image:: ../_images/joints.png
-   :width: 75%
+   :width: 85%
    :align: right
    :alt: compas_assembly2
 
@@ -93,7 +93,7 @@ Viewer class
 ============
 
 .. image:: ../_images/log_0.gif
-   :width: 75%
+   :width: 85%
    :align: right
    :alt: compas_assembly2
 
@@ -107,7 +107,7 @@ Fabrication class
 =================
 
 .. image:: ../_images/fabrication.png
-   :width: 75%
+   :width: 85%
    :align: right
    :alt: compas_assembly2
 
@@ -121,7 +121,7 @@ Structure class
 =================
 
 .. image:: ../_images/structure.png
-   :width: 75%
+   :width: 85%
    :align: right
    :alt: compas_assembly2
 
