@@ -680,7 +680,6 @@ class Viewer:
                 # change opacity of elements
                 @viewer.slider(title="opacity", maxval=100, step=1, value=95)  # type: ignore
                 def slider_opacity(t):
-
                     global opacity
                     opacity = t / 100.0
 
@@ -711,7 +710,6 @@ class Viewer:
                     title="color_index", maxval=len(viewer_objects["viewer_complexes"]), step=1, value=0
                 )  # type: ignore
                 def slider_color(t):
-
                     # instead of slider do somethign else for a list selection
 
                     for id, o in enumerate(viewer_objects["viewer_complexes"]):
