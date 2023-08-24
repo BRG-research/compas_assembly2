@@ -12,6 +12,19 @@ compas_assembly2
 
 .. rst-class:: lead
 
+The **compas_assembly2** represents:
+* a collection of structural elements such as blocks, beams, nodes, and plates.
+* it is a recursive structure is reminiscent of the Composite pattern.
+* an element is primary a description of a simple and complex geometry.
+* initially elements do not have neither connectivity nor grouping information.
+* the grouping and connectivity is added manually by the user or automatically by collision detection.
+* assembly can contain assemblies within assemblies
+* the visual representation of the assembly structure is below:
+* it means that the top level assembly contains:
+   * a dict of _all_elements (to query by id)
+   * a dict of assemblies (to grouping elements)
+   * a graph (for connectivity between all elements)
+
 The **compas_assembly2** represents a data-structure to work with **a collection of structural elements** such as **blocks, beams, nodes, and plates**. This data-structure helps to **find adjacency** and joinery information, as well as interfaces between these elements. Additionally, it should allow for the data-transfer between **the model, structural simulation, and fabrication processes**.
 
 .. .. figure:: /_images/

@@ -589,7 +589,7 @@ for group_id, subsequent_groups in grouped_objects.items():
                     o.frame = Frame(o.complex[0][0], x_axis_vector, y_axis_vector)
 
     # --------------------------------------------------------------------------
-    # special case for plates, where the simpices must be sorted and split
+    # special case for plates, where the simplices must be sorted and split
     # --------------------------------------------------------------------------
     if o.name == "PLATE":
         first_half, merged, frame = conversions.sort_polyline_pairs(o.simplex)
