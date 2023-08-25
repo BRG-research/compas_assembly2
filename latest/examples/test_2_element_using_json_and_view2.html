@@ -115,6 +115,7 @@
     <span class="c1"># COLLIDE ELEMENTS</span>
     <span class="c1"># ==========================================================================</span>
     <span class="n">assembly</span> <span class="o">=</span> <span class="n">Assembly</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;elements_json&quot;</span><span class="p">,</span> <span class="n">elements</span><span class="o">=</span><span class="n">elements_json</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">elements_json</span><span class="p">)</span>
     <span class="n">collision_pairs</span> <span class="o">=</span> <span class="n">assembly</span><span class="o">.</span><span class="n">find_collisions_brute_force</span><span class="p">()</span>
     <span class="c1"># pair0 = collision_pairs[0]</span>
 
@@ -122,7 +123,6 @@
     <span class="c1"># print(assembly._elements._objects[tuple(pair0[0])])</span>
     <span class="c1"># print(assembly._elements[pair0[0]])</span>
     <span class="n">joints</span> <span class="o">=</span> <span class="n">assembly</span><span class="o">.</span><span class="n">find_joints</span><span class="p">(</span><span class="n">collision_pairs</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">joints</span><span class="p">)</span>
     <span class="n">geometry</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">joint</span> <span class="ow">in</span> <span class="n">joints</span><span class="p">:</span>
         <span class="n">geometry</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">joint</span><span class="o">.</span><span class="n">polygon</span><span class="p">)</span>
@@ -136,12 +136,12 @@
     <span class="c1"># ==========================================================================</span>
     <span class="c1"># NEST ELEMENTS</span>
     <span class="c1"># ==========================================================================</span>
-    <span class="n">FabricationNest</span><span class="o">.</span><span class="n">pack_elements</span><span class="p">(</span><span class="n">elements</span><span class="o">=</span><span class="n">assembly</span><span class="o">.</span><span class="n">_elements</span><span class="o">.</span><span class="n">to_flat_list</span><span class="p">(),</span> <span class="n">nest_type</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">inflate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">height_step</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">FabricationNest</span><span class="o">.</span><span class="n">pack_elements</span><span class="p">(</span><span class="n">elements</span><span class="o">=</span><span class="n">assembly</span><span class="o">.</span><span class="n">to_elements_list</span><span class="p">(),</span> <span class="n">nest_type</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">inflate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">height_step</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 
     <span class="c1"># ==========================================================================</span>
     <span class="c1"># VIEW2</span>
     <span class="c1"># ==========================================================================</span>
-    <span class="n">Viewer</span><span class="o">.</span><span class="n">show_elements</span><span class="p">(</span><span class="n">assembly</span><span class="o">.</span><span class="n">_elements</span><span class="o">.</span><span class="n">to_flat_list</span><span class="p">(),</span> <span class="n">viewer_type</span><span class="o">=</span><span class="s2">&quot;view2&quot;</span><span class="p">,</span> <span class="n">show_grid</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">geometry</span><span class="p">)</span>
+    <span class="n">Viewer</span><span class="o">.</span><span class="n">show_elements</span><span class="p">(</span><span class="n">assembly</span><span class="o">.</span><span class="n">to_elements_list</span><span class="p">(),</span> <span class="n">viewer_type</span><span class="o">=</span><span class="s2">&quot;view2&quot;</span><span class="p">,</span> <span class="n">show_grid</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">geometry</span><span class="p">)</span>
 </code></pre></div>
 </div>
 </section>
