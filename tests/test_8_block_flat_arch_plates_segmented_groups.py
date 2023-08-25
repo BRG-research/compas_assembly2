@@ -648,7 +648,7 @@ for i in range(len(planes_assemblys)):
         * 0.5,
     )
 
-    assembly._elements.add(
+    assembly.add_element_by_index(
         Element.from_plate_planes(
             bottom_plate_base_plane,
             bottom_plate_planes,
@@ -684,7 +684,7 @@ for i in range(len(planes_assemblys)):
 
     top_plate_base_plane = Plane(Point(0, 0, height), Vector(0, 0, 1))
 
-    assembly._elements.add(
+    assembly.add_element_by_index(
         Element.from_plate_planes(
             top_plate_base_plane, top_plate_planes, plate_thickness, [1, remap_sequence(i, len(planes_assemblys))]
         )
@@ -731,12 +731,12 @@ for i in range(len(planes_assemblys)):
 
     web_base_plane = Plane(Point(0, 0.35, 0), Vector(0, 1, 0))
 
-    assembly._elements.add(
+    assembly.add_element_by_index(
         Element.from_plate_planes(
             web_base_plane, bottom_plate_planes, plate_thickness, [0, remap_sequence(i, len(planes_assemblys))]
         )
     )
-    assembly._elements.add(
+    assembly.add_element_by_index(
         Element.from_plate_planes(
             web_base_plane.offset(-0.75),
             bottom_plate_planes,
@@ -815,7 +815,7 @@ for i in range(len(planes_assemblys0)):
     p_web1 = Plane(linear_interpolation(p0, p1, 0.85), p_web0.normal)
 
     id = [1, remap_sequence(i, len(planes_assemblys0))]
-    assembly._elements.add(Element.from_plate_planes(p_web0, top_plate_planes, plate_thickness, id))
+    assembly.add_element_by_index(Element.from_plate_planes(p_web0, top_plate_planes, plate_thickness, id))
 
     top_plate_planes = [
         Plane(
@@ -835,7 +835,7 @@ for i in range(len(planes_assemblys0)):
         Plane(Point(0, offset, 0), Vector(0, 1, 0)),
     ]
 
-    assembly._elements.add(
+    assembly.add_element_by_index(
         Element.from_plate_planes(
             p_web1,
             top_plate_planes,
@@ -848,13 +848,22 @@ for i in range(len(planes_assemblys0)):
     for temp_element in assembly._elements[id[0], id[1]]:
         temp_element.insertion = top_plate_planes[0].normal
 
+print("___________________________________________")
+print(assembly.to_elements_list())
+Viewer.show_elements(
+    assembly.to_elements_list(),
+    show_simplices=False,
+    show_grid=False,
+    measurements=measurements,
+    geometry=geometry,
+)
 
 # ==========================================================================
 # NEST ELEMENTS
 # ==========================================================================
 # assembly.to_nested_list
 # elements = assembly.reassembly_by_keeping_first_indices(0)
-FabricationNest.pack_elements(elements=assembly._elements.to_flat_list(), nest_type=2, inflate=0.1, height_step=4)
+FabricationNest.pack_elements(elements=assembly.to_elements_list(), nest_type=2, inflate=0.1, height_step=4)
 
 # ==========================================================================
 # WRITE PLATE GEOMETRY TO JSON
@@ -877,7 +886,7 @@ if compas_wood_available:
     # COMPAS_WOOD CREATE ADJACENCY
     # ==========================================================================
     adjancency = []
-    nested_lists = assembly._elements.to_nested_list()
+    nested_lists = assembly.to_elements_list()
     for i in range(len(nested_lists)):
         adjancency.append(0 + 3 * i)
         adjancency.append(2 + 3 * i)
@@ -966,7 +975,7 @@ if compas_wood_available:
 # ==========================================================================
 # assembly IN A DIFFERENT ASSEMBLY ORDER
 # ==========================================================================
-assembly_as_nested_list = assembly._elements.to_nested_list()
+assembly_as_nested_list = assembly.to_elements_lists()
 assembly_as_nested_list_reordered = []
 half = math.floor(len(assembly_as_nested_list) / 2)
 for i in range(half):
@@ -976,10 +985,11 @@ for i in range(half):
 if len(assembly_as_nested_list) % 2 == 1:
     assembly_as_nested_list_reordered.append(assembly_as_nested_list[-1])
 
+
 # ==========================================================================
 # VIEWER
 # ==========================================================================
-color_red = [3] * assembly._elements.size()
+color_red = [3] * assembly.number_of_elements
 color_red[0] = 0
 color_red[1] = 0
 color_red[2] = 0

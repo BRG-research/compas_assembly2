@@ -460,10 +460,10 @@ class Viewer:
                             )
                             viewer_objects["viewer_oobbs"].append(o)
 
-                    if element._convex_hull:
-                        if element._convex_hull.number_of_vertices() > 0:
+                    if element.convex_hull:
+                        if element.convex_hull.number_of_vertices() > 0:
                             o = viewer.add(
-                                data=element._convex_hull,
+                                data=element.convex_hull,
                                 name=element_id,
                                 is_selected=False,
                                 is_visible=show_convex_hulls,

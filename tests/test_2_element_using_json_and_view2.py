@@ -20,6 +20,7 @@ if __name__ == "__main__":
     # COLLIDE ELEMENTS
     # ==========================================================================
     assembly = Assembly(name="elements_json", elements=elements_json)
+    print(elements_json)
     collision_pairs = assembly.find_collisions_brute_force()
     # pair0 = collision_pairs[0]
 
@@ -27,7 +28,6 @@ if __name__ == "__main__":
     # print(assembly._elements._objects[tuple(pair0[0])])
     # print(assembly._elements[pair0[0]])
     joints = assembly.find_joints(collision_pairs)
-    print(joints)
     geometry = []
     for joint in joints:
         geometry.append(joint.polygon)
@@ -41,9 +41,9 @@ if __name__ == "__main__":
     # ==========================================================================
     # NEST ELEMENTS
     # ==========================================================================
-    FabricationNest.pack_elements(elements=assembly._elements.to_flat_list(), nest_type=2, inflate=0.1, height_step=4)
+    FabricationNest.pack_elements(elements=assembly.to_elements_list(), nest_type=2, inflate=0.1, height_step=4)
 
     # ==========================================================================
     # VIEW2
     # ==========================================================================
-    Viewer.show_elements(assembly._elements.to_flat_list(), viewer_type="view2", show_grid=False, geometry=geometry)
+    Viewer.show_elements(assembly.to_elements_list(), viewer_type="view2", show_grid=False, geometry=geometry)
