@@ -944,22 +944,12 @@
     <span class="k">for</span> <span class="n">temp_element</span> <span class="ow">in</span> <span class="n">assembly</span><span class="o">.</span><span class="n">_elements</span><span class="p">[</span><span class="nb">id</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">id</span><span class="p">[</span><span class="mi">1</span><span class="p">]]:</span>
         <span class="n">temp_element</span><span class="o">.</span><span class="n">insertion</span> <span class="o">=</span> <span class="n">top_plate_planes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">normal</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;___________________________________________&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">assembly</span><span class="o">.</span><span class="n">to_elements_list</span><span class="p">())</span>
-<span class="n">Viewer</span><span class="o">.</span><span class="n">show_elements</span><span class="p">(</span>
-    <span class="n">assembly</span><span class="o">.</span><span class="n">to_elements_list</span><span class="p">(),</span>
-    <span class="n">show_simplices</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">show_grid</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">measurements</span><span class="o">=</span><span class="n">measurements</span><span class="p">,</span>
-    <span class="n">geometry</span><span class="o">=</span><span class="n">geometry</span><span class="p">,</span>
-<span class="p">)</span>
-
 <span class="c1"># ==========================================================================</span>
 <span class="c1"># NEST ELEMENTS</span>
 <span class="c1"># ==========================================================================</span>
 <span class="c1"># assembly.to_nested_list</span>
 <span class="c1"># elements = assembly.reassembly_by_keeping_first_indices(0)</span>
-<span class="n">FabricationNest</span><span class="o">.</span><span class="n">pack_elements</span><span class="p">(</span><span class="n">elements</span><span class="o">=</span><span class="n">assembly</span><span class="o">.</span><span class="n">to_elements_list</span><span class="p">(),</span> <span class="n">nest_type</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">inflate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">height_step</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">FabricationNest</span><span class="o">.</span><span class="n">pack_elements</span><span class="p">(</span><span class="n">elements</span><span class="o">=</span><span class="n">assembly</span><span class="o">.</span><span class="n">to_list</span><span class="p">(),</span> <span class="n">nest_type</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">inflate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">height_step</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 
 <span class="c1"># ==========================================================================</span>
 <span class="c1"># WRITE PLATE GEOMETRY TO JSON</span>
@@ -982,7 +972,7 @@
     <span class="c1"># COMPAS_WOOD CREATE ADJACENCY</span>
     <span class="c1"># ==========================================================================</span>
     <span class="n">adjancency</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">nested_lists</span> <span class="o">=</span> <span class="n">assembly</span><span class="o">.</span><span class="n">to_elements_list</span><span class="p">()</span>
+    <span class="n">nested_lists</span> <span class="o">=</span> <span class="n">assembly</span><span class="o">.</span><span class="n">to_lists</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">nested_lists</span><span class="p">)):</span>
         <span class="n">adjancency</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">i</span><span class="p">)</span>
         <span class="n">adjancency</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">i</span><span class="p">)</span>
@@ -1046,7 +1036,7 @@
         <span class="mf">0.95</span><span class="p">,</span>
         <span class="mi">50</span><span class="p">,</span>
     <span class="p">]</span>
-
+    <span class="nb">print</span><span class="p">(</span><span class="n">simplices</span><span class="p">)</span>
     <span class="n">simplices</span> <span class="o">=</span> <span class="n">get_connection_zones</span><span class="p">(</span><span class="n">simplices</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">adjancency</span><span class="p">,</span> <span class="n">joint_parameters</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">],</span> <span class="mi">4</span><span class="p">)</span>
 
     <span class="c1"># ==========================================================================</span>
@@ -1066,12 +1056,13 @@
             <span class="n">element</span><span class="o">.</span><span class="n">simplex</span> <span class="o">=</span> <span class="n">simplices</span><span class="p">[</span><span class="n">counter</span><span class="p">]</span>
             <span class="n">element</span><span class="o">.</span><span class="n">complex</span> <span class="o">=</span> <span class="p">[</span><span class="n">_</span><span class="o">.</span><span class="n">Triagulator</span><span class="o">.</span><span class="n">from_loft_two_polygons</span><span class="p">(</span><span class="n">simplices</span><span class="p">[</span><span class="n">counter</span><span class="p">][</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="n">simplices</span><span class="p">[</span><span class="n">counter</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])]</span>
             <span class="n">counter</span> <span class="o">=</span> <span class="n">counter</span> <span class="o">+</span> <span class="mi">1</span>
-
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;WARNING: the code is skipped because compas_wood not found&quot;</span><span class="p">)</span>
 
 <span class="c1"># ==========================================================================</span>
 <span class="c1"># assembly IN A DIFFERENT ASSEMBLY ORDER</span>
 <span class="c1"># ==========================================================================</span>
-<span class="n">assembly_as_nested_list</span> <span class="o">=</span> <span class="n">assembly</span><span class="o">.</span><span class="n">to_elements_lists</span><span class="p">()</span>
+<span class="n">assembly_as_nested_list</span> <span class="o">=</span> <span class="n">assembly</span><span class="o">.</span><span class="n">to_lists</span><span class="p">()</span>
 <span class="n">assembly_as_nested_list_reordered</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="n">half</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">assembly_as_nested_list</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">half</span><span class="p">):</span>
