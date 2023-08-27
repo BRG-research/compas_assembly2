@@ -2,6 +2,9 @@
 
 ## TODO
 
+
+- [ ] Assembly.py review the "add_element_by_index" method. Example, elements are added not by element index, but assemblies can be created by b) adding assemblies within the assembly, c) manually grouping when first grandchilds are created and then childs can be added, then parents, so it is a reversed scheme.
+- [ ] Create different Element classes e.g. Beam, Plate, Block, Glulam, etc. Use OCC for curved geometries
 - [ ] Element.py - Interface detection using compas_assembly shapely library for outlines for complex
 - [ ] Element.py - Interace detection using Line and Polyline proximity for simplex
 - [ ] Fast Tree search that is native to Python

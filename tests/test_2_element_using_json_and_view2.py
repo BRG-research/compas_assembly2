@@ -41,9 +41,9 @@ if __name__ == "__main__":
     # ==========================================================================
     # NEST ELEMENTS
     # ==========================================================================
-    FabricationNest.pack_elements(elements=assembly.to_elements_list(), nest_type=2, inflate=0.1, height_step=4)
+    FabricationNest.pack_elements(elements=assembly.to_list(), nest_type=2, inflate=0.1, height_step=4)
 
     # ==========================================================================
     # VIEW2
     # ==========================================================================
-    Viewer.show_elements(assembly.to_elements_list(), viewer_type="view2", show_grid=False, geometry=geometry)
+    Viewer.show_elements(assembly.to_list(), viewer_type="view2", show_grid=False, geometry=geometry)

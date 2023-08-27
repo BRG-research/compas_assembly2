@@ -848,22 +848,12 @@ for i in range(len(planes_assemblys0)):
     for temp_element in assembly._elements[id[0], id[1]]:
         temp_element.insertion = top_plate_planes[0].normal
 
-print("___________________________________________")
-print(assembly.to_elements_list())
-Viewer.show_elements(
-    assembly.to_elements_list(),
-    show_simplices=False,
-    show_grid=False,
-    measurements=measurements,
-    geometry=geometry,
-)
-
 # ==========================================================================
 # NEST ELEMENTS
 # ==========================================================================
 # assembly.to_nested_list
 # elements = assembly.reassembly_by_keeping_first_indices(0)
-FabricationNest.pack_elements(elements=assembly.to_elements_list(), nest_type=2, inflate=0.1, height_step=4)
+FabricationNest.pack_elements(elements=assembly.to_list(), nest_type=2, inflate=0.1, height_step=4)
 
 # ==========================================================================
 # WRITE PLATE GEOMETRY TO JSON
@@ -886,7 +876,7 @@ if compas_wood_available:
     # COMPAS_WOOD CREATE ADJACENCY
     # ==========================================================================
     adjancency = []
-    nested_lists = assembly.to_elements_list()
+    nested_lists = assembly.to_lists()
     for i in range(len(nested_lists)):
         adjancency.append(0 + 3 * i)
         adjancency.append(2 + 3 * i)
@@ -950,7 +940,7 @@ if compas_wood_available:
         0.95,
         50,
     ]
-
+    print(simplices)
     simplices = get_connection_zones(simplices, None, None, None, adjancency, joint_parameters, 2, [1, 1, 1.1], 4)
 
     # ==========================================================================
@@ -970,12 +960,13 @@ if compas_wood_available:
             element.simplex = simplices[counter]
             element.complex = [_.Triagulator.from_loft_two_polygons(simplices[counter][-2], simplices[counter][-1])]
             counter = counter + 1
-
+else:
+    print("WARNING: the code is skipped because compas_wood not found")
 
 # ==========================================================================
 # assembly IN A DIFFERENT ASSEMBLY ORDER
 # ==========================================================================
-assembly_as_nested_list = assembly.to_elements_lists()
+assembly_as_nested_list = assembly.to_lists()
 assembly_as_nested_list_reordered = []
 half = math.floor(len(assembly_as_nested_list) / 2)
 for i in range(half):

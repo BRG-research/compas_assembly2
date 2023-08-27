@@ -28,7 +28,9 @@ if __name__ == "__main__":
     # ==========================================================================
     # COLLIDE ELEMENTS
     # ==========================================================================
-    assembly = Assembly(name="elements_json", elements=elements_json)
+    assembly = Assembly(name="elements_json")
+    for element in elements_json:
+        assembly.add_element_by_index(element)
     # collision_pairs = assembly.find_collisions_brute_force()
     # # pair0 = collision_pairs[0]
 
@@ -63,7 +65,7 @@ if compas_wood_available:
     # COMPAS_WOOD CREATE ADJACENCY
     # ==========================================================================
     adjancency = []
-    nested_lists = assembly._elements.to_nested_list()
+    nested_lists = assembly.to_lists()
     # for i in range(len(nested_lists)):
     #     adjancency.append(0 + 3 * i)
     #     adjancency.append(2 + 3 * i)
@@ -228,11 +230,12 @@ if compas_wood_available:
     # ==========================================================================
     # NEST ELEMENTS
     # ==========================================================================
-    FabricationNest.pack_elements(elements=assembly._elements.to_flat_list(), nest_type=2, inflate=0.1, height_step=4)
+    FabricationNest.pack_elements(elements=assembly.to_list(), nest_type=2, inflate=0.1, height_step=4)
 
     # ==========================================================================
     # VIEW2
     # ==========================================================================
+    element_lists = assembly.to_lists(2)
     Viewer.show_elements(
-        assembly._elements.to_trimmed_list("x"), viewer_type="view2", show_grid=False, geometry=geometry
-    )
+        element_lists, viewer_type="view2", show_grid=False, geometry=geometry
+    )  # assembly._elements.to_trimmed_list("x")

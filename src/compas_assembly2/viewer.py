@@ -85,6 +85,13 @@ class Viewer:
                 print("compas_view2 is not installed. Skipping the code. ---> Use pip install compas_view <---")
             else:
                 # The code here will only be executed if the import was successful
+                if lists_of_elements is None:
+                    print("WARNING VIEW2 - lists_of_elements is None")
+                    return
+
+                if len(lists_of_elements) == 0:
+                    print("WARNING VIEW2 - lists_of_elements is Empty")
+                    return
 
                 # initialize the viewer
                 # modifications to the default viewer:
@@ -127,6 +134,7 @@ class Viewer:
 
                 dict_elements_lists_of_elements = {}
                 elements = []
+
                 for counter, group in enumerate(lists_of_elements):
                     if isinstance(group, list):
                         for e in group:
