@@ -1,6 +1,6 @@
 import rhinoscriptsyntax as rs  # type: ignore https://github.com/mcneel/rhinoscriptsyntax
 import Rhino  # type: ignore
-from Rhino.Geometry import Brep, Mesh, MeshingParameters
+from Rhino.Geometry import Mesh, MeshingParameters
 from compas.datastructures import Mesh
 from compas.geometry import (
     Polyline,
@@ -492,13 +492,13 @@ for group_id, subsequent_groups in grouped_objects.items():
         # print(obj.layer_name)
         layer_name = obj.layer_name
         processed_layer_name = process_string(layer_name)
-        #print(processed_layer_name, layer_name)
-        #print processed_layer_name["PROPERTY_TYPE"] 
+        # print(processed_layer_name, layer_name)
+        # print processed_layer_name["PROPERTY_TYPE"]
         # --------------------------------------------------------------------------
         # simplex
         # --------------------------------------------------------------------------
         if processed_layer_name["PROPERTY_TYPE"] == "simplex":
-            #print("_____________simplex_________________", type(obj.geometry), layer_name)
+            # print("_____________simplex_________________", type(obj.geometry), layer_name)
             if str(type(obj.geometry)) == "<type 'Mesh'>":
                 o.simplex.append(conversions.from_rhino_mesh(obj.geometry))
             elif (
@@ -507,7 +507,7 @@ for group_id, subsequent_groups in grouped_objects.items():
                 or str(type(obj.geometry)) == "<type 'PolylineCurve'>"
             ):
                 o.simplex.append(conversions.from_rhino_polyline(obj.geometry))
-                #print(o.simplex)
+                # print(o.simplex)
         # --------------------------------------------------------------------------
         # frame
         # --------------------------------------------------------------------------
@@ -533,35 +533,34 @@ for group_id, subsequent_groups in grouped_objects.items():
         # complex
         # --------------------------------------------------------------------------
         elif processed_layer_name["PROPERTY_TYPE"] == "complex":
-            
+
             # print("______________________________")
             if str(type(obj.geometry)) == "<type 'Mesh'>":
                 o.complex.append(conversions.from_rhino_mesh(obj.geometry))
             elif str(type(obj.geometry)) == "<type 'Brep'>":
                 brep = obj.geometry
                 mesh_params = MeshingParameters.Default
-                mesh_params.JaggedSeams = False;
-                mesh_params.ClosedObjectPostProcess = False;
-                mesh_params.ComputeCurvature = False;
-                mesh_params.SimplePlanes = True;             
-                mesh_params.GridAmplification = 0;
-                mesh_params.GridAngle = 0;
-                mesh_params.GridAspectRatio = 0;
-                mesh_params.GridMaxCount = 0;
-                mesh_params.GridMinCount = 0;
-                mesh_params.MaximumEdgeLength = 0;
-                mesh_params.MinimumEdgeLength = 1e10;
+                mesh_params.JaggedSeams = False
+                mesh_params.ClosedObjectPostProcess = False
+                mesh_params.ComputeCurvature = False
+                mesh_params.SimplePlanes = True
+                mesh_params.GridAmplification = 0
+                mesh_params.GridAngle = 0
+                mesh_params.GridAspectRatio = 0
+                mesh_params.GridMaxCount = 0
+                mesh_params.GridMinCount = 0
+                mesh_params.MaximumEdgeLength = 0
+                mesh_params.MinimumEdgeLength = 1e10
                 mesh_array = Rhino.Geometry.Mesh.CreateFromBrep(brep, mesh_params)
                 mesh = Rhino.Geometry.Mesh()
                 for m in mesh_array:
                     mesh.Append(m)
-                mesh.Vertices.CombineIdentical(True, True);
-                mesh.UnifyNormals();
-                mesh.Compact();
-                #Rhino.RhinoDoc.ActiveDoc.Objects.AddMesh(mesh)
+                mesh.Vertices.CombineIdentical(True, True)
+                mesh.UnifyNormals()
+                mesh.Compact()
+                # Rhino.RhinoDoc.ActiveDoc.Objects.AddMesh(mesh)
                 o.complex.append(conversions.from_rhino_mesh(mesh))
-                
-                
+
             elif (
                 str(type(obj.geometry)) == "<type 'LineCurve'>"
                 or str(type(obj.geometry)) == "<type 'NurbsCurve'>"
@@ -573,7 +572,6 @@ for group_id, subsequent_groups in grouped_objects.items():
         # --------------------------------------------------------------------------
         elif processed_layer_name["PROPERTY_TYPE"] == "id":
             if str(type(obj.geometry)) == "<type 'TextDot'>":
-                
 
                 def extract_integers_from_string(input_string):
                     integers = []
@@ -600,10 +598,11 @@ for group_id, subsequent_groups in grouped_objects.items():
             if (
                 str(type(obj.geometry)) == "<type 'LineCurve'>"
                 or str(type(obj.geometry)) == "<type 'NurbsCurve'>"
-                or str(type(obj.geometry)) == "<type 'PolylineCurve'>"):
+                or str(type(obj.geometry)) == "<type 'PolylineCurve'>"
+            ):
                 p0 = obj.geometry.PointAtStart
                 p1 = obj.geometry.PointAtEnd
-                o.insertion = Vector(p0.X-p1.X, p0.Y-p1.Y, p0.Z-p1.Z)
+                o.insertion = Vector(p0.X - p1.X, p0.Y - p1.Y, p0.Z - p1.Z)
 
     # --------------------------------------------------------------------------
     # reassign center incase local and global frames are not given
@@ -639,12 +638,10 @@ for group_id, subsequent_groups in grouped_objects.items():
         start = time.time()
         first_half, merged, frame = conversions.sort_polyline_pairs(o.simplex)
         end = time.time()
-        print("time", 
-        end - start)
+        print("time", end - start)
         # print(merged)
         # o.simplex = first_half
         o.frame = frame
-        
 
     # --------------------------------------------------------------------------
     # collect the element instance

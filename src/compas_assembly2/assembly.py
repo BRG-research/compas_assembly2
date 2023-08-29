@@ -281,7 +281,9 @@ class Assembly(Data):
 
         elements_str = ", ".join([str(e) for e in assembly._elements.values()])
         arrow = "|-" if prefix else "-"
-        print("--------- Assembly name: {} {} {} [{}]".format(assembly.name, indentation, prefix, arrow, elements_str))
+        print(
+            "--------- Assembly name: {} {} {} {} [{}]".format(assembly.name, indentation, prefix, arrow, elements_str)
+        )
 
         for idx, child in enumerate(assembly._assembly_childs):
             child_prefix = "|   " if idx < len(assembly._assembly_childs) - 1 else "    "
