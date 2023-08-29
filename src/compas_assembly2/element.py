@@ -226,6 +226,7 @@ class Element(Data):
             "frame": self.frame,
             "simplex": self.simplex,
             "complex": self.complex,
+            "insertion": self.insertion,
             "attributes": self.attributes,
         }
 
@@ -251,6 +252,7 @@ class Element(Data):
         self.frame = data["frame"]
         self.simplex = data["simplex"]
         self.complex = data["complex"]
+        self.insertion = data["insertion"]
         self.attributes = data["attributes"]
 
         # custom properties
@@ -270,6 +272,7 @@ class Element(Data):
             frame=data["frame"],
             simplex=data["simplex"],
             complex=data["complex"],
+            insertion=data["insertion"],
             **data["attributes"],
         )
 

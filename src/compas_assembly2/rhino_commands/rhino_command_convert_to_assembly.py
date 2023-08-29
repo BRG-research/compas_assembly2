@@ -1,5 +1,6 @@
 import rhinoscriptsyntax as rs  # type: ignore https://github.com/mcneel/rhinoscriptsyntax
 import Rhino  # type: ignore
+from Rhino.Geometry import Brep, Mesh, MeshingParameters
 from compas.datastructures import Mesh
 from compas.geometry import (
     Polyline,
@@ -22,6 +23,7 @@ from compas_assembly2.element import Element
 from compas.data import (
     json_dump,
 )  # https://compas.dev/compas/latest/reference/generated/compas.data.Data.html
+import time
 
 # select objects
 ids = rs.GetObjects("Select objects", preselect=True, select=True)
@@ -441,7 +443,7 @@ def process_string(input_string):
                 if "block" in input_string:
                     result["ELEMENT_NAME"] = "block"
                 elif "frame" in input_string:
-                    result["ELEMENT_NAME"] = "frame"
+                    result["ELEMENT_NAME"] = "beam"
                 elif "plate" in input_string:
                     result["ELEMENT_NAME"] = "plate"
 
@@ -455,12 +457,14 @@ def process_string(input_string):
                 result["PROPERTY_TYPE"] = "frame_global"
             elif "id" in input_string:
                 result["PROPERTY_TYPE"] = "id"
+            elif "insertion" in input_string:
+                result["PROPERTY_TYPE"] = "insertion"
     return result  # Return None if none of the specified substrings are found
 
 
 elements = []
 counter = 0
-dict_id = {"BLOCK": 0, "FRAME": 1, "PLATE": 2}
+dict_id = {"BLOCK": 0, "BEAM": 1, "PLATE": 2}
 
 for group_id, subsequent_groups in grouped_objects.items():
 
@@ -488,12 +492,13 @@ for group_id, subsequent_groups in grouped_objects.items():
         # print(obj.layer_name)
         layer_name = obj.layer_name
         processed_layer_name = process_string(layer_name)
-        # print(processed_layer_name, layer_name)
+        #print(processed_layer_name, layer_name)
+        #print processed_layer_name["PROPERTY_TYPE"] 
         # --------------------------------------------------------------------------
         # simplex
         # --------------------------------------------------------------------------
         if processed_layer_name["PROPERTY_TYPE"] == "simplex":
-            # print("_____________simplex_________________", type(obj.geometry), layer_name)
+            #print("_____________simplex_________________", type(obj.geometry), layer_name)
             if str(type(obj.geometry)) == "<type 'Mesh'>":
                 o.simplex.append(conversions.from_rhino_mesh(obj.geometry))
             elif (
@@ -502,6 +507,7 @@ for group_id, subsequent_groups in grouped_objects.items():
                 or str(type(obj.geometry)) == "<type 'PolylineCurve'>"
             ):
                 o.simplex.append(conversions.from_rhino_polyline(obj.geometry))
+                #print(o.simplex)
         # --------------------------------------------------------------------------
         # frame
         # --------------------------------------------------------------------------
@@ -527,10 +533,35 @@ for group_id, subsequent_groups in grouped_objects.items():
         # complex
         # --------------------------------------------------------------------------
         elif processed_layer_name["PROPERTY_TYPE"] == "complex":
+            
             # print("______________________________")
             if str(type(obj.geometry)) == "<type 'Mesh'>":
                 o.complex.append(conversions.from_rhino_mesh(obj.geometry))
-
+            elif str(type(obj.geometry)) == "<type 'Brep'>":
+                brep = obj.geometry
+                mesh_params = MeshingParameters.Default
+                mesh_params.JaggedSeams = False;
+                mesh_params.ClosedObjectPostProcess = False;
+                mesh_params.ComputeCurvature = False;
+                mesh_params.SimplePlanes = True;             
+                mesh_params.GridAmplification = 0;
+                mesh_params.GridAngle = 0;
+                mesh_params.GridAspectRatio = 0;
+                mesh_params.GridMaxCount = 0;
+                mesh_params.GridMinCount = 0;
+                mesh_params.MaximumEdgeLength = 0;
+                mesh_params.MinimumEdgeLength = 1e10;
+                mesh_array = Rhino.Geometry.Mesh.CreateFromBrep(brep, mesh_params)
+                mesh = Rhino.Geometry.Mesh()
+                for m in mesh_array:
+                    mesh.Append(m)
+                mesh.Vertices.CombineIdentical(True, True);
+                mesh.UnifyNormals();
+                mesh.Compact();
+                #Rhino.RhinoDoc.ActiveDoc.Objects.AddMesh(mesh)
+                o.complex.append(conversions.from_rhino_mesh(mesh))
+                
+                
             elif (
                 str(type(obj.geometry)) == "<type 'LineCurve'>"
                 or str(type(obj.geometry)) == "<type 'NurbsCurve'>"
@@ -542,6 +573,7 @@ for group_id, subsequent_groups in grouped_objects.items():
         # --------------------------------------------------------------------------
         elif processed_layer_name["PROPERTY_TYPE"] == "id":
             if str(type(obj.geometry)) == "<type 'TextDot'>":
+                
 
                 def extract_integers_from_string(input_string):
                     integers = []
@@ -560,6 +592,18 @@ for group_id, subsequent_groups in grouped_objects.items():
                     return integers
 
                 o.id = extract_integers_from_string(obj.geometry.Text) + o.id
+        # --------------------------------------------------------------------------
+        # insertion line
+        # --------------------------------------------------------------------------
+        elif processed_layer_name["PROPERTY_TYPE"] == "insertion":
+            print(str(type(obj.geometry)))
+            if (
+                str(type(obj.geometry)) == "<type 'LineCurve'>"
+                or str(type(obj.geometry)) == "<type 'NurbsCurve'>"
+                or str(type(obj.geometry)) == "<type 'PolylineCurve'>"):
+                p0 = obj.geometry.PointAtStart
+                p1 = obj.geometry.PointAtEnd
+                o.insertion = Vector(p0.X-p1.X, p0.Y-p1.Y, p0.Z-p1.Z)
 
     # --------------------------------------------------------------------------
     # reassign center incase local and global frames are not given
@@ -592,15 +636,21 @@ for group_id, subsequent_groups in grouped_objects.items():
     # special case for plates, where the simplices must be sorted and split
     # --------------------------------------------------------------------------
     if o.name == "PLATE":
+        start = time.time()
         first_half, merged, frame = conversions.sort_polyline_pairs(o.simplex)
+        end = time.time()
+        print("time", 
+        end - start)
         # print(merged)
         # o.simplex = first_half
         o.frame = frame
+        
 
     # --------------------------------------------------------------------------
     # collect the element instance
     # --------------------------------------------------------------------------
     print(o)
+    print(o.insertion)
     elements.append(o)
 
 
@@ -608,4 +658,4 @@ for group_id, subsequent_groups in grouped_objects.items():
 # fill the compas_assembly_user_input with geometry and types
 # ==========================================================================
 # write data to file
-json_dump(data=elements, fp="rhino_command_convert_to_assembly_1.json", pretty=True)
+json_dump(data=elements, fp="rhino_command_convert_to_assembly_3.json", pretty=True)

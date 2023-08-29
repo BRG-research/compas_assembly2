@@ -702,11 +702,13 @@ class Viewer:
                         xform = Translation.from_vector(dict_elements_lists_of_elements[o.name][0].insertion * scale)
 
                         if dict_elements_lists_of_elements[o.name][1] > t / 100:
-                            o.opacity = 0
+                            o.is_visible = False
+
                             o.matrix = xform = Translation.from_vector(
                                 dict_elements_lists_of_elements[o.name][0].insertion
                             ).matrix
                         else:
+                            o.is_visible = True
                             o.opacity = opacity
                             if dict_elements_lists_of_elements[o.name][1] == math.floor(t / 100):
                                 o.matrix = xform.matrix

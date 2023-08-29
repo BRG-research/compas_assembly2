@@ -277,16 +277,16 @@ class Assembly(Data):
             _parent = _parent._parent
             counter = counter + 1
 
-        indentation = "│   " * counter
+        indentation = "|   " * counter
 
         elements_str = ", ".join([str(e) for e in assembly._elements.values()])
-        arrow = "─┐" if prefix else "─"
-        print("───────── Assembly name: ", assembly.name, f"{indentation}{prefix}{arrow} [{elements_str}]")
+        arrow = "|-" if prefix else "-"
+        print("--------- Assembly name: {} {} {} [{}]".format(assembly.name, indentation, prefix, arrow, elements_str))
 
         for idx, child in enumerate(assembly._assembly_childs):
-            child_prefix = "│   " if idx < len(assembly._assembly_childs) - 1 else "    "
-            arrow = "└──" if idx == len(assembly._assembly_childs) - 1 else "├──"
-            self.print_elements(child, child_prefix + arrow)
+            child_prefix = "|   " if idx < len(assembly._assembly_childs) - 1 else "    "
+            arrow = "`--" if idx == len(assembly._assembly_childs) - 1 else "|--"
+            self.print_elements(child, "{}{}".format(child_prefix, arrow))
 
     # ==========================================================================
     # TREE QUERING METHODS

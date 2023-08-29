@@ -955,6 +955,7 @@ if compas_wood_available:
     # CHANGE SIMPLEX AND COMPLEX OF ELEMENTS
     # ==========================================================================
     counter = 0
+    print(nested_lists)
     for element_list in nested_lists:
         for element in element_list:
             element.simplex = simplices[counter]
@@ -966,7 +967,7 @@ else:
 # ==========================================================================
 # assembly IN A DIFFERENT ASSEMBLY ORDER
 # ==========================================================================
-assembly_as_nested_list = assembly.to_lists()
+assembly_as_nested_list = assembly.to_lists(1)
 assembly_as_nested_list_reordered = []
 half = math.floor(len(assembly_as_nested_list) / 2)
 for i in range(half):
