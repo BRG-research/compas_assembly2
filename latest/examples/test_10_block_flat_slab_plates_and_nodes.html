@@ -129,201 +129,12 @@
     <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">elements_json</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
         <span class="n">assembly</span><span class="o">.</span><span class="n">add_element_by_index</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
-    <span class="c1"># collision_pairs = assembly.find_collisions_brute_force()</span>
-    <span class="c1"># # pair0 = collision_pairs[0]</span>
 
-    <span class="c1"># # print(assembly._elements._objects.keys()[0])</span>
-    <span class="c1"># # print(assembly._elements._objects[tuple(pair0[0])])</span>
-    <span class="c1"># # print(assembly._elements[pair0[0]])</span>
-    <span class="c1"># joints = assembly.find_joints(collision_pairs)</span>
-    <span class="c1"># print(joints)</span>
     <span class="n">geometry</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="c1"># for joint in joints:</span>
-    <span class="c1">#     geometry.append(joint.polygon)</span>
-
-    <span class="c1"># print(collision_pairs)</span>
 
     <span class="c1"># ==========================================================================</span>
     <span class="c1"># DETECT JOINTS</span>
     <span class="c1"># ==========================================================================</span>
-
-<span class="c1"># ==========================================================================</span>
-<span class="c1"># COMPAS_WOOD</span>
-<span class="c1"># ==========================================================================</span>
-<span class="k">if</span> <span class="n">compas_wood_available</span> <span class="ow">and</span> <span class="kc">False</span><span class="p">:</span>
-    <span class="c1"># ==========================================================================</span>
-    <span class="c1"># COMPAS_WOOD SCALE POLYLINES DUE TO TOLERANCE</span>
-    <span class="c1"># ==========================================================================</span>
-    <span class="n">simplices</span> <span class="o">=</span> <span class="n">assembly</span><span class="o">.</span><span class="n">get_elements_properties</span><span class="p">(</span><span class="s2">&quot;simplex&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
-    <span class="n">scale</span> <span class="o">=</span> <span class="n">Scale</span><span class="o">.</span><span class="n">from_factors</span><span class="p">([</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">])</span>
-    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">simplices</span><span class="p">:</span>
-        <span class="n">s</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">scale</span><span class="p">)</span>
-
-    <span class="c1"># ==========================================================================</span>
-    <span class="c1"># COMPAS_WOOD CREATE ADJACENCY</span>
-    <span class="c1"># ==========================================================================</span>
-    <span class="n">adjancency</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">nested_lists</span> <span class="o">=</span> <span class="n">assembly</span><span class="o">.</span><span class="n">to_lists</span><span class="p">()</span>
-    <span class="c1"># for i in range(len(nested_lists)):</span>
-    <span class="c1">#     adjancency.append(0 + 3 * i)</span>
-    <span class="c1">#     adjancency.append(2 + 3 * i)</span>
-    <span class="c1">#     adjancency.append(-1)</span>
-    <span class="c1">#     adjancency.append(-1)</span>
-    <span class="c1">#     adjancency.append(0 + 3 * i)</span>
-    <span class="c1">#     adjancency.append(1 + 3 * i)</span>
-    <span class="c1">#     adjancency.append(-1)</span>
-    <span class="c1">#     adjancency.append(-1)</span>
-
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">9</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">13</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">13</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">15</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">15</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">19</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">19</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">20</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">20</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">23</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">23</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">26</span><span class="p">,</span> <span class="mi">27</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">26</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">29</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">29</span><span class="p">,</span> <span class="mi">31</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">52</span><span class="p">,</span> <span class="mi">53</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">52</span><span class="p">,</span> <span class="mi">54</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">33</span><span class="p">,</span> <span class="mi">34</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">33</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">32</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">34</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">35</span><span class="p">,</span> <span class="mi">36</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">35</span><span class="p">,</span> <span class="mi">37</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">36</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">37</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">38</span><span class="p">,</span> <span class="mi">39</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">39</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">39</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">41</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">41</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">41</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">42</span><span class="p">,</span> <span class="mi">43</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">42</span><span class="p">,</span> <span class="mi">44</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">43</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">44</span><span class="p">,</span> <span class="mi">31</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">45</span><span class="p">,</span> <span class="mi">46</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">45</span><span class="p">,</span> <span class="mi">47</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">47</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">46</span><span class="p">,</span> <span class="mi">31</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">49</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">49</span><span class="p">,</span> <span class="mi">27</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">49</span><span class="p">,</span> <span class="mi">48</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">51</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">51</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">51</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">55</span><span class="p">,</span> <span class="mi">56</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">55</span><span class="p">,</span> <span class="mi">57</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">58</span><span class="p">,</span> <span class="mi">59</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">58</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">61</span><span class="p">,</span> <span class="mi">62</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">61</span><span class="p">,</span> <span class="mi">63</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">64</span><span class="p">,</span> <span class="mi">65</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">64</span><span class="p">,</span> <span class="mi">66</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">57</span><span class="p">,</span> <span class="mi">27</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">57</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">56</span><span class="p">,</span> <span class="mi">53</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">56</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">60</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">59</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">60</span><span class="p">,</span> <span class="mi">54</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">59</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">62</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">63</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">62</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">63</span><span class="p">,</span> <span class="mi">54</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">66</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">66</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">65</span><span class="p">,</span> <span class="mi">53</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">adjancency</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">65</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-
-    <span class="c1"># ==========================================================================</span>
-    <span class="c1"># COMPAS_WOOD RUN</span>
-    <span class="c1"># ==========================================================================</span>
-    <span class="n">division_length</span> <span class="o">=</span> <span class="mi">40</span>
-    <span class="n">joint_parameters</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">division_length</span><span class="p">,</span>
-        <span class="mf">0.5</span><span class="p">,</span>
-        <span class="mi">9</span><span class="p">,</span>
-        <span class="n">division_length</span> <span class="o">*</span> <span class="mf">1.5</span><span class="p">,</span>
-        <span class="mf">0.65</span><span class="p">,</span>
-        <span class="mi">10</span><span class="p">,</span>
-        <span class="n">division_length</span> <span class="o">*</span> <span class="mf">1.5</span><span class="p">,</span>
-        <span class="mf">0.5</span><span class="p">,</span>
-        <span class="mi">21</span><span class="p">,</span>
-        <span class="n">division_length</span><span class="p">,</span>
-        <span class="mf">0.95</span><span class="p">,</span>
-        <span class="mi">30</span><span class="p">,</span>
-        <span class="n">division_length</span><span class="p">,</span>
-        <span class="mf">0.95</span><span class="p">,</span>
-        <span class="mi">40</span><span class="p">,</span>
-        <span class="n">division_length</span><span class="p">,</span>
-        <span class="mf">0.95</span><span class="p">,</span>
-        <span class="mi">50</span><span class="p">,</span>
-    <span class="p">]</span>
-
-    <span class="n">simplices</span> <span class="o">=</span> <span class="n">get_connection_zones</span><span class="p">(</span><span class="n">simplices</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">adjancency</span><span class="p">,</span> <span class="n">joint_parameters</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">],</span> <span class="mi">4</span><span class="p">)</span>
-    <span class="c1"># ==========================================================================</span>
-    <span class="c1"># COMPAS_WOOD SCALE BACK TO ORIGINAL SCALE THE OUTLINES</span>
-    <span class="c1"># ==========================================================================</span>
-    <span class="n">scale</span> <span class="o">=</span> <span class="n">Scale</span><span class="o">.</span><span class="n">from_factors</span><span class="p">([</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">100</span><span class="p">])</span>
-    <span class="k">for</span> <span class="n">outlines</span> <span class="ow">in</span> <span class="n">simplices</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">outline</span> <span class="ow">in</span> <span class="n">outlines</span><span class="p">:</span>
-            <span class="n">outline</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">scale</span><span class="p">)</span>
-
-    <span class="c1"># ==========================================================================</span>
-    <span class="c1"># CHANGE SIMPLEX AND COMPLEX OF ELEMENTS</span>
-    <span class="c1"># ==========================================================================</span>
-    <span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">for</span> <span class="n">element_list</span> <span class="ow">in</span> <span class="n">nested_lists</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">element_list</span><span class="p">:</span>
-            <span class="n">element</span><span class="o">.</span><span class="n">simplex</span> <span class="o">=</span> <span class="n">simplices</span><span class="p">[</span><span class="n">counter</span><span class="p">]</span>
-            <span class="n">element</span><span class="o">.</span><span class="n">complex</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">_</span><span class="o">.</span><span class="n">Triagulator</span><span class="o">.</span><span class="n">from_loft_two_point_lists</span><span class="p">(</span><span class="n">simplices</span><span class="p">[</span><span class="n">counter</span><span class="p">][</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="n">simplices</span><span class="p">[</span><span class="n">counter</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">points</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="p">]</span>
-            <span class="n">counter</span> <span class="o">=</span> <span class="n">counter</span> <span class="o">+</span> <span class="mi">1</span>
 
 <span class="c1"># ==========================================================================</span>
 <span class="c1"># NEST ELEMENTS</span>
@@ -373,6 +184,8 @@
 <li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="test_9_block_flat_slab_plates_segmented_groups.html">test_9_block_flat_slab_plates_segmented_groups</a></li>
 <li class="toctree-l2 nav-item active"><a class="nav-link active reference internal" href="#">test_10_block_flat_slab_plates_and_nodes</a></li>
 <li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="test_11_block_flat_slab_plates_and_ribs.html">test_11_block_flat_slab_plates_and_ribs</a></li>
+<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="test_12_block_flat_slab_plates_and_frames.html">test_12_block_flat_slab_plates_and_frames</a></li>
+<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="test_13_block_flat_slab_plates_and_raw.html">test_13_block_flat_slab_plates_and_raw</a></li>
 </ul>
 </li>
 <li class="toctree-l1 nav-item"><a class="nav-link reference internal" href="../api.html">API Reference</a><ul class="nav flex-column collapse">
