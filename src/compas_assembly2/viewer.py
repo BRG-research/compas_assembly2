@@ -14,6 +14,7 @@ from compas.datastructures import Mesh
 from compas.colors import Color
 from compas_assembly2.fabrication import FABRICATION_TYPES
 import math
+import time
 
 # ==========================================================================
 # DISPLAY IN DIFFERENT VIEWERS
@@ -23,6 +24,8 @@ import math
 # ==========================================================================
 
 opacity = 0.9
+start = time.time()
+stop = False
 
 
 class Viewer:
@@ -294,7 +297,7 @@ class Viewer:
                             viewer_objects["viewer_simplices"].append(o)
 
                     # --------------------------------------------------------------------------
-                    # add display shapes
+                    # add complexes
                     # --------------------------------------------------------------------------
 
                     for i in range(len(element.complex)):
@@ -695,6 +698,44 @@ class Viewer:
                         o.opacity = opacity
 
                 # insertion vector visualization following the order of elements
+                start = time.time()
+
+                @viewer.button(text="run_insertion")
+                def reset_click():
+                    global stop
+                    stop = False
+
+                    @viewer.on(interval=1)
+                    def move(t):
+                        global stop
+                        if stop:
+                            return
+
+                        for id, o in enumerate(viewer_objects["viewer_complexes"]):
+                            scale = 1 - ((t / 12) % 1)
+                            xform = Translation.from_vector(
+                                dict_elements_lists_of_elements[o.name][0].insertion * scale
+                            )
+
+                            if dict_elements_lists_of_elements[o.name][1] > t / 12:
+                                o.is_visible = False
+
+                                o.matrix = xform = Translation.from_vector(
+                                    dict_elements_lists_of_elements[o.name][0].insertion
+                                ).matrix
+                            else:
+                                o.is_visible = True
+                                o.opacity = opacity
+                                if dict_elements_lists_of_elements[o.name][1] == math.floor(t / 12):
+                                    o.matrix = xform.matrix
+                                else:
+                                    o.matrix = xform = Translation.from_vector(Vector(0, 0, 0)).matrix
+
+                @viewer.button(text="stop_insertion")
+                def stop_click():
+                    global stop
+                    stop = True
+
                 @viewer.slider(title="insertion", maxval=len(lists_of_elements) * 100, step=1, value=0)  # type: ignore
                 def slider_insertion(t):
                     for id, o in enumerate(viewer_objects["viewer_complexes"]):

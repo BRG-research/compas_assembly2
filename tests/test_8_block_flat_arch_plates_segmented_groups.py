@@ -967,7 +967,7 @@ else:
 # ==========================================================================
 # assembly IN A DIFFERENT ASSEMBLY ORDER
 # ==========================================================================
-assembly_as_nested_list = assembly.to_lists(1)
+assembly_as_nested_list = assembly.to_lists(2)
 assembly_as_nested_list_reordered = []
 half = math.floor(len(assembly_as_nested_list) / 2)
 for i in range(half):

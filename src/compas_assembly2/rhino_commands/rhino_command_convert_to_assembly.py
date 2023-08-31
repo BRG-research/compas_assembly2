@@ -415,6 +415,31 @@ class conversions:
 
             compas_mesh = Mesh.from_polygons(polygons)
         return compas_mesh
+    
+    @classmethod
+    def from_rhino_brep(cls, brep):
+        mesh_params = MeshingParameters.Default
+        mesh_params.JaggedSeams = False
+        mesh_params.ClosedObjectPostProcess = False
+        mesh_params.ComputeCurvature = False
+        mesh_params.SimplePlanes = True
+        mesh_params.GridAmplification = 0
+        mesh_params.GridAngle = 0
+        mesh_params.GridAspectRatio = 0
+        mesh_params.GridMaxCount = 0
+        mesh_params.GridMinCount = 0
+        mesh_params.MaximumEdgeLength = 0
+        mesh_params.MinimumEdgeLength = 1e10
+        mesh_array = Rhino.Geometry.Mesh.CreateFromBrep(brep, mesh_params)
+        mesh = Rhino.Geometry.Mesh()
+        for m in mesh_array:
+            mesh.Append(m)
+        mesh.Vertices.CombineIdentical(True, True)
+        mesh.UnifyNormals()
+        mesh.Compact()
+        compas_mesh = conversions.from_rhino_mesh(mesh)
+        #Rhino.RhinoDoc.ActiveDoc.Objects.AddMesh(mesh)
+        return compas_mesh
 
 
 # ==========================================================================
@@ -439,10 +464,9 @@ def process_string(input_string):
                 substring = "".join(filter(str.isalpha, substring))
 
                 # Check if the string contains any of the specified substrings
-                # print(substring)
                 if "block" in input_string:
                     result["ELEMENT_NAME"] = "block"
-                elif "frame" in input_string:
+                elif "beam" in input_string:
                     result["ELEMENT_NAME"] = "beam"
                 elif "plate" in input_string:
                     result["ELEMENT_NAME"] = "plate"
@@ -479,7 +503,7 @@ for group_id, subsequent_groups in grouped_objects.items():
     # create objects, the assignment of right properties is dependent on user
     # --------------------------------------------------------------------------
     # TODO skip certain objects
-    # create element
+    # create elementcop 
     o = Element(
         # ensure that this name exists
         name=compas_assembly2.ELEMENT_NAME.exists(processed_layer_name["ELEMENT_NAME"].upper()),  # type: ignore
@@ -489,7 +513,7 @@ for group_id, subsequent_groups in grouped_objects.items():
     counter = counter + 1
 
     for obj in subsequent_groups:
-        # print(obj.layer_name)
+        #print(obj.layer_name, processed_layer_name["PROPERTY_TYPE"])
         layer_name = obj.layer_name
         processed_layer_name = process_string(layer_name)
         # print(processed_layer_name, layer_name)
@@ -534,39 +558,20 @@ for group_id, subsequent_groups in grouped_objects.items():
         # --------------------------------------------------------------------------
         elif processed_layer_name["PROPERTY_TYPE"] == "complex":
 
-            # print("______________________________")
+            #print("______________________________", type(obj.geometry))
             if str(type(obj.geometry)) == "<type 'Mesh'>":
                 o.complex.append(conversions.from_rhino_mesh(obj.geometry))
             elif str(type(obj.geometry)) == "<type 'Brep'>":
-                brep = obj.geometry
-                mesh_params = MeshingParameters.Default
-                mesh_params.JaggedSeams = False
-                mesh_params.ClosedObjectPostProcess = False
-                mesh_params.ComputeCurvature = False
-                mesh_params.SimplePlanes = True
-                mesh_params.GridAmplification = 0
-                mesh_params.GridAngle = 0
-                mesh_params.GridAspectRatio = 0
-                mesh_params.GridMaxCount = 0
-                mesh_params.GridMinCount = 0
-                mesh_params.MaximumEdgeLength = 0
-                mesh_params.MinimumEdgeLength = 1e10
-                mesh_array = Rhino.Geometry.Mesh.CreateFromBrep(brep, mesh_params)
-                mesh = Rhino.Geometry.Mesh()
-                for m in mesh_array:
-                    mesh.Append(m)
-                mesh.Vertices.CombineIdentical(True, True)
-                mesh.UnifyNormals()
-                mesh.Compact()
-                # Rhino.RhinoDoc.ActiveDoc.Objects.AddMesh(mesh)
-                o.complex.append(conversions.from_rhino_mesh(mesh))
-
+                o.complex.append(conversions.from_rhino_brep(obj.geometry))
+            elif str(type(obj.geometry)) == "<type 'Extrusion'>":
+                o.complex.append(conversions.from_rhino_brep(obj.geometry.ToBrep(True)))
             elif (
                 str(type(obj.geometry)) == "<type 'LineCurve'>"
                 or str(type(obj.geometry)) == "<type 'NurbsCurve'>"
                 or str(type(obj.geometry)) == "<type 'PolylineCurve'>"
             ):
                 o.complex.append(conversions.from_rhino_polyline(obj.geometry))
+            
         # --------------------------------------------------------------------------
         # id
         # --------------------------------------------------------------------------
@@ -594,7 +599,7 @@ for group_id, subsequent_groups in grouped_objects.items():
         # insertion line
         # --------------------------------------------------------------------------
         elif processed_layer_name["PROPERTY_TYPE"] == "insertion":
-            print(str(type(obj.geometry)))
+            #print(str(type(obj.geometry)))
             if (
                 str(type(obj.geometry)) == "<type 'LineCurve'>"
                 or str(type(obj.geometry)) == "<type 'NurbsCurve'>"
@@ -603,7 +608,7 @@ for group_id, subsequent_groups in grouped_objects.items():
                 p0 = obj.geometry.PointAtStart
                 p1 = obj.geometry.PointAtEnd
                 o.insertion = Vector(p0.X - p1.X, p0.Y - p1.Y, p0.Z - p1.Z)
-
+    
     # --------------------------------------------------------------------------
     # reassign center incase local and global frames are not given
     # --------------------------------------------------------------------------
@@ -638,7 +643,7 @@ for group_id, subsequent_groups in grouped_objects.items():
         start = time.time()
         first_half, merged, frame = conversions.sort_polyline_pairs(o.simplex)
         end = time.time()
-        print("time", end - start)
+        #print("time", end - start)
         # print(merged)
         # o.simplex = first_half
         o.frame = frame
@@ -647,7 +652,7 @@ for group_id, subsequent_groups in grouped_objects.items():
     # collect the element instance
     # --------------------------------------------------------------------------
     print(o)
-    print(o.insertion)
+    #print(len(o.complex))
     elements.append(o)
 
 
@@ -655,4 +660,4 @@ for group_id, subsequent_groups in grouped_objects.items():
 # fill the compas_assembly_user_input with geometry and types
 # ==========================================================================
 # write data to file
-json_dump(data=elements, fp="rhino_command_convert_to_assembly_3.json", pretty=True)
+json_dump(data=elements, fp="rhino_command_convert_to_assembly_1.json", pretty=False)

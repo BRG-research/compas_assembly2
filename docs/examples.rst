@@ -18,3 +18,5 @@ Examples
    examples/test_9_block_flat_slab_plates_segmented_groups
    examples/test_10_block_flat_slab_plates_and_nodes
    examples/test_11_block_flat_slab_plates_and_ribs
+   examples/test_12_block_flat_slab_plates_and_frames
+   examples/test_13_block_flat_slab_plates_and_raw
