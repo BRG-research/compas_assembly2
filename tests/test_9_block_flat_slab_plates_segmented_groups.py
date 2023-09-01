@@ -235,7 +235,7 @@ if compas_wood_available:
     # ==========================================================================
     # VIEW2
     # ==========================================================================
-    element_lists = assembly.to_lists(2)
+    element_lists = assembly.to_lists(1)
     Viewer.show_elements(
         element_lists, viewer_type="view2", show_grid=False, geometry=geometry
     )  # assembly._elements.to_trimmed_list("x")

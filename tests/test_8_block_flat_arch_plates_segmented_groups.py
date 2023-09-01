@@ -986,7 +986,7 @@ else:
 # ==========================================================================
 print(assembly)
 
-lists = assembly.to_lists(3)
+lists = assembly.to_lists(2)
 
 # assembly.print_elements()
 print(assembly._depth)

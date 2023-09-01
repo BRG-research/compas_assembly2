@@ -25,8 +25,6 @@ class Assembly_Child(Data):
         self._name = assembly._name
         self._level = self._parent._level + 1
         self._root._depth = max(self._root._depth, self._level)
-        print(self._root._depth)
-        print(self._root)
 
         # current elements of the child assembly
         # add current assembly elements to the root Assembly
@@ -48,7 +46,6 @@ class Assembly_Child(Data):
     def add_assembly(self, assembly):
         # change the root of the given assembly, because it can be different
         assembly._root = self._root
-        print("_______________________________________root", self._root)
 
         # construct the child assembly from the given assembly
         child_assembly = Assembly_Child(assembly, self)
