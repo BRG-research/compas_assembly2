@@ -18,8 +18,6 @@ if __name__ == "__main__":
     # ELEMENTS FROM JSON
     # ==========================================================================
     elements_json = json_load(fp="src/compas_assembly2/rhino_commands/rhino_command_convert_to_assembly_4.json")
-    for element in elements_json:
-        print(len(element.complex))
 
     # ==========================================================================
     # ELEMENTS NEST - TEST FABRICATION TYPE
@@ -32,7 +30,6 @@ if __name__ == "__main__":
     # ==========================================================================
     assembly = Assembly(name="elements_json")
     for element in elements_json:
-        print(element.id)
         assembly.add_element_by_index(element)
 
     geometry = []
@@ -50,7 +47,6 @@ FabricationNest.pack_elements(elements=assembly.to_list(), nest_type=2, inflate=
 # VIEW2
 # ==========================================================================
 element_lists = assembly.to_lists(2)
-print(element_lists)
 Viewer.show_elements(
     element_lists, viewer_type="view2", show_grid=False, geometry=geometry
 )  # assembly._elements.to_trimmed_list("x")

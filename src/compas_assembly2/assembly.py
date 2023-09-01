@@ -23,6 +23,10 @@ class Assembly_Child(Data):
         self._root._number_of_assemblies = self._root._number_of_assemblies + 1
         self._id = self._root._number_of_assemblies
         self._name = assembly._name
+        self._level = self._parent._level + 1
+        self._root._depth = max(self._root._depth, self._level)
+        print(self._root._depth)
+        print(self._root)
 
         # current elements of the child assembly
         # add current assembly elements to the root Assembly
@@ -42,11 +46,13 @@ class Assembly_Child(Data):
     # ASSEMBLY METHODS
     # --------------------------------------------------------------------------
     def add_assembly(self, assembly):
-        # change the root of the given assembly
+        # change the root of the given assembly, because it can be different
         assembly._root = self._root
+        print("_______________________________________root", self._root)
 
         # construct the child assembly from the given assembly
         child_assembly = Assembly_Child(assembly, self)
+        child_assembly._root = self._root
         self._assembly_childs.append(child_assembly)
 
         # add the assembly to the root dictionary
@@ -123,6 +129,8 @@ class Assembly(Data):
         self._assembly_childs = []  # there is no indexing for for assembly nesting
         self._assembly_dict = {}  # flat dictionary for the lookup using assembly ids
         self._number_of_assemblies = 0
+        self._level = 0
+        self._depth = 0
 
         # --------------------------------------------------------------------------
         # element dictionary
@@ -190,66 +198,56 @@ class Assembly(Data):
         return elements_list
 
     def _get_elements_by_level(self, assembly, level, elements_lists, current_level=1):
-        if current_level == level and assembly._assembly_childs:
+        """Get elements by level in recursively."""
+
+        if (current_level - 1) == level:
             child_elements_list = []
             for _elements_list in assembly._elements.values():
                 for element in _elements_list:
                     child_elements_list.append(element)
             elements_lists.append(child_elements_list)
+        else:
+            child_elements_list = []
+            for _elements_list in assembly._elements.values():
+                for element in _elements_list:
+                    child_elements_list.append(element)
 
-        if current_level < level:
+        if current_level <= level:
             for child_assembly in assembly._assembly_childs:
                 self._get_elements_by_level(child_assembly, level, elements_lists, current_level + 1)
 
-    def to_lists(self, level=1, sort_childs_by_index=True):
-        """Convert dictionary of _elements to a list of list of elements."""
+    def to_lists(self, level=0, sort_childs_by_index=True):
+        """Convert dictionary of _elements to a list of list of elements.
+        A - user give input zero or None, return one list of all elements
+        B - user gives from 1 to maximum depth, return a list of lists of elements in that level
+        C - user gives input bigger than maximum depth, return each element placed into an individual list"""
 
         elements_lists = []
 
-        if level is None:
+        # one big mass of assembly
+        if level is None or level <= 0:  # or level > self._depth
             for _elements_list in self._elements.values():
-                elements_lists.append(_elements_list)
+                elements_lists.extend(_elements_list)
+            elements_lists = [elements_lists]
+        # individual elements
+        elif level > self._depth:
+            for _elements_list in self._elements.values():
+                elements_lists.extend(_elements_list)
         else:
-            # get first level childs
+            # get N-th level childs
             self._get_elements_by_level(self, level, elements_lists)
-            # if self._assembly_childs:
-            #     for child_assembly in self._assembly_childs:
-            #         child_elements_list = []
-            #         for _elements_list in child_assembly._elements.values():
-            #             for element in _elements_list:
-            #                 child_elements_list.append(element)
-            #         elements_lists.append(child_elements_list)
 
-            # sort the childs by the id of element
-            if sort_childs_by_index:
-                tuple_list = []
-                for element_list in elements_lists:
-                    tuple_list.append(element_list[0].id)
+        # # sort the childs by the id of element
+        # if sort_childs_by_index:
+        #     tuple_list = []
+        #     for element_list in elements_lists:
+        #         tuple_list.append(element_list[0].id)
 
-                combined_list = list(zip(tuple_list, elements_lists))
-                combined_list.sort(key=lambda x: x[0])
-                elements_lists = [item[1] for item in combined_list]
+        #     combined_list = list(zip(tuple_list, elements_lists))
+        #     combined_list.sort(key=lambda x: x[0])
+        #     elements_lists = [item[1] for item in combined_list]
 
         return elements_lists
-
-        # # if the target index is 0, return the root assembly
-        # result = []
-
-        # queue = [self]
-
-        # while queue:
-
-        #     # remove the first element from the queue
-        #     assembly_child = queue.pop(0)
-
-        #     if assembly_nesting_level is None:
-        #         # collect the elements of the assembly
-        #         result.append(assembly_child._elements.values())
-
-        #         # keep adding childs to the queue until the target index is found
-        #         queue.extend(assembly_child._assembly_childs)
-
-        # return result  # Node not found
 
     def replace_in_empty(self, input_string, word, start_index, end_index):
         if start_index < 0 or end_index >= len(input_string):
@@ -267,6 +265,7 @@ class Assembly(Data):
         return new_string
 
     def print_elements(self, assembly=None, prefix=""):
+
         if assembly is None:
             assembly = self
 
@@ -312,6 +311,7 @@ class Assembly(Data):
             self.add_element(element)  # add elements to the parent assembly
             if element.id >= len(self._assembly_childs):
                 empty_assembly = Assembly(elements=[element])
+                empty_assembly._root = self._root
                 self.add_assembly(empty_assembly)
             else:
                 assembly = self._assembly_childs[element.id]
@@ -347,6 +347,7 @@ class Assembly(Data):
                 # print("parent_assembly", parent_assembly._id, self._root._number_of_assemblies)
                 if found_child is False:
                     assembly = Assembly(elements=[element], name=str(local_index))
+                    assembly._root = self._root
                     # print("create new assembly, parent_assembly", parent_assembly)
                     parent_assembly = parent_assembly.add_assembly(assembly)
                 else:
@@ -357,7 +358,7 @@ class Assembly(Data):
                 # print("parent_assembly", parent_assembly._id, self._root._number_of_assemblies)
 
     def add_assembly(self, assembly, name=None):
-        # change the root of the given assembly
+        # change the root of the given assembly to current assembly
         assembly.root = self._root
 
         # construct the child assembly from the given assembly
@@ -587,4 +588,4 @@ if __name__ == "__main__":
     #     print(assembly.get_elements_properties("simplex", True))
     #     print(assembly.get_elements_properties("simplex", False))
 
-    print(assembly.print_elements())
+    # assembly.print_elements()

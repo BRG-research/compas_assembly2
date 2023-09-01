@@ -848,6 +848,9 @@ for i in range(len(planes_assemblys0)):
     for temp_element in assembly._elements[id[0], id[1]]:
         temp_element.insertion = top_plate_planes[0].normal
 
+print("assembly", assembly)
+print("root", assembly._assembly_childs[0]._root)
+print("root", assembly._assembly_childs[1]._root)
 # ==========================================================================
 # NEST ELEMENTS
 # ==========================================================================
@@ -876,6 +879,7 @@ if compas_wood_available:
     # COMPAS_WOOD CREATE ADJACENCY
     # ==========================================================================
     adjancency = []
+    print(assembly)
     nested_lists = assembly.to_lists()
     for i in range(len(nested_lists)):
         adjancency.append(0 + 3 * i)
@@ -940,7 +944,7 @@ if compas_wood_available:
         0.95,
         50,
     ]
-    print(simplices)
+
     simplices = get_connection_zones(simplices, None, None, None, adjancency, joint_parameters, 2, [1, 1, 1.1], 4)
 
     # ==========================================================================
@@ -955,7 +959,6 @@ if compas_wood_available:
     # CHANGE SIMPLEX AND COMPLEX OF ELEMENTS
     # ==========================================================================
     counter = 0
-    print(nested_lists)
     for element_list in nested_lists:
         for element in element_list:
             element.simplex = simplices[counter]
@@ -967,26 +970,33 @@ else:
 # ==========================================================================
 # assembly IN A DIFFERENT ASSEMBLY ORDER
 # ==========================================================================
-assembly_as_nested_list = assembly.to_lists(2)
-assembly_as_nested_list_reordered = []
-half = math.floor(len(assembly_as_nested_list) / 2)
-for i in range(half):
-    assembly_as_nested_list_reordered.append(assembly_as_nested_list[i])
-    assembly_as_nested_list_reordered.append(assembly_as_nested_list[i + half])
+# assembly_as_nested_list = assembly.to_lists(2)
+# assembly_as_nested_list_reordered = []
+# half = math.floor(len(assembly_as_nested_list) / 2)
+# for i in range(half):
+#     assembly_as_nested_list_reordered.append(assembly_as_nested_list[i])
+#     assembly_as_nested_list_reordered.append(assembly_as_nested_list[i + half])
 
-if len(assembly_as_nested_list) % 2 == 1:
-    assembly_as_nested_list_reordered.append(assembly_as_nested_list[-1])
+# if len(assembly_as_nested_list) % 2 == 1:
+#     assembly_as_nested_list_reordered.append(assembly_as_nested_list[-1])
 
 
 # ==========================================================================
 # VIEWER
 # ==========================================================================
+print(assembly)
+
+lists = assembly.to_lists(3)
+
+# assembly.print_elements()
+print(assembly._depth)
+print(lists[0])
 color_red = [3] * assembly.number_of_elements
 color_red[0] = 0
 color_red[1] = 0
 color_red[2] = 0
 Viewer.show_elements(
-    assembly_as_nested_list_reordered,
+    lists,
     show_simplices=False,
     show_grid=False,
     measurements=measurements,
