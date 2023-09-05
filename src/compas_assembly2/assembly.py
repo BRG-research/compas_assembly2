@@ -13,89 +13,47 @@ from compas_assembly2.sorteddict import SortedDict
 import time
 
 
-class Assembly_Child(Data):
-    def __init__(self, assembly, parent, **kwargs):
-        super(Assembly_Child, self).__init__()
-
-        # indexing and naming
-        self._root = assembly._root
-        self._parent = parent
-        self._root._number_of_assemblies = self._root._number_of_assemblies + 1
-        self._id = self._root._number_of_assemblies
-        self._name = assembly._name
-        self._level = self._parent._level + 1
-        self._root._depth = max(self._root._depth, self._level)
-
-        # current elements of the child assembly
-        # add current assembly elements to the root Assembly
-        # WARNING: there is no check for duplicate objects
-        self._elements = SortedDict()
-        for elements in assembly._elements.values():
-            # since dictionary can have multiple elements with the same key, iterate over the list
-            for element in elements:
-                self.add_element(element)
-                # self._parent.add_element(element)
-
-        # child recursive tree
-        self._assembly_childs = []  # there is no indexing for assembly nesting
-        self._root._assembly_dict[self._id] = [self]
-
-    # --------------------------------------------------------------------------
-    # ASSEMBLY METHODS
-    # --------------------------------------------------------------------------
-    def add_assembly(self, assembly):
-        # change the root of the given assembly, because it can be different
-        assembly._root = self._root
-
-        # construct the child assembly from the given assembly
-        child_assembly = Assembly_Child(assembly, self)
-        child_assembly._root = self._root
-        self._assembly_childs.append(child_assembly)
-
-        # add the assembly to the root dictionary
-        if child_assembly._name in self._root._assembly_dict:
-            self._root._assembly_dict[child_assembly._name].append(child_assembly)
-        else:
-            self._root._assembly_dict[child_assembly._name] = [child_assembly]
-
-        return self._root._assembly_dict[child_assembly._name][-1]
-
-    # --------------------------------------------------------------------------
-    # ELEMENT METHODS
-    # --------------------------------------------------------------------------
-    def to_tuple(self, input_data):
-        if isinstance(input_data, int):
-            return (input_data,)
-        elif isinstance(input_data, (tuple, list)):
-            return tuple(input_data)
-        else:
-            raise ValueError("Input must be an integer, tuple, or list of integers")
-
-    def add_element(self, element):
-        # there are no assemblies, add the element to the root assembly
-        # print("child", element)
-        key = self.to_tuple(element.id)
-        if key in self._elements:
-            self._elements[key].append(element)
-        else:
-            self._elements[key] = [element]
-
-
 class Assembly(Data):
+    """
+    The compas_assembly2 represents:
+    - a collection of structural elements such as blocks, beams, nodes, and plates.
+    - it is a recursive structure reminiscent of the Composite pattern.
+    - an element is primarily a description of simple and complex geometry.
+    - initially elements do not have neither connectivity nor grouping information.
+    - the grouping and connectivity are added manually by the user or automatically by collision detection.
+    - an assembly can contain assemblies within assemblies.
+
+    The visual representation of the assembly structure is below:
+    - it means that the top-level assembly contains:
+        - a list _all_elements (to query by id)
+        - a list of child assemblies (to group elements)
+        - a graph (for connectivity between all elements)
+    """
+
     def __init__(self, name=None, elements=None, frame=None, **kwargs):
         """
-        The compas_assembly2 represents:
-            a collection of structural elements such as blocks, beams, nodes, and plates.
-            it is a recursive structure is reminiscent of the Composite pattern.
-            an element is primary a description of a simple and complex geometry.
-            initially elements do not have neither connectivity nor grouping information.
-            the grouping and connectivity is added manually by the user or automatically by collision detection.
-            assembly can contain assemblies within assemblies
-            the visual representation of the assembly structure is below:
-            it means that the top level assembly contains:
-                a list _all_elements (to query by id)
-                a list of child assemblies (to grouping elements)
-                a graph (for connectivity between all elements)
+        Initialize a new Assembly instance.
+
+        Args:
+            name (str): The name of the assembly. Default is "Root Assembly" if not provided.
+            elements (list): A list of elements to add to the assembly.
+            frame (Frame): The orientation frame for the assembly. Default is a default frame.
+            **kwargs: Additional keyword arguments.
+
+        Attributes:
+            _id (int): The unique identifier for this assembly.
+            _name (str): The name of the assembly.
+            attributes (dict): Additional attributes associated with the assembly.
+            _root: The root assembly in the assembly hierarchy.
+            _parent: The parent assembly to which this assembly belongs.
+            _assembly_childs (list): A list of child assemblies within this assembly.
+            _assembly_dict (dict): A dictionary for looking up assemblies by name.
+            _number_of_assemblies (int): The number of assemblies in the hierarchy.
+            _level (int): The level of this assembly within the assembly hierarchy.
+            _depth (int): The maximum depth of the assembly hierarchy.
+            _elements (SortedDict): A sorted dictionary containing elements associated with this assembly.
+            _graph (Graph): A graph for representing connectivity between elements.
+            _frame (Frame): The orientation frame of the assembly.
         """
 
         # --------------------------------------------------------------------------
@@ -106,11 +64,11 @@ class Assembly(Data):
         # --------------------------------------------------------------------------
         # declare index, naming and attributes
         # --------------------------------------------------------------------------
-        self._id = 0
+        # self._id = 0
         if name:
             self._name = name
         else:
-            self._name = "Root Assembly"
+            self._name = "-"
 
         self.attributes = {"name": name or "Assembly"}
         self.attributes.update(kwargs)
@@ -135,6 +93,7 @@ class Assembly(Data):
         self._elements = SortedDict()  # all elements in a model including nested assemblies ones
 
         if elements:
+            print("elements given")
             for element in elements:
                 # self.add_element_by_index(element)
                 key = self.to_tuple(element.id)
@@ -167,6 +126,18 @@ class Assembly(Data):
     # SETTER AND GETTER METHODS
     # ==========================================================================
     def to_tuple(self, input_data):
+        """
+        Convert input data to a tuple.
+
+        Args:
+            input_data: The input data to be converted.
+
+        Returns:
+            tuple: The converted input data as a tuple.
+
+        Raises:
+            ValueError: If the input data is not an integer, tuple, or list of integers.
+        """
         if isinstance(input_data, int):
             return (input_data,)
         elif isinstance(input_data, (tuple, list)):
@@ -174,11 +145,27 @@ class Assembly(Data):
         else:
             raise ValueError("Input must be an integer, tuple, or list of integers")
 
-    def __getitem__(self, index):  # id is a list
+    def __getitem__(self, index):
+        """
+        Get elements by their ID.
+
+        Args:
+            index: The ID of the elements to retrieve.
+
+        Returns:
+            list: A list of elements with the specified ID.
+        """
         key = self.to_tuple(index)
         return self._elements[key]
 
-    def __setitem__(self, index, element):  # id is a list
+    def __setitem__(self, index, element):
+        """
+        Set elements by their ID.
+
+        Args:
+            index: The ID of the elements to set.
+            element: The element to add or set.
+        """
         key = self.to_tuple(index)
         if key in self._elements:
             self._elements[key].append(element)
@@ -186,7 +173,12 @@ class Assembly(Data):
             self._elements[key] = [element]
 
     def to_list(self):
-        """Convert dictionary of _elements to a flat list of elements."""
+        """
+        Convert the dictionary of elements to a flat list of elements.
+
+        Returns:
+            list: A flat list of elements.
+        """
 
         elements_list = []
         for _elements_list in self._elements.values():
@@ -214,10 +206,16 @@ class Assembly(Data):
                 self._get_elements_by_level(child_assembly, level, elements_lists, current_level + 1)
 
     def to_lists(self, level=0, sort_childs_by_index=True):
-        """Convert dictionary of _elements to a list of list of elements.
-        A - user give input zero or None, return one list of all elements
-        B - user gives from 1 to maximum depth, return a list of lists of elements in that level
-        C - user gives input bigger than maximum depth, return each element placed into an individual list"""
+        """
+        Convert the dictionary of elements to a list of lists of elements, grouped by level.
+
+        Args:
+            level (int): The level to group elements by.
+            sort_childs_by_index (bool): Whether to sort child assemblies by their index.
+
+        Returns:
+            list: A list of lists of elements.
+        """
 
         elements_lists = []
 
@@ -247,6 +245,21 @@ class Assembly(Data):
         return elements_lists
 
     def replace_in_empty(self, input_string, word, start_index, end_index):
+        """
+        Replace characters within a string with a specified word.
+
+        Args:
+            input_string (str): The input string.
+            word (str): The word to replace characters with.
+            start_index (int): The starting index of the characters to replace.
+            end_index (int): The ending index of the characters to replace.
+
+        Returns:
+            str: The modified string.
+
+        Raises:
+            ValueError: If the indices are out of bounds.
+        """
         if start_index < 0 or end_index >= len(input_string):
             raise ValueError("Indices are out of bounds")
 
@@ -262,34 +275,49 @@ class Assembly(Data):
         return new_string
 
     def print_elements(self, assembly=None, prefix=""):
+        """
+        Print the elements and assembly structure.
+
+        Args:
+            assembly: The assembly to print. Defaults to the root assembly.
+            prefix (str): A prefix for indentation.
+
+        Example:
+            assembly.print_elements()  # Print the assembly structure.
+        """
 
         if assembly is None:
             assembly = self
 
-        _parent = assembly._parent
-        counter = 0
-
-        while _parent._id != 0:
-            _parent = _parent._parent
-            counter = counter + 1
-
-        indentation = "|   " * counter
+        indentation = "    " * assembly._level
 
         elements_str = ", ".join([str(e) for e in assembly._elements.values()])
-        arrow = "|-" if prefix else "-"
+        elements_str = ""
+
+        for e in assembly._elements.values():
+            elements_str = elements_str + str(e) + ", " + str(id(e[0]))
+        arrow = ">" if prefix else "-"
+
         print(
-            "--------- Assembly name: {} {} {} {} [{}]".format(assembly.name, indentation, prefix, arrow, elements_str)
+            "----- Assembly name: {} ----- lists {} {} {} [{}]".format(
+                assembly.name, indentation, prefix, arrow, elements_str
+            )
         )
 
         for idx, child in enumerate(assembly._assembly_childs):
-            child_prefix = "|   " if idx < len(assembly._assembly_childs) - 1 else "    "
-            arrow = "`--" if idx == len(assembly._assembly_childs) - 1 else "|--"
-            self.print_elements(child, "{}{}".format(child_prefix, arrow))
+            arrow = "--" if idx == len(assembly._assembly_childs) - 1 else "|--"
+            self.print_elements(child, "{}".format(arrow))
 
     # ==========================================================================
     # TREE QUERING METHODS
     # ==========================================================================
     def add_element(self, element):
+        """
+        Add an element to the assembly.
+
+        Args:
+            element: The element to add.
+        """
         # there are no assemblies, add the element to the root assembly
         key = self.to_tuple(element.id)
         # print("root", element, self)
@@ -299,8 +327,15 @@ class Assembly(Data):
             self._elements[key] = [element]
 
     def add_element_by_index(self, element):
-        """the element index can be a list, if it is the case, the case create assembly childs"""
-        # print("add_element_by_index", element.id, "\n")
+        """
+        Add an element to the assembly with an index.
+
+        Args:
+            element: The element to add.
+
+        Note:
+            The element index can be a list, creating nested assemblies if needed.
+        """
 
         # assemblies are created based on the assembly indices
         # option 1 - index is an integer
@@ -320,17 +355,18 @@ class Assembly(Data):
             # when the list is empty the element is added to the root assembly
             parent_assembly = self
 
-            self.add_element(element)  # add elements to the parent assembly
+            # self.add_element(element)  # add elements to the parent assembly
 
             # if the list is not empty we start adding elements iteratevely
             # parent assembly always contains child elements since they are references
-            for local_index in element.id:
+            for index, local_index in enumerate(element.id):
                 if isinstance(local_index, int) is False:
                     raise ValueError("Input must be an integer, tuple, or list of integers")
 
                 # check if there is any current child with the same name
                 # WARNING this can be optional, when assemblies with the same names must exist
                 found_child = False
+                print(parent_assembly)
                 for child in parent_assembly._assembly_childs:
                     # print("_________________________", child.name, local_index)
                     if child.name == str(local_index):
@@ -343,56 +379,122 @@ class Assembly(Data):
                 # print("local_index", local_index, "child_count", len(parent_assembly._assembly_childs))
                 # print("parent_assembly", parent_assembly._id, self._root._number_of_assemblies)
                 if found_child is False:
-                    assembly = Assembly(elements=[element], name=str(local_index))
+                    assembly = (
+                        Assembly(elements=[element], name=str(local_index))
+                        if index == len(element.id) - 1
+                        else Assembly(name=str(local_index))
+                    )
                     assembly._root = self._root
-                    # print("create new assembly, parent_assembly", parent_assembly)
                     parent_assembly = parent_assembly.add_assembly(assembly)
                 else:
-                    # print("add to existing assembly")
                     parent_assembly.add_element(element)
-                    # print("exists assembly, parent_assembly", parent_assembly)
-                    # print("add to existing assembly, parent_assembly", parent_assembly)
-                # print("parent_assembly", parent_assembly._id, self._root._number_of_assemblies)
 
-    def add_assembly(self, assembly, name=None):
+    def add_assembly(self, assembly):
+        """
+        Add a child assembly to this assembly.
+
+        Args:
+            assembly (Assembly): The child assembly to be added.
+            name (str): The name of the child assembly.
+
+        Returns:
+            Assembly: The added child assembly.
+        """
         # change the root of the given assembly to current assembly
-        assembly.root = self._root
+        # assembly.root = self._root
 
         # construct the child assembly from the given assembly
-        child_assembly = Assembly_Child(assembly, self._parent)
-        self._assembly_childs.append(child_assembly)
+        # for elements in assembly._elements.values():
+        #     for element in elements:
+        #         self.add_element_by_index(element)
+        # assembly._elements.clear()
+        temp_assembly = Assembly()
+        # temp_assembly._id = 0
+        if assembly._name:
+            temp_assembly._name = assembly.name
+        else:
+            temp_assembly._name = "-"
+
+        temp_assembly.attributes = {"name": temp_assembly._name or "Assembly"}
+        temp_assembly.attributes.update(assembly.attributes)
+
+        # --------------------------------------------------------------------------
+        # nested assemblies
+        # the lookup is possible by
+        #   1. using the recusive looping
+        #   2. using the assembly id
+        # --------------------------------------------------------------------------
+        temp_assembly._root = self
+        temp_assembly._parent = self
+        temp_assembly._assembly_childs = []  # there is no indexing for for assembly nesting
+        temp_assembly._assembly_dict = {}  # flat dictionary for the lookup using assembly ids
+        temp_assembly._number_of_assemblies = 0
+        temp_assembly._level = self._level + 1
+        temp_assembly._depth = max(self._root._depth, self._level + 1)
+
+        # --------------------------------------------------------------------------
+        # element dictionary
+        # --------------------------------------------------------------------------
+        temp_assembly._elements = SortedDict()  # all elements in a model including nested assemblies ones
+
+        if assembly._elements:
+            print("elements given")
+            for element_list in assembly._elements.values():
+                for element in element_list:
+                    print("element", element)
+                    # self.add_element_by_index(element)
+                    key = temp_assembly.to_tuple(element.id)
+                    if key in temp_assembly._elements:
+                        temp_assembly._elements[key].append(element)
+                    else:
+                        temp_assembly._elements[key] = [element]
+
+        temp_assembly._graph = Graph()  # for grouping elements
+
+        # --------------------------------------------------------------------------
+        # orientation frames
+        # if user does not give a frame, try to define it based on simplex
+        # --------------------------------------------------------------------------
+        if isinstance(temp_assembly._frame, Frame):
+            temp_assembly._frame = Frame.copy(temp_assembly._frame)
+        else:
+            temp_assembly._frame = Frame([0, 0, 0], [1, 0, 0], [0, 1, 0])
+
+        # --------------------------------------------------------------------------
+        # declare graph
+        # --------------------------------------------------------------------------
+        temp_assembly._graph.update_default_node_attributes(
+            {
+                "element_name": None,
+            }
+        )
+
+        # self._elements.update(assembly._elements)
+        # self.add_element_by_index(child_assembly)
+        self._assembly_childs.append(temp_assembly)
+        return temp_assembly
 
         # add the assembly to the root dictionary
-        if child_assembly.name in self._assembly_dict:
-            self._root._assembly_dict[child_assembly.name].append(child_assembly)
-        else:
-            self._root._assembly_dict[child_assembly.name] = [child_assembly]
+        # if child_assembly.name in self._assembly_dict:
+        #     self._root._assembly_dict[child_assembly.name].append(child_assembly)
+        # else:
+        #     self._root._assembly_dict[child_assembly.name] = [child_assembly]
 
-        return self._root._assembly_dict[child_assembly.name][-1]
-
-    def retrieve_assembly_by_index(self, val):
-
-        # if the target index is 0, return the root assembly
-        if val == 0:
-            return self
-
-        queue = [self]
-
-        while queue:
-
-            # remove the first element from the queue
-            assembly_child = queue.pop(0)
-
-            # check if the target index is found
-            if val == assembly_child._id:
-                return assembly_child
-
-            # keep adding childs to the queue until the target index is found
-            queue.extend(assembly_child._assembly_childs)
-
-        return None  # Node not found
+        # return self._root._assembly_dict[child_assembly.name][-1]
 
     def retrieve_assembly_by_name(self, val):
+        """
+        Retrieve an assembly by its name.
+
+        Args:
+            val (str): The name of the assembly to retrieve.
+
+        Returns:
+            Assembly: The retrieved assembly.
+
+        Note:
+            If the target name is "0," it returns the root assembly.
+        """
 
         # if the target index is 0, return the root assembly
         if val == 0:
@@ -419,7 +521,12 @@ class Assembly(Data):
     # ==========================================================================
     @property
     def number_of_elements(self):
-        """Get the number of elements in the assembly."""
+        """
+        Get the number of elements in the assembly.
+
+        Returns:
+            int: The number of elements.
+        """
         return len(self._elements)
 
     # ==========================================================================
@@ -440,25 +547,33 @@ class Assembly(Data):
 
     def get_by_key(self, key):
         """
-        Get the element(s) with the specified key.
+        Get elements by a specified key.
 
-        Parameters:
-            key (str): The t of the key to search for.
+        Args:
+            key (str): The key to search for in element attributes.
 
         Returns:
-            List[Element]: A list of Element objects that match the specified key and value.
+            list: A list of elements with the specified key.
 
         Example:
-            assembly.add(Element(id=(1, 2, 3), l_frame=None, g_frame=None, attr={'t': 'Block', 'm': 30}))
-            assembly.add(Element(id=(1, 3, 5), l_frame=None, g_frame=None, attr={'t': 'Beam', 'm': 25}))
-
-            result = assembly.get_by_key('t')
-            print(result)  # Output: [Element1, Element2]
+            assembly.get_by_key('t')  # Get elements with the 't' key in their attributes.
         """
         return [element.value for element in self._elements if key in element.attr]
 
     def get_elements_properties(self, property_name, flatten=True):
-        """Get properties of elements flattened (True) or in nested lists (False)."""
+        """
+        Get properties of elements flattened (True) or in nested lists (False).
+
+        Args:
+            property_name (str): The name of the property to retrieve.
+            flatten (bool): Whether to flatten the properties into a single list.
+
+        Returns:
+            list: A list of element properties.
+
+        Example:
+            assembly.get_elements_properties('length')  # Get lengths of all elements.
+        """
         elements_properties = []
         # for element_list in self._elements._objects.values():
         #     for element in element_list:
@@ -480,6 +595,15 @@ class Assembly(Data):
     # COLLISION DETECTION
     # ==========================================================================
     def find_collisions_brute_force(self):
+        """
+        Find collisions between elements using a brute-force approach.
+
+        Returns:
+            list: A list of collision pairs, each pair containing the IDs of colliding elements.
+
+        Note:
+            This method is for display purposes to check which elements are colliding.
+        """
         # start measuring time
         start_time = time.time()
 
@@ -515,6 +639,14 @@ class Assembly(Data):
     # JOINT DETECTION
     # ==========================================================================
     def find_joints(self, collision_pairs_as_element_ids):
+        """
+        Find joints between elements based on collision pairs.
+
+        Args:
+            collision_pairs_as_element_ids (list): A list of collision pairs, each pair containing element IDs.
+
+        Returns:
+        """
         # it is assumed that keys are single element lists
         joints = []
         for pair in collision_pairs_as_element_ids:
@@ -546,21 +678,48 @@ class Assembly(Data):
 # Example Usage:
 # ==============================================================================
 if __name__ == "__main__":
-    assembly = Assembly()
-    assembly.add_element_by_index(
-        Element(id=[1, 2, 3], frame=Frame.worldXY(), simplex=Point(0, 0, 0), attr={"t": "Block", "m": 30})
-    )
-    # print(assembly._elements)
-    # assembly.add_element_by_index(
-    #     Element(id=[1, 2, 3], frame=Frame.worldXY(), simplex=Point(1, 0, 0), attr={"t": "Block", "m": 30})
+
+    # this assembly has already nested assemblies by index
+    assembly_1 = Assembly()
+    # assembly_1.add_element(
+    #     Element(id=[1, 2, 3], frame=Frame.worldXY(), simplex=Point(0, 0, 0), attr={"t": "Block", "m": 30})
     # )
 
-    assembly.add_element_by_index(
-        Element(id=[1, 2, 4], frame=Frame.worldXY(), simplex=Point(1, 0, 0), attr={"t": "Block", "m": 30})
+    assembly_1.add_element_by_index(
+        Element(id=[1, 2, 3], frame=Frame.worldXY(), simplex=Point(0, 0, 0), attr={"t": "Block", "m": 30})
     )
-    # assembly.add_element_by_index(
+    print("__________________________________________________________________________________________")
+    assembly_1.print_elements()
+    # print(assembly_1._assembly_childs[0]._assembly_childs[0]._assembly_childs[0]._level)
+    print("__________________________________________________________________________________________")
+
+    # if you add this assembly to another assembly
+    assembly_0 = Assembly()
+    assembly_0.add_assembly(assembly_1)
+    # assembly_0.add_assembly(assembly_1)
+    # assembly_0._assembly_childs[0].add_assembly(assembly_1)
+    # assembly_0._assembly_childs[0]._assembly_childs[0].add_assembly(assembly_1)
+
+    # # assembly.add_element_by_index(
+    # #     Element(id=[1, 2, 3], frame=Frame.worldXY(), simplex=Point(1, 0, 0), attr={"t": "Block", "m": 30})
+    # # )
+
+    assembly_0.print_elements()
+    print("__________________________________________________________________________________________")
+    # assembly_0.add_element_by_index(
+    #     Element(id=[1, 2, 4], frame=Frame.worldXY(), simplex=Point(1, 0, 0), attr={"t": "Block", "m": 30})
+    # )
+
+    # assembly_1 = Assembly()
+
+    # assembly_1.add_element_by_index(
     #     Element(id=[3, 0, 3], frame=Frame.worldXY(), simplex=Point(0, 5, 0), attr={"t": "Beam", "m": 25})
     # )
+
+    # assembly_0.add_assembly(assembly_1)
+
+    # print(assembly_0.print_elements())
+
     # assembly.add_element_by_index(
     #     Element(id=[3, 1, 3], frame=Frame.worldXY(), simplex=Point(0, 5, 0), attr={"t": "Beam", "m": 25})
     # )
