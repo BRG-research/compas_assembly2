@@ -4,7 +4,7 @@ import pytest
 
 
 @pytest.fixture
-def setup_assemblies_merging_0():
+def setup_assemblies():
     # Create an empty assembly and add an element by index
     assembly_1 = Assembly(name="b")
     assembly_1._allow_duplicate_assembly_names = False
@@ -15,13 +15,13 @@ def setup_assemblies_merging_0():
     # Create another empty assembly and add the previous assembly to this assembly
     assembly_0 = Assembly(name="a")
     assembly_0._allow_duplicate_assembly_names = False
-    assembly_0.add_assembly(assembly_1, True)
+    assembly_0.add_assembly(assembly_1)
 
     return assembly_0
 
 
-def test_add_element_by_index_to_empty_assembly_and_merge_it_with_empty_assembly(setup_assemblies_merging_0):
-    assembly_0 = setup_assemblies_merging_0
+def test_add_element_by_index_to_empty_assembly_and_merge_it_with_empty_assembly(setup_assemblies):
+    assembly_0 = setup_assemblies
 
     # Print the result (for debugging purposes)
     assembly_0.print_elements()
