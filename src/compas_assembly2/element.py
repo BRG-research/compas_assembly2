@@ -1203,7 +1203,7 @@ class Element(Data):
         Returns:
             str: The string representation of the Element.
         """
-        return """Type: {0}, ID: {1}""".format(self.name, self.id)
+        return """TYPE {0}, ID {1}, MEM {2}""".format(self.name, self.id, id(self))
 
 
 class _:
