@@ -94,60 +94,6 @@
         <section id="test-11-block-flat-slab-plates-and-ribs">
 <h1>test_11_block_flat_slab_plates_and_ribs</h1>
 <a class="reference internal image-reference" href="../_images/test_11_block_flat_slab_plates_and_ribs.gif"><img alt="compas_assembly2" class="align-right" src="../_images/test_11_block_flat_slab_plates_and_ribs.gif" style="width: 100%;" /></a>
-<div class="language-python notranslate"><div class="highlight"><pre><button class="btn copy"><i class="far fa-copy"></i></button><code><span></span><span class="kn">from</span> <span class="nn">compas_assembly2</span> <span class="kn">import</span> <span class="n">Viewer</span><span class="p">,</span> <span class="n">FabricationNest</span><span class="p">,</span> <span class="n">Assembly</span>
-
-<span class="c1"># https://compas.dev/compas/latest/reference/generated/compas.data.Data.html</span>
-<span class="kn">from</span> <span class="nn">compas.data</span> <span class="kn">import</span> <span class="n">json_load</span>
-<span class="kn">from</span> <span class="nn">compas.geometry</span> <span class="kn">import</span> <span class="n">Scale</span>
-<span class="kn">from</span> <span class="nn">compas_assembly2.element</span> <span class="kn">import</span> <span class="n">_</span>
-
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">compas_wood.joinery</span> <span class="kn">import</span> <span class="n">get_connection_zones</span>
-
-    <span class="n">compas_wood_available</span> <span class="o">=</span> <span class="kc">True</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;compas_wood package not available. Please install it.&quot;</span><span class="p">)</span>
-    <span class="n">compas_wood_available</span> <span class="o">=</span> <span class="kc">False</span>
-
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="c1"># ==========================================================================</span>
-    <span class="c1"># ELEMENTS FROM JSON</span>
-    <span class="c1"># ==========================================================================</span>
-    <span class="n">elements_json</span> <span class="o">=</span> <span class="n">json_load</span><span class="p">(</span><span class="n">fp</span><span class="o">=</span><span class="s2">&quot;src/compas_assembly2/rhino_commands/rhino_command_convert_to_assembly_3.json&quot;</span><span class="p">)</span>
-
-    <span class="c1"># ==========================================================================</span>
-    <span class="c1"># ELEMENTS NEST - TEST FABRICATION TYPE</span>
-    <span class="c1"># This can be a function in a class that inherits from FABRICATION class</span>
-    <span class="c1"># ==========================================================================</span>
-    <span class="n">elements_json</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">element</span><span class="p">:</span> <span class="n">element</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-    <span class="c1"># ==========================================================================</span>
-    <span class="c1"># COLLIDE ELEMENTS</span>
-    <span class="c1"># ==========================================================================</span>
-    <span class="n">assembly</span> <span class="o">=</span> <span class="n">Assembly</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;elements_json&quot;</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">elements_json</span><span class="p">:</span>
-        <span class="n">assembly</span><span class="o">.</span><span class="n">add_element_by_index</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
-
-    <span class="n">geometry</span> <span class="o">=</span> <span class="p">[]</span>
-
-    <span class="c1"># ==========================================================================</span>
-    <span class="c1"># DETECT JOINTS</span>
-    <span class="c1"># ==========================================================================</span>
-
-<span class="c1"># ==========================================================================</span>
-<span class="c1"># NEST ELEMENTS</span>
-<span class="c1"># ==========================================================================</span>
-<span class="n">FabricationNest</span><span class="o">.</span><span class="n">pack_elements</span><span class="p">(</span><span class="n">elements</span><span class="o">=</span><span class="n">assembly</span><span class="o">.</span><span class="n">to_list</span><span class="p">(),</span> <span class="n">nest_type</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">inflate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">height_step</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-
-<span class="c1"># ==========================================================================</span>
-<span class="c1"># VIEW2</span>
-<span class="c1"># ==========================================================================</span>
-<span class="n">element_lists</span> <span class="o">=</span> <span class="n">assembly</span><span class="o">.</span><span class="n">to_lists</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">Viewer</span><span class="o">.</span><span class="n">show_elements</span><span class="p">(</span>
-    <span class="n">element_lists</span><span class="p">,</span> <span class="n">viewer_type</span><span class="o">=</span><span class="s2">&quot;view2&quot;</span><span class="p">,</span> <span class="n">show_grid</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">geometry</span>
-<span class="p">)</span>  <span class="c1"># assembly._elements.to_trimmed_list(&quot;x&quot;)</span>
-</code></pre></div>
-</div>
 </section>
 
         
