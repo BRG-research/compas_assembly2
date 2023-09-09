@@ -3,7 +3,7 @@
 
 <head>
   
-  <title>compas_assembly2 - Assembly.transformed</title>
+  <title>compas_assembly2 - Assembly.merge_assemblies</title>
   
 
   <meta charset="utf-8" />
@@ -20,11 +20,11 @@
   <link rel="stylesheet" type="text/css" href="../../_static/css/compas-reference.css" />
 
   
-  <link rel="next" title="Assembly.ToString" href="compas_assembly2.assembly.Assembly.ToString.html" />
+  <link rel="next" title="Assembly.orient" href="compas_assembly2.assembly.Assembly.orient.html" />
   
 
   
-  <link rel="prev" title="Assembly.transform" href="compas_assembly2.assembly.Assembly.transform.html" />
+  <link rel="prev" title="Assembly.get_elements_properties" href="compas_assembly2.assembly.Assembly.get_elements_properties.html" />
   
 
   <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
@@ -88,19 +88,27 @@
             
             <li class="breadcrumb-item"><a href="compas_assembly2.assembly.Assembly.html">Assembly</a></li>
             
-            <!-- <li class="breadcrumb-item active" aria-current="page">Assembly.transformed</li> -->
+            <!-- <li class="breadcrumb-item active" aria-current="page">Assembly.merge_assemblies</li> -->
           </ol>
         </nav>
         
 
         
         
-        <section class="detail" id="assembly-transformed">
-<h1>Assembly.transformed</h1>
+        <section class="detail" id="assembly-merge-assemblies">
+<h1>Assembly.merge_assemblies</h1>
 <dl class="py method">
-<dt class="sig sig-object py" id="compas_assembly2.assembly.Assembly.transformed">
-<span class="sig-prename descclassname"><span class="pre">Assembly.</span></span><span class="sig-name descname"><span class="pre">transformed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transformation</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BRG-research/compas_assembly2/blob/master/src/compas_assembly2/assembly.py#L920"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="compas_assembly2.assembly.Assembly.merge_assemblies">
+<span class="sig-prename descclassname"><span class="pre">Assembly.</span></span><span class="sig-name descname"><span class="pre">merge_assemblies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">assembly</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BRG-research/compas_assembly2/blob/master/src/compas_assembly2/assembly.py#L540"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Merge a child assembly to this assembly.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>assembly (Assembly): The child assembly to be added.
+name (str): The name of the child assembly.</p>
+</dd>
+<dt>Returns:</dt><dd><p>Assembly: The added child assembly.</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 
@@ -162,7 +170,7 @@
       <div class="d-none d-xl-block col-xl-2 compas-toc" role="toc">
         
         <ul class="nav flex-column" id="compas-toc">
-<li class="nav-item"><a class="nav-link reference internal" href="#">Assembly.transformed</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="#">Assembly.merge_assemblies</a></li>
 </ul>
 
       </div>
@@ -174,20 +182,20 @@
   <footer class="compas-footer">
     <nav class="nav p-2">
       
-      <a href="compas_assembly2.assembly.Assembly.transform.html" title="Assembly.transform" class="nav-link footer-link float-start text-left d-flex w-50" rel="prev">
+      <a href="compas_assembly2.assembly.Assembly.get_elements_properties.html" title="Assembly.get_elements_properties" class="nav-link footer-link float-start text-left d-flex w-50" rel="prev">
         <div class="nav-button p-2 m-2"><i class="fas fa-arrow-left"></i></div>
         <div class="nav-title flex-grow-1 align-self-center">
           <div class="nav-direction small font-weight-light">Previous</div>
-          Assembly.transform
+          Assembly.get_elements_properties
         </div>
       </a>
       
 
       
-      <a href="compas_assembly2.assembly.Assembly.ToString.html" title="Assembly.ToString" class="nav-link footer-link float-end text-right d-flex w-50" rel="next">
+      <a href="compas_assembly2.assembly.Assembly.orient.html" title="Assembly.orient" class="nav-link footer-link float-end text-right d-flex w-50" rel="next">
         <div class="nav-title footer-link flex-grow-1 align-self-center">
           <div class="nav-direction small font-weight-light">Next</div>
-          Assembly.ToString
+          Assembly.orient
         </div>
         <div class="nav-button p-2 m-2"><i class="fas fa-arrow-right"></i></div>
       </a>

@@ -3,7 +3,7 @@
 
 <head>
   
-  <title>compas_assembly2 - Assembly.transformed</title>
+  <title>compas_assembly2 - Assembly.find_child_by_name</title>
   
 
   <meta charset="utf-8" />
@@ -20,11 +20,11 @@
   <link rel="stylesheet" type="text/css" href="../../_static/css/compas-reference.css" />
 
   
-  <link rel="next" title="Assembly.ToString" href="compas_assembly2.assembly.Assembly.ToString.html" />
+  <link rel="next" title="Assembly.find_collisions_brute_force" href="compas_assembly2.assembly.Assembly.find_collisions_brute_force.html" />
   
 
   
-  <link rel="prev" title="Assembly.transform" href="compas_assembly2.assembly.Assembly.transform.html" />
+  <link rel="prev" title="Assembly.copy" href="compas_assembly2.assembly.Assembly.copy.html" />
   
 
   <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
@@ -88,19 +88,22 @@
             
             <li class="breadcrumb-item"><a href="compas_assembly2.assembly.Assembly.html">Assembly</a></li>
             
-            <!-- <li class="breadcrumb-item active" aria-current="page">Assembly.transformed</li> -->
+            <!-- <li class="breadcrumb-item active" aria-current="page">Assembly.find_child_by_name</li> -->
           </ol>
         </nav>
         
 
         
         
-        <section class="detail" id="assembly-transformed">
-<h1>Assembly.transformed</h1>
+        <section class="detail" id="assembly-find-child-by-name">
+<h1>Assembly.find_child_by_name</h1>
 <dl class="py method">
-<dt class="sig sig-object py" id="compas_assembly2.assembly.Assembly.transformed">
-<span class="sig-prename descclassname"><span class="pre">Assembly.</span></span><span class="sig-name descname"><span class="pre">transformed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transformation</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BRG-research/compas_assembly2/blob/master/src/compas_assembly2/assembly.py#L920"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="compas_assembly2.assembly.Assembly.find_child_by_name">
+<span class="sig-prename descclassname"><span class="pre">Assembly.</span></span><span class="sig-name descname"><span class="pre">find_child_by_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_assemblies</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">my_assembly</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BRG-research/compas_assembly2/blob/master/src/compas_assembly2/assembly.py#L526"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>check if any of the child assembly have the same name
+if it does return its index
+only the first occurence is checked</p>
+</dd></dl>
 
 </section>
 
@@ -162,7 +165,7 @@
       <div class="d-none d-xl-block col-xl-2 compas-toc" role="toc">
         
         <ul class="nav flex-column" id="compas-toc">
-<li class="nav-item"><a class="nav-link reference internal" href="#">Assembly.transformed</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="#">Assembly.find_child_by_name</a></li>
 </ul>
 
       </div>
@@ -174,20 +177,20 @@
   <footer class="compas-footer">
     <nav class="nav p-2">
       
-      <a href="compas_assembly2.assembly.Assembly.transform.html" title="Assembly.transform" class="nav-link footer-link float-start text-left d-flex w-50" rel="prev">
+      <a href="compas_assembly2.assembly.Assembly.copy.html" title="Assembly.copy" class="nav-link footer-link float-start text-left d-flex w-50" rel="prev">
         <div class="nav-button p-2 m-2"><i class="fas fa-arrow-left"></i></div>
         <div class="nav-title flex-grow-1 align-self-center">
           <div class="nav-direction small font-weight-light">Previous</div>
-          Assembly.transform
+          Assembly.copy
         </div>
       </a>
       
 
       
-      <a href="compas_assembly2.assembly.Assembly.ToString.html" title="Assembly.ToString" class="nav-link footer-link float-end text-right d-flex w-50" rel="next">
+      <a href="compas_assembly2.assembly.Assembly.find_collisions_brute_force.html" title="Assembly.find_collisions_brute_force" class="nav-link footer-link float-end text-right d-flex w-50" rel="next">
         <div class="nav-title footer-link flex-grow-1 align-self-center">
           <div class="nav-direction small font-weight-light">Next</div>
-          Assembly.ToString
+          Assembly.find_collisions_brute_force
         </div>
         <div class="nav-button p-2 m-2"><i class="fas fa-arrow-right"></i></div>
       </a>
