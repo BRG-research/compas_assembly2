@@ -550,7 +550,7 @@ class Assembly(Data):
         """
 
         temp_assembly = Assembly()
-        # temp_assembly._id = 0
+
         if assembly._name:
             temp_assembly._name = assembly.name
         else:
@@ -573,7 +573,6 @@ class Assembly(Data):
         temp_assembly._number_of_assemblies = 0
         temp_assembly._level = self._level + 1
         temp_assembly._depth = max(self._depth, temp_assembly._level)
-        
 
         # --------------------------------------------------------------------------
         # element dictionary
@@ -659,27 +658,36 @@ class Assembly(Data):
 
             temp_assembly_child = queue.pop(0)
             # 2. check if any of the child has the same name
-            print("\n___", assembly_to_insert._name)
-            id = self.find_child_by_name(self._assembly_childs, assembly_to_insert)
-
             
+            id = self.find_child_by_name(assembly_to_insert_into._assembly_childs, assembly_to_insert)
+            print("\n___", assembly_to_insert._name, "___ ", id)
 
             # 3. if it does
             if (id > -1):
 
-                print("\n___", self._assembly_childs[id]._name, assembly_to_insert._name, assembly_to_insert._assembly_childs[0]._name)
+                print("\n___", 
+                      self._assembly_childs[id]._name,
+                      assembly_to_insert._name)
                 ids.append(id)
 
                 # replace current queue with the found assembly childs
                 queue = list(temp_assembly_child._assembly_childs)
-                assembly_to_insert_into = self._assembly_childs[id]
+                assembly_to_insert_into = assembly_to_insert_into._assembly_childs[id]
 
-                # the insertable assembly gets truncated
-                assembly_to_insert = assembly_to_insert._assembly_childs[0]
+                if (len(assembly_to_insert._assembly_childs) > 0):
+                    # the insertable assembly gets truncated
+                    assembly_to_insert = assembly_to_insert._assembly_childs[0]
                 continue
+        #else:
+        # 3. if does not
+        # a) add element
+        # b) add assembly with elements or subassemblies with elements
+        print(assembly_to_insert._elements.values()[0])
+        assembly_to_insert_into.add_element(assembly_to_insert._elements.values()[0][0])
 
-        print("______________", ids)
-        assembly_to_insert_into.add_assembly(temp_assembly)
+                # assembly_to_insert_into.add_element()
+
+        #assembly_to_insert_into.add_assembly(temp_assembly)
         return temp_assembly
 
     def retrieve_assembly_by_name(self, val):
