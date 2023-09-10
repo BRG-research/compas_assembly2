@@ -66,7 +66,7 @@ class Assembly(Data):
         # --------------------------------------------------------------------------
         # declare index, naming and attributes
         # --------------------------------------------------------------------------
-        # self._id = 0
+
         if name:
             self._name = name
         else:
@@ -84,10 +84,16 @@ class Assembly(Data):
         self._allow_duplicate_assembly_names = False
         self._root = self
         self._parent = self
-        self._assembly_childs = []  # there is no indexing for for assembly nesting
+        self._assembly_childs = []  # there is no indexing for assembly nesting
         self._assembly_dict = {}  # flat dictionary for the lookup using assembly names
         self._number_of_assemblies = 0
         self._level = 0
+        self._depth = 0
+
+        # --------------------------------------------------------------------------
+        # root assembly properties
+        # --------------------------------------------------------------------------
+        if ()
         self._depth = 0
 
         # --------------------------------------------------------------------------
@@ -123,6 +129,7 @@ class Assembly(Data):
                 "element_name": None,
             }
         )
+
 
     # ==========================================================================
     # SETTER AND GETTER METHODS
@@ -427,7 +434,7 @@ class Assembly(Data):
         """
 
         temp_assembly = Assembly()
-        # temp_assembly._id = 0
+
         if assembly._name:
             temp_assembly._name = assembly.name
         else:
@@ -549,146 +556,163 @@ class Assembly(Data):
             Assembly: The added child assembly.
         """
 
-        temp_assembly = Assembly()
+        # temp_assembly = Assembly()
 
-        if assembly._name:
-            temp_assembly._name = assembly.name
-        else:
-            temp_assembly._name = "-"
+        # if assembly._name:
+        #     temp_assembly._name = assembly.name
+        # else:
+        #     temp_assembly._name = "-"
 
-        temp_assembly.attributes = {"name": temp_assembly._name or "Assembly"}
-        temp_assembly.attributes.update(assembly.attributes)
+        # temp_assembly.attributes = {"name": temp_assembly._name or "Assembly"}
+        # temp_assembly.attributes.update(assembly.attributes)
 
-        # --------------------------------------------------------------------------
-        # nested assemblies
-        # the lookup is possible by
-        #   1. using the recusive looping
-        #   2. using the assembly id
-        # --------------------------------------------------------------------------
-        temp_assembly._root = self
-        temp_assembly._name = assembly._name
-        temp_assembly._parent = self
-        temp_assembly._assembly_childs = assembly._assembly_childs  # there is no indexing for assembly nesting
-        temp_assembly._assembly_dict = {}  # flat dictionary for the lookup using assembly ids
-        temp_assembly._number_of_assemblies = 0
-        temp_assembly._level = self._level + 1
-        temp_assembly._depth = max(self._depth, temp_assembly._level)
+        # # --------------------------------------------------------------------------
+        # # nested assemblies
+        # # the lookup is possible by
+        # #   1. using the recusive looping
+        # #   2. using the assembly id
+        # # --------------------------------------------------------------------------
+        # temp_assembly._root = self
+        # temp_assembly._name = assembly._name
+        # temp_assembly._parent = self
+        # temp_assembly._assembly_childs = assembly._assembly_childs  # there is no indexing for assembly nesting
+        # temp_assembly._assembly_dict = {}  # flat dictionary for the lookup using assembly ids
+        # temp_assembly._number_of_assemblies = 0
+        # temp_assembly._level = self._level + 1
+        # temp_assembly._depth = max(self._depth, temp_assembly._level)
 
-        # --------------------------------------------------------------------------
-        # element dictionary
-        # --------------------------------------------------------------------------
-        temp_assembly._elements = SortedDict()
+        # # --------------------------------------------------------------------------
+        # # element dictionary
+        # # --------------------------------------------------------------------------
+        # temp_assembly._elements = SortedDict()
 
-        if assembly._elements:
-            for element_list in assembly._elements.values():
-                for element in element_list:
-                    key = temp_assembly.to_tuple(element.id)
-                    if key in temp_assembly._elements:
-                        temp_assembly._elements[key].append(element)
-                    else:
-                        temp_assembly._elements[key] = [element]
+        # if assembly._elements:
+        #     for element_list in assembly._elements.values():
+        #         for element in element_list:
+        #             key = temp_assembly.to_tuple(element.id)
+        #             if key in temp_assembly._elements:
+        #                 temp_assembly._elements[key].append(element)
+        #             else:
+        #                 temp_assembly._elements[key] = [element]
 
-        temp_assembly._graph = Graph()  # for grouping elements
+        # temp_assembly._graph = Graph()  # for grouping elements
 
-        # --------------------------------------------------------------------------
-        # assembly childs dictionary
-        # update inner assemblies
-        # --------------------------------------------------------------------------
-        queue = list(temp_assembly._assembly_childs)
+        # # --------------------------------------------------------------------------
+        # # assembly childs dictionary
+        # # update inner assemblies
+        # # --------------------------------------------------------------------------
+        # queue = list(temp_assembly._assembly_childs)
 
-        while queue:
-            temp_assembly_child = queue.pop(0)
-            # -->
-            temp_assembly_child._root = self
-            temp_assembly_child._level = temp_assembly_child._level + 1
-            self._root._depth = max(self._root._depth, temp_assembly_child._level)
-            # <--
-            queue.extend(temp_assembly_child._assembly_childs)
+        # while queue:
+        #     temp_assembly_child = queue.pop(0)
+        #     # -->
+        #     temp_assembly_child._root = self
+        #     temp_assembly_child._level = temp_assembly_child._level + 1
+        #     self._root._depth = max(self._root._depth, temp_assembly_child._level)
+        #     # <--
+        #     queue.extend(temp_assembly_child._assembly_childs)
 
-        # --------------------------------------------------------------------------
-        # reassign depths
-        # --------------------------------------------------------------------------
-        queue = list(temp_assembly._assembly_childs)
-        temp_assembly._depth = self._root._depth
+        # # --------------------------------------------------------------------------
+        # # reassign depths
+        # # --------------------------------------------------------------------------
+        # queue = list(temp_assembly._assembly_childs)
+        # temp_assembly._depth = self._root._depth
 
-        while queue:
-            temp_assembly_child = queue.pop(0)
-            # -->
-            temp_assembly_child._depth = self._root._depth
-            # <--
-            queue.extend(temp_assembly_child._assembly_childs)
+        # while queue:
+        #     temp_assembly_child = queue.pop(0)
+        #     # -->
+        #     temp_assembly_child._depth = self._root._depth
+        #     # <--
+        #     queue.extend(temp_assembly_child._assembly_childs)
 
-        # --------------------------------------------------------------------------
-        # orientation frames
-        # if user does not give a frame, try to define it based on simplex
-        # --------------------------------------------------------------------------
-        if isinstance(temp_assembly._frame, Frame):
-            temp_assembly._frame = Frame.copy(temp_assembly._frame)
-        else:
-            temp_assembly._frame = Frame([0, 0, 0], [1, 0, 0], [0, 1, 0])
+        # # --------------------------------------------------------------------------
+        # # orientation frames
+        # # if user does not give a frame, try to define it based on simplex
+        # # --------------------------------------------------------------------------
+        # if isinstance(temp_assembly._frame, Frame):
+        #     temp_assembly._frame = Frame.copy(temp_assembly._frame)
+        # else:
+        #     temp_assembly._frame = Frame([0, 0, 0], [1, 0, 0], [0, 1, 0])
 
-        # --------------------------------------------------------------------------
-        # declare graph
-        # --------------------------------------------------------------------------
-        temp_assembly._graph.update_default_node_attributes(
-            {
-                "element_name": None,
-            }
-        )
+        # # --------------------------------------------------------------------------
+        # # declare graph
+        # # --------------------------------------------------------------------------
+        # temp_assembly._graph.update_default_node_attributes(
+        #     {
+        #         "element_name": None,
+        #     }
+        # )
 
-        # --------------------------------------------------------------------------
-        # the assemblies can have either duplicated names or uniques names
-        # the implementation explores both
-        # --------------------------------------------------------------------------
+        # # --------------------------------------------------------------------------
+        # # the assemblies can have either duplicated names or uniques names
+        # # the implementation explores both
+        # # --------------------------------------------------------------------------
 
-        # --------------------------------------------------------------------------
-        # find the order of insertion
-        # there are two possibilities
-        # 1) insert a truncated assembly in a certain position
-        # 2) insert element in  a certain position
-        # --------------------------------------------------------------------------
+        # # --------------------------------------------------------------------------
+        # # find the order of insertion
+        # # there are two possibilities
+        # # 1) insert a truncated assembly in a certain position
+        # # 2) insert element in  a certain position
+        # # --------------------------------------------------------------------------
 
-        # 1. take current assembly childs
-        queue = list(self._assembly_childs)
-        ids = []
-        assembly_to_insert_into = self
-        assembly_to_insert = temp_assembly
+        # # 1. take current assembly childs
+        # queue = list(self._assembly_childs)
+        # ids = []
+        # assembly_to_insert_into = self
+        # assembly_to_insert = temp_assembly
 
-        while queue:
+        # while queue:
 
-            temp_assembly_child = queue.pop(0)
-            # 2. check if any of the child has the same name
+        #     temp_assembly_child = queue.pop(0)
+        #     # 2. check if any of the child has the same name
             
-            id = self.find_child_by_name(assembly_to_insert_into._assembly_childs, assembly_to_insert)
-            print("\n___", assembly_to_insert._name, "___ ", id)
+        #     id = self.find_child_by_name(assembly_to_insert_into._assembly_childs, assembly_to_insert)
+        #     print("\n___", assembly_to_insert._name, "___ ", id)
 
-            # 3. if it does
-            if (id > -1):
+        #     # 3. if it does
+        #     if (id > -1):
 
-                print("\n___", 
-                      self._assembly_childs[id]._name,
-                      assembly_to_insert._name)
-                ids.append(id)
+        #         print("\n___", 
+        #               self._assembly_childs[id]._name,
+        #               assembly_to_insert._name)
+        #         ids.append(id)
 
-                # replace current queue with the found assembly childs
-                queue = list(temp_assembly_child._assembly_childs)
-                assembly_to_insert_into = assembly_to_insert_into._assembly_childs[id]
+        #         # replace current queue with the found assembly childs
+        #         queue = list(temp_assembly_child._assembly_childs)
+        #         assembly_to_insert_into = assembly_to_insert_into._assembly_childs[id]
 
-                if (len(assembly_to_insert._assembly_childs) > 0):
-                    # the insertable assembly gets truncated
-                    assembly_to_insert = assembly_to_insert._assembly_childs[0]
-                continue
-        #else:
-        # 3. if does not
-        # a) add element
-        # b) add assembly with elements or subassemblies with elements
-        print(assembly_to_insert._elements.values()[0])
-        assembly_to_insert_into.add_element(assembly_to_insert._elements.values()[0][0])
+        #         if (len(assembly_to_insert._assembly_childs) > 0):
+        #             # the insertable assembly gets truncated
+        #             assembly_to_insert = assembly_to_insert._assembly_childs[0]
+        #         continue
+        # else:
+        #     # 3. if does not
+        #     # a) add element
+        #     if (len(assembly_to_insert._elements.values()) > 0):
+        #         if(assembly_to_insert.name == assembly_to_insert_into.name):
+        #             assembly_to_insert_into.add_element(assembly_to_insert._elements.values()[0][0])
+        #         else:
+        #             assembly_to_insert_into.add_assembly(assembly_to_insert)
 
-                # assembly_to_insert_into.add_element()
 
-        #assembly_to_insert_into.add_assembly(temp_assembly)
-        return temp_assembly
+        #         print("insert element, assembly name:", assembly_to_insert.name , "\n")
+                
+        #         #
+        #     else:
+        #         print("insert assembly \n")
+        #         # print(assembly_to_insert.has_childs())
+        #         assembly_to_insert_into.add_assembly(assembly_to_insert)
+
+
+        #     # b) add assembly with elements or subassemblies with elements
+        #     #print(assembly_to_insert._elements.values()[0])
+        #     #
+            
+
+        #         # assembly_to_insert_into.add_element()
+
+        # #assembly_to_insert_into.add_assembly(temp_assembly)
+        # return temp_assembly
 
     def retrieve_assembly_by_name(self, val):
         """

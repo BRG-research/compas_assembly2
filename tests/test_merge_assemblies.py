@@ -15,7 +15,7 @@ def setup_assemblies():
     assembly_2 = Assembly(name="b")
     assembly_2._allow_duplicate_assembly_names = False
     assembly_2.add_element_by_index(
-        Element(id=[1, 2, 3], frame=Frame.worldXY(), simplex=Point(0, 0, 0), attr={"t": "Block", "m": 30})
+        Element(id=[1, 3, 3], frame=Frame.worldXY(), simplex=Point(0, 0, 0), attr={"t": "Block", "m": 30})
     )
 
     # Create another empty assembly and add the previous assembly to this assembly
