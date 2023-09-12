@@ -1,6 +1,23 @@
-import uuid
-
 # Path - Breanch, Element - Node Lead
+
+
+class Path:
+
+    def __init__(self, name):
+        self.name = name
+
+    def __str__(self):
+        return self.name
+
+
+class Part:
+
+    def __init__(self, name):
+        self.name = name
+
+    def __str__(self):
+        return self.name
+
 
 class Assembly_Tree:
     def __init__(self, branch, twigs=None):
