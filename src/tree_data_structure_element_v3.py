@@ -263,12 +263,17 @@ class AssemblyTree:
     # Merging and adding assemblies
     # ==========================================================================
 
-    def merge_assemblies(self, a1, allow_duplicate_assembly_trees=True, allow_duplicate_assemblies=True):
+    def merge_assemblies(self, a1, allow_duplicate_assembly_trees=False, allow_duplicate_assemblies=True):
         # Helper function to find a node with the same name in a list of nodes
         def find_node_by_path(nodes, node_a1):
-            if allow_duplicate_assembly_trees or isinstance(node_a1, Assembly):  # or a1.group_or_assembly or node_a1.group_or_assembly
+            if allow_duplicate_assembly_trees:  # or a1.group_or_assembly or node_a1.group_or_assembly
                 return None
             else:
+
+                if (allow_duplicate_assemblies):
+                    if (node_a1.group_or_assembly is False):
+                        return None
+                
                 for node in nodes:
                     if node.name == node_a1.name:
                         return node
@@ -285,7 +290,7 @@ class AssemblyTree:
                 # If no corresponding node is found, add the node from a1 to a0
                 self.add_child(node_a1)
 
-    def add_by_index(self, name_list, data):
+    def add_by_index(self, name_list, data, allow_duplicate_assembly_trees=False, allow_duplicate_assemblies=True):
         # create data
 
         branch_tree = AssemblyTree("temp")
@@ -296,11 +301,10 @@ class AssemblyTree:
             last_branch = child
 
         # add "real" data to the last data
-        data_node = AssemblyTree(data)
-        last_branch.add_child(data_node)
+        last_branch.add_child(AssemblyTree(data))
 
         # merge this data with the rest
-        self.merge_assemblies(branch_tree, False)
+        self.merge_assemblies(branch_tree, False, True)
 
     # ==========================================================================
     # copy
@@ -371,6 +375,7 @@ def build_product_tree_1():
     Schnitzel.add_child(Veal)
     Schnitzel.add_child(Salt)
     Schnitzel.add_child(Egg)
+    Schnitzel.add_child(Egg)
     Schnitzel.add_child(Butter)
     Schnitzel.add_child(Lemon)
     Schnitzel_Haus.add_child(Bier)
@@ -386,7 +391,7 @@ if __name__ == "__main__":
     # a0.print_tree()
     a1 = build_product_tree_1()
     # a1.print_tree()
-    a0.merge_assemblies(a1, True)
+    a0.merge_assemblies(a1)
     assembly = Assembly("_____Cream____")
     a0.add_by_index(["Restaurant The Taste of Berlin", "Schnitzel"], assembly)
     a0.add_by_index(["Restaurant The Taste of Berlin", "Schnitzel"], assembly)
