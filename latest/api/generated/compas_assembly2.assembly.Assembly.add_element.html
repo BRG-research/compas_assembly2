@@ -20,11 +20,11 @@
   <link rel="stylesheet" type="text/css" href="../../_static/css/compas-reference.css" />
 
   
-  <link rel="next" title="Assembly.add_element_by_index" href="compas_assembly2.assembly.Assembly.add_element_by_index.html" />
+  <link rel="next" title="Assembly.add_sub_assembly" href="compas_assembly2.assembly.Assembly.add_sub_assembly.html" />
   
 
   
-  <link rel="prev" title="Assembly.add_assembly" href="compas_assembly2.assembly.Assembly.add_assembly.html" />
+  <link rel="prev" title="Assembly.aabb" href="compas_assembly2.assembly.Assembly.aabb.html" />
   
 
   <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
@@ -99,13 +99,8 @@
 <h1>Assembly.add_element</h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="compas_assembly2.assembly.Assembly.add_element">
-<span class="sig-prename descclassname"><span class="pre">Assembly.</span></span><span class="sig-name descname"><span class="pre">add_element</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BRG-research/compas_assembly2/blob/master/src/compas_assembly2/assembly.py#L342"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
-<dd><p>Add an element to the assembly.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>element: The element to add.</p>
-</dd>
-</dl>
-</dd></dl>
+<span class="sig-prename descclassname"><span class="pre">Assembly.</span></span><span class="sig-name descname"><span class="pre">add_element</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name_or_element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_duplicate_assembly_trees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_duplicate_assemblies</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BRG-research/compas_assembly2/blob/master/src/compas_assembly2/assembly.py#L303"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd></dd></dl>
 
 </section>
 
@@ -148,8 +143,6 @@
 <li class="toctree-l2 nav-item active"><a class="nav-link reference internal" href="../compas_assembly2.html">compas_assembly2</a><ul class="nav flex-column collapse show active">
 <li class="toctree-l3 nav-item active"><a class="nav-link reference internal" href="compas_assembly2.assembly.Assembly.html">Assembly</a></li>
 <li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="compas_assembly2.element.Element.html">Element</a></li>
-<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="compas_assembly2.element_block.Block.html">Block</a></li>
-<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="compas_assembly2.element_beam.Beam.html">Beam</a></li>
 <li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="compas_assembly2.viewer.Viewer.html">Viewer</a></li>
 <li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="compas_assembly2.fabrication.Fabrication.html">Fabrication</a></li>
 <li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="compas_assembly2.fabrication_nest.FabricationNest.html">FabricationNest</a></li>
@@ -179,20 +172,20 @@
   <footer class="compas-footer">
     <nav class="nav p-2">
       
-      <a href="compas_assembly2.assembly.Assembly.add_assembly.html" title="Assembly.add_assembly" class="nav-link footer-link float-start text-left d-flex w-50" rel="prev">
+      <a href="compas_assembly2.assembly.Assembly.aabb.html" title="Assembly.aabb" class="nav-link footer-link float-start text-left d-flex w-50" rel="prev">
         <div class="nav-button p-2 m-2"><i class="fas fa-arrow-left"></i></div>
         <div class="nav-title flex-grow-1 align-self-center">
           <div class="nav-direction small font-weight-light">Previous</div>
-          Assembly.add_assembly
+          Assembly.aabb
         </div>
       </a>
       
 
       
-      <a href="compas_assembly2.assembly.Assembly.add_element_by_index.html" title="Assembly.add_element_by_index" class="nav-link footer-link float-end text-right d-flex w-50" rel="next">
+      <a href="compas_assembly2.assembly.Assembly.add_sub_assembly.html" title="Assembly.add_sub_assembly" class="nav-link footer-link float-end text-right d-flex w-50" rel="next">
         <div class="nav-title footer-link flex-grow-1 align-self-center">
           <div class="nav-direction small font-weight-light">Next</div>
-          Assembly.add_element_by_index
+          Assembly.add_sub_assembly
         </div>
         <div class="nav-button p-2 m-2"><i class="fas fa-arrow-right"></i></div>
       </a>

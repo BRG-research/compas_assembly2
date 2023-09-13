@@ -20,7 +20,7 @@
   <link rel="stylesheet" type="text/css" href="../../_static/css/compas-reference.css" />
 
   
-  <link rel="next" title="Assembly.add_assembly" href="compas_assembly2.assembly.Assembly.add_assembly.html" />
+  <link rel="next" title="Assembly.aabb" href="compas_assembly2.assembly.Assembly.aabb.html" />
   
 
   
@@ -97,24 +97,11 @@
 <h1>Assembly</h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="compas_assembly2.assembly.Assembly">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_assembly2.assembly.</span></span><span class="sig-name descname"><span class="pre">Assembly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elements</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BRG-research/compas_assembly2/blob/master/src/compas_assembly2/assembly.py#L18"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_assembly2.assembly.</span></span><span class="sig-name descname"><span class="pre">Assembly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name_or_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BRG-research/compas_assembly2/blob/master/src/compas_assembly2/assembly.py#L123"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://compas.dev/compas/latest/reference/generated/compas.data.Data.html#compas.data.Data" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.data.data.Data</span></code></a></p>
-<p>The compas_assembly2 represents:
-- a collection of structural elements such as blocks, beams, nodes, and plates.
-- it is a recursive structure reminiscent of the Composite pattern.
-- an element is primarily a description of simple and complex geometry.
-- initially elements do not have neither connectivity nor grouping information.
-- the grouping and connectivity are added manually by the user or automatically by collision detection.
-- an assembly can contain assemblies within assemblies.</p>
-<p>The visual representation of the assembly structure is below:
-- it means that the top-level assembly contains:</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>a list _all_elements (to query by id)</p></li>
-<li><p>a list of child assemblies (to group elements)</p></li>
-<li><p>a graph (for connectivity between all elements)</p></li>
-</ul>
-</div></blockquote>
+<p>Assembly is a tree data-structure.
+The recursive structure allows to store group names as tree branches and elements as tree leaves.
+The root of assembly is responsible for storing links between elements</p>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable docutils align-default">
 <colgroup>
@@ -122,64 +109,55 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.add_assembly.html#compas_assembly2.assembly.Assembly.add_assembly" title="compas_assembly2.assembly.Assembly.add_assembly"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_assembly</span></code></a></p></td>
-<td><p>Add a child assembly to this assembly.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.aabb.html#compas_assembly2.assembly.Assembly.aabb" title="compas_assembly2.assembly.Assembly.aabb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">aabb</span></code></a></p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.add_element.html#compas_assembly2.assembly.Assembly.add_element" title="compas_assembly2.assembly.Assembly.add_element"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_element</span></code></a></p></td>
-<td><p>Add an element to the assembly.</p></td>
+<td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.add_element_by_index.html#compas_assembly2.assembly.Assembly.add_element_by_index" title="compas_assembly2.assembly.Assembly.add_element_by_index"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_element_by_index</span></code></a></p></td>
-<td><p>Add an element to the assembly with an index.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.add_sub_assembly.html#compas_assembly2.assembly.Assembly.add_sub_assembly" title="compas_assembly2.assembly.Assembly.add_sub_assembly"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_sub_assembly</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.child_behave.html#compas_assembly2.assembly.Assembly.child_behave" title="compas_assembly2.assembly.Assembly.child_behave"><code class="xref py py-obj docutils literal notranslate"><span class="pre">child_behave</span></code></a></p></td>
+<td><p># Assuming self is an instance of your class self.child_behave(&quot;method_name&quot;, collection, arg1, arg2, kwarg1=value1, kwarg2=value2)</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.child_properties.html#compas_assembly2.assembly.Assembly.child_properties" title="compas_assembly2.assembly.Assembly.child_properties"><code class="xref py py-obj docutils literal notranslate"><span class="pre">child_properties</span></code></a></p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.copy.html#compas_assembly2.assembly.Assembly.copy" title="compas_assembly2.assembly.Assembly.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a></p></td>
 <td><p>Make an independent copy of the data object.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.find_child_by_name.html#compas_assembly2.assembly.Assembly.find_child_by_name" title="compas_assembly2.assembly.Assembly.find_child_by_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_child_by_name</span></code></a></p></td>
-<td><p>check if any of the child assembly have the same name if it does return its index only the first occurence is checked</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.find_collisions_brute_force.html#compas_assembly2.assembly.Assembly.find_collisions_brute_force" title="compas_assembly2.assembly.Assembly.find_collisions_brute_force"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_collisions_brute_force</span></code></a></p></td>
-<td><p>Find collisions between elements using a brute-force approach.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.find_joints.html#compas_assembly2.assembly.Assembly.find_joints" title="compas_assembly2.assembly.Assembly.find_joints"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_joints</span></code></a></p></td>
-<td><p>Find joints between elements based on collision pairs.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.get_by_key.html#compas_assembly2.assembly.Assembly.get_by_key" title="compas_assembly2.assembly.Assembly.get_by_key"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_by_key</span></code></a></p></td>
-<td><p>Get elements by a specified key.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.get_elements_properties.html#compas_assembly2.assembly.Assembly.get_elements_properties" title="compas_assembly2.assembly.Assembly.get_elements_properties"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_elements_properties</span></code></a></p></td>
-<td><p>Get properties of elements flattened (True) or in nested lists (False).</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.merge_assemblies.html#compas_assembly2.assembly.Assembly.merge_assemblies" title="compas_assembly2.assembly.Assembly.merge_assemblies"><code class="xref py py-obj docutils literal notranslate"><span class="pre">merge_assemblies</span></code></a></p></td>
-<td><p>Merge a child assembly to this assembly.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.orient.html#compas_assembly2.assembly.Assembly.orient" title="compas_assembly2.assembly.Assembly.orient"><code class="xref py py-obj docutils literal notranslate"><span class="pre">orient</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.init_root.html#compas_assembly2.assembly.Assembly.init_root" title="compas_assembly2.assembly.Assembly.init_root"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_root</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.oriented.html#compas_assembly2.assembly.Assembly.oriented" title="compas_assembly2.assembly.Assembly.oriented"><code class="xref py py-obj docutils literal notranslate"><span class="pre">oriented</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.merge_assembly.html#compas_assembly2.assembly.Assembly.merge_assembly" title="compas_assembly2.assembly.Assembly.merge_assembly"><code class="xref py py-obj docutils literal notranslate"><span class="pre">merge_assembly</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.print_elements.html#compas_assembly2.assembly.Assembly.print_elements" title="compas_assembly2.assembly.Assembly.print_elements"><code class="xref py py-obj docutils literal notranslate"><span class="pre">print_elements</span></code></a></p></td>
-<td><p>Print the elements and assembly structure.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.replace_in_empty.html#compas_assembly2.assembly.Assembly.replace_in_empty" title="compas_assembly2.assembly.Assembly.replace_in_empty"><code class="xref py py-obj docutils literal notranslate"><span class="pre">replace_in_empty</span></code></a></p></td>
-<td><p>Replace characters within a string with a specified word.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.retrieve_assembly_by_name.html#compas_assembly2.assembly.Assembly.retrieve_assembly_by_name" title="compas_assembly2.assembly.Assembly.retrieve_assembly_by_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">retrieve_assembly_by_name</span></code></a></p></td>
-<td><p>Retrieve an assembly by its name.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.to_list.html#compas_assembly2.assembly.Assembly.to_list" title="compas_assembly2.assembly.Assembly.to_list"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_list</span></code></a></p></td>
-<td><p>Convert the dictionary of elements to a flat list of elements.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.to_lists.html#compas_assembly2.assembly.Assembly.to_lists" title="compas_assembly2.assembly.Assembly.to_lists"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_lists</span></code></a></p></td>
-<td><p>Convert the dictionary of elements to a list of lists of elements, grouped by level.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.to_tuple.html#compas_assembly2.assembly.Assembly.to_tuple" title="compas_assembly2.assembly.Assembly.to_tuple"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_tuple</span></code></a></p></td>
-<td><p>Convert input data to a tuple.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.transform.html#compas_assembly2.assembly.Assembly.transform" title="compas_assembly2.assembly.Assembly.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.print_tree.html#compas_assembly2.assembly.Assembly.print_tree" title="compas_assembly2.assembly.Assembly.print_tree"><code class="xref py py-obj docutils literal notranslate"><span class="pre">print_tree</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.transformed.html#compas_assembly2.assembly.Assembly.transformed" title="compas_assembly2.assembly.Assembly.transformed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transformed</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.remove_root.html#compas_assembly2.assembly.Assembly.remove_root" title="compas_assembly2.assembly.Assembly.remove_root"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_root</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.transfer_root.html#compas_assembly2.assembly.Assembly.transfer_root" title="compas_assembly2.assembly.Assembly.transfer_root"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transfer_root</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.transform.html#compas_assembly2.assembly.Assembly.transform" title="compas_assembly2.assembly.Assembly.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.transform_from_frame_to_frame.html#compas_assembly2.assembly.Assembly.transform_from_frame_to_frame" title="compas_assembly2.assembly.Assembly.transform_from_frame_to_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform_from_frame_to_frame</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.transform_to_frame.html#compas_assembly2.assembly.Assembly.transform_to_frame" title="compas_assembly2.assembly.Assembly.transform_to_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform_to_frame</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.transformed.html#compas_assembly2.assembly.Assembly.transformed" title="compas_assembly2.assembly.Assembly.transformed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transformed</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.transformed_from_frame_to_frame.html#compas_assembly2.assembly.Assembly.transformed_from_frame_to_frame" title="compas_assembly2.assembly.Assembly.transformed_from_frame_to_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transformed_from_frame_to_frame</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.transformed_to_frame.html#compas_assembly2.assembly.Assembly.transformed_to_frame" title="compas_assembly2.assembly.Assembly.transformed_to_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transformed_to_frame</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -266,8 +244,6 @@
 <li class="toctree-l2 nav-item active"><a class="nav-link reference internal" href="../compas_assembly2.html">compas_assembly2</a><ul class="nav flex-column collapse show active">
 <li class="toctree-l3 nav-item active"><a class="nav-link active reference internal" href="#">Assembly</a></li>
 <li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="compas_assembly2.element.Element.html">Element</a></li>
-<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="compas_assembly2.element_block.Block.html">Block</a></li>
-<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="compas_assembly2.element_beam.Beam.html">Beam</a></li>
 <li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="compas_assembly2.viewer.Viewer.html">Viewer</a></li>
 <li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="compas_assembly2.fabrication.Fabrication.html">Fabrication</a></li>
 <li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="compas_assembly2.fabrication_nest.FabricationNest.html">FabricationNest</a></li>
@@ -309,10 +285,10 @@
       
 
       
-      <a href="compas_assembly2.assembly.Assembly.add_assembly.html" title="Assembly.add_assembly" class="nav-link footer-link float-end text-right d-flex w-50" rel="next">
+      <a href="compas_assembly2.assembly.Assembly.aabb.html" title="Assembly.aabb" class="nav-link footer-link float-end text-right d-flex w-50" rel="next">
         <div class="nav-title footer-link flex-grow-1 align-self-center">
           <div class="nav-direction small font-weight-light">Next</div>
-          Assembly.add_assembly
+          Assembly.aabb
         </div>
         <div class="nav-button p-2 m-2"><i class="fas fa-arrow-right"></i></div>
       </a>
