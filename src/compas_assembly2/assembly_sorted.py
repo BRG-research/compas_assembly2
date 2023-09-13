@@ -152,7 +152,7 @@ class Assembly(Data):
             return "ELEMENT --> " + str(self.name_or_element)
 
     @property
-    def is_group_or_assembly(self):
+    def group_or_assembly(self):
         return isinstance(self.name_or_element, str)
 
     @property
@@ -244,17 +244,17 @@ class Assembly(Data):
         # --------------------------------------------------------------------------
         # update elements
         # --------------------------------------------------------------------------
-        if not self.is_group_or_assembly:
+        if not self.group_or_assembly:
             self.all_assemblies[self.name_or_element.guid] = self.name_or_element
 
         queue = [self]
         while queue:
             name_or_element = queue.pop(0)
 
-            if not self.is_group_or_assembly:
+            if not self.group_or_assembly:
                 self.all_assemblies[self.name_or_element.guid] = self.name_or_element
             for sub_assembly in name_or_element.sub_assemblies:
-                if not sub_assembly.is_group_or_assembly:
+                if not sub_assembly.group_or_assembly:
                     self.all_assemblies[sub_assembly.name_or_element.guid] = sub_assembly.name_or_element
                 else:
                     queue.append(sub_assembly)
@@ -274,7 +274,7 @@ class Assembly(Data):
         sub_assembly.transfer_root(self)
 
         # insert the sub_assembly
-        if sorted and sub_assembly.is_group_or_assembly:
+        if sorted:
             # Find the index where the item should be inserted based on alphabetical order
             insert_index = 0
             while (
@@ -290,11 +290,11 @@ class Assembly(Data):
     def merge_assembly(self, a1, allow_duplicate_assembly_trees=False, allow_duplicate_assemblies=True):
         # Helper function to find a node with the same name in a list of nodes
         def find_node_by_path(nodes, node_a1):
-            if allow_duplicate_assembly_trees:  # or a1.is_group_or_assembly or node_a1.is_group_or_assembly
+            if allow_duplicate_assembly_trees:  # or a1.group_or_assembly or node_a1.group_or_assembly
                 return None
             else:
                 if allow_duplicate_assemblies:
-                    if node_a1.is_group_or_assembly is False:
+                    if node_a1.group_or_assembly is False:
                         return None
 
                 for node in nodes:
