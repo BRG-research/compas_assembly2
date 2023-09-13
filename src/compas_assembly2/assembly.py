@@ -128,7 +128,10 @@ class Assembly(Data):
     # ==========================================================================
     # Constructor and main body of the tree structureAssembly_Tree
     # ==========================================================================
-    def __init__(self, name_or_obj, copy=False):
+    def __init__(self, name_or_obj, copy=True):
+
+        super(Assembly, self).__init__()
+
         # --------------------------------------------------------------------------
         # the main data-structure representation, do not change it!
         # --------------------------------------------------------------------------
@@ -139,6 +142,7 @@ class Assembly(Data):
         # --------------------------------------------------------------------------
         # attributes
         # --------------------------------------------------------------------------
+        self.first_access = False
         self.init_root()
 
     def __repr__(self):
@@ -147,9 +151,9 @@ class Assembly(Data):
     @property
     def name(self):
         if isinstance(self.name_or_element, str):
-            return "ASSEMBLY --> " + self.name_or_element
+            return self.name_or_element
         else:
-            return "ELEMENT --> " + str(self.name_or_element)
+            return str(self.name_or_element)
 
     @property
     def is_group_or_assembly(self):
@@ -200,10 +204,17 @@ class Assembly(Data):
         # Return the maximum depth among sub_assemblies's subtrees
         return max_child_depth
 
+    @property
+    def type(self):
+        if isinstance(self.name_or_element, str):
+            return "ASSEMBLY"
+        else:
+            return "ELEMENT"
+
     def _print_tree(self):
         prefix = "   " * self.level
         prefix = prefix + "|__ " if self.parent_assembly else ""
-        print(prefix + self.name)
+        print(prefix + self.type + " --> " + self.name)
         if self.sub_assemblies:
             for sub_assembly in self.sub_assemblies:
                 sub_assembly._print_tree()
@@ -264,12 +275,15 @@ class Assembly(Data):
 
     # ==========================================================================
     # APPEND METHODS
-    # add_sub_assembly() | add_sub_assemblies
+    # add() | add_sub_assemblies
     # add_element() | add_elements
     # merge_assembly() | merge_assemblies
     # ==========================================================================
 
-    def add_sub_assembly(self, sub_assembly, sorted=True):
+    def add(self, sub_assembly_or_object, sorted=True):
+
+        sub_assembly = sub_assembly_or_object if isinstance(sub_assembly_or_object, Assembly) else Assembly(sub_assembly_or_object)
+
         sub_assembly.parent_assembly = self
         sub_assembly.transfer_root(self)
 
@@ -311,7 +325,7 @@ class Assembly(Data):
                 existing_node_a0.merge_assembly(node_a1, allow_duplicate_assembly_trees, allow_duplicate_assemblies)
             else:
                 # If no corresponding node is found, add the node from a1 to a0
-                self.add_sub_assembly(node_a1)
+                self.add(node_a1)
 
     def add_element(
         self, name_or_element, name_list=None, allow_duplicate_assembly_trees=False, allow_duplicate_assemblies=True
@@ -324,14 +338,65 @@ class Assembly(Data):
         for name in name_list:
             assemblyname_or_element = str(name) if isinstance(name, int) else name
             sub_assembly = Assembly(assemblyname_or_element)
-            last_branch.add_sub_assembly(sub_assembly)
+            last_branch.add(sub_assembly)
             last_branch = sub_assembly
 
         # add "real" name_or_element to the last name_or_element
-        last_branch.add_sub_assembly(Assembly(name_or_element))
+        last_branch.add(Assembly(name_or_element))
 
         # merge this name_or_element with the rest
         self.merge_assembly(branch_tree, allow_duplicate_assembly_trees, allow_duplicate_assemblies)
+
+    # square brackets operator using multiple arguments
+    def __getitem__(self, *args):
+        print("getter")
+        # names - user do need to give the first assembly name
+        input_names = [self.name]
+        for arg in list(*args):
+            if (isinstance(arg, int)):
+                input_names.append(str(arg))
+            elif (isinstance(arg, str)):
+                input_names.append(arg)
+
+        # get the assembly in the given path
+        temp_assembly = self
+        for input_name in input_names:
+            for my_assembly in temp_assembly.sub_assemblies:
+                if (my_assembly.name == input_name):
+                    temp_assembly = my_assembly
+                    break
+        
+        # collect its child data
+        return temp_assembly
+        temp_assembly_sub_assembly_data = []
+        for sub_assembly in temp_assembly.sub_assemblies:
+            temp_assembly_sub_assembly_data.append(sub_assembly)
+
+        # output the child data
+        return temp_assembly_sub_assembly_data
+
+    def __setitem__(self, args, user_objects):
+        print("setter")
+        # names - user do need to give the first assembly name
+        input_names = [self.name]
+        for arg in args:
+            if (isinstance(arg, int)):
+                input_names.append(str(arg))
+            elif (isinstance(arg, str)):
+                input_names.append(arg)
+
+        # get the assembly in the given path
+        temp_assembly = self
+        for input_name in input_names:
+            for my_assembly in temp_assembly.sub_assemblies:
+                if (my_assembly.name == input_name):
+                    temp_assembly = my_assembly
+                    break
+
+        # set the temp_assembly child data to the user given
+        for i in range(min(len(temp_assembly.sub_assemblies), len(user_objects))):
+            print(user_objects[i].name)
+            temp_assembly.sub_assemblies[i].name_or_element = user_objects[i]
 
     # ==========================================================================
     # copy
@@ -343,7 +408,7 @@ class Assembly(Data):
         # Recursively copy sub_assembly and its descendants
         for sub_assembly in self.sub_assemblies:
             child_copy = sub_assembly._recursive_copy()
-            new_instance.add_sub_assembly(child_copy)
+            new_instance.add(child_copy)
 
         return new_instance
 
@@ -472,10 +537,10 @@ def build_product_tree_0():
     root = Assembly("Oktoberfest")
     Schnitzel_Haus = Assembly("Restaurant The Taste of Berlin")
     Bier = Assembly("Bier")
-    Bier.add_sub_assembly(Assembly(Element(name="Water", simplex=Point(0, 0, 0), complex=Point(0, 0, 0))))
-    Bier.add_sub_assembly(Assembly(Element(name="Wheat malt", simplex=Point(0, 0, 0), complex=Point(0, 0, 0))))
-    Bier.add_sub_assembly(Assembly(Element(name="Noble hops", simplex=Point(0, 0, 0), complex=Point(0, 0, 0))))
-    Bier.add_sub_assembly(Assembly(Element(name="Wheat beer yeast", simplex=Point(0, 0, 0), complex=Point(0, 0, 0))))
+    Bier.add(Assembly(Element(name="Water", simplex=Point(0, 0, 0), complex=Point(0, 0, 0))))
+    Bier.add(Assembly(Element(name="Wheat malt", simplex=Point(0, 0, 0), complex=Point(0, 0, 0))))
+    Bier.add(Assembly(Element(name="Noble hops", simplex=Point(0, 0, 0), complex=Point(0, 0, 0))))
+    Bier.add(Assembly(Element(name="Wheat beer yeast", simplex=Point(0, 0, 0), complex=Point(0, 0, 0))))
 
     Schnitzel = Assembly("Schnitzel")
     Chicken = Assembly(Element(name="Chicken", simplex=Point(0, 0, 0), complex=Point(0, 0, 0)))
@@ -483,13 +548,13 @@ def build_product_tree_0():
     Egg = Assembly(Element(name="Egg", simplex=Point(0, 0, 0), complex=Point(0, 0, 0)))
     Oil = Assembly(Element(name="Oil", simplex=Point(0, 0, 0), complex=Point(0, 0, 0)))
     Oil = Assembly(Point(0, 0, 0))
-    Schnitzel.add_sub_assembly(Chicken)
-    Schnitzel.add_sub_assembly(Salt)
-    Schnitzel.add_sub_assembly(Egg)
-    Schnitzel.add_sub_assembly(Oil)
-    Schnitzel_Haus.add_sub_assembly(Bier)
-    Schnitzel_Haus.add_sub_assembly(Schnitzel)
-    root.add_sub_assembly(Schnitzel_Haus)
+    Schnitzel.add(Chicken)
+    Schnitzel.add(Salt)
+    Schnitzel.add(Egg)
+    Schnitzel.add(Oil)
+    Schnitzel_Haus.add(Bier)
+    Schnitzel_Haus.add(Schnitzel)
+    root.add(Schnitzel_Haus)
 
     return root
 
@@ -499,13 +564,13 @@ def build_product_tree_1():
     root = Assembly("Oktoberfest")
     Schnitzel_Haus = Assembly("Restaurant The Taste of Berlin")
     Bier = Assembly("Bier")
-    Bier.add_sub_assembly(Assembly(Element(name="Water", simplex=Point(0, 0, 0))))
-    Bier.add_sub_assembly(Assembly(Element(name="Pilsner malt", simplex=Point(0, 0, 0))))
-    Bier.add_sub_assembly(Assembly(Element(name="Saaz hops", simplex=Point(0, 0, 0))))
-    Bier.add_sub_assembly(Assembly(Element(name="Lager yeast", simplex=Point(0, 0, 0))))
+    Bier.add(Assembly(Element(name="Water", simplex=Point(0, 0, 0))))
+    Bier.add(Assembly(Element(name="Pilsner malt", simplex=Point(0, 0, 0))))
+    Bier.add(Assembly(Element(name="Saaz hops", simplex=Point(0, 0, 0))))
+    Bier.add(Assembly(Element(name="Lager yeast", simplex=Point(0, 0, 0))))
 
     Bier2 = Assembly("Bier2")
-    Schnitzel_Haus.add_sub_assembly(Bier2)
+    Schnitzel_Haus.add(Bier2)
     Schnitzel = Assembly("Schnitzel")
     Veal = Assembly(Element(name="Veal", simplex=Point(0, 0, 0)))
     Salt = Assembly(Element(name="Salt", simplex=Point(0, 0, 0)))
@@ -513,15 +578,15 @@ def build_product_tree_1():
     Butter = Assembly(Element(name="Butter", simplex=Point(0, 0, 0)))
     Lemon = Assembly(Element(name="Lemon", simplex=Point(0, 0, 0)))
 
-    Schnitzel.add_sub_assembly(Veal)
-    Schnitzel.add_sub_assembly(Salt)
-    Schnitzel.add_sub_assembly(Egg)
-    Schnitzel.add_sub_assembly(Egg)
-    Schnitzel.add_sub_assembly(Butter)
-    Schnitzel.add_sub_assembly(Lemon)
-    Schnitzel_Haus.add_sub_assembly(Bier)
-    Schnitzel_Haus.add_sub_assembly(Schnitzel)
-    root.add_sub_assembly(Schnitzel_Haus)
+    Schnitzel.add(Veal)
+    Schnitzel.add(Salt)
+    Schnitzel.add(Egg)
+    Schnitzel.add(Egg)
+    Schnitzel.add(Butter)
+    Schnitzel.add(Lemon)
+    Schnitzel_Haus.add(Bier)
+    Schnitzel_Haus.add(Schnitzel)
+    root.add(Schnitzel_Haus)
     # print(root.depth)
     # print(root.sub_assemblies[0].depth)
     return root
@@ -535,12 +600,41 @@ if __name__ == "__main__":
     # # # a1.print_tree()
     a0.merge_assembly(a1)
     element = Element(name="_____Cream____", id=[0, 1])
+    element3 = Element(name="_____newcream____", id=[0, 1])
+    element2 = Element(name="_____Powder____", id=[0, 1])
     a0.add_element(element)
-    a0.add_element(element, None, False, False)
+    a0.add_element(element, None, False, True)
+    
     # a0.add_by_index(element, ["Restaurant The Taste of Berlin", "Schnitzel"], )
     # a0.add_by_index(element, ["Restaurant The Taste of Berlin", "Schnitzel"])
 
+    # a0.print_tree()
+
+    # taken_assembly = a0[0, 1]
+
+    # --------------------------------------------------------------------------
+    # modification of elements while keeping the assmeblies intact
+    # --------------------------------------------------------------------------
+
+    # this one changes all the elements
+    a0[0, 1] = [Assembly(element2), Assembly(element2)]  # setter
+    # this one change one element
+    a0[0, 1].sub_assemblies[1].name_or_element = element3  # getter
+
+    # WANTED FUNCTIONALITY a0[0, 1][1] = element3
+
+    # getter - append assemnbly to the current branch
+    a0[0, 1].add(element)
+    a0[0, 1].add(Assembly(element))
+
+
+    # print(ref_elements[0].guid)
+    # print(ref_elements[1].guid)
+    # ref_elements[0] = element3
+    # ref_elements[0] = element
+    # print(ref_elements)
     a0.print_tree()
+
 
     # # print("_____________________________________COPY_______
     # ______________________________")
