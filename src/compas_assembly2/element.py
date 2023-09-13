@@ -647,6 +647,21 @@ class Element(Data):
             elif isinstance(self.complex[i], Pointcloud):
                 corners = bounding_box(self.complex[i].points)
                 points_bbox.extend([corners[0], corners[6]])
+            elif isinstance(self.complex[i], Point):
+                points_bbox.extend(
+                    [
+                        [
+                            self.complex[i][0] - (inflate + 0.001),
+                            self.complex[i][1] - (inflate + 0.001),
+                            self.complex[i][2] - (inflate + 0.001),
+                        ],
+                        [
+                            self.complex[i][0] + (inflate + 0.001),
+                            self.complex[i][1] + (inflate + 0.001),
+                            self.complex[i][2] + (inflate + 0.001),
+                        ],
+                    ]
+                )
 
         # if no points found, return
         if len(points_bbox) < 2:
@@ -663,6 +678,8 @@ class Element(Data):
 
         # compute axis-aligned-bounding-box of all objects
         points_bbox = bounding_box(points_bbox)
+
+        # inflate the box
         self._aabb = bounding_box(
             [
                 [points_bbox[0][0] - inflate, points_bbox[0][1] - inflate, points_bbox[0][2] - inflate],
@@ -1203,7 +1220,7 @@ class Element(Data):
         Returns:
             str: The string representation of the Element.
         """
-        return """TYPE_{0} ID_{1} MEMO_{2}""".format(self.name, "_".join(map(str, self.id)) , hex(id(self)))
+        return """TYPE_{0} ID_{1} GUID_{2}""".format(self.name, "_".join(map(str, self.id)), self.guid)
 
 
 class _:

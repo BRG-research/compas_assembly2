@@ -224,8 +224,8 @@ class FABRICATION_TYPES:
     CUSTOM = "CUSTOM"
 
 
+
 from .element import Element  # noqa
-from .joint import Joint  # noqa
 from .assembly import Assembly  # noqa
 from .viewer import Viewer  # noqa
 from .fabrication import Fabrication  # noqa
