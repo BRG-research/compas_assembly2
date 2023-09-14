@@ -119,6 +119,9 @@ from compas.geometry import bounding_box, Point
 from compas_assembly2 import Element
 from compas_assembly2 import sorteddict
 
+# todo:
+# 1. serialization
+# 2. create a version with a dictionary
 
 class Assembly(Data):
     """Assembly is a tree data-structure.
@@ -301,13 +304,13 @@ class Assembly(Data):
         else:
             self.sub_assemblies.append(sub_assembly)
 
-    def merge_assembly(self, a1, allow_duplicate_assembly_trees=False, allow_duplicate_assemblies=True):
+    def merge_assembly(self, a1, allow_duplicate_assembly_branches=False, allow_duplicate_assembly_leaves=True):
         # Helper function to find a node with the same name in a list of nodes
         def find_node_by_path(nodes, node_a1):
-            if allow_duplicate_assembly_trees:  # or a1.is_group_or_assembly or node_a1.is_group_or_assembly
+            if allow_duplicate_assembly_branches:  # or a1.is_group_or_assembly or node_a1.is_group_or_assembly
                 return None
             else:
-                if allow_duplicate_assemblies:
+                if allow_duplicate_assembly_leaves:
                     if node_a1.is_group_or_assembly is False:
                         return None
 
@@ -322,13 +325,13 @@ class Assembly(Data):
             existing_node_a0 = find_node_by_path(self.sub_assemblies, node_a1)
             if existing_node_a0 is not None:
                 # Recursively merge the sub_assemblies of the two nodes
-                existing_node_a0.merge_assembly(node_a1, allow_duplicate_assembly_trees, allow_duplicate_assemblies)
+                existing_node_a0.merge_assembly(node_a1, allow_duplicate_assembly_branches, allow_duplicate_assembly_leaves)
             else:
                 # If no corresponding node is found, add the node from a1 to a0
                 self.add(node_a1)
 
     def add_by_index(
-        self, name_or_element, name_list=None, allow_duplicate_assembly_trees=False, allow_duplicate_assemblies=True
+        self, name_or_element, name_list=None, allow_duplicate_assembly_branches=False, allow_duplicate_assembly_leaves=True
     ):
         # create name_or_element
         name_list = name_list if name_list is not None else name_or_element.id
@@ -345,10 +348,10 @@ class Assembly(Data):
         last_branch.add(Assembly(name_or_element))
 
         # merge this name_or_element with the rest
-        self.merge_assembly(branch_tree, allow_duplicate_assembly_trees, allow_duplicate_assemblies)
+        self.merge_assembly(branch_tree, allow_duplicate_assembly_branches, allow_duplicate_assembly_leaves)
 
     def __getitem__(self, arg):
-        print("getter")
+
         # names - user doesn't need to give the first assembly name
         input_name = arg if isinstance(arg, str) else str(arg)
 
@@ -376,7 +379,6 @@ class Assembly(Data):
             id = -1
             for local_id, my_assembly in enumerate(self.sub_assemblies):
                 if my_assembly.name == input_name:
-                    
                     id = local_id
                     break
 
@@ -534,8 +536,8 @@ class Assembly(Data):
         return points_bbox
 
 
-def build_product_tree_0():
-    # a0 name_or_element
+def build_assembly_tree_0():
+
     root = Assembly("Oktoberfest")
     Schnitzel_Haus = Assembly("Restaurant The Taste of Berlin")
     Bier = Assembly("Bier")
@@ -561,7 +563,7 @@ def build_product_tree_0():
     return root
 
 
-def build_product_tree_1():
+def build_assembly_tree_1():
     # a1 name_or_element
     root = Assembly("Oktoberfest")
     Schnitzel_Haus = Assembly("Restaurant The Taste of Berlin")
@@ -595,55 +597,43 @@ def build_product_tree_1():
 
 
 if __name__ == "__main__":
-    a0 = build_product_tree_0()
-
-    # # # a0.print_tree()
-    a1 = build_product_tree_1()
-    # # # a1.print_tree()
-    a0.merge_assembly(a1)
-    element = Element(name="_____Cream____", id=[0, 1])
-    element3 = Element(name="_____newcream____", id=[0, 1])
-    element2 = Element(name="_____Powder____", id=[0, 1])
-    a0.add_by_index(element)
-    a0.add_by_index(element, None, False, True)
-
-    # a0.add_by_index(element, ["Restaurant The Taste of Berlin", "Schnitzel"], )
-    # a0.add_by_index(element, ["Restaurant The Taste of Berlin", "Schnitzel"])
-
-    # a0.print_tree()
-
-    # taken_assembly = a0[0, 1]
 
     # --------------------------------------------------------------------------
-    # modification of elements while keeping the assmeblies intact
+    # Constructor
     # --------------------------------------------------------------------------
-
-    # this one changes all the elements
-    # a0[0, 1] = [Assembly(element2), Assembly(element2)]  # setter
-    # # this one change one element
-    # a0[0, 1].sub_assemblies[1].name_or_element = element3  # getter
+    a0 = build_assembly_tree_0()
 
     # --------------------------------------------------------------------------
     # Collection operators
     # --------------------------------------------------------------------------
-    a0["Restaurant The Taste of Berlin"]["Bier"][0] = element3
+    new_element0 = Element(name="___NEW_INSERTED_ELEMENT_0___", id=[0, 1])
+    a0["Restaurant The Taste of Berlin"]["Bier"][0] = new_element0
 
     # # getter - append assemnbly to the current branch
-    a0["Restaurant The Taste of Berlin"]["Bier"].add(element)
+    new_element1 = Element(name="___NEW_INSERTED_ELEMENT_1___", id=[0, 1])
+    a0["Restaurant The Taste of Berlin"]["Bier"].add(new_element1)
 
-    a0 += a0
+    # these operators call merge_assembly method, the structure is copie internally
+    # if you do not want to copy data just call merge_assembly method
+    # a1 = build_assembly_tree_1()
+    # a0.merge_assembly(a1)
+    # a0 = a0 + a1
+    # a0 += a0
 
-    # # print(ref_elements[0].guid)
-    # # print(ref_elements[1].guid)
-    # # ref_elements[0] = element3
-    # # ref_elements[0] = element
-    # # print(ref_elements)
+    new_element2 = Element(name="___NEW_INSERTED_ELEMENT_2___", id=[0, 1])
+    a0.add_by_index(new_element2, None, allow_duplicate_assembly_branches=False, allow_duplicate_assembly_leaves=True)
+    a0.add_by_index(new_element2, None, allow_duplicate_assembly_branches=False, allow_duplicate_assembly_leaves=True)
+    a0.add_by_index(new_element2, [0, 2])
+
+    # -----allow_duplicate_assembly_branc---------------------------------------------------------------------
+    a0_copy = a0.copy()
+
+    # --------------------------------------------------------------------------
+    # print the tree
+    # --------------------------------------------------------------------------
     a0.print_tree()
-    # print (a0[0][1])
 
-    # # print("_____________________________________COPY_______
-    # ______________________________")
-    # a0_copy = a0.copy()
-    # a0_copy.print_tree()
-
-    # print(a0.aabb(0.09999999999))
+    # --------------------------------------------------------------------------
+    # geometry methods
+    # --------------------------------------------------------------------------
+    #print(a0.aabb(0.1))
