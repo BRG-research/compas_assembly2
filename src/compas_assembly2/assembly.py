@@ -129,7 +129,6 @@ class Assembly(Data):
     # Constructor and main body of the tree structureAssembly_Tree
     # ==========================================================================
     def __init__(self, name_or_obj, copy=True):
-
         super(Assembly, self).__init__()
 
         # --------------------------------------------------------------------------
@@ -276,13 +275,14 @@ class Assembly(Data):
     # ==========================================================================
     # APPEND METHODS
     # add() | add_sub_assemblies
-    # add_element() | add_elements
+    # add_by_index() | add_by_indexs
     # merge_assembly() | merge_assemblies
     # ==========================================================================
 
     def add(self, sub_assembly_or_object, sorted=True):
-
-        sub_assembly = sub_assembly_or_object if isinstance(sub_assembly_or_object, Assembly) else Assembly(sub_assembly_or_object)
+        sub_assembly = (
+            sub_assembly_or_object if isinstance(sub_assembly_or_object, Assembly) else Assembly(sub_assembly_or_object)
+        )
 
         sub_assembly.parent_assembly = self
         sub_assembly.transfer_root(self)
@@ -327,7 +327,7 @@ class Assembly(Data):
                 # If no corresponding node is found, add the node from a1 to a0
                 self.add(node_a1)
 
-    def add_element(
+    def add_by_index(
         self, name_or_element, name_list=None, allow_duplicate_assembly_trees=False, allow_duplicate_assemblies=True
     ):
         # create name_or_element
@@ -347,56 +347,58 @@ class Assembly(Data):
         # merge this name_or_element with the rest
         self.merge_assembly(branch_tree, allow_duplicate_assembly_trees, allow_duplicate_assemblies)
 
-    # square brackets operator using multiple arguments
-    def __getitem__(self, *args):
+    def __getitem__(self, arg):
         print("getter")
-        # names - user do need to give the first assembly name
-        input_names = [self.name]
-        for arg in list(*args):
-            if (isinstance(arg, int)):
-                input_names.append(str(arg))
-            elif (isinstance(arg, str)):
-                input_names.append(arg)
+        # names - user doesn't need to give the first assembly name
+        input_name = arg if isinstance(arg, str) else str(arg)
 
-        # get the assembly in the given path
-        temp_assembly = self
-        for input_name in input_names:
-            for my_assembly in temp_assembly.sub_assemblies:
-                if (my_assembly.name == input_name):
-                    temp_assembly = my_assembly
-                    break
-        
-        # collect its child data
-        return temp_assembly
-        temp_assembly_sub_assembly_data = []
-        for sub_assembly in temp_assembly.sub_assemblies:
-            temp_assembly_sub_assembly_data.append(sub_assembly)
+        id = -1
+        for local_id, my_assembly in enumerate(self.sub_assemblies):
+            if my_assembly.name == input_name:
+                id = local_id
+                break
+        if id == -1:
+            print("WARNING GETTER the element is not found")
+            return
+        else:
+            return self.sub_assemblies[id]
 
-        # output the child data
-        return temp_assembly_sub_assembly_data
+    def __setitem__(self, arg, user_object):
+        input_name = arg
 
-    def __setitem__(self, args, user_objects):
-        print("setter")
-        # names - user do need to give the first assembly name
-        input_names = [self.name]
-        for arg in args:
-            if (isinstance(arg, int)):
-                input_names.append(str(arg))
-            elif (isinstance(arg, str)):
-                input_names.append(arg)
-
-        # get the assembly in the given path
-        temp_assembly = self
-        for input_name in input_names:
-            for my_assembly in temp_assembly.sub_assemblies:
-                if (my_assembly.name == input_name):
-                    temp_assembly = my_assembly
+        if isinstance(arg, int):
+            if isinstance(user_object, Element):
+                self.sub_assemblies[arg].name_or_element = user_object
+            elif isinstance(user_object, Assembly):
+                self.sub_assemblies[arg] = user_object
+        else:
+            # find index of the element
+            id = -1
+            for local_id, my_assembly in enumerate(self.sub_assemblies):
+                if my_assembly.name == input_name:
+                    
+                    id = local_id
                     break
 
-        # set the temp_assembly child data to the user given
-        for i in range(min(len(temp_assembly.sub_assemblies), len(user_objects))):
-            print(user_objects[i].name)
-            temp_assembly.sub_assemblies[i].name_or_element = user_objects[i]
+            # if the element is not found
+            if id == -1:
+                print("WARNING SETTER the element is not found")
+                return
+            else:
+                if isinstance(user_object, Element):
+                    self.sub_assemblies[input_name].name_or_element = user_object
+                elif isinstance(user_object, Assembly):
+                    self.sub_assemblies[input_name] = user_object
+
+    def __add__(self, other):
+        copy = self.copy()
+        copy.merge_assembly(other)
+        return copy
+
+    def __iadd__(self, other):
+        copy = self.copy()
+        copy.merge_assembly(other)
+        return copy
 
     # ==========================================================================
     # copy
@@ -602,9 +604,9 @@ if __name__ == "__main__":
     element = Element(name="_____Cream____", id=[0, 1])
     element3 = Element(name="_____newcream____", id=[0, 1])
     element2 = Element(name="_____Powder____", id=[0, 1])
-    a0.add_element(element)
-    a0.add_element(element, None, False, True)
-    
+    a0.add_by_index(element)
+    a0.add_by_index(element, None, False, True)
+
     # a0.add_by_index(element, ["Restaurant The Taste of Berlin", "Schnitzel"], )
     # a0.add_by_index(element, ["Restaurant The Taste of Berlin", "Schnitzel"])
 
@@ -617,24 +619,27 @@ if __name__ == "__main__":
     # --------------------------------------------------------------------------
 
     # this one changes all the elements
-    a0[0, 1] = [Assembly(element2), Assembly(element2)]  # setter
-    # this one change one element
-    a0[0, 1].sub_assemblies[1].name_or_element = element3  # getter
+    # a0[0, 1] = [Assembly(element2), Assembly(element2)]  # setter
+    # # this one change one element
+    # a0[0, 1].sub_assemblies[1].name_or_element = element3  # getter
 
-    # WANTED FUNCTIONALITY a0[0, 1][1] = element3
+    # --------------------------------------------------------------------------
+    # Collection operators
+    # --------------------------------------------------------------------------
+    a0["Restaurant The Taste of Berlin"]["Bier"][0] = element3
 
-    # getter - append assemnbly to the current branch
-    a0[0, 1].add(element)
-    a0[0, 1].add(Assembly(element))
+    # # getter - append assemnbly to the current branch
+    a0["Restaurant The Taste of Berlin"]["Bier"].add(element)
 
+    a0 += a0
 
-    # print(ref_elements[0].guid)
-    # print(ref_elements[1].guid)
-    # ref_elements[0] = element3
-    # ref_elements[0] = element
-    # print(ref_elements)
+    # # print(ref_elements[0].guid)
+    # # print(ref_elements[1].guid)
+    # # ref_elements[0] = element3
+    # # ref_elements[0] = element
+    # # print(ref_elements)
     a0.print_tree()
-
+    # print (a0[0][1])
 
     # # print("_____________________________________COPY_______
     # ______________________________")
