@@ -19,8 +19,8 @@ class Assembly:
 
 DO THIS INSTEAD BECAUSE ASSEMBLY MUST BE FINITE NOT RECURSIVE + IT CAN STORE PATH:
 class Assembly:
-    def __init__(self, assemblyname_or_element):
-        self.name_or_element = assemblyname_or_element  # can be a string or class<Element>
+    def __init__(self, assemblyvalue):
+        self.value = assemblyvalue  # can be a string or class<Element>
         self.parent_assembly = None
         self.sub_assemblies = [] # list<Assembly>
 
@@ -28,7 +28,7 @@ class Assembly:
 # ==========================================================================
 # What types are stored?
 # ==========================================================================
-The main property is called "name_or_element", it can be either:
+The main property is called "value", it can be either:
 a) group -> a string (indexing for the hierarch using text)
 b) assembly -> class<assembly> (beams, plates, nodes, etc.)
 
@@ -36,14 +36,14 @@ b) assembly -> class<assembly> (beams, plates, nodes, etc.)
 # How can the group hierarchy reperesented in one single class?
 # ==========================================================================
 It is represented by three propertes:
-a) name_or_element -> group or class<element>
+a) value -> group or class<element>
 b) parent_assembly -> None or group
 c) sub_assemblies -> list<Assembly or Element or mix of both>
 
 # ==========================================================================
 # How new assemblies or groups are added?
 # ==========================================================================
-When a sub_assembly assembly is added the parent_assembly is set to the name_or_element assembly.
+When a sub_assembly assembly is added the parent_assembly is set to the value assembly.
 def add_assembly(self, sub_assembly):
     sub_assembly.parent_assembly = self
     self.sub_assemblies.append(sub_assembly)
@@ -66,7 +66,7 @@ b) the root assembly stores all elements
 # ==========================================================================
 # How assemblies are transformed?
 # ==========================================================================
-Transformation is performed on a name_or_element branch and its sub_assemblies using methods:
+Transformation is performed on a value branch and its sub_assemblies using methods:
 a) transform, transformed
 b) orient, oriented (for the most common operation)
 
@@ -98,7 +98,7 @@ def level(self):
 # ==========================================================================
 @property
 def depth(self):
-    # Initialize depth to 0 and start from the name_or_element node
+    # Initialize depth to 0 and start from the value node
     depth = 0
     current_node = self
 
@@ -116,15 +116,19 @@ def depth(self):
 import copy
 from compas.data import Data
 from compas.geometry import bounding_box, Point
+from compas.datastructures import Mesh
 from compas_assembly2 import Element
 from compas.colors import Color
 from compas.data import json_dump, json_load
 # todo:
-# 1. serialization method
-# 3. show method
-# 3. write tests for transformation, copy, properties retrieval
+# [x] - 1. serialization method
+# [ ] - 2. update example files
+# [ ] - 3. show method
+# [ ] - 4. write tests for transformation, copy, properties retrieval
 # ...
-# 4. create a version with a dictionary, it is not dictionary, if really needed, then it is a sorted list (for sorting you also need keys)
+# DROPPED: 5. create a version with a dictionary, it is not dictionary, if really needed, then it is a sorted list (for sorting you also need keys)
+
+
 class Assembly(Data):
     """Assembly is a tree data-structure.
     The recursive structure allows to store group names as tree branches and elements as tree leaves.
@@ -133,14 +137,14 @@ class Assembly(Data):
     # ==========================================================================
     # Constructor and main body of the tree structureAssembly_Tree
     # ==========================================================================
-    def __init__(self, name_or_obj, make_copy=True):
+    def __init__(self, value, make_copy=True):
         super(Assembly, self).__init__()
 
         # --------------------------------------------------------------------------
         # the main data-structure representation, do not change it!
         # --------------------------------------------------------------------------
         self.make_copy = make_copy
-        self.name_or_element = name_or_obj if self.make_copy is False or isinstance(name_or_obj, str) else name_or_obj.copy()
+        self.value = value if self.make_copy is False or isinstance(value, str) else value.copy()
         self.parent_assembly = None
         self.sub_assemblies = []  # can be a list or dictionary or sorted dictionary
 
@@ -158,12 +162,12 @@ class Assembly(Data):
         # create the data object from the class properties§+
         # call the inherited Data constructor for json serialization
         data = {
-            "name_or_obj": self.name_or_element,
+            "value": self.value,
             "make_copy": self.make_copy,
         }
 
         # custom properties - handles circular references
-        data["parent_assembly"] = None if self.parent_assembly is None else self.parent_assembly.name_or_element
+        data["parent_assembly"] = None if self.parent_assembly is None else self.parent_assembly.value
         data["sub_assemblies"] = [sub.data for sub in self.sub_assemblies]
 
         # return the data object
@@ -175,7 +179,7 @@ class Assembly(Data):
         # call the inherited Data constructor for json serialization
 
         # main properties
-        self.name_or_element = data["name_or_obj"]
+        self.value = data["value"]
         self.make_copy = data["make_copy"]
 
         # custom properties
@@ -186,7 +190,7 @@ class Assembly(Data):
     def from_data(cls, data):
         """Alternative to None default __init__ parameters."""
 
-        obj = Assembly(name_or_obj=data["name_or_obj"], make_copy=data["make_copy"])
+        obj = Assembly(value=data["value"], make_copy=data["make_copy"])
 
         # custom properties
         parent_assembly_data = data.get("parent_assembly")
@@ -194,9 +198,7 @@ class Assembly(Data):
             obj.parent_assembly = Assembly.from_data(parent_assembly_data)
         else:
             obj.parent_assembly = None
-        
-        # Handle the sub_assemblies list
-        
+
         # Handle the sub_assemblies list
         obj.sub_assemblies = []
         for sub_data in data["sub_assemblies"]:
@@ -208,26 +210,23 @@ class Assembly(Data):
                 # Handle non-Assembly data types (e.g., strings or integers)
                 obj.sub_assemblies.append(sub_data)
 
-
         # Return the object
         return obj
 
-
-
-
     def __repr__(self):
+        return self.stringify_tree()
         return self.name
 
     @property
     def name(self):
-        if isinstance(self.name_or_element, str):
-            return self.name_or_element
+        if isinstance(self.value, str):
+            return self.value
         else:
-            return str(self.name_or_element)
+            return str(self.value)
 
     @property
     def is_group_or_assembly(self):
-        return isinstance(self.name_or_element, str)
+        return isinstance(self.value, str)
 
     @property
     def level(self):
@@ -247,7 +246,7 @@ class Assembly(Data):
 
     @property
     def depth(self):
-        # Initialize depth to 0 and start from the name_or_element node
+        # Initialize depth to 0 and start from the value node
         depth = 0
         current_node = self
 
@@ -261,7 +260,7 @@ class Assembly(Data):
 
     def _calculate_depth(self, node, depth):
         if not node.sub_assemblies:
-            # If the node has no sub_assemblies, return the name_or_element depth
+            # If the node has no sub_assemblies, return the value depth
             return depth
 
         max_child_depth = depth
@@ -276,10 +275,27 @@ class Assembly(Data):
 
     @property
     def type(self):
-        if isinstance(self.name_or_element, str):
+        if isinstance(self.value, str):
             return "ASSEMBLY"
         else:
             return "ELEMENT"
+
+    def _stringify_tree(self, tree_str):
+        prefix = "   " * self.level
+        prefix = prefix + "|__ " if self.parent_assembly else ""
+        tree_str = prefix + self.type + " --> " + self.name + "\n"
+        if self.sub_assemblies:
+            for sub_assembly in self.sub_assemblies:
+                subtree = sub_assembly._stringify_tree(tree_str)
+                if subtree:
+                    tree_str += subtree
+        return tree_str
+
+    def stringify_tree(self):
+        tree_str = "======================================= ROOT ASSEMBLY =============================================\n"
+        tree_str += self._stringify_tree(tree_str)
+        tree_str += "===================================================================================================\n"
+        return tree_str
 
     def _print_tree(self):
         prefix = "   " * self.level
@@ -326,17 +342,17 @@ class Assembly(Data):
         # update elements
         # --------------------------------------------------------------------------
         if not self.is_group_or_assembly:
-            self.all_assemblies[self.name_or_element.guid] = self.name_or_element
+            self.all_assemblies[self.value.guid] = self.value
 
         queue = [self]
         while queue:
-            name_or_element = queue.pop(0)
+            value = queue.pop(0)
 
             if not self.is_group_or_assembly:
-                self.all_assemblies[self.name_or_element.guid] = self.name_or_element
-            for sub_assembly in name_or_element.sub_assemblies:
+                self.all_assemblies[self.value.guid] = self.value
+            for sub_assembly in value.sub_assemblies:
                 if not sub_assembly.is_group_or_assembly:
-                    self.all_assemblies[sub_assembly.name_or_element.guid] = sub_assembly.name_or_element
+                    self.all_assemblies[sub_assembly.value.guid] = sub_assembly.value
                 else:
                     queue.append(sub_assembly)
 
@@ -399,47 +415,52 @@ class Assembly(Data):
                 self.add(node_a1)
 
     def add_by_index(
-        self, name_or_element, name_list=None, allow_duplicate_assembly_branches=False, allow_duplicate_assembly_leaves=True
+        self, value, name_list=None, allow_duplicate_assembly_branches=False, allow_duplicate_assembly_leaves=True
     ):
-        # create name_or_element
-        name_list = name_list if name_list is not None else name_or_element.id
+        # create value
+        name_list = name_list if name_list is not None else value.id
 
         branch_tree = Assembly("temp_-->_it_will_be_deleted_in_merge_assembly_method")
         last_branch = branch_tree
         for name in name_list:
-            assemblyname_or_element = str(name) if isinstance(name, int) else name
-            sub_assembly = Assembly(assemblyname_or_element)
+            assemblyvalue = str(name) if isinstance(name, int) else name
+            sub_assembly = Assembly(assemblyvalue)
             last_branch.add(sub_assembly)
             last_branch = sub_assembly
 
-        # add "real" name_or_element to the last name_or_element
-        last_branch.add(Assembly(name_or_element))
+        # add "real" value to the last value
+        last_branch.add(Assembly(value))
 
-        # merge this name_or_element with the rest
+        # merge this value with the rest
         self.merge_assembly(branch_tree, allow_duplicate_assembly_branches, allow_duplicate_assembly_leaves)
 
     def __getitem__(self, arg):
 
-        # names - user doesn't need to give the first assembly name
-        input_name = arg if isinstance(arg, str) else str(arg)
-
-        id = -1
-        for local_id, my_assembly in enumerate(self.sub_assemblies):
-            if my_assembly.name == input_name:
-                id = local_id
-                break
-        if id == -1:
-            print("WARNING GETTER the element is not found")
-            return
-        else:
-            return self.sub_assemblies[id]
+        # string input
+        if (isinstance(arg, str)):
+            id = -1
+            for local_id, my_assembly in enumerate(self.sub_assemblies):
+                if my_assembly.name == arg:
+                    id = local_id
+                    break
+            if id == -1:
+                print("WARNING GETTER the element is not found")
+                return
+            else:
+                return self.sub_assemblies[id]
+        elif (isinstance(arg, int)):
+            # check if value is string
+            if isinstance(self.sub_assemblies[arg].value, str):
+                return self.sub_assemblies[arg]
+            else:
+                return self.sub_assemblies[arg].value
 
     def __setitem__(self, arg, user_object):
         input_name = arg
 
         if isinstance(arg, int):
             if isinstance(user_object, Element):
-                self.sub_assemblies[arg].name_or_element = user_object
+                self.sub_assemblies[arg].value = user_object
             elif isinstance(user_object, Assembly):
                 self.sub_assemblies[arg] = user_object
         else:
@@ -456,7 +477,7 @@ class Assembly(Data):
                 return
             else:
                 if isinstance(user_object, Element):
-                    self.sub_assemblies[input_name].name_or_element = user_object
+                    self.sub_assemblies[input_name].value = user_object
                 elif isinstance(user_object, Assembly):
                     self.sub_assemblies[input_name] = user_object
 
@@ -474,8 +495,8 @@ class Assembly(Data):
     # copy
     # ==========================================================================
     def _recursive_copy(self):
-        # Create a new instance with the same name_or_element
-        new_instance = Assembly(self.name_or_element)
+        # Create a new instance with the same value
+        new_instance = Assembly(self.value)
 
         # Recursively copy sub_assembly and its descendants
         for sub_assembly in self.sub_assemblies:
@@ -485,7 +506,7 @@ class Assembly(Data):
         return new_instance
 
     def copy(self):
-        # Create a new instance with the same name_or_element
+        # Create a new instance with the same value
         new_instance = self._recursive_copy()
 
         # Once the structure is copied run the initialization again
@@ -500,11 +521,11 @@ class Assembly(Data):
     # transform_to_frame, transform_from_frame_to_frame, transform and copies
     # ==========================================================================
     def transform_to_frame(self, target_frame):
-        # apply the transformation the name_or_element
-        if isinstance(self.name_or_element, Element):
-            self.name_or_element.transformed_to_frame(target_frame)
+        # apply the transformation the value
+        if isinstance(self.value, Element):
+            self.value.transformed_to_frame(target_frame)
 
-        # recursively iterate through sub_assemblies name_or_element and transform them
+        # recursively iterate through sub_assemblies value and transform them
         for sub_assembly in self.sub_assemblies:
             sub_assembly.transform_to_frame(target_frame)
 
@@ -514,11 +535,11 @@ class Assembly(Data):
         return new_instance
 
     def transform_from_frame_to_frame(self, source_frame, target_frame):
-        # apply the transformation the name_or_element
-        if isinstance(self.name_or_element, Element):
-            self.name_or_element.transform_from_frame_to_frame(source_frame, target_frame)
+        # apply the transformation the value
+        if isinstance(self.value, Element):
+            self.value.transform_from_frame_to_frame(source_frame, target_frame)
 
-        # recursively iterate through sub_assemblies name_or_element and transform them
+        # recursively iterate through sub_assemblies value and transform them
         for sub_assembly in self.sub_assemblies:
             sub_assembly.transform_to_frame(source_frame, target_frame)
 
@@ -528,11 +549,11 @@ class Assembly(Data):
         return new_instance
 
     def transform(self, transformation):
-        # apply the transformation the name_or_element
-        if isinstance(self.name_or_element, Element):
-            self.name_or_element.transform(transformation)
+        # apply the transformation the value
+        if isinstance(self.value, Element):
+            self.value.transform(transformation)
 
-        # recursively iterate through sub_assemblies name_or_element and transform them
+        # recursively iterate through sub_assemblies value and transform them
         for sub_assembly in self.sub_assemblies:
             sub_assembly.transform(transformation)
 
@@ -547,13 +568,13 @@ class Assembly(Data):
     # ==========================================================================
     def child_properties(self, collection, attribute_name="_aabb"):
         # collect attibutes
-        if isinstance(self.name_or_element, Element):
-            result = getattr(self.name_or_element, attribute_name, None)
+        if isinstance(self.value, Element):
+            result = getattr(self.value, attribute_name, None)
 
             # check possible results
             collection.append(result)
             if result is None:
-                print("WARNING Attribute --> " + attribute_name + " <-- not found in " + str(self.name_or_element))
+                print("WARNING Attribute --> " + attribute_name + " <-- not found in " + str(self.value))
             else:
                 collection.append(result)
 
@@ -568,11 +589,11 @@ class Assembly(Data):
         # run the method
 
         # Use getattr() to check if the method exists and call it
-        method_to_call = getattr(self.name_or_element, method_name, None)
+        method_to_call = getattr(self.value, method_name, None)
 
         # check possible results
         if method_to_call is None or callable(method_to_call) is False:
-            print("WARNING Method --> " + method_name + " <-- not found in " + str(self.name_or_element))
+            print("WARNING Method --> " + method_name + " <-- not found in " + str(self.value))
         else:
             # Call the method with additional arguments
             result = method_to_call(*args, **kwargs)
@@ -639,6 +660,27 @@ class Assembly(Data):
     ):
         pass
 
+    # ==========================================================================
+    # flatterning
+    # ==========================================================================
+
+    def to_lists(self):
+        pass
+
+    def _flatten(self, list):
+        if self.sub_assemblies:
+            for sub_assembly in self.sub_assemblies:
+                if (len(sub_assembly.sub_assemblies) > 0):
+                    sub_assembly._flatten(list)
+                elif (isinstance(sub_assembly.value, Element)):
+                    list.append(sub_assembly.value)
+        return list
+
+    def flatten(self):
+        list = []
+        return self._flatten(list)
+
+
 def build_assembly_tree_0():
 
     root = Assembly("Oktoberfest")
@@ -667,7 +709,7 @@ def build_assembly_tree_0():
 
 
 def build_assembly_tree_1():
-    # a1 name_or_element
+    # a1 value
     root = Assembly("Oktoberfest")
     Schnitzel_Haus = Assembly("Restaurant The Taste of Berlin")
     Bier = Assembly("Bier")
@@ -705,13 +747,15 @@ if __name__ == "__main__":
     # Constructor
     # --------------------------------------------------------------------------
     a0 = build_assembly_tree_0()
-    
 
-    # # --------------------------------------------------------------------------
-    # # Collection operators
-    # # --------------------------------------------------------------------------
-    # new_element0 = Element(name="___NEW_INSERTED_ELEMENT_0___", id=[0, 1])
-    # a0["Restaurant The Taste of Berlin"]["Bier"][0] = new_element0
+    # --------------------------------------------------------------------------
+    # Collection operators
+    # --------------------------------------------------------------------------
+    mesh = Mesh.from_polyhedron(6)
+    center = Point(0, 0.2578, 0.58)
+    new_element0 = Element(name="___NEW_INSERTED_ELEMENT_0___", id=[0, 1], simplex=center, complex=mesh)
+
+    a0["Restaurant The Taste of Berlin"]["Bier"][0] = new_element0
 
     # # # getter - append assemnbly to the current branch
     # new_element1 = Element(name="___NEW_INSERTED_ELEMENT_1___", id=[0, 1])
@@ -748,3 +792,8 @@ if __name__ == "__main__":
     json_dump(data=a0, fp="src/compas_assembly2/data_sets/assembly.json", pretty=True)
     a0_serialized = json_load(fp="src/compas_assembly2/data_sets/assembly.json")
     a0_serialized.print_tree()
+    print(a0["Restaurant The Taste of Berlin"]["Bier"][0].complex[0].number_of_vertices())
+    print(a0_serialized["Restaurant The Taste of Berlin"]["Bier"][0].complex[0].number_of_vertices())
+    print(a0_serialized[0][0][0])
+    print(a0_serialized[0][0][1])
+    print(a0_serialized[0][1][1])

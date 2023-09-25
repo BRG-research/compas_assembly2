@@ -1,84 +1,181 @@
 {
     "dtype": "__main__/Assembly",
-    "guid": "3316192b-e232-41e7-90e5-ad13a003114d",
+    "guid": "9e84b3b6-5dd8-4b4e-b2b7-0b2f9f2d3dd0",
     "value": {
         "make_copy": true,
-        "name_or_obj": "Oktoberfest",
         "parent_assembly": null,
         "sub_assemblies": [
             {
                 "make_copy": true,
-                "name_or_obj": "Restaurant The Taste of Berlin",
                 "parent_assembly": "Oktoberfest",
                 "sub_assemblies": [
                     {
                         "make_copy": true,
-                        "name_or_obj": "Bier",
                         "parent_assembly": "Restaurant The Taste of Berlin",
                         "sub_assemblies": [
                             {
                                 "make_copy": true,
-                                "name_or_obj": {
+                                "parent_assembly": "Bier",
+                                "sub_assemblies": [],
+                                "value": {
                                     "dtype": "compas_assembly2.element/Element",
-                                    "guid": "93c6e13e-5cc3-4a7f-8a55-4fc260a1824e",
+                                    "guid": "53370772-5ef3-4cc0-a43d-cc269c5fe595",
                                     "value": {
                                         "aabb": [
                                             [
-                                                -0.001,
-                                                -0.001,
-                                                -0.001
+                                                -1.1547005383792517,
+                                                -1.1547005383792517,
+                                                -1.1547005383792517
                                             ],
                                             [
-                                                0.001,
-                                                -0.001,
-                                                -0.001
+                                                1.1547005383792517,
+                                                -1.1547005383792517,
+                                                -1.1547005383792517
                                             ],
                                             [
-                                                0.001,
-                                                0.001,
-                                                -0.001
+                                                1.1547005383792517,
+                                                1.1547005383792517,
+                                                -1.1547005383792517
                                             ],
                                             [
-                                                -0.001,
-                                                0.001,
-                                                -0.001
+                                                -1.1547005383792517,
+                                                1.1547005383792517,
+                                                -1.1547005383792517
                                             ],
                                             [
-                                                -0.001,
-                                                -0.001,
-                                                0.001
+                                                -1.1547005383792517,
+                                                -1.1547005383792517,
+                                                1.1547005383792517
                                             ],
                                             [
-                                                0.001,
-                                                -0.001,
-                                                0.001
+                                                1.1547005383792517,
+                                                -1.1547005383792517,
+                                                1.1547005383792517
                                             ],
                                             [
-                                                0.001,
-                                                0.001,
-                                                0.001
+                                                1.1547005383792517,
+                                                1.1547005383792517,
+                                                1.1547005383792517
                                             ],
                                             [
-                                                -0.001,
-                                                0.001,
-                                                0.001
+                                                -1.1547005383792517,
+                                                1.1547005383792517,
+                                                1.1547005383792517
                                             ]
                                         ],
                                         "attributes": {},
                                         "complex": [
                                             {
-                                                "dtype": "compas.geometry/Point",
-                                                "guid": "78abb3ab-4be7-4b25-a262-1c142e9672b7",
-                                                "value": [
-                                                    0.0,
-                                                    0.0,
-                                                    0.0
-                                                ]
+                                                "dtype": "compas.datastructures/Mesh",
+                                                "guid": "fa140cd2-a777-42f2-9c30-0a9229c7ef16",
+                                                "value": {
+                                                    "attributes": {
+                                                        "name": "Mesh"
+                                                    },
+                                                    "dea": {},
+                                                    "dfa": {},
+                                                    "dva": {
+                                                        "x": 0.0,
+                                                        "y": 0.0,
+                                                        "z": 0.0
+                                                    },
+                                                    "edgedata": {},
+                                                    "face": {
+                                                        "0": [
+                                                            0,
+                                                            3,
+                                                            2,
+                                                            1
+                                                        ],
+                                                        "1": [
+                                                            0,
+                                                            1,
+                                                            7,
+                                                            6
+                                                        ],
+                                                        "2": [
+                                                            0,
+                                                            6,
+                                                            5,
+                                                            3
+                                                        ],
+                                                        "3": [
+                                                            4,
+                                                            2,
+                                                            3,
+                                                            5
+                                                        ],
+                                                        "4": [
+                                                            4,
+                                                            7,
+                                                            1,
+                                                            2
+                                                        ],
+                                                        "5": [
+                                                            4,
+                                                            5,
+                                                            6,
+                                                            7
+                                                        ]
+                                                    },
+                                                    "facedata": {
+                                                        "0": {},
+                                                        "1": {},
+                                                        "2": {},
+                                                        "3": {},
+                                                        "4": {},
+                                                        "5": {}
+                                                    },
+                                                    "max_face": 5,
+                                                    "max_vertex": 7,
+                                                    "vertex": {
+                                                        "0": {
+                                                            "x": -1.1547005383792517,
+                                                            "y": -1.1547005383792517,
+                                                            "z": -1.1547005383792517
+                                                        },
+                                                        "1": {
+                                                            "x": 1.1547005383792517,
+                                                            "y": -1.1547005383792517,
+                                                            "z": -1.1547005383792517
+                                                        },
+                                                        "2": {
+                                                            "x": 1.1547005383792517,
+                                                            "y": 1.1547005383792517,
+                                                            "z": -1.1547005383792517
+                                                        },
+                                                        "3": {
+                                                            "x": -1.1547005383792517,
+                                                            "y": 1.1547005383792517,
+                                                            "z": -1.1547005383792517
+                                                        },
+                                                        "4": {
+                                                            "x": 1.1547005383792517,
+                                                            "y": 1.1547005383792517,
+                                                            "z": 1.1547005383792517
+                                                        },
+                                                        "5": {
+                                                            "x": -1.1547005383792517,
+                                                            "y": 1.1547005383792517,
+                                                            "z": 1.1547005383792517
+                                                        },
+                                                        "6": {
+                                                            "x": -1.1547005383792517,
+                                                            "y": -1.1547005383792517,
+                                                            "z": 1.1547005383792517
+                                                        },
+                                                        "7": {
+                                                            "x": 1.1547005383792517,
+                                                            "y": -1.1547005383792517,
+                                                            "z": 1.1547005383792517
+                                                        }
+                                                    }
+                                                }
                                             }
                                         ],
                                         "convex_hull": {
                                             "dtype": "compas.datastructures/Mesh",
-                                            "guid": "bd1fb40b-e590-4597-a538-22f68e679a2f",
+                                            "guid": "9731ef96-fdca-46ff-b7ca-11ade9af5ede",
                                             "value": {
                                                 "attributes": {
                                                     "name": "Mesh"
@@ -91,17 +188,132 @@
                                                     "z": 0.0
                                                 },
                                                 "edgedata": {},
-                                                "face": {},
-                                                "facedata": {},
-                                                "max_face": -1,
-                                                "max_vertex": -1,
-                                                "vertex": {}
+                                                "face": {
+                                                    "0": [
+                                                        0,
+                                                        2,
+                                                        1
+                                                    ],
+                                                    "1": [
+                                                        2,
+                                                        0,
+                                                        3
+                                                    ],
+                                                    "2": [
+                                                        4,
+                                                        2,
+                                                        5
+                                                    ],
+                                                    "3": [
+                                                        2,
+                                                        3,
+                                                        5
+                                                    ],
+                                                    "4": [
+                                                        3,
+                                                        0,
+                                                        6
+                                                    ],
+                                                    "5": [
+                                                        5,
+                                                        3,
+                                                        6
+                                                    ],
+                                                    "6": [
+                                                        0,
+                                                        1,
+                                                        7
+                                                    ],
+                                                    "7": [
+                                                        2,
+                                                        4,
+                                                        7
+                                                    ],
+                                                    "8": [
+                                                        1,
+                                                        2,
+                                                        7
+                                                    ],
+                                                    "9": [
+                                                        4,
+                                                        5,
+                                                        7
+                                                    ],
+                                                    "10": [
+                                                        5,
+                                                        6,
+                                                        7
+                                                    ],
+                                                    "11": [
+                                                        6,
+                                                        0,
+                                                        7
+                                                    ]
+                                                },
+                                                "facedata": {
+                                                    "0": {},
+                                                    "1": {},
+                                                    "2": {},
+                                                    "3": {},
+                                                    "4": {},
+                                                    "5": {},
+                                                    "6": {},
+                                                    "7": {},
+                                                    "8": {},
+                                                    "9": {},
+                                                    "10": {},
+                                                    "11": {}
+                                                },
+                                                "max_face": 11,
+                                                "max_vertex": 7,
+                                                "vertex": {
+                                                    "0": {
+                                                        "x": -1.1547005383792517,
+                                                        "y": -1.1547005383792517,
+                                                        "z": -1.1547005383792517
+                                                    },
+                                                    "1": {
+                                                        "x": 1.1547005383792517,
+                                                        "y": -1.1547005383792517,
+                                                        "z": -1.1547005383792517
+                                                    },
+                                                    "2": {
+                                                        "x": 1.1547005383792517,
+                                                        "y": 1.1547005383792517,
+                                                        "z": -1.1547005383792517
+                                                    },
+                                                    "3": {
+                                                        "x": -1.1547005383792517,
+                                                        "y": 1.1547005383792517,
+                                                        "z": -1.1547005383792517
+                                                    },
+                                                    "4": {
+                                                        "x": 1.1547005383792517,
+                                                        "y": 1.1547005383792517,
+                                                        "z": 1.1547005383792517
+                                                    },
+                                                    "5": {
+                                                        "x": -1.1547005383792517,
+                                                        "y": 1.1547005383792517,
+                                                        "z": 1.1547005383792517
+                                                    },
+                                                    "6": {
+                                                        "x": -1.1547005383792517,
+                                                        "y": -1.1547005383792517,
+                                                        "z": 1.1547005383792517
+                                                    },
+                                                    "7": {
+                                                        "x": 1.1547005383792517,
+                                                        "y": -1.1547005383792517,
+                                                        "z": 1.1547005383792517
+                                                    }
+                                                }
                                             }
                                         },
                                         "fabrication": {},
                                         "frame": {
                                             "dtype": "compas.geometry/Frame",
-                                            "guid": "f6da4b32-bc90-4a51-b872-bf842d448080",
+                                            "guid": "ba9b44a4-c0d1-475c-b4de-1489a4e663e7",
                                             "value": {
                                                 "point": [
                                                     0.0,
@@ -122,7 +334,7 @@
                                         },
                                         "frame_global": {
                                             "dtype": "compas.geometry/Frame",
-                                            "guid": "f053f7bd-90c1-40f4-adc8-1ac1765fe525",
+                                            "guid": "71d9f161-aae3-45be-b9ba-33e51472b3da",
                                             "value": {
                                                 "point": [
                                                     0.0,
@@ -142,41 +354,83 @@
                                             }
                                         },
                                         "id": [
-                                            -1
+                                            0,
+                                            1
                                         ],
                                         "insertion": {
                                             "dtype": "compas.geometry/Vector",
-                                            "guid": "6360182b-38c5-4fc7-83d7-f6db77278dca",
+                                            "guid": "57e2b6b0-d9f6-47d1-92f3-05a2711d09b1",
                                             "value": [
                                                 0.0,
                                                 0.0,
                                                 1.0
                                             ]
                                         },
-                                        "name": "WATER",
-                                        "oobb": null,
+                                        "name": "___NEW_INSERTED_ELEMENT_0___",
+                                        "oobb": [
+                                            [
+                                                -1.1547005383792517,
+                                                -1.1547005383792517,
+                                                -1.1547005383792517
+                                            ],
+                                            [
+                                                1.1547005383792517,
+                                                -1.1547005383792517,
+                                                -1.1547005383792517
+                                            ],
+                                            [
+                                                1.1547005383792517,
+                                                1.1547005383792517,
+                                                -1.1547005383792517
+                                            ],
+                                            [
+                                                -1.1547005383792517,
+                                                1.1547005383792517,
+                                                -1.1547005383792517
+                                            ],
+                                            [
+                                                -1.1547005383792517,
+                                                -1.1547005383792517,
+                                                1.1547005383792517
+                                            ],
+                                            [
+                                                1.1547005383792517,
+                                                -1.1547005383792517,
+                                                1.1547005383792517
+                                            ],
+                                            [
+                                                1.1547005383792517,
+                                                1.1547005383792517,
+                                                1.1547005383792517
+                                            ],
+                                            [
+                                                -1.1547005383792517,
+                                                1.1547005383792517,
+                                                1.1547005383792517
+                                            ]
+                                        ],
                                         "simplex": [
                                             {
                                                 "dtype": "compas.geometry/Point",
-                                                "guid": "03675864-152a-4dd8-a1b2-6456d1f2b5f2",
+                                                "guid": "7370b14e-08e2-4c42-bdd4-e579d41e48c2",
                                                 "value": [
                                                     0.0,
-                                                    0.0,
-                                                    0.0
+                                                    0.2578,
+                                                    0.58
                                                 ]
                                             }
                                         ],
                                         "structure": {}
                                     }
-                                },
-                                "parent_assembly": "Bier",
-                                "sub_assemblies": []
+                                }
                             },
                             {
                                 "make_copy": true,
-                                "name_or_obj": {
+                                "parent_assembly": "Bier",
+                                "sub_assemblies": [],
+                                "value": {
                                     "dtype": "compas_assembly2.element/Element",
-                                    "guid": "efcf2718-b6b0-4f9c-8cb4-ec57f6278c6e",
+                                    "guid": "9e99348f-1ba9-4e62-84ee-a1dd9c00360d",
                                     "value": {
                                         "aabb": [
                                             [
@@ -224,7 +478,7 @@
                                         "complex": [
                                             {
                                                 "dtype": "compas.geometry/Point",
-                                                "guid": "63fccb83-9e61-43f6-bd41-5b49fc5ec6ca",
+                                                "guid": "0c0df563-4232-4ee4-ac44-f3a1d239b36d",
                                                 "value": [
                                                     0.0,
                                                     0.0,
@@ -234,7 +488,7 @@
                                         ],
                                         "convex_hull": {
                                             "dtype": "compas.datastructures/Mesh",
-                                            "guid": "2df5c821-48a9-4bcb-9957-398cded0aac9",
+                                            "guid": "c983d9ce-a95b-4272-8eeb-918395bffeb4",
                                             "value": {
                                                 "attributes": {
                                                     "name": "Mesh"
@@ -257,7 +511,7 @@
                                         "fabrication": {},
                                         "frame": {
                                             "dtype": "compas.geometry/Frame",
-                                            "guid": "d54a4035-ec03-42f7-a913-4e3a10111ea2",
+                                            "guid": "b5a9b60f-4701-4c00-9d51-ed610012252e",
                                             "value": {
                                                 "point": [
                                                     0.0,
@@ -278,7 +532,7 @@
                                         },
                                         "frame_global": {
                                             "dtype": "compas.geometry/Frame",
-                                            "guid": "34dd4e4c-0b6f-443a-8826-10e868ba1077",
+                                            "guid": "87f74e52-16b6-4519-baf5-d6ac741f2801",
                                             "value": {
                                                 "point": [
                                                     0.0,
@@ -302,7 +556,7 @@
                                         ],
                                         "insertion": {
                                             "dtype": "compas.geometry/Vector",
-                                            "guid": "6408b4e0-9f7d-4a24-966b-6d154c1e3954",
+                                            "guid": "5e866749-27cc-4f56-9c13-c10da7787ee8",
                                             "value": [
                                                 0.0,
                                                 0.0,
@@ -314,7 +568,7 @@
                                         "simplex": [
                                             {
                                                 "dtype": "compas.geometry/Point",
-                                                "guid": "21992932-9bb0-4d56-a057-d1783eade20d",
+                                                "guid": "46861df5-29aa-4f79-8227-1668fb849805",
                                                 "value": [
                                                     0.0,
                                                     0.0,
@@ -324,15 +578,15 @@
                                         ],
                                         "structure": {}
                                     }
-                                },
-                                "parent_assembly": "Bier",
-                                "sub_assemblies": []
+                                }
                             },
                             {
                                 "make_copy": true,
-                                "name_or_obj": {
+                                "parent_assembly": "Bier",
+                                "sub_assemblies": [],
+                                "value": {
                                     "dtype": "compas_assembly2.element/Element",
-                                    "guid": "d7c56468-8e51-4664-8122-f14917154d3b",
+                                    "guid": "90d7fc07-ee8a-4a61-ae35-7223439213e3",
                                     "value": {
                                         "aabb": [
                                             [
@@ -380,7 +634,7 @@
                                         "complex": [
                                             {
                                                 "dtype": "compas.geometry/Point",
-                                                "guid": "a7a78973-cdeb-46ed-8924-351fdee319ef",
+                                                "guid": "8e1a067d-0a82-4776-b164-73e29563d19b",
                                                 "value": [
                                                     0.0,
                                                     0.0,
@@ -390,7 +644,7 @@
                                         ],
                                         "convex_hull": {
                                             "dtype": "compas.datastructures/Mesh",
-                                            "guid": "c03e85c3-f7bb-42f8-8882-caec034207df",
+                                            "guid": "c8340ca7-e1ec-4872-a6b4-51c5f7633bfd",
                                             "value": {
                                                 "attributes": {
                                                     "name": "Mesh"
@@ -413,7 +667,7 @@
                                         "fabrication": {},
                                         "frame": {
                                             "dtype": "compas.geometry/Frame",
-                                            "guid": "1698273b-ac5a-4160-b706-24f0cbfddcba",
+                                            "guid": "70cb9a29-8667-49c5-9006-db9a884cd434",
                                             "value": {
                                                 "point": [
                                                     0.0,
@@ -434,7 +688,7 @@
                                         },
                                         "frame_global": {
                                             "dtype": "compas.geometry/Frame",
-                                            "guid": "50c24ffb-36f0-479c-9ca6-41557a5c5835",
+                                            "guid": "1f08028f-e1ae-4246-a0e8-2534829d934a",
                                             "value": {
                                                 "point": [
                                                     0.0,
@@ -458,7 +712,7 @@
                                         ],
                                         "insertion": {
                                             "dtype": "compas.geometry/Vector",
-                                            "guid": "fc2e286f-f227-44c0-b846-0e00646cdbe6",
+                                            "guid": "09fa6bcf-c8e9-4ead-b9dd-e6500a5e3382",
                                             "value": [
                                                 0.0,
                                                 0.0,
@@ -470,7 +724,7 @@
                                         "simplex": [
                                             {
                                                 "dtype": "compas.geometry/Point",
-                                                "guid": "931c7090-6208-477e-9953-ca565773d688",
+                                                "guid": "96f3151f-bf77-493d-94fd-a5d194876b74",
                                                 "value": [
                                                     0.0,
                                                     0.0,
@@ -480,15 +734,15 @@
                                         ],
                                         "structure": {}
                                     }
-                                },
-                                "parent_assembly": "Bier",
-                                "sub_assemblies": []
+                                }
                             },
                             {
                                 "make_copy": true,
-                                "name_or_obj": {
+                                "parent_assembly": "Bier",
+                                "sub_assemblies": [],
+                                "value": {
                                     "dtype": "compas_assembly2.element/Element",
-                                    "guid": "5170bab7-8051-418d-ac82-ef80e0acffa1",
+                                    "guid": "2c2ea5c3-e217-4a8e-85eb-95646eef756d",
                                     "value": {
                                         "aabb": [
                                             [
@@ -536,7 +790,7 @@
                                         "complex": [
                                             {
                                                 "dtype": "compas.geometry/Point",
-                                                "guid": "21cd32a7-b1d6-4d75-ad23-879d9b874bbc",
+                                                "guid": "b2508e4b-562d-48e1-886a-bd6f4285c16d",
                                                 "value": [
                                                     0.0,
                                                     0.0,
@@ -546,7 +800,7 @@
                                         ],
                                         "convex_hull": {
                                             "dtype": "compas.datastructures/Mesh",
-                                            "guid": "56a3a45a-7d1b-4128-ba56-15448320af8c",
+                                            "guid": "30eb19dd-c8fe-4247-ae1a-4bac5f8c02ec",
                                             "value": {
                                                 "attributes": {
                                                     "name": "Mesh"
@@ -569,7 +823,7 @@
                                         "fabrication": {},
                                         "frame": {
                                             "dtype": "compas.geometry/Frame",
-                                            "guid": "d5a7030a-715f-402b-b218-732dd90c1e3d",
+                                            "guid": "87dd156b-da94-4454-9660-1be8c83836a4",
                                             "value": {
                                                 "point": [
                                                     0.0,
@@ -590,7 +844,7 @@
                                         },
                                         "frame_global": {
                                             "dtype": "compas.geometry/Frame",
-                                            "guid": "32851316-fe4a-465d-8e12-561bebd6f1a2",
+                                            "guid": "60f522a9-1a7c-479c-a1c1-dc10ef1f4f6f",
                                             "value": {
                                                 "point": [
                                                     0.0,
@@ -614,7 +868,7 @@
                                         ],
                                         "insertion": {
                                             "dtype": "compas.geometry/Vector",
-                                            "guid": "8d1fca77-a9a4-47eb-8ddf-d84b9cf089f2",
+                                            "guid": "177cf6af-8e75-4074-88e0-47ef0474c9d3",
                                             "value": [
                                                 0.0,
                                                 0.0,
@@ -626,7 +880,7 @@
                                         "simplex": [
                                             {
                                                 "dtype": "compas.geometry/Point",
-                                                "guid": "4ceaf0c8-5ec8-4c37-8107-13087fe50b21",
+                                                "guid": "91beeada-a30b-4ab6-850c-a9f39082df5b",
                                                 "value": [
                                                     0.0,
                                                     0.0,
@@ -636,22 +890,22 @@
                                         ],
                                         "structure": {}
                                     }
-                                },
-                                "parent_assembly": "Bier",
-                                "sub_assemblies": []
+                                }
                             }
-                        ]
+                        ],
+                        "value": "Bier"
                     },
                     {
                         "make_copy": true,
-                        "name_or_obj": "Schnitzel",
                         "parent_assembly": "Restaurant The Taste of Berlin",
                         "sub_assemblies": [
                             {
                                 "make_copy": true,
-                                "name_or_obj": {
+                                "parent_assembly": "Schnitzel",
+                                "sub_assemblies": [],
+                                "value": {
                                     "dtype": "compas_assembly2.element/Element",
-                                    "guid": "777cf6b1-1659-46dc-b06c-4b663c90cf9e",
+                                    "guid": "f177adef-3892-45c6-a2e7-ff355cc83c83",
                                     "value": {
                                         "aabb": [
                                             [
@@ -699,7 +953,7 @@
                                         "complex": [
                                             {
                                                 "dtype": "compas.geometry/Point",
-                                                "guid": "cec39202-11a8-4a6c-bec0-dc929ec41549",
+                                                "guid": "319c11ee-5b80-41e6-880c-81657c6ac209",
                                                 "value": [
                                                     0.0,
                                                     0.0,
@@ -709,7 +963,7 @@
                                         ],
                                         "convex_hull": {
                                             "dtype": "compas.datastructures/Mesh",
-                                            "guid": "8e7a330c-1525-4e87-a042-a9c5e733123d",
+                                            "guid": "ba147264-ca00-4ffb-bb78-911472479dbd",
                                             "value": {
                                                 "attributes": {
                                                     "name": "Mesh"
@@ -732,7 +986,7 @@
                                         "fabrication": {},
                                         "frame": {
                                             "dtype": "compas.geometry/Frame",
-                                            "guid": "e48bf1f0-cb84-467f-a2cf-1f04acac39c1",
+                                            "guid": "67e93bb5-8db3-49dc-a036-6e93a8c8b27b",
                                             "value": {
                                                 "point": [
                                                     0.0,
@@ -753,7 +1007,7 @@
                                         },
                                         "frame_global": {
                                             "dtype": "compas.geometry/Frame",
-                                            "guid": "f1574357-798d-4024-8571-6679c5423983",
+                                            "guid": "1e9c2ae0-11ef-495d-a3cf-6fe7e4f8bd0d",
                                             "value": {
                                                 "point": [
                                                     0.0,
@@ -777,7 +1031,7 @@
                                         ],
                                         "insertion": {
                                             "dtype": "compas.geometry/Vector",
-                                            "guid": "5cf52eaf-39f5-4fc6-bf63-37cb1ead60b1",
+                                            "guid": "d3eb8834-5454-466e-a761-4aa86e540e40",
                                             "value": [
                                                 0.0,
                                                 0.0,
@@ -789,7 +1043,7 @@
                                         "simplex": [
                                             {
                                                 "dtype": "compas.geometry/Point",
-                                                "guid": "cd7795ed-c184-4bfb-a3b2-9d6ce968f529",
+                                                "guid": "bab49be1-e189-4d22-8421-f897b03170f8",
                                                 "value": [
                                                     0.0,
                                                     0.0,
@@ -799,15 +1053,15 @@
                                         ],
                                         "structure": {}
                                     }
-                                },
-                                "parent_assembly": "Schnitzel",
-                                "sub_assemblies": []
+                                }
                             },
                             {
                                 "make_copy": true,
-                                "name_or_obj": {
+                                "parent_assembly": "Schnitzel",
+                                "sub_assemblies": [],
+                                "value": {
                                     "dtype": "compas_assembly2.element/Element",
-                                    "guid": "57a0306a-849d-451b-9aa1-cdc69335cabf",
+                                    "guid": "1196cb84-3862-4eee-8e4e-6fc678e973e5",
                                     "value": {
                                         "aabb": [
                                             [
@@ -855,7 +1109,7 @@
                                         "complex": [
                                             {
                                                 "dtype": "compas.geometry/Point",
-                                                "guid": "7b7f6829-64a0-44ee-ae01-467962288d28",
+                                                "guid": "fc4ec0b1-08f5-44ca-aa80-a7a5489136bc",
                                                 "value": [
                                                     0.0,
                                                     0.0,
@@ -865,7 +1119,7 @@
                                         ],
                                         "convex_hull": {
                                             "dtype": "compas.datastructures/Mesh",
-                                            "guid": "efce9a28-56e2-442f-9a3e-5b8bb9ae7f15",
+                                            "guid": "91ec38e8-df33-48e8-a564-67e86e5a1980",
                                             "value": {
                                                 "attributes": {
                                                     "name": "Mesh"
@@ -888,7 +1142,7 @@
                                         "fabrication": {},
                                         "frame": {
                                             "dtype": "compas.geometry/Frame",
-                                            "guid": "9f2d6e93-ef1f-41f6-88e7-c7a1a9e97004",
+                                            "guid": "8e76c0dc-bc03-4d2c-8c0d-b5a80d86c0fd",
                                             "value": {
                                                 "point": [
                                                     0.0,
@@ -909,7 +1163,7 @@
                                         },
                                         "frame_global": {
                                             "dtype": "compas.geometry/Frame",
-                                            "guid": "73c8b2cf-5720-47de-b012-ee6dd9d70e09",
+                                            "guid": "84d1ffb9-f487-4d4c-a453-847ca53bb8dc",
                                             "value": {
                                                 "point": [
                                                     0.0,
@@ -933,7 +1187,7 @@
                                         ],
                                         "insertion": {
                                             "dtype": "compas.geometry/Vector",
-                                            "guid": "e0c156d2-e4f7-445a-8757-e3054cd213e8",
+                                            "guid": "a9542f03-7617-485e-a679-a3e9ddcf7585",
                                             "value": [
                                                 0.0,
                                                 0.0,
@@ -945,7 +1199,7 @@
                                         "simplex": [
                                             {
                                                 "dtype": "compas.geometry/Point",
-                                                "guid": "8cafd2e5-5851-4cdf-96c0-6b14638fb320",
+                                                "guid": "c0accc88-3cf6-4927-a8fa-a591094cf21c",
                                                 "value": [
                                                     0.0,
                                                     0.0,
@@ -955,15 +1209,15 @@
                                         ],
                                         "structure": {}
                                     }
-                                },
-                                "parent_assembly": "Schnitzel",
-                                "sub_assemblies": []
+                                }
                             },
                             {
                                 "make_copy": true,
-                                "name_or_obj": {
+                                "parent_assembly": "Schnitzel",
+                                "sub_assemblies": [],
+                                "value": {
                                     "dtype": "compas_assembly2.element/Element",
-                                    "guid": "40569a1b-c98a-4226-93cb-10f3763d7b1b",
+                                    "guid": "f48d55ed-9ca7-4c15-aead-5c9178faccb2",
                                     "value": {
                                         "aabb": [
                                             [
@@ -1011,7 +1265,7 @@
                                         "complex": [
                                             {
                                                 "dtype": "compas.geometry/Point",
-                                                "guid": "5cd3093f-ba21-4acb-ba05-4a99cd8af6f2",
+                                                "guid": "38f3f912-e496-4897-8b69-60c88dd59220",
                                                 "value": [
                                                     0.0,
                                                     0.0,
@@ -1021,7 +1275,7 @@
                                         ],
                                         "convex_hull": {
                                             "dtype": "compas.datastructures/Mesh",
-                                            "guid": "3416412c-170a-47b1-84d1-f264433d341f",
+                                            "guid": "cebacff7-7f68-4087-b697-086eae66d7bb",
                                             "value": {
                                                 "attributes": {
                                                     "name": "Mesh"
@@ -1044,7 +1298,7 @@
                                         "fabrication": {},
                                         "frame": {
                                             "dtype": "compas.geometry/Frame",
-                                            "guid": "ae19b21a-11c6-454d-88a0-c656364f7887",
+                                            "guid": "e1a1fd17-1227-4cb8-b68a-0abb590006e9",
                                             "value": {
                                                 "point": [
                                                     0.0,
@@ -1065,7 +1319,7 @@
                                         },
                                         "frame_global": {
                                             "dtype": "compas.geometry/Frame",
-                                            "guid": "62512e68-85c8-48a7-96dd-bab2a24122db",
+                                            "guid": "586267a9-9374-4568-ba2d-b63834a82be6",
                                             "value": {
                                                 "point": [
                                                     0.0,
@@ -1089,7 +1343,7 @@
                                         ],
                                         "insertion": {
                                             "dtype": "compas.geometry/Vector",
-                                            "guid": "88735825-74f3-4d2f-9c15-8a6e6852020f",
+                                            "guid": "5614e364-3de5-4a6f-8a49-3f981d63d51b",
                                             "value": [
                                                 0.0,
                                                 0.0,
@@ -1101,7 +1355,7 @@
                                         "simplex": [
                                             {
                                                 "dtype": "compas.geometry/Point",
-                                                "guid": "f401164e-4649-4270-8958-4257a9e3d166",
+                                                "guid": "ef82749e-25e0-490a-b67f-5abc619d84a1",
                                                 "value": [
                                                     0.0,
                                                     0.0,
@@ -1111,28 +1365,29 @@
                                         ],
                                         "structure": {}
                                     }
-                                },
-                                "parent_assembly": "Schnitzel",
-                                "sub_assemblies": []
+                                }
                             },
                             {
                                 "make_copy": true,
-                                "name_or_obj": {
+                                "parent_assembly": "Schnitzel",
+                                "sub_assemblies": [],
+                                "value": {
                                     "dtype": "compas.geometry/Point",
-                                    "guid": "78994327-6138-4ea9-9586-b86fd4c6ba3b",
+                                    "guid": "c8610342-973c-44f2-883b-320ec3d83cde",
                                     "value": [
                                         0.0,
                                         0.0,
                                         0.0
                                     ]
-                                },
-                                "parent_assembly": "Schnitzel",
-                                "sub_assemblies": []
+                                }
                             }
-                        ]
+                        ],
+                        "value": "Schnitzel"
                     }
-                ]
+                ],
+                "value": "Restaurant The Taste of Berlin"
             }
-        ]
+        ],
+        "value": "Oktoberfest"
     }
 }
