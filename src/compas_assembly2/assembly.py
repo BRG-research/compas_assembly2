@@ -121,12 +121,13 @@ from compas_assembly2 import Element
 from compas.colors import Color
 from compas.data import json_dump, json_load
 # todo:
-# [x] - 1. serialization method
-# [ ] - 2. update example files
-# [ ] - 3. show method
-# [ ] - 4. write tests for transformation, copy, properties retrieval
+# [x] - 1. serialization methods
+# [ ] - 2. flatten the tree, to nested lists, collapse leaves by certain amount
+# [ ] - 3. update example files
+# [ ] - 4. show method
+# [ ] - 5. write tests for transformation, copy, properties retrieval
 # ...
-# DROPPED: 5. create a version with a dictionary, it is not dictionary, if really needed, then it is a sorted list (for sorting you also need keys)
+# DROPPED: 6. create a version with a dictionary, it is not dictionary, if really needed, then it is a sorted list (for sorting you also need keys)
 
 
 class Assembly(Data):
@@ -661,11 +662,24 @@ class Assembly(Data):
         pass
 
     # ==========================================================================
-    # flatterning
+    # flattening
     # ==========================================================================
 
-    def to_lists(self):
-        pass
+    def to_nested_list(self):
+        def _to_nested_list(assembly):
+
+            # divide into 1) empty assembliyes 2) nested ones
+            result = []
+
+            for sub_assembly in assembly.sub_assemblies:
+                if (isinstance(sub_assembly.value, Element)):
+                    result.append(sub_assembly.value)
+                else:
+                    result.append(_to_nested_list(sub_assembly))
+            if (len(result) > 0):
+                return result
+
+        return _to_nested_list(self)
 
     def _flatten(self, list):
         if self.sub_assemblies:
@@ -679,6 +693,20 @@ class Assembly(Data):
     def flatten(self):
         list = []
         return self._flatten(list)
+
+    # Method to collapse sub-assemblies based on the level
+
+    # def _collapse_sub_assemblies(self, level):
+    #     pass
+
+    # def collapse_sub_assemblies(self, level):
+    #     if self.level <= level:  # stop collapsing if the level is reached
+    #         return
+        
+    #     for sub_assembly in self.sub_assemblies:
+    #         sub_assembly.collapse_sub_assemblies(level)
+    #         sub_assembly.parent_assembly.extend(self.sub_assemblies)
+
 
 
 def build_assembly_tree_0():
@@ -756,6 +784,8 @@ if __name__ == "__main__":
     new_element0 = Element(name="___NEW_INSERTED_ELEMENT_0___", id=[0, 1], simplex=center, complex=mesh)
 
     a0["Restaurant The Taste of Berlin"]["Bier"][0] = new_element0
+    # a0.collapse_sub_assemblies(0)
+    print(a0.to_nested_list())
 
     # # # getter - append assemnbly to the current branch
     # new_element1 = Element(name="___NEW_INSERTED_ELEMENT_1___", id=[0, 1])
@@ -789,11 +819,11 @@ if __name__ == "__main__":
     # --------------------------------------------------------------------------
     # SERIALIZATION
     # --------------------------------------------------------------------------
-    json_dump(data=a0, fp="src/compas_assembly2/data_sets/assembly.json", pretty=True)
-    a0_serialized = json_load(fp="src/compas_assembly2/data_sets/assembly.json")
-    a0_serialized.print_tree()
-    print(a0["Restaurant The Taste of Berlin"]["Bier"][0].complex[0].number_of_vertices())
-    print(a0_serialized["Restaurant The Taste of Berlin"]["Bier"][0].complex[0].number_of_vertices())
-    print(a0_serialized[0][0][0])
-    print(a0_serialized[0][0][1])
-    print(a0_serialized[0][1][1])
+    # json_dump(data=a0, fp="src/compas_assembly2/data_sets/assembly.json", pretty=True)
+    # a0_serialized = json_load(fp="src/compas_assembly2/data_sets/assembly.json")
+    # a0_serialized.print_tree()
+    # print(a0["Restaurant The Taste of Berlin"]["Bier"][0].complex[0].number_of_vertices())
+    # print(a0_serialized["Restaurant The Taste of Berlin"]["Bier"][0].complex[0].number_of_vertices())
+    # print(a0_serialized[0][0][0])
+    # print(a0_serialized[0][0][1])
+    # print(a0_serialized[0][1][1])
