@@ -32,6 +32,7 @@ if __name__ == "__main__":
     for element in elements_json:
         assembly.add_by_index(element)
 
+    
     #assembly.print_tree()
     # print(assembly.flatten())
     geometry = []
@@ -49,6 +50,7 @@ FabricationNest.pack_elements(elements=assembly.flatten(), nest_type=2, inflate=
 # VIEW2
 # ==========================================================================
 element_lists = assembly.flatten()  # assembly.all_assemblies(1)
+element_lists = assembly.collapse(1).to_nested_list()
 Viewer.show_elements(
     element_lists, viewer_type="view2", show_grid=False, geometry=geometry
 )  # assembly._elements.to_trimmed_list("x")
