@@ -672,26 +672,53 @@ class Assembly(Data):
         # Start by copying the current assembly.
         collapsed_assembly = self.copy()
 
+        if level == 0:
+            elements = collapsed_assembly.flatten()
+            collapsed_assembly.sub_assemblies = []
+            for element in elements:
+                collapsed_assembly.add(Assembly(element, True))
+
         # Iterate through sub-assemblies.
-        queue = collapsed_assembly.sub_assemblies
+        queue = []
+        queue.extend(collapsed_assembly.sub_assemblies)
         for sub_assembly in queue:
             # If the sub-assembly has sub-assemblies, add them to the queue.
             if (sub_assembly.level >= level):
                 # find leave and add it to the sub_assembly
                 elements = sub_assembly.flatten()
-                sub_assembly.print_tree()
                 sub_assembly.sub_assemblies = []
                 for element in elements:
                     sub_assembly.add(Assembly(element, True))
-                
-            # else:
-            #     queue.extend(sub_assembly.sub_assemblies)
+            else:
+                queue.extend(sub_assembly.sub_assemblies)
 
         return collapsed_assembly
 
     def prune(self, level):
-        """ remove branches that are deeper than a certain level """
-        pass
+        """Iterate through sub-assemblies and adjust their levels based on user input."""
+        if level < 0:
+            raise ValueError("Level must be a non-negative integer.")
+
+        # Start by copying the current assembly.
+        collapsed_assembly = self.copy()
+
+        if level == 0:
+            collapsed_assembly.sub_assemblies = []
+
+        # Iterate through sub-assemblies.
+        queue = []
+        queue.extend(collapsed_assembly.sub_assemblies)
+        for sub_assembly in queue:
+            # If the sub-assembly has sub-assemblies, add them to the queue.
+            if (sub_assembly.level >= level):
+                # find leave and add it to the sub_assembly
+                sub_assembly.sub_assemblies = []
+                # if (isinstance(sub_assembly.value, str) is not True):
+                #     sub_assembly.add(Assembly(sub_assembly.value, True))
+            else:
+                queue.extend(sub_assembly.sub_assemblies)
+
+        return collapsed_assembly
 
     def to_nested_list(self):
         def _to_nested_list(assembly):
@@ -799,7 +826,8 @@ if __name__ == "__main__":
     new_element0 = Element(name="___NEW_INSERTED_ELEMENT_0___", id=[0, 1], simplex=center, complex=mesh)
 
     a0["Restaurant The Taste of Berlin"]["Bier"][0] = new_element0
-    a0 = a0.collapse(1)
+    a0 = a0.collapse(2)
+    #a0 = a0.prune(3)
     # a0.collapse_sub_assemblies(0)
     # print(a0.to_nested_list())
 
