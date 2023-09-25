@@ -3,7 +3,7 @@
 
 <head>
   
-  <title>compas_assembly2 - Assembly.add_by_index</title>
+  <title>compas_assembly2 - Assembly.show</title>
   
 
   <meta charset="utf-8" />
@@ -20,11 +20,11 @@
   <link rel="stylesheet" type="text/css" href="../../_static/css/compas-reference.css" />
 
   
-  <link rel="next" title="Assembly.child_behave" href="compas_assembly2.assembly.Assembly.child_behave.html" />
+  <link rel="next" title="Assembly.transfer_root" href="compas_assembly2.assembly.Assembly.transfer_root.html" />
   
 
   
-  <link rel="prev" title="Assembly.add" href="compas_assembly2.assembly.Assembly.add.html" />
+  <link rel="prev" title="Assembly.remove_root" href="compas_assembly2.assembly.Assembly.remove_root.html" />
   
 
   <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
@@ -88,18 +88,18 @@
             
             <li class="breadcrumb-item"><a href="compas_assembly2.assembly.Assembly.html">Assembly</a></li>
             
-            <!-- <li class="breadcrumb-item active" aria-current="page">Assembly.add_by_index</li> -->
+            <!-- <li class="breadcrumb-item active" aria-current="page">Assembly.show</li> -->
           </ol>
         </nav>
         
 
         
         
-        <section class="detail" id="assembly-add-by-index">
-<h1>Assembly.add_by_index</h1>
+        <section class="detail" id="assembly-show">
+<h1>Assembly.show</h1>
 <dl class="py method">
-<dt class="sig sig-object py" id="compas_assembly2.assembly.Assembly.add_by_index">
-<span class="sig-prename descclassname"><span class="pre">Assembly.</span></span><span class="sig-name descname"><span class="pre">add_by_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name_or_element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_duplicate_assembly_branches</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_duplicate_assembly_leaves</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BRG-research/compas_assembly2/blob/master/src/compas_assembly2/assembly.py#L401"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py" id="compas_assembly2.assembly.Assembly.show">
+<span class="sig-prename descclassname"><span class="pre">Assembly.</span></span><span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">viewer_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'view2-0_rhino-1_blender-2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1280</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1600</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_grid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_indices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_simplices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_complexes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_aabbs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_oobbs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_convex_hulls</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_frames</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_fabrication</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_structure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text_height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">display_axis_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">point_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[Color(0.929,</span> <span class="pre">0.082,</span> <span class="pre">0.498,</span> <span class="pre">1.0),</span> <span class="pre">Color(0.129,</span> <span class="pre">0.572,</span> <span class="pre">0.815,</span> <span class="pre">1.0),</span> <span class="pre">Color(0.5,</span> <span class="pre">0.5,</span> <span class="pre">0.5,</span> <span class="pre">1.0),</span> <span class="pre">Color(0.95,</span> <span class="pre">0.95,</span> <span class="pre">0.95,</span> <span class="pre">1.0),</span> <span class="pre">Color(0.0,</span> <span class="pre">0.0,</span> <span class="pre">0.0,</span> <span class="pre">1.0)]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_red</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">measurements</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BRG-research/compas_assembly2/blob/master/src/compas_assembly2/assembly.py#L609"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd></dd></dl>
 
 </section>
@@ -160,7 +160,7 @@
       <div class="d-none d-xl-block col-xl-2 compas-toc" role="toc">
         
         <ul class="nav flex-column" id="compas-toc">
-<li class="nav-item"><a class="nav-link reference internal" href="#">Assembly.add_by_index</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="#">Assembly.show</a></li>
 </ul>
 
       </div>
@@ -172,20 +172,20 @@
   <footer class="compas-footer">
     <nav class="nav p-2">
       
-      <a href="compas_assembly2.assembly.Assembly.add.html" title="Assembly.add" class="nav-link footer-link float-start text-left d-flex w-50" rel="prev">
+      <a href="compas_assembly2.assembly.Assembly.remove_root.html" title="Assembly.remove_root" class="nav-link footer-link float-start text-left d-flex w-50" rel="prev">
         <div class="nav-button p-2 m-2"><i class="fas fa-arrow-left"></i></div>
         <div class="nav-title flex-grow-1 align-self-center">
           <div class="nav-direction small font-weight-light">Previous</div>
-          Assembly.add
+          Assembly.remove_root
         </div>
       </a>
       
 
       
-      <a href="compas_assembly2.assembly.Assembly.child_behave.html" title="Assembly.child_behave" class="nav-link footer-link float-end text-right d-flex w-50" rel="next">
+      <a href="compas_assembly2.assembly.Assembly.transfer_root.html" title="Assembly.transfer_root" class="nav-link footer-link float-end text-right d-flex w-50" rel="next">
         <div class="nav-title footer-link flex-grow-1 align-self-center">
           <div class="nav-direction small font-weight-light">Next</div>
-          Assembly.child_behave
+          Assembly.transfer_root
         </div>
         <div class="nav-button p-2 m-2"><i class="fas fa-arrow-right"></i></div>
       </a>

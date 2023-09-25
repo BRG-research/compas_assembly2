@@ -97,7 +97,7 @@
 <h1>Assembly</h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="compas_assembly2.assembly.Assembly">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_assembly2.assembly.</span></span><span class="sig-name descname"><span class="pre">Assembly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name_or_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BRG-research/compas_assembly2/blob/master/src/compas_assembly2/assembly.py#L126"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_assembly2.assembly.</span></span><span class="sig-name descname"><span class="pre">Assembly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name_or_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">make_copy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BRG-research/compas_assembly2/blob/master/src/compas_assembly2/assembly.py#L128"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://compas.dev/compas/latest/reference/generated/compas.data.Data.html#compas.data.Data" title="(in COMPAS v1.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.data.data.Data</span></code></a></p>
 <p>Assembly is a tree data-structure.
 The recursive structure allows to store group names as tree branches and elements as tree leaves.
@@ -127,16 +127,22 @@ The root of assembly is responsible for storing links between elements</p>
 <tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.copy.html#compas_assembly2.assembly.Assembly.copy" title="compas_assembly2.assembly.Assembly.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a></p></td>
 <td><p>Make an independent copy of the data object.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.init_root.html#compas_assembly2.assembly.Assembly.init_root" title="compas_assembly2.assembly.Assembly.init_root"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_root</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.from_data.html#compas_assembly2.assembly.Assembly.from_data" title="compas_assembly2.assembly.Assembly.from_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_data</span></code></a></p></td>
+<td><p>Alternative to None default __init__ parameters.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.init_root.html#compas_assembly2.assembly.Assembly.init_root" title="compas_assembly2.assembly.Assembly.init_root"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_root</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.merge_assembly.html#compas_assembly2.assembly.Assembly.merge_assembly" title="compas_assembly2.assembly.Assembly.merge_assembly"><code class="xref py py-obj docutils literal notranslate"><span class="pre">merge_assembly</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.merge_assembly.html#compas_assembly2.assembly.Assembly.merge_assembly" title="compas_assembly2.assembly.Assembly.merge_assembly"><code class="xref py py-obj docutils literal notranslate"><span class="pre">merge_assembly</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.print_tree.html#compas_assembly2.assembly.Assembly.print_tree" title="compas_assembly2.assembly.Assembly.print_tree"><code class="xref py py-obj docutils literal notranslate"><span class="pre">print_tree</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.print_tree.html#compas_assembly2.assembly.Assembly.print_tree" title="compas_assembly2.assembly.Assembly.print_tree"><code class="xref py py-obj docutils literal notranslate"><span class="pre">print_tree</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.remove_root.html#compas_assembly2.assembly.Assembly.remove_root" title="compas_assembly2.assembly.Assembly.remove_root"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_root</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.remove_root.html#compas_assembly2.assembly.Assembly.remove_root" title="compas_assembly2.assembly.Assembly.remove_root"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_root</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.show.html#compas_assembly2.assembly.Assembly.show" title="compas_assembly2.assembly.Assembly.show"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.transfer_root.html#compas_assembly2.assembly.Assembly.transfer_root" title="compas_assembly2.assembly.Assembly.transfer_root"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transfer_root</span></code></a></p></td>
@@ -172,31 +178,28 @@ The root of assembly is responsible for storing links between elements</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.ToString.html#compas_assembly2.assembly.Assembly.ToString" title="compas_assembly2.assembly.Assembly.ToString"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ToString</span></code></a></p></td>
 <td><p>Converts the instance to a string.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.from_data.html#compas_assembly2.assembly.Assembly.from_data" title="compas_assembly2.assembly.Assembly.from_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_data</span></code></a></p></td>
-<td><p>Construct an object of this type from the provided data.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.from_json.html#compas_assembly2.assembly.Assembly.from_json" title="compas_assembly2.assembly.Assembly.from_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_json</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.from_json.html#compas_assembly2.assembly.Assembly.from_json" title="compas_assembly2.assembly.Assembly.from_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_json</span></code></a></p></td>
 <td><p>Construct an object from serialized data contained in a JSON file.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.from_jsonstring.html#compas_assembly2.assembly.Assembly.from_jsonstring" title="compas_assembly2.assembly.Assembly.from_jsonstring"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_jsonstring</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.from_jsonstring.html#compas_assembly2.assembly.Assembly.from_jsonstring" title="compas_assembly2.assembly.Assembly.from_jsonstring"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_jsonstring</span></code></a></p></td>
 <td><p>Construct an object from serialized data contained in a JSON string.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.sha256.html#compas_assembly2.assembly.Assembly.sha256" title="compas_assembly2.assembly.Assembly.sha256"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sha256</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.sha256.html#compas_assembly2.assembly.Assembly.sha256" title="compas_assembly2.assembly.Assembly.sha256"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sha256</span></code></a></p></td>
 <td><p>Compute a hash of the data for comparison during version control using the sha256 algorithm.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.to_data.html#compas_assembly2.assembly.Assembly.to_data" title="compas_assembly2.assembly.Assembly.to_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_data</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.to_data.html#compas_assembly2.assembly.Assembly.to_data" title="compas_assembly2.assembly.Assembly.to_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_data</span></code></a></p></td>
 <td><p>Convert an object to its native data representation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.to_json.html#compas_assembly2.assembly.Assembly.to_json" title="compas_assembly2.assembly.Assembly.to_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_json</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.to_json.html#compas_assembly2.assembly.Assembly.to_json" title="compas_assembly2.assembly.Assembly.to_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_json</span></code></a></p></td>
 <td><p>Serialize the data representation of an object to a JSON file.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.to_jsonstring.html#compas_assembly2.assembly.Assembly.to_jsonstring" title="compas_assembly2.assembly.Assembly.to_jsonstring"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_jsonstring</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.to_jsonstring.html#compas_assembly2.assembly.Assembly.to_jsonstring" title="compas_assembly2.assembly.Assembly.to_jsonstring"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_jsonstring</span></code></a></p></td>
 <td><p>Serialize the data representation of an object to a JSON string.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.validate_data.html#compas_assembly2.assembly.Assembly.validate_data" title="compas_assembly2.assembly.Assembly.validate_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_data</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.validate_data.html#compas_assembly2.assembly.Assembly.validate_data" title="compas_assembly2.assembly.Assembly.validate_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_data</span></code></a></p></td>
 <td><p>Validate the object's data against its data schema.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.validate_json.html#compas_assembly2.assembly.Assembly.validate_json" title="compas_assembly2.assembly.Assembly.validate_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_json</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.validate_json.html#compas_assembly2.assembly.Assembly.validate_json" title="compas_assembly2.assembly.Assembly.validate_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_json</span></code></a></p></td>
 <td><p>Validate the object's data against its json schema.</p></td>
 </tr>
 </tbody>
