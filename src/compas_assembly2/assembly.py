@@ -117,12 +117,14 @@ import copy
 from compas.data import Data
 from compas.geometry import bounding_box, Point
 from compas_assembly2 import Element
-from compas_assembly2 import sorteddict
-
+from compas.colors import Color
+from compas.data import json_dump, json_load
 # todo:
-# 1. serialization
-# 2. create a version with a dictionary
-
+# 1. serialization method
+# 3. show method
+# 3. write tests for transformation, copy, properties retrieval
+# ...
+# 4. create a version with a dictionary, it is not dictionary, if really needed, then it is a sorted list (for sorting you also need keys)
 class Assembly(Data):
     """Assembly is a tree data-structure.
     The recursive structure allows to store group names as tree branches and elements as tree leaves.
@@ -131,21 +133,87 @@ class Assembly(Data):
     # ==========================================================================
     # Constructor and main body of the tree structureAssembly_Tree
     # ==========================================================================
-    def __init__(self, name_or_obj, copy=True):
+    def __init__(self, name_or_obj, make_copy=True):
         super(Assembly, self).__init__()
 
         # --------------------------------------------------------------------------
         # the main data-structure representation, do not change it!
         # --------------------------------------------------------------------------
-        self.name_or_element = name_or_obj if copy is False or isinstance(name_or_obj, str) else name_or_obj.copy()
+        self.make_copy = make_copy
+        self.name_or_element = name_or_obj if self.make_copy is False or isinstance(name_or_obj, str) else name_or_obj.copy()
         self.parent_assembly = None
         self.sub_assemblies = []  # can be a list or dictionary or sorted dictionary
 
         # --------------------------------------------------------------------------
         # attributes
         # --------------------------------------------------------------------------
-        self.first_access = False
         self.init_root()
+
+    # ==========================================================================
+    # SERIALIZATION
+    # ==========================================================================
+
+    @property
+    def data(self):
+        # create the data object from the class properties§+
+        # call the inherited Data constructor for json serialization
+        data = {
+            "name_or_obj": self.name_or_element,
+            "make_copy": self.make_copy,
+        }
+
+        # custom properties - handles circular references
+        data["parent_assembly"] = None if self.parent_assembly is None else self.parent_assembly.name_or_element
+        data["sub_assemblies"] = [sub.data for sub in self.sub_assemblies]
+
+        # return the data object
+        return data
+
+    @data.setter
+    def data(self, data):
+        # vice versa - create the class properties from the data object
+        # call the inherited Data constructor for json serialization
+
+        # main properties
+        self.name_or_element = data["name_or_obj"]
+        self.make_copy = data["make_copy"]
+
+        # custom properties
+        self.parent_assembly = data["parent_assembly"]
+        self.sub_assemblies = data["sub_assemblies"]
+
+    @classmethod
+    def from_data(cls, data):
+        """Alternative to None default __init__ parameters."""
+
+        obj = Assembly(name_or_obj=data["name_or_obj"], make_copy=data["make_copy"])
+
+        # custom properties
+        parent_assembly_data = data.get("parent_assembly")
+        if isinstance(parent_assembly_data, dict):
+            obj.parent_assembly = Assembly.from_data(parent_assembly_data)
+        else:
+            obj.parent_assembly = None
+        
+        # Handle the sub_assemblies list
+        
+        # Handle the sub_assemblies list
+        obj.sub_assemblies = []
+        for sub_data in data["sub_assemblies"]:
+            if isinstance(sub_data, dict):
+                sub_obj = Assembly.from_data(sub_data)  # Recursively create sub-assembly
+                sub_obj.parent_assembly = obj  # Set the parent assembly
+                obj.sub_assemblies.append(sub_obj)
+            else:
+                # Handle non-Assembly data types (e.g., strings or integers)
+                obj.sub_assemblies.append(sub_data)
+
+
+        # Return the object
+        return obj
+
+
+
 
     def __repr__(self):
         return self.name
@@ -535,6 +603,41 @@ class Assembly(Data):
 
         return points_bbox
 
+    # ==========================================================================
+    # Vizualization
+    # ==========================================================================
+    def show(
+        lists_of_elements=[],
+        viewer_type="view2-0_rhino-1_blender-2",
+        width=1280,
+        height=1600,
+        show_grid=False,
+        show_indices=False,
+        show_names=False,
+        show_simplices=False,
+        show_complexes=True,
+        show_aabbs=False,
+        show_oobbs=False,
+        show_convex_hulls=False,
+        show_frames=False,
+        show_fabrication=False,
+        show_structure=False,
+        text_height=30,  # type: ignore
+        display_axis_scale=0.5,
+        point_size=8,
+        line_width=2,
+        colors=[
+            Color(0.929, 0.082, 0.498),
+            Color(0.129, 0.572, 0.815),
+            Color(0.5, 0.5, 0.5),
+            Color(0.95, 0.95, 0.95),
+            Color(0, 0, 0),
+        ],
+        color_red=[],
+        measurements=[],
+        geometry=[],
+    ):
+        pass
 
 def build_assembly_tree_0():
 
@@ -602,31 +705,32 @@ if __name__ == "__main__":
     # Constructor
     # --------------------------------------------------------------------------
     a0 = build_assembly_tree_0()
+    
 
-    # --------------------------------------------------------------------------
-    # Collection operators
-    # --------------------------------------------------------------------------
-    new_element0 = Element(name="___NEW_INSERTED_ELEMENT_0___", id=[0, 1])
-    a0["Restaurant The Taste of Berlin"]["Bier"][0] = new_element0
+    # # --------------------------------------------------------------------------
+    # # Collection operators
+    # # --------------------------------------------------------------------------
+    # new_element0 = Element(name="___NEW_INSERTED_ELEMENT_0___", id=[0, 1])
+    # a0["Restaurant The Taste of Berlin"]["Bier"][0] = new_element0
 
-    # # getter - append assemnbly to the current branch
-    new_element1 = Element(name="___NEW_INSERTED_ELEMENT_1___", id=[0, 1])
-    a0["Restaurant The Taste of Berlin"]["Bier"].add(new_element1)
+    # # # getter - append assemnbly to the current branch
+    # new_element1 = Element(name="___NEW_INSERTED_ELEMENT_1___", id=[0, 1])
+    # a0["Restaurant The Taste of Berlin"]["Bier"].add(new_element1)
 
-    # these operators call merge_assembly method, the structure is copie internally
-    # if you do not want to copy data just call merge_assembly method
-    # a1 = build_assembly_tree_1()
-    # a0.merge_assembly(a1)
-    # a0 = a0 + a1
-    # a0 += a0
+    # # these operators call merge_assembly method, the structure is copie internally
+    # # if you do not want to copy data just call merge_assembly method
+    # # a1 = build_assembly_tree_1()
+    # # a0.merge_assembly(a1)
+    # # a0 = a0 + a1
+    # # a0 += a0
 
-    new_element2 = Element(name="___NEW_INSERTED_ELEMENT_2___", id=[0, 1])
-    a0.add_by_index(new_element2, None, allow_duplicate_assembly_branches=False, allow_duplicate_assembly_leaves=True)
-    a0.add_by_index(new_element2, None, allow_duplicate_assembly_branches=False, allow_duplicate_assembly_leaves=True)
-    a0.add_by_index(new_element2, [0, 2])
+    # new_element2 = Element(name="___NEW_INSERTED_ELEMENT_2___", id=[0, 1])
+    # a0.add_by_index(new_element2, None, allow_duplicate_assembly_branches=False, allow_duplicate_assembly_leaves=True)
+    # a0.add_by_index(new_element2, None, allow_duplicate_assembly_branches=False, allow_duplicate_assembly_leaves=True)
+    # a0.add_by_index(new_element2, [0, 2])
 
-    # -----allow_duplicate_assembly_branc---------------------------------------------------------------------
-    a0_copy = a0.copy()
+    # # -----allow_duplicate_assembly_branc---------------------------------------------------------------------
+    # a0_copy = a0.copy()
 
     # --------------------------------------------------------------------------
     # print the tree
@@ -636,4 +740,11 @@ if __name__ == "__main__":
     # --------------------------------------------------------------------------
     # geometry methods
     # --------------------------------------------------------------------------
-    #print(a0.aabb(0.1))
+    # print(a0.aabb(0.1))
+
+    # --------------------------------------------------------------------------
+    # SERIALIZATION
+    # --------------------------------------------------------------------------
+    json_dump(data=a0, fp="src/compas_assembly2/data_sets/assembly.json", pretty=True)
+    a0_serialized = json_load(fp="src/compas_assembly2/data_sets/assembly.json")
+    a0_serialized.print_tree()
