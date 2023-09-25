@@ -664,11 +664,39 @@ class Assembly(Data):
     # ==========================================================================
     # flattening
     # ==========================================================================
+    def collapse(self, level):
+        """Iterate through sub-assemblies and adjust their levels based on user input."""
+        if level < 0:
+            raise ValueError("Level must be a non-negative integer.")
+
+        # Start by copying the current assembly.
+        collapsed_assembly = self.copy()
+
+        # Iterate through sub-assemblies.
+        queue = collapsed_assembly.sub_assemblies
+        for sub_assembly in queue:
+            # If the sub-assembly has sub-assemblies, add them to the queue.
+            if (sub_assembly.level >= level):
+                # find leave and add it to the sub_assembly
+                elements = sub_assembly.flatten()
+                sub_assembly.print_tree()
+                sub_assembly.sub_assemblies = []
+                for element in elements:
+                    sub_assembly.add(Assembly(element, True))
+                
+            # else:
+            #     queue.extend(sub_assembly.sub_assemblies)
+
+        return collapsed_assembly
+
+    def prune(self, level):
+        """ remove branches that are deeper than a certain level """
+        pass
 
     def to_nested_list(self):
         def _to_nested_list(assembly):
 
-            # divide into 1) empty assembliyes 2) nested ones
+            # divide into 1) empty assemblies 2) nested ones
             result = []
 
             for sub_assembly in assembly.sub_assemblies:
@@ -684,29 +712,15 @@ class Assembly(Data):
     def _flatten(self, list):
         if self.sub_assemblies:
             for sub_assembly in self.sub_assemblies:
+                if (isinstance(sub_assembly.value, str) is False):  # isinstance(sub_assembly.value, Element)
+                    list.append(sub_assembly.value)
                 if (len(sub_assembly.sub_assemblies) > 0):
                     sub_assembly._flatten(list)
-                elif (isinstance(sub_assembly.value, Element)):
-                    list.append(sub_assembly.value)
         return list
 
     def flatten(self):
         list = []
         return self._flatten(list)
-
-    # Method to collapse sub-assemblies based on the level
-
-    # def _collapse_sub_assemblies(self, level):
-    #     pass
-
-    # def collapse_sub_assemblies(self, level):
-    #     if self.level <= level:  # stop collapsing if the level is reached
-    #         return
-        
-    #     for sub_assembly in self.sub_assemblies:
-    #         sub_assembly.collapse_sub_assemblies(level)
-    #         sub_assembly.parent_assembly.extend(self.sub_assemblies)
-
 
 
 def build_assembly_tree_0():
@@ -721,12 +735,13 @@ def build_assembly_tree_0():
 
     Schnitzel = Assembly("Schnitzel")
     Chicken = Assembly(Element(name="Chicken", simplex=Point(0, 0, 0), complex=Point(0, 0, 0)))
+    # Chicken = Assembly("Chicken")
     Salt = Assembly(Element(name="Salt", simplex=Point(0, 0, 0), complex=Point(0, 0, 0)))
     Egg = Assembly(Element(name="Egg", simplex=Point(0, 0, 0), complex=Point(0, 0, 0)))
     Oil = Assembly(Element(name="Oil", simplex=Point(0, 0, 0), complex=Point(0, 0, 0)))
     Oil = Assembly(Point(0, 0, 0))
     Schnitzel.add(Chicken)
-    Schnitzel.add(Salt)
+    Chicken.add(Salt)
     Schnitzel.add(Egg)
     Schnitzel.add(Oil)
     Schnitzel_Haus.add(Bier)
@@ -784,8 +799,9 @@ if __name__ == "__main__":
     new_element0 = Element(name="___NEW_INSERTED_ELEMENT_0___", id=[0, 1], simplex=center, complex=mesh)
 
     a0["Restaurant The Taste of Berlin"]["Bier"][0] = new_element0
+    a0 = a0.collapse(1)
     # a0.collapse_sub_assemblies(0)
-    print(a0.to_nested_list())
+    # print(a0.to_nested_list())
 
     # # # getter - append assemnbly to the current branch
     # new_element1 = Element(name="___NEW_INSERTED_ELEMENT_1___", id=[0, 1])
@@ -813,10 +829,7 @@ if __name__ == "__main__":
 
     # --------------------------------------------------------------------------
     # geometry methods
-    # --------------------------------------------------------------------------
-    # print(a0.aabb(0.1))
-
-    # --------------------------------------------------------------------------
+    # -------------------------------------------------------------1-------------
     # SERIALIZATION
     # --------------------------------------------------------------------------
     # json_dump(data=a0, fp="src/compas_assembly2/data_sets/assembly.json", pretty=True)
