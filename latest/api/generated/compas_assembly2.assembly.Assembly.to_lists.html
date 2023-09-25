@@ -20,11 +20,11 @@
   <link rel="stylesheet" type="text/css" href="../../_static/css/compas-reference.css" />
 
   
-  <link rel="next" title="Assembly.to_tuple" href="compas_assembly2.assembly.Assembly.to_tuple.html" />
+  <link rel="next" title="Assembly.transfer_root" href="compas_assembly2.assembly.Assembly.transfer_root.html" />
   
 
   
-  <link rel="prev" title="Assembly.to_list" href="compas_assembly2.assembly.Assembly.to_list.html" />
+  <link rel="prev" title="Assembly.stringify_tree" href="compas_assembly2.assembly.Assembly.stringify_tree.html" />
   
 
   <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
@@ -99,16 +99,8 @@
 <h1>Assembly.to_lists</h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="compas_assembly2.assembly.Assembly.to_lists">
-<span class="sig-prename descclassname"><span class="pre">Assembly.</span></span><span class="sig-name descname"><span class="pre">to_lists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_childs_by_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BRG-research/compas_assembly2/blob/master/src/compas_assembly2/assembly.py#L210"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
-<dd><p>Convert the dictionary of elements to a list of lists of elements, grouped by level.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>level (int): The level to group elements by.
-sort_childs_by_index (bool): Whether to sort child assemblies by their index.</p>
-</dd>
-<dt>Returns:</dt><dd><p>list: A list of lists of elements.</p>
-</dd>
-</dl>
-</dd></dl>
+<span class="sig-prename descclassname"><span class="pre">Assembly.</span></span><span class="sig-name descname"><span class="pre">to_lists</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BRG-research/compas_assembly2/blob/master/src/compas_assembly2/assembly.py#L667"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd></dd></dl>
 
 </section>
 
@@ -151,8 +143,6 @@ sort_childs_by_index (bool): Whether to sort child assemblies by their index.</p
 <li class="toctree-l2 nav-item active"><a class="nav-link reference internal" href="../compas_assembly2.html">compas_assembly2</a><ul class="nav flex-column collapse show active">
 <li class="toctree-l3 nav-item active"><a class="nav-link reference internal" href="compas_assembly2.assembly.Assembly.html">Assembly</a></li>
 <li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="compas_assembly2.element.Element.html">Element</a></li>
-<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="compas_assembly2.element_block.Block.html">Block</a></li>
-<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="compas_assembly2.element_beam.Beam.html">Beam</a></li>
 <li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="compas_assembly2.viewer.Viewer.html">Viewer</a></li>
 <li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="compas_assembly2.fabrication.Fabrication.html">Fabrication</a></li>
 <li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="compas_assembly2.fabrication_nest.FabricationNest.html">FabricationNest</a></li>
@@ -182,20 +172,20 @@ sort_childs_by_index (bool): Whether to sort child assemblies by their index.</p
   <footer class="compas-footer">
     <nav class="nav p-2">
       
-      <a href="compas_assembly2.assembly.Assembly.to_list.html" title="Assembly.to_list" class="nav-link footer-link float-start text-left d-flex w-50" rel="prev">
+      <a href="compas_assembly2.assembly.Assembly.stringify_tree.html" title="Assembly.stringify_tree" class="nav-link footer-link float-start text-left d-flex w-50" rel="prev">
         <div class="nav-button p-2 m-2"><i class="fas fa-arrow-left"></i></div>
         <div class="nav-title flex-grow-1 align-self-center">
           <div class="nav-direction small font-weight-light">Previous</div>
-          Assembly.to_list
+          Assembly.stringify_tree
         </div>
       </a>
       
 
       
-      <a href="compas_assembly2.assembly.Assembly.to_tuple.html" title="Assembly.to_tuple" class="nav-link footer-link float-end text-right d-flex w-50" rel="next">
+      <a href="compas_assembly2.assembly.Assembly.transfer_root.html" title="Assembly.transfer_root" class="nav-link footer-link float-end text-right d-flex w-50" rel="next">
         <div class="nav-title footer-link flex-grow-1 align-self-center">
           <div class="nav-direction small font-weight-light">Next</div>
-          Assembly.to_tuple
+          Assembly.transfer_root
         </div>
         <div class="nav-button p-2 m-2"><i class="fas fa-arrow-right"></i></div>
       </a>
