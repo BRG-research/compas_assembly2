@@ -983,17 +983,12 @@ else:
 # ==========================================================================
 # VIEWER
 # ==========================================================================
-# assembly = assembly.collapse(3)
+
 assembly = assembly.graft()
 print(assembly)
 
-lists = assembly.to_lists(0)
+lists = assembly.to_lists(1) # the number is for collapse level
 
-# print(assembly.number_of_elements)
-# print(len(lists))
-
-# print(assembly.depth)
-# print(lists[0])
 color_red = [3] * assembly.number_of_elements
 color_red[0] = 0
 color_red[1] = 0

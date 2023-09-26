@@ -123,12 +123,13 @@ from compas_assembly2.sortedlist import SortedList
 from compas.data import json_dump, json_load
 # todo:
 # [x] - 1. serialization methods
-# [ ] - 2. flatten the tree, to nested lists, collapse leaves by certain amount
+# [x] - 2. flatten the tree, to nested lists, collapse leaves by certain amount
 # [ ] - 3. update example files
 # [ ] - 4. show method
 # [ ] - 5. write tests for transformation, copy, properties retrieval
+# [ ] - 6. create assembly from json file
 # ...
-# DROPPED: 6. create a version with a dictionary, it is not dictionary, if really needed, then it is a sorted list (for sorting you also need keys)
+# DROPPED: 7. create a version with a dictionary, it is not dictionary, if really needed, then it is a sorted list (for sorting you also need keys)
 
 
 class Assembly(Data):
@@ -741,32 +742,9 @@ class Assembly(Data):
         for sub_assembly in queue:
             # If the sub-assembly has sub-assemblies, add_assembly them to the queue.
             if (isinstance(sub_assembly.value, str) is False):
-                print("found")
-                # copy assembly with one element and add_assembly it to the sub_assembly
-                # temp_grafted_assembly = Assembly(value=name)
-                # temp_grafted_assembly.add_assembly(sub_assembly.copy())
-                # temp_grafted_assembly.transfer_root(grafted_assembly.root)
-                # print(temp_grafted_assembly)
-
-                # # replace the current assembly
-                # # sub_assembly.value = "temp"
-                # temp = Assembly(value=Assembly(value="temp"))
-                # temp.transfer_root(grafted_assembly.root)
-
-                # print(temp)
                 temp = Assembly(value=sub_assembly.value)
-                # temp.transfer_root(grafted_assembly.root)
                 sub_assembly.value = name
                 sub_assembly.add_assembly(temp)
-                # temp_grafted_assembly.remove_root()
-
-                # replace the assembly with the new one
-                # sub_assembly.value = temp_grafted_assembly
-
-                # sub_assembly.add_assembly(temp_grafted_assembly)
-                # sub_assembly.value = Assembly(value=name)
-                # sub_assembly.remove_root()
-                # element_assembly_copy.remove_root()
             else:
                 queue.extend(sub_assembly.sub_assemblies)
 

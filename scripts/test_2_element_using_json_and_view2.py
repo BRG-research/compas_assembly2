@@ -19,18 +19,24 @@ if __name__ == "__main__":
     # ==========================================================================
     # COLLIDE ELEMENTS
     # ==========================================================================
-    assembly = Assembly(name="elements_json", elements=elements_json)
-    print(elements_json)
-    collision_pairs = assembly.find_collisions_brute_force()
-    # pair0 = collision_pairs[0]
+    assembly = Assembly(value="elements_json")
+    # , elements=elements_json
+    for element in elements_json:
+        assembly.add_by_index(element)
+    
+    print(assembly)
 
-    # print(assembly._elements._objects.keys()[0])
-    # print(assembly._elements._objects[tuple(pair0[0])])
-    # print(assembly._elements[pair0[0]])
-    joints = assembly.find_joints(collision_pairs)
+    # print(elements_json)
+    # collision_pairs = assembly.find_collisions_brute_force()
+    # # pair0 = collision_pairs[0]
+
+    # # print(assembly._elements._objects.keys()[0])
+    # # print(assembly._elements._objects[tuple(pair0[0])])
+    # # print(assembly._elements[pair0[0]])
+    # joints = assembly.find_joints(collision_pairs)
     geometry = []
-    for joint in joints:
-        geometry.append(joint.polygon)
+    # for joint in joints:
+    #     geometry.append(joint.polygon)
 
     # print(collision_pairs)
 
@@ -41,9 +47,9 @@ if __name__ == "__main__":
     # ==========================================================================
     # NEST ELEMENTS
     # ==========================================================================
-    FabricationNest.pack_elements(elements=assembly.to_list(), nest_type=2, inflate=0.1, height_step=4)
+    FabricationNest.pack_elements(elements=assembly.flatten(), nest_type=2, inflate=0.1, height_step=4)
 
     # ==========================================================================
     # VIEW2
     # ==========================================================================
-    Viewer.show_elements(assembly.to_list(), viewer_type="view2", show_grid=False, geometry=geometry)
+    Viewer.show_elements(assembly.to_lists(), viewer_type="view2", show_grid=False, geometry=geometry)

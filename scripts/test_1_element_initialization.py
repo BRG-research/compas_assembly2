@@ -52,7 +52,7 @@ if __name__ == "__main__":
     )
 
     elem_1 = Element(
-        name=ELEMENT_NAME.FRAME,
+        name=ELEMENT_NAME.BEAM,
         id=[0, 2],
         frame=Frame([0, 0, 0], [0, 1, 0.0], [1, 0, 0.0]),
         simplex=[Line((0, -2, 0), (0, 2, 0))],

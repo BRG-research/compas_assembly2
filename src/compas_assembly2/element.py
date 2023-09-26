@@ -272,9 +272,12 @@ class Element(Data):
             frame=data["frame"],
             simplex=data["simplex"],
             complex=data["complex"],
-            insertion=data["insertion"],
+            insertion=None,
             **data["attributes"],
         )
+
+        if (data.get("insertion", None) is not None):
+            obj.insertion = data["insertion"]
 
         # custom properties
         obj._frame_global = data["frame_global"]
