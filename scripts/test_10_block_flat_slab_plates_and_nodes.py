@@ -46,8 +46,4 @@ FabricationNest.pack_elements(elements=assembly.flatten(), nest_type=2, inflate=
 # ==========================================================================
 # VIEW2
 # ==========================================================================
-element_lists = assembly.to_lists(2)
-
-Viewer.show_elements(
-    element_lists, viewer_type="view2", show_grid=False, geometry=geometry
-)  # assembly._elements.to_trimmed_list("x")
+assembly.show(collapse_level=1)

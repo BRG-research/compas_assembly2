@@ -121,6 +121,8 @@ from compas_assembly2 import Element
 from compas.colors import Color
 from compas_assembly2.sortedlist import SortedList
 from compas.data import json_dump, json_load
+from compas_assembly2.viewer import Viewer
+
 # todo:
 # [x] - 1. serialization methods
 # [x] - 2. flatten the tree, to nested lists, collapse leaves by certain amount
@@ -170,7 +172,7 @@ class Assembly(Data):
     def __lt__(self, other):
         # Add at the end of the list
         # If you need sorting implement your own comparator
-        if (isinstance(self.value, str) and isinstance(other.value, str)):
+        if isinstance(self.value, str) and isinstance(other.value, str):
             try:
                 integer0 = int(self.value)
                 integer1 = int(other.value)
@@ -329,9 +331,13 @@ class Assembly(Data):
         return tree_str
 
     def stringify_tree(self):
-        tree_str = "======================================= ROOT ASSEMBLY =============================================\n"
+        tree_str = (
+            "======================================= ROOT ASSEMBLY =============================================\n"
+        )
         tree_str += self._stringify_tree(tree_str)
-        tree_str += "===================================================================================================\n"
+        tree_str += (
+            "===================================================================================================\n"
+        )
         return tree_str
 
     def _print_tree(self):
@@ -421,7 +427,7 @@ class Assembly(Data):
                 insert_index += 1
 
             # Insert the item at the determined index
-            #self.sub_assemblies.insert(insert_index, sub_assembly)
+            # self.sub_assemblies.insert(insert_index, sub_assembly)
             self.sub_assemblies.add(sub_assembly)
         else:
             self.sub_assemblies.add(sub_assembly)
@@ -447,7 +453,9 @@ class Assembly(Data):
             existing_node_a0 = find_node_by_path(self.sub_assemblies, node_a1)
             if existing_node_a0 is not None:
                 # Recursively merge the sub_assemblies of the two nodes
-                existing_node_a0.merge_assembly(node_a1, allow_duplicate_assembly_branches, allow_duplicate_assembly_leaves)
+                existing_node_a0.merge_assembly(
+                    node_a1, allow_duplicate_assembly_branches, allow_duplicate_assembly_leaves
+                )
             else:
                 # If no corresponding node is found, add_assembly the node from a1 to a0
                 self.add_assembly(node_a1)
@@ -475,7 +483,7 @@ class Assembly(Data):
     def __getitem__(self, arg):
 
         # string input
-        if (isinstance(arg, str)):
+        if isinstance(arg, str):
             id = -1
             for local_id, my_assembly in enumerate(self.sub_assemblies):
                 if my_assembly.name == arg:
@@ -486,7 +494,7 @@ class Assembly(Data):
                 return
             else:
                 return self.sub_assemblies[id]
-        elif (isinstance(arg, int)):
+        elif isinstance(arg, int):
             # check if value is string
             if isinstance(self.sub_assemblies[arg].value, str):
                 return self.sub_assemblies[arg]
@@ -666,8 +674,9 @@ class Assembly(Data):
     # Vizualization
     # ==========================================================================
     def show(
-        lists_of_elements=[],
-        viewer_type="view2-0_rhino-1_blender-2",
+        self,
+        collapse_level=0,
+        viewer_type="view2",
         width=1280,
         height=1600,
         show_grid=False,
@@ -696,7 +705,10 @@ class Assembly(Data):
         measurements=[],
         geometry=[],
     ):
-        pass
+        lists_of_elements = (
+            self.collapse(collapse_level).to_lists() if collapse_level >= 0 else self.graft("0").to_lists()
+        )
+        Viewer.show_elements(lists_of_elements=lists_of_elements, viewer_type=viewer_type)
 
     # ==========================================================================
     # flattening
@@ -720,7 +732,7 @@ class Assembly(Data):
         queue.extend(collapsed_assembly.sub_assemblies)
         for sub_assembly in queue:
             # If the sub-assembly has sub-assemblies, add_assembly them to the queue.
-            if (sub_assembly.level >= level):
+            if sub_assembly.level >= level:
                 # find leave and add_assembly it to the sub_assembly
                 elements = sub_assembly.flatten()
                 sub_assembly.sub_assemblies = SortedList()
@@ -741,7 +753,7 @@ class Assembly(Data):
         queue.extend(grafted_assembly.sub_assemblies)
         for sub_assembly in queue:
             # If the sub-assembly has sub-assemblies, add_assembly them to the queue.
-            if (isinstance(sub_assembly.value, str) is False):
+            if isinstance(sub_assembly.value, str) is False:
                 temp = Assembly(value=sub_assembly.value)
                 sub_assembly.value = name
                 sub_assembly.add_assembly(temp)
@@ -766,7 +778,7 @@ class Assembly(Data):
         queue.extend(collapsed_assembly.sub_assemblies)
         for sub_assembly in queue:
             # If the sub-assembly has sub-assemblies, add_assembly them to the queue.
-            if (sub_assembly.level >= level):
+            if sub_assembly.level >= level:
                 # find leave and add_assembly it to the sub_assembly
                 sub_assembly.sub_assemblies = []
                 # if (isinstance(sub_assembly.value, str) is not True):
@@ -783,23 +795,23 @@ class Assembly(Data):
             result = []
 
             for sub_assembly in assembly.sub_assemblies:
-                if (isinstance(sub_assembly.value, Element)):
+                if isinstance(sub_assembly.value, Element):
                     result.append(sub_assembly.value)
                 else:
                     result.append(_to_nested_list(sub_assembly))
-            if (len(result) > 0):
+            if len(result) > 0:
                 return result
 
         return _to_nested_list(self)
-    
+
     def to_lists(self, collapse_level=None):
-        """ unwrap the nested nested n times lists in one list of lists"""
+        """unwrap the nested nested n times lists in one list of lists"""
 
         # references
         assembly = self
 
         # collapse
-        if (collapse_level is not None):
+        if collapse_level is not None:
             assembly = self.collapse(collapse_level)
 
         # convert the tree to nested list
@@ -817,10 +829,10 @@ class Assembly(Data):
                         queue = [i] + queue
                     else:
                         individual_elements.append(i)
-            if (len(individual_elements) > 0):
+            if len(individual_elements) > 0:
                 lists.append(individual_elements)
 
-        if (len(lists) == 0):
+        if len(lists) == 0:
             return tree
         else:
             return lists
@@ -828,9 +840,9 @@ class Assembly(Data):
     def _flatten(self, list):
         if self.sub_assemblies:
             for sub_assembly in self.sub_assemblies:
-                if (isinstance(sub_assembly.value, str) is False):  # isinstance(sub_assembly.value, Element)
+                if isinstance(sub_assembly.value, str) is False:  # isinstance(sub_assembly.value, Element)
                     list.append(sub_assembly.value)
-                if (len(sub_assembly.sub_assemblies) > 0):
+                if len(sub_assembly.sub_assemblies) > 0:
                     sub_assembly._flatten(list)
         return list
 
@@ -916,7 +928,7 @@ if __name__ == "__main__":
 
     a0["Restaurant The Taste of Berlin"]["Bier"][0] = new_element0
     a0 = a0.collapse(2)
-    #a0 = a0.prune(3)
+    # a0 = a0.prune(3)
     # a0.collapse_sub_assemblies(0)
     # print(a0.to_nested_list())
 

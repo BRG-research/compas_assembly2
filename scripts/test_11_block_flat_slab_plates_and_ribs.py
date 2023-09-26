@@ -47,11 +47,11 @@ FabricationNest.pack_elements(elements=assembly.flatten(), nest_type=2, inflate=
 # VIEW2
 # ==========================================================================
 assembly.print_tree()
-element_lists = assembly.collapse(2).to_lists()
+assembly.show(collapse_level=2)
+
+# element_lists = assembly.collapse(2).to_lists()
 
 
-# # element_lists = [item for sublist in element_lists for item in sublist]
-# # print(flatten_to_individual_lists(element_lists))
-Viewer.show_elements(
-    element_lists, viewer_type="view2", show_grid=False, geometry=geometry
-)  # assembly._elements.to_trimmed_list("x")
+# # # element_lists = [item for sublist in element_lists for item in sublist]
+# # # print(flatten_to_individual_lists(element_lists))
+# Viewer.show_elements(element_lists, viewer_type="view2", show_grid=False)  # assembly._elements.to_trimmed_list("x")
