@@ -41,12 +41,12 @@ b) parent_assembly -> None or group
 c) sub_assemblies -> list<Assembly or Element or mix of both>
 
 # ==========================================================================
-# How new assemblies or groups are add_assemblyed?
+# How new assemblies or groups are added?
 # ==========================================================================
-When a sub_assembly assembly is add_assemblyed the parent_assembly is set to the value assembly.
-def add_assembly_assembly(self, sub_assembly):
+When a sub_assembly assembly is added the parent_assembly is set to the value assembly.
+def add_assembly(self, sub_assembly):
     sub_assembly.parent_assembly = self
-    self.sub_assemblies.add(sub_assembly)
+    self.sub_assemblies.append(sub_assembly)
 
 # ==========================================================================
 # What the assembly is copied?
@@ -148,36 +148,12 @@ class Assembly(Data):
         self.make_copy = make_copy
         self.value = value if self.make_copy is False or isinstance(value, str) else value.copy()
         self.parent_assembly = None
-        self.sub_assemblies = SortedList()
+        self.sub_assemblies = []  # can be a list or dictionary or sorted dictionary
 
         # --------------------------------------------------------------------------
         # attributes
         # --------------------------------------------------------------------------
         self.init_root()
-
-    # ==========================================================================
-    # SORTED LIST METHODS
-    # ==========================================================================
-    # def add_by_key(self, value):
-    #     if(isinstance(value, str)):
-    #         # try cast it to integer
-    #         try:
-    #             value = int(value)
-    #             self.sub_assemblies.add
-    #         except:
-
-    def __lt__(self, other):
-        # Add at the end of the list
-        # If you need sorting implement your own comparator
-        if (isinstance(self.value, str) and isinstance(other.value, str)):
-            try:
-                integer0 = int(self.value)
-                integer1 = int(other.value)
-                return integer0 < integer1
-            except ValueError:
-                return self.value < other.value
-        else:
-            return True
 
     # ==========================================================================
     # SERIALIZATION
@@ -387,12 +363,12 @@ class Assembly(Data):
 
     # ==========================================================================
     # APPEND METHODS
-    # add_assembly() | add_assembly_sub_assemblies
+    # add() | add_sub_assemblies
     # add_by_index() | add_by_indexs
     # merge_assembly() | merge_assemblies
     # ==========================================================================
 
-    def add_assembly(self, sub_assembly_or_object, sorted=True):
+    def add(self, sub_assembly_or_object, sorted=True):
         sub_assembly = (
             sub_assembly_or_object if isinstance(sub_assembly_or_object, Assembly) else Assembly(sub_assembly_or_object)
         )
@@ -410,10 +386,9 @@ class Assembly(Data):
                 insert_index += 1
 
             # Insert the item at the determined index
-            #self.sub_assemblies.insert(insert_index, sub_assembly)
-            self.sub_assemblies.add(sub_assembly)
+            self.sub_assemblies.insert(insert_index, sub_assembly)
         else:
-            self.sub_assemblies.add(sub_assembly)
+            self.sub_assemblies.append(sub_assembly)
 
     def merge_assembly(self, a1, allow_duplicate_assembly_branches=False, allow_duplicate_assembly_leaves=True):
         # Helper function to find a node with the same name in a list of nodes
@@ -438,8 +413,8 @@ class Assembly(Data):
                 # Recursively merge the sub_assemblies of the two nodes
                 existing_node_a0.merge_assembly(node_a1, allow_duplicate_assembly_branches, allow_duplicate_assembly_leaves)
             else:
-                # If no corresponding node is found, add_assembly the node from a1 to a0
-                self.add_assembly(node_a1)
+                # If no corresponding node is found, add the node from a1 to a0
+                self.add(node_a1)
 
     def add_by_index(
         self, value, name_list=None, allow_duplicate_assembly_branches=False, allow_duplicate_assembly_leaves=True
@@ -452,11 +427,11 @@ class Assembly(Data):
         for name in name_list:
             assemblyvalue = str(name) if isinstance(name, int) else name
             sub_assembly = Assembly(assemblyvalue)
-            last_branch.add_assembly(sub_assembly)
+            last_branch.add(sub_assembly)
             last_branch = sub_assembly
 
-        # add_assembly "real" value to the last value
-        last_branch.add_assembly(Assembly(value))
+        # add "real" value to the last value
+        last_branch.add(Assembly(value))
 
         # merge this value with the rest
         self.merge_assembly(branch_tree, allow_duplicate_assembly_branches, allow_duplicate_assembly_leaves)
@@ -508,12 +483,12 @@ class Assembly(Data):
                 elif isinstance(user_object, Assembly):
                     self.sub_assemblies[input_name] = user_object
 
-    def __add_assembly__(self, other):
+    def __add__(self, other):
         copy = self.copy()
         copy.merge_assembly(other)
         return copy
 
-    def __iadd_assembly__(self, other):
+    def __iadd__(self, other):
         copy = self.copy()
         copy.merge_assembly(other)
         return copy
@@ -528,7 +503,7 @@ class Assembly(Data):
         # Recursively copy sub_assembly and its descendants
         for sub_assembly in self.sub_assemblies:
             child_copy = sub_assembly._recursive_copy()
-            new_instance.add_assembly(child_copy)
+            new_instance.add(child_copy)
 
         return new_instance
 
@@ -622,7 +597,7 @@ class Assembly(Data):
         if method_to_call is None or callable(method_to_call) is False:
             print("WARNING Method --> " + method_name + " <-- not found in " + str(self.value))
         else:
-            # Call the method with add_assemblyitional arguments
+            # Call the method with additional arguments
             result = method_to_call(*args, **kwargs)
             # check possible results
             collection.append(result)
@@ -700,21 +675,21 @@ class Assembly(Data):
 
         if level == 0:
             elements = collapsed_assembly.flatten()
-            collapsed_assembly.sub_assemblies = SortedList()
+            collapsed_assembly.sub_assemblies = []
             for element in elements:
-                collapsed_assembly.add_assembly(Assembly(element, True))
+                collapsed_assembly.add(Assembly(element, True))
 
         # Iterate through sub-assemblies.
         queue = []
         queue.extend(collapsed_assembly.sub_assemblies)
         for sub_assembly in queue:
-            # If the sub-assembly has sub-assemblies, add_assembly them to the queue.
+            # If the sub-assembly has sub-assemblies, add them to the queue.
             if (sub_assembly.level >= level):
-                # find leave and add_assembly it to the sub_assembly
+                # find leave and add it to the sub_assembly
                 elements = sub_assembly.flatten()
-                sub_assembly.sub_assemblies = SortedList()
+                sub_assembly.sub_assemblies = []
                 for element in elements:
-                    sub_assembly.add_assembly(Assembly(element, True))
+                    sub_assembly.add(Assembly(element, True))
             else:
                 queue.extend(sub_assembly.sub_assemblies)
 
@@ -735,12 +710,12 @@ class Assembly(Data):
         queue = []
         queue.extend(collapsed_assembly.sub_assemblies)
         for sub_assembly in queue:
-            # If the sub-assembly has sub-assemblies, add_assembly them to the queue.
+            # If the sub-assembly has sub-assemblies, add them to the queue.
             if (sub_assembly.level >= level):
-                # find leave and add_assembly it to the sub_assembly
+                # find leave and add it to the sub_assembly
                 sub_assembly.sub_assemblies = []
                 # if (isinstance(sub_assembly.value, str) is not True):
-                #     sub_assembly.add_assembly(Assembly(sub_assembly.value, True))
+                #     sub_assembly.add(Assembly(sub_assembly.value, True))
             else:
                 queue.extend(sub_assembly.sub_assemblies)
 
@@ -781,10 +756,10 @@ def build_assembly_tree_0():
     root = Assembly("Oktoberfest")
     Schnitzel_Haus = Assembly("Restaurant The Taste of Berlin")
     Bier = Assembly("Bier")
-    Bier.add_assembly(Assembly(Element(name="Water", simplex=Point(0, 0, 0), complex=Point(0, 0, 0))))
-    Bier.add_assembly(Assembly(Element(name="Wheat malt", simplex=Point(0, 0, 0), complex=Point(0, 0, 0))))
-    Bier.add_assembly(Assembly(Element(name="Noble hops", simplex=Point(0, 0, 0), complex=Point(0, 0, 0))))
-    Bier.add_assembly(Assembly(Element(name="Wheat beer yeast", simplex=Point(0, 0, 0), complex=Point(0, 0, 0))))
+    Bier.add(Assembly(Element(name="Water", simplex=Point(0, 0, 0), complex=Point(0, 0, 0))))
+    Bier.add(Assembly(Element(name="Wheat malt", simplex=Point(0, 0, 0), complex=Point(0, 0, 0))))
+    Bier.add(Assembly(Element(name="Noble hops", simplex=Point(0, 0, 0), complex=Point(0, 0, 0))))
+    Bier.add(Assembly(Element(name="Wheat beer yeast", simplex=Point(0, 0, 0), complex=Point(0, 0, 0))))
 
     Schnitzel = Assembly("Schnitzel")
     Chicken = Assembly(Element(name="Chicken", simplex=Point(0, 0, 0), complex=Point(0, 0, 0)))
@@ -793,13 +768,13 @@ def build_assembly_tree_0():
     Egg = Assembly(Element(name="Egg", simplex=Point(0, 0, 0), complex=Point(0, 0, 0)))
     Oil = Assembly(Element(name="Oil", simplex=Point(0, 0, 0), complex=Point(0, 0, 0)))
     Oil = Assembly(Point(0, 0, 0))
-    Schnitzel.add_assembly(Chicken)
-    Chicken.add_assembly(Salt)
-    Schnitzel.add_assembly(Egg)
-    Schnitzel.add_assembly(Oil)
-    Schnitzel_Haus.add_assembly(Bier)
-    Schnitzel_Haus.add_assembly(Schnitzel)
-    root.add_assembly(Schnitzel_Haus)
+    Schnitzel.add(Chicken)
+    Chicken.add(Salt)
+    Schnitzel.add(Egg)
+    Schnitzel.add(Oil)
+    Schnitzel_Haus.add(Bier)
+    Schnitzel_Haus.add(Schnitzel)
+    root.add(Schnitzel_Haus)
 
     return root
 
@@ -809,13 +784,13 @@ def build_assembly_tree_1():
     root = Assembly("Oktoberfest")
     Schnitzel_Haus = Assembly("Restaurant The Taste of Berlin")
     Bier = Assembly("Bier")
-    Bier.add_assembly(Assembly(Element(name="Water", simplex=Point(0, 0, 0))))
-    Bier.add_assembly(Assembly(Element(name="Pilsner malt", simplex=Point(0, 0, 0))))
-    Bier.add_assembly(Assembly(Element(name="Saaz hops", simplex=Point(0, 0, 0))))
-    Bier.add_assembly(Assembly(Element(name="Lager yeast", simplex=Point(0, 0, 0))))
+    Bier.add(Assembly(Element(name="Water", simplex=Point(0, 0, 0))))
+    Bier.add(Assembly(Element(name="Pilsner malt", simplex=Point(0, 0, 0))))
+    Bier.add(Assembly(Element(name="Saaz hops", simplex=Point(0, 0, 0))))
+    Bier.add(Assembly(Element(name="Lager yeast", simplex=Point(0, 0, 0))))
 
     Bier2 = Assembly("Bier2")
-    Schnitzel_Haus.add_assembly(Bier2)
+    Schnitzel_Haus.add(Bier2)
     Schnitzel = Assembly("Schnitzel")
     Veal = Assembly(Element(name="Veal", simplex=Point(0, 0, 0)))
     Salt = Assembly(Element(name="Salt", simplex=Point(0, 0, 0)))
@@ -823,15 +798,15 @@ def build_assembly_tree_1():
     Butter = Assembly(Element(name="Butter", simplex=Point(0, 0, 0)))
     Lemon = Assembly(Element(name="Lemon", simplex=Point(0, 0, 0)))
 
-    Schnitzel.add_assembly(Veal)
-    Schnitzel.add_assembly(Salt)
-    Schnitzel.add_assembly(Egg)
-    Schnitzel.add_assembly(Egg)
-    Schnitzel.add_assembly(Butter)
-    Schnitzel.add_assembly(Lemon)
-    Schnitzel_Haus.add_assembly(Bier)
-    Schnitzel_Haus.add_assembly(Schnitzel)
-    root.add_assembly(Schnitzel_Haus)
+    Schnitzel.add(Veal)
+    Schnitzel.add(Salt)
+    Schnitzel.add(Egg)
+    Schnitzel.add(Egg)
+    Schnitzel.add(Butter)
+    Schnitzel.add(Lemon)
+    Schnitzel_Haus.add(Bier)
+    Schnitzel_Haus.add(Schnitzel)
+    root.add(Schnitzel_Haus)
     # print(root.depth)
     # print(root.sub_assemblies[0].depth)
     return root
@@ -859,7 +834,7 @@ if __name__ == "__main__":
 
     # # # getter - append assemnbly to the current branch
     # new_element1 = Element(name="___NEW_INSERTED_ELEMENT_1___", id=[0, 1])
-    # a0["Restaurant The Taste of Berlin"]["Bier"].add_assembly(new_element1)
+    # a0["Restaurant The Taste of Berlin"]["Bier"].add(new_element1)
 
     # # these operators call merge_assembly method, the structure is copie internally
     # # if you do not want to copy data just call merge_assembly method

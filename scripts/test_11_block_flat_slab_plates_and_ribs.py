@@ -46,7 +46,32 @@ FabricationNest.pack_elements(elements=assembly.flatten(), nest_type=2, inflate=
 # ==========================================================================
 # VIEW2
 # ==========================================================================
+assembly.print_tree()
 element_lists = assembly.collapse(1).to_nested_list()
+
+# print(element_lists)
+def flatten_to_individual_lists(tree):
+    lists = []
+    queue = list(tree)
+    while queue:
+        item = queue.pop(0)
+        individual_elements = []
+        if isinstance(item, list):
+            for i in item:
+                if isinstance(i, list):
+                    queue = [i] + queue
+                else:
+                    individual_elements.append(i)
+        if (len(individual_elements) > 0):
+            lists.append(individual_elements)
+
+    if (len(lists) == 0):
+        return tree
+    else:
+        return lists
+
+# # element_lists = [item for sublist in element_lists for item in sublist]
+# # print(flatten_to_individual_lists(element_lists))
 Viewer.show_elements(
     element_lists, viewer_type="view2", show_grid=False, geometry=geometry
 )  # assembly._elements.to_trimmed_list("x")
