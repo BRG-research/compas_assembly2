@@ -28,9 +28,9 @@ if __name__ == "__main__":
     # ==========================================================================
     # COLLIDE ELEMENTS
     # ==========================================================================
-    assembly = Assembly(name="elements_json")
+    assembly = Assembly(value="elements_json")
     for element in elements_json:
-        assembly.add_element_by_index(element)
+        assembly.add_by_index(element)
     # collision_pairs = assembly.find_collisions_brute_force()
     # # pair0 = collision_pairs[0]
 
@@ -52,7 +52,7 @@ if __name__ == "__main__":
 # ==========================================================================
 # COMPAS_WOOD
 # ==========================================================================
-if compas_wood_available:
+if compas_wood_available and False:
     # ==========================================================================
     # COMPAS_WOOD SCALE POLYLINES DUE TO TOLERANCE
     # ==========================================================================
@@ -232,10 +232,10 @@ if compas_wood_available:
     # ==========================================================================
     FabricationNest.pack_elements(elements=assembly.to_list(), nest_type=2, inflate=0.1, height_step=4)
 
-    # ==========================================================================
-    # VIEW2
-    # ==========================================================================
-    element_lists = assembly.to_lists(1)
-    Viewer.show_elements(
-        element_lists, viewer_type="view2", show_grid=False, geometry=geometry
-    )  # assembly._elements.to_trimmed_list("x")
+# ==========================================================================
+# VIEW2
+# ==========================================================================
+element_lists = assembly.to_lists(1)
+Viewer.show_elements(
+    element_lists, viewer_type="view2", show_grid=False, geometry=geometry
+)  # assembly._elements.to_trimmed_list("x")

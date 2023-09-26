@@ -572,7 +572,7 @@ def remap_sequence(i, n):
 # return remapped_sequence
 
 plate_thickness = 0.04
-assembly = Assembly()
+assembly = Assembly(value="my_assembly")
 side_planes_for_beams = [
     Plane(Point(0, 0, height - plate_thickness), Vector(0, 0, 1)),
     Plane(Point(-length, 0, 0), Vector(-1, 0, 0)),
@@ -648,7 +648,7 @@ for i in range(len(planes_assemblys)):
         * 0.5,
     )
 
-    assembly.add_element_by_index(
+    assembly.add_by_index(
         Element.from_plate_planes(
             bottom_plate_base_plane,
             bottom_plate_planes,
@@ -684,7 +684,7 @@ for i in range(len(planes_assemblys)):
 
     top_plate_base_plane = Plane(Point(0, 0, height), Vector(0, 0, 1))
 
-    assembly.add_element_by_index(
+    assembly.add_by_index(
         Element.from_plate_planes(
             top_plate_base_plane, top_plate_planes, plate_thickness, [1, remap_sequence(i, len(planes_assemblys))]
         )
@@ -731,12 +731,12 @@ for i in range(len(planes_assemblys)):
 
     web_base_plane = Plane(Point(0, 0.35, 0), Vector(0, 1, 0))
 
-    assembly.add_element_by_index(
+    assembly.add_by_index(
         Element.from_plate_planes(
             web_base_plane, bottom_plate_planes, plate_thickness, [0, remap_sequence(i, len(planes_assemblys))]
         )
     )
-    assembly.add_element_by_index(
+    assembly.add_by_index(
         Element.from_plate_planes(
             web_base_plane.offset(-0.75),
             bottom_plate_planes,
@@ -815,7 +815,7 @@ for i in range(len(planes_assemblys0)):
     p_web1 = Plane(linear_interpolation(p0, p1, 0.85), p_web0.normal)
 
     id = [1, remap_sequence(i, len(planes_assemblys0))]
-    assembly.add_element_by_index(Element.from_plate_planes(p_web0, top_plate_planes, plate_thickness, id))
+    assembly.add_by_index(Element.from_plate_planes(p_web0, top_plate_planes, plate_thickness, id))
 
     top_plate_planes = [
         Plane(
@@ -835,7 +835,7 @@ for i in range(len(planes_assemblys0)):
         Plane(Point(0, offset, 0), Vector(0, 1, 0)),
     ]
 
-    assembly.add_element_by_index(
+    assembly.add_by_index(
         Element.from_plate_planes(
             p_web1,
             top_plate_planes,
@@ -845,29 +845,28 @@ for i in range(len(planes_assemblys0)):
         )
     )
 
-    for temp_element in assembly._elements[id[0], id[1]]:
+    for temp_element in assembly[id[0]][ id[1]]:
         temp_element.insertion = top_plate_planes[0].normal
 
-print("assembly", assembly)
-print("root", assembly._assembly_childs[0]._root)
-print("root", assembly._assembly_childs[1]._root)
+# print("assembly", assembly)
 # ==========================================================================
 # NEST ELEMENTS
 # ==========================================================================
 # assembly.to_nested_list
 # elements = assembly.reassembly_by_keeping_first_indices(0)
-FabricationNest.pack_elements(elements=assembly.to_list(), nest_type=2, inflate=0.1, height_step=4)
+FabricationNest.pack_elements(elements=assembly.to_lists(0), nest_type=2, inflate=0.1, height_step=4)
 
 # ==========================================================================
 # WRITE PLATE GEOMETRY TO JSON
 # ==========================================================================
-simplices = assembly.get_elements_properties("simplex", True)
+simplices = []
+assembly.child_properties(simplices, "simplex")
 json_dump(simplices, "tests/json_dumps/simplices.json")
 
 # ==========================================================================
 # COMPAS_WOOD
 # ==========================================================================
-if compas_wood_available:
+if compas_wood_available and False:
     # ==========================================================================
     # COMPAS_WOOD SCALE POLYLINES DUE TO TOLERANCE
     # ==========================================================================
@@ -984,13 +983,17 @@ else:
 # ==========================================================================
 # VIEWER
 # ==========================================================================
+# assembly = assembly.collapse(3)
+assembly = assembly.graft()
 print(assembly)
 
-lists = assembly.to_lists(2)
+lists = assembly.to_lists(0)
 
-# assembly.print_elements()
-print(assembly._depth)
-print(lists[0])
+# print(assembly.number_of_elements)
+# print(len(lists))
+
+# print(assembly.depth)
+# print(lists[0])
 color_red = [3] * assembly.number_of_elements
 color_red[0] = 0
 color_red[1] = 0

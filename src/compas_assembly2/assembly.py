@@ -19,10 +19,10 @@ class Assembly:
 
 DO THIS INSTEAD BECAUSE ASSEMBLY MUST BE FINITE NOT RECURSIVE + IT CAN STORE PATH:
 class Assembly:
-    def __init__(self, assemblyvalue):
-        self.value = assemblyvalue  # can be a string or class<Element>
+    def __init__(self, value):
+        self.value = value  # can be a string or class<Element>
         self.parent_assembly = None
-        self.sub_assemblies = [] # list<Assembly>
+        self.sub_assemblies = SortedList() # meaning the class<Assembly> must have __lt__ method
 
 
 # ==========================================================================
@@ -306,6 +306,16 @@ class Assembly(Data):
         else:
             return "ELEMENT"
 
+    @property
+    def number_of_elements(self):
+        number_of_elements = 0
+        for sub_assembly in self.sub_assemblies:
+            if isinstance(sub_assembly.value, str):
+                number_of_elements += sub_assembly.number_of_elements
+            else:
+                number_of_elements += 1
+        return number_of_elements
+
     def _stringify_tree(self, tree_str):
         prefix = "   " * self.level
         prefix = prefix + "|__ " if self.parent_assembly else ""
@@ -383,7 +393,7 @@ class Assembly(Data):
                     queue.append(sub_assembly)
 
         # remove the attributes because they are not needed anymore
-        self.remove_root_attributes()
+        # self.remove_root_attributes()
 
     # ==========================================================================
     # APPEND METHODS
@@ -720,6 +730,48 @@ class Assembly(Data):
 
         return collapsed_assembly
 
+    def graft(self, name="0"):
+        """iterate through the assemblies if the leaves have multiple elements in a current assembly, then split it into individual branches under the given name"""
+        # Start by copying the current assembly.
+        grafted_assembly = self.copy()
+
+        # Iterate through sub-assemblies.
+        queue = []
+        queue.extend(grafted_assembly.sub_assemblies)
+        for sub_assembly in queue:
+            # If the sub-assembly has sub-assemblies, add_assembly them to the queue.
+            if (isinstance(sub_assembly.value, str) is False):
+                print("found")
+                # copy assembly with one element and add_assembly it to the sub_assembly
+                # temp_grafted_assembly = Assembly(value=name)
+                # temp_grafted_assembly.add_assembly(sub_assembly.copy())
+                # temp_grafted_assembly.transfer_root(grafted_assembly.root)
+                # print(temp_grafted_assembly)
+
+                # # replace the current assembly
+                # # sub_assembly.value = "temp"
+                # temp = Assembly(value=Assembly(value="temp"))
+                # temp.transfer_root(grafted_assembly.root)
+
+                # print(temp)
+                temp = Assembly(value=sub_assembly.value)
+                # temp.transfer_root(grafted_assembly.root)
+                sub_assembly.value = name
+                sub_assembly.add_assembly(temp)
+                # temp_grafted_assembly.remove_root()
+
+                # replace the assembly with the new one
+                # sub_assembly.value = temp_grafted_assembly
+
+                # sub_assembly.add_assembly(temp_grafted_assembly)
+                # sub_assembly.value = Assembly(value=name)
+                # sub_assembly.remove_root()
+                # element_assembly_copy.remove_root()
+            else:
+                queue.extend(sub_assembly.sub_assemblies)
+
+        return grafted_assembly
+
     def prune(self, level):
         """Iterate through sub-assemblies and adjust their levels based on user input."""
         if level < 0:
@@ -761,6 +813,39 @@ class Assembly(Data):
                 return result
 
         return _to_nested_list(self)
+    
+    def to_lists(self, collapse_level=None):
+        """ unwrap the nested nested n times lists in one list of lists"""
+
+        # references
+        assembly = self
+
+        # collapse
+        if (collapse_level is not None):
+            assembly = self.collapse(collapse_level)
+
+        # convert the tree to nested list
+        tree = assembly.to_nested_list()
+
+        # convert the nested lists to list of lists
+        lists = []
+        queue = list(tree)
+        while queue:
+            item = queue.pop(0)
+            individual_elements = []
+            if isinstance(item, list):
+                for i in item:
+                    if isinstance(i, list):
+                        queue = [i] + queue
+                    else:
+                        individual_elements.append(i)
+            if (len(individual_elements) > 0):
+                lists.append(individual_elements)
+
+        if (len(lists) == 0):
+            return tree
+        else:
+            return lists
 
     def _flatten(self, list):
         if self.sub_assemblies:

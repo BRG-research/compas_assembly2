@@ -28,9 +28,9 @@ if __name__ == "__main__":
     # ==========================================================================
     # COLLIDE ELEMENTS
     # ==========================================================================
-    assembly = Assembly(name="elements_json")
+    assembly = Assembly(value="elements_json")
     for element in elements_json:
-        assembly.add_element_by_index(element)
+        assembly.add_by_index(element)
 
     geometry = []
 
@@ -41,12 +41,12 @@ if __name__ == "__main__":
 # ==========================================================================
 # NEST ELEMENTS
 # ==========================================================================
-FabricationNest.pack_elements(elements=assembly.to_list(), nest_type=2, inflate=0.1, height_step=4)
+FabricationNest.pack_elements(elements=assembly.flatten(), nest_type=2, inflate=0.1, height_step=4)
 
 # ==========================================================================
 # VIEW2
 # ==========================================================================
-element_lists = assembly.to_lists(1)
+element_lists = assembly.to_lists(2)
 
 Viewer.show_elements(
     element_lists, viewer_type="view2", show_grid=False, geometry=geometry
