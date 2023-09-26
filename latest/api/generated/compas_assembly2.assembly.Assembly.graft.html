@@ -3,7 +3,7 @@
 
 <head>
   
-  <title>compas_assembly2 - Assembly.child_properties</title>
+  <title>compas_assembly2 - Assembly.graft</title>
   
 
   <meta charset="utf-8" />
@@ -20,11 +20,11 @@
   <link rel="stylesheet" type="text/css" href="../../_static/css/compas-reference.css" />
 
   
-  <link rel="next" title="Assembly.collapse" href="compas_assembly2.assembly.Assembly.collapse.html" />
+  <link rel="next" title="Assembly.init_root" href="compas_assembly2.assembly.Assembly.init_root.html" />
   
 
   
-  <link rel="prev" title="Assembly.child_behave" href="compas_assembly2.assembly.Assembly.child_behave.html" />
+  <link rel="prev" title="Assembly.from_data" href="compas_assembly2.assembly.Assembly.from_data.html" />
   
 
   <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
@@ -88,19 +88,20 @@
             
             <li class="breadcrumb-item"><a href="compas_assembly2.assembly.Assembly.html">Assembly</a></li>
             
-            <!-- <li class="breadcrumb-item active" aria-current="page">Assembly.child_properties</li> -->
+            <!-- <li class="breadcrumb-item active" aria-current="page">Assembly.graft</li> -->
           </ol>
         </nav>
         
 
         
         
-        <section class="detail" id="assembly-child-properties">
-<h1>Assembly.child_properties</h1>
+        <section class="detail" id="assembly-graft">
+<h1>Assembly.graft</h1>
 <dl class="py method">
-<dt class="sig sig-object py" id="compas_assembly2.assembly.Assembly.child_properties">
-<span class="sig-prename descclassname"><span class="pre">Assembly.</span></span><span class="sig-name descname"><span class="pre">child_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">collection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attribute_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'_aabb'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BRG-research/compas_assembly2/blob/master/src/compas_assembly2/assembly.py#L606"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="compas_assembly2.assembly.Assembly.graft">
+<span class="sig-prename descclassname"><span class="pre">Assembly.</span></span><span class="sig-name descname"><span class="pre">graft</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'0'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BRG-research/compas_assembly2/blob/master/src/compas_assembly2/assembly.py#L733"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>iterate through the assemblies if the leaves have multiple elements in a current assembly, then split it into individual branches under the given name</p>
+</dd></dl>
 
 </section>
 
@@ -160,7 +161,7 @@
       <div class="d-none d-xl-block col-xl-2 compas-toc" role="toc">
         
         <ul class="nav flex-column" id="compas-toc">
-<li class="nav-item"><a class="nav-link reference internal" href="#">Assembly.child_properties</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="#">Assembly.graft</a></li>
 </ul>
 
       </div>
@@ -172,20 +173,20 @@
   <footer class="compas-footer">
     <nav class="nav p-2">
       
-      <a href="compas_assembly2.assembly.Assembly.child_behave.html" title="Assembly.child_behave" class="nav-link footer-link float-start text-left d-flex w-50" rel="prev">
+      <a href="compas_assembly2.assembly.Assembly.from_data.html" title="Assembly.from_data" class="nav-link footer-link float-start text-left d-flex w-50" rel="prev">
         <div class="nav-button p-2 m-2"><i class="fas fa-arrow-left"></i></div>
         <div class="nav-title flex-grow-1 align-self-center">
           <div class="nav-direction small font-weight-light">Previous</div>
-          Assembly.child_behave
+          Assembly.from_data
         </div>
       </a>
       
 
       
-      <a href="compas_assembly2.assembly.Assembly.collapse.html" title="Assembly.collapse" class="nav-link footer-link float-end text-right d-flex w-50" rel="next">
+      <a href="compas_assembly2.assembly.Assembly.init_root.html" title="Assembly.init_root" class="nav-link footer-link float-end text-right d-flex w-50" rel="next">
         <div class="nav-title footer-link flex-grow-1 align-self-center">
           <div class="nav-direction small font-weight-light">Next</div>
-          Assembly.collapse
+          Assembly.init_root
         </div>
         <div class="nav-button p-2 m-2"><i class="fas fa-arrow-right"></i></div>
       </a>
