@@ -113,31 +113,34 @@ def depth(self):
 
 """
 
-import copy
-from compas.data import Data
-from compas.geometry import bounding_box, Point
-from compas.datastructures import Mesh
-from compas_assembly2 import Element
-from compas.colors import Color
-from compas_assembly2.sortedlist import SortedList
-from compas_assembly2.viewer import Viewer
-
 # todo:
 # [x] - 1. serialization methods
 # [x] - 2. flatten the tree, to nested lists, collapse leaves by certain amount
 # [ ] - 3. update example files
-# [ ] - 4. show method
+# [x] - 4. show method
 # [ ] - 5. write tests for transformation, copy, properties retrieval
 # [ ] - 6. create assembly from json file
 
 
+import copy
+from compas.data import Data
+from compas.geometry import bounding_box, Point
+from compas_assembly2 import Element
+from compas.colors import Color
+from compas_assembly2.sortedlist import SortedList
+from compas_assembly2.viewer import Viewer
+from compas.data import json_load, json_dump
+
+
 class Assembly(Data):
     """Assembly is a tree data-structure.
-    The recursive structure allows to store group names as tree branches and elements as tree leaves.
-    The root of assembly is responsible for storing links between elements"""
+    There are several ways how the data-structure can be used:
+    a) the recursive structure allows to store group names as tree branches and elements as tree leaves.
+    b) elememts can be nested within elements, which allows to store the assembly hierarchy.
+    c) the root of assembly is responsible for storing links between elements"""
 
     # ==========================================================================
-    # Constructor and main body of the tree structureAssembly_Tree
+    # CONSTRUCTOR THAt HAS A RECURSIVE DATA-STRUCTURE, DO NOT CHANGE IT!
     # ==========================================================================
     def __init__(self, value, make_copy=True):
         super(Assembly, self).__init__()
@@ -155,20 +158,34 @@ class Assembly(Data):
         # --------------------------------------------------------------------------
         self.init_root()
 
+    @staticmethod
+    def example():
+        root = Assembly("model")
+        structure = Assembly("structure")
+
+        timber = Assembly("timber")
+        timber.add_assembly(Assembly(Element(name="beam", simplex=Point(0, 0, 0))))
+        timber.add_assembly(Assembly(Element(name="beam", simplex=Point(0, 5, 0))))
+        timber.add_assembly(Assembly(Element(name="plate", simplex=Point(0, 0, 0))))
+        timber.add_assembly(Assembly(Element(name="plate", simplex=Point(0, 7, 0))))
+
+        concrete = Assembly("concrete")
+        structure.add_assembly(concrete)
+        concrete.add_assembly(Assembly(Element(name="node", simplex=Point(0, 0, 0))))
+        concrete.add_assembly(Assembly(Element(name="block", simplex=Point(0, 5, 0))))
+        concrete.add_assembly(Assembly(Element(name="block", simplex=Point(0, 0, 0))))
+
+        structure.add_assembly(timber)
+        root.add_assembly(structure)
+        return root
+
     # ==========================================================================
     # SORTED LIST METHODS
     # ==========================================================================
-    # def add_by_key(self, value):
-    #     if(isinstance(value, str)):
-    #         # try cast it to integer
-    #         try:
-    #             value = int(value)
-    #             self.sub_assemblies.add
-    #         except:
 
     def __lt__(self, other):
-        # Add at the end of the list
-        # If you need sorting implement your own comparator
+        """Less than operator for sorting assemblies by name.
+        It must be implemented for SortedList to work properly."""
         if isinstance(self.value, str) and isinstance(other.value, str):
             try:
                 integer0 = int(self.value)
@@ -177,6 +194,7 @@ class Assembly(Data):
             except ValueError:
                 return self.value < other.value
         else:
+            # returns false to add element to the end of the list
             return False
 
     # ==========================================================================
@@ -239,8 +257,25 @@ class Assembly(Data):
         # Return the object
         return obj
 
+    def serialize(self, fp, pretty=False):
+        """Serialize the assembly to a JSON file."""
+        json_dump(data=self.data, fp=fp, pretty=pretty)
+
+    @staticmethod
+    def deserialize(fp):
+        """Deserialize the assembly from a JSON file."""
+        data = json_load(fp=fp)
+        return Assembly.from_data(data)
+
+    # ==========================================================================
+    # ATTRIBUTES
+    # ==========================================================================
+
     @property
     def name(self):
+        """Returns the name the value either
+        a) the name of the group
+        b) the name of the element"""
         if isinstance(self.value, str):
             return self.value
         else:
@@ -248,10 +283,12 @@ class Assembly(Data):
 
     @property
     def is_group_or_assembly(self):
+        """Returns True if the current branch value is a string"""
         return isinstance(self.value, str)
 
     @property
     def level(self):
+        """Returns the level of the current branch"""
         level = 0
         p = self.parent_assembly
         while p:
@@ -261,6 +298,7 @@ class Assembly(Data):
 
     @property
     def root(self):
+        """Returns the root of the current branch"""
         current_node = self
         while current_node.parent_assembly:
             current_node = current_node.parent_assembly
@@ -268,6 +306,7 @@ class Assembly(Data):
 
     @property
     def depth(self):
+        """Returns the depth of the current branch"""
         # Initialize depth to 0 and start from the value node
         depth = 0
         current_node = self
@@ -297,13 +336,15 @@ class Assembly(Data):
 
     @property
     def type(self):
+        """Returns name GROUP if the value is string else ELEMENT"""
         if isinstance(self.value, str):
-            return "ASSEMBLY"
+            return "GROUP"
         else:
             return "ELEMENT"
 
     @property
     def number_of_elements(self):
+        """Counts the total number of elements in the assembly"""
         number_of_elements = 0
         for sub_assembly in self.sub_assemblies:
             if isinstance(sub_assembly.value, str):
@@ -313,9 +354,13 @@ class Assembly(Data):
                 number_of_elements += sub_assembly.number_of_elements
         return number_of_elements
 
+    # ==========================================================================
+    # PRINT METHODS
+    # ==========================================================================
+
     def __repr__(self):
+        """returns the printed tree structure"""
         return self.stringify_tree()
-        return self.name
 
     def _stringify_tree(self, tree_str):
         prefix = "   " * self.level
@@ -329,6 +374,7 @@ class Assembly(Data):
         return tree_str
 
     def stringify_tree(self):
+        """returns the printed tree structure as one string"""
         tree_str = (
             "\n======================================= ROOT ASSEMBLY =============================================\n"
         )
@@ -347,25 +393,27 @@ class Assembly(Data):
                 sub_assembly._print_tree()
 
     def print_tree(self):
+        """prints the tree structure"""
         print("======================================= ROOT ASSEMBLY =============================================")
         self._print_tree()
         print("===================================================================================================")
 
     # ==========================================================================
-    # Functionality for the root assembly
+    # ROOT BRANCH BEHAVIOR
     # ==========================================================================
 
     def init_root(self):
+        """initialize the root assembly properties"""
         if self.parent_assembly is None:
             self.graph = []
-            self.all_assemblies = {}
 
     def remove_root(self):
+        """remove the root assembly properties"""
         if self.parent_assembly is not None:
             del self.graph
-            del self.all_assemblies
 
     def transfer_root(self, new_root):
+        """transfer the root assembly properties"""
         # --------------------------------------------------------------------------
         # if it was already the sub_assembly it probably did not have any connectivity
         # --------------------------------------------------------------------------
@@ -379,27 +427,6 @@ class Assembly(Data):
         for pair in self.graph:
             new_root.graph.append(pair[0] + n, pair[1] + n)
 
-        # --------------------------------------------------------------------------
-        # update elements
-        # --------------------------------------------------------------------------
-        if not self.is_group_or_assembly:
-            self.all_assemblies[self.value.guid] = self.value  # type: ignore
-
-        queue = [self]
-        while queue:
-            value = queue.pop(0)
-
-            if not self.is_group_or_assembly:
-                self.all_assemblies[self.value.guid] = self.value  # type: ignore
-            for sub_assembly in value.sub_assemblies:
-                if not sub_assembly.is_group_or_assembly:
-                    self.all_assemblies[sub_assembly.value.guid] = sub_assembly.value
-                else:
-                    queue.append(sub_assembly)
-
-        # remove the attributes because they are not needed anymore
-        # self.remove_root_attributes()
-
     # ==========================================================================
     # APPEND METHODS
     # add_assembly() | add_assembly_sub_assemblies
@@ -407,31 +434,30 @@ class Assembly(Data):
     # merge_assembly() | merge_assemblies
     # ==========================================================================
 
-    def add_assembly(self, sub_assembly_or_object, sorted=True):
+    def add_assembly(self, sub_assembly_or_element):
+        """adds assembly to the current assembly sub-assemblies list,
+        if the user inout element or any other type, it will wrap into the assembly"""
+
+        # check if the input is an element or assembly
         sub_assembly = (
-            sub_assembly_or_object if isinstance(sub_assembly_or_object, Assembly) else Assembly(sub_assembly_or_object)
+            sub_assembly_or_element
+            if isinstance(sub_assembly_or_element, Assembly)
+            else Assembly(sub_assembly_or_element)
         )
 
+        # update the parent_assembly and transfer the root properties
         sub_assembly.parent_assembly = self
         sub_assembly.transfer_root(self)
 
-        # insert the sub_assembly
-        if sorted and sub_assembly.is_group_or_assembly:
-            # Find the index where the item should be inserted based on alphabetical order
-            insert_index = 0
-            while (
-                insert_index < len(self.sub_assemblies)
-                and self.sub_assemblies[insert_index].name < sub_assembly.name  # type: ignore
-            ):
-                insert_index += 1
-
-            # Insert the item at the determined index
-            # self.sub_assemblies.insert(insert_index, sub_assembly)
-            self.sub_assemblies.add(sub_assembly)
-        else:
-            self.sub_assemblies.add(sub_assembly)
+        # add_assembly the sub_assembly to the list
+        self.sub_assemblies.add(sub_assembly)
 
     def merge_assembly(self, a1, allow_duplicate_assembly_branches=False, allow_duplicate_assembly_leaves=True):
+        """merge elements within two assemblies
+        if the names of the groups are the same then the elements are merged in the same branch
+        else they are added based on the a1 group names
+        the merging have two boolean flag to allow duplicate branch names and leaves, if elements are references"""
+
         # Helper function to find a node with the same name in a list of nodes
         def find_node_by_path(nodes, node_a1):
             if allow_duplicate_assembly_branches:  # or a1.is_group_or_assembly or node_a1.is_group_or_assembly
@@ -462,6 +488,8 @@ class Assembly(Data):
     def add_by_index(
         self, value, name_list=None, allow_duplicate_assembly_branches=False, allow_duplicate_assembly_leaves=True
     ):
+        """add element to the assembly by creating group that follows element indices
+        otherwise user can give a list of names to add an element to the specific branch"""
         # create value
         name_list = name_list if name_list is not None else value.id
 
@@ -479,240 +507,8 @@ class Assembly(Data):
         # merge this value with the rest
         self.merge_assembly(branch_tree, allow_duplicate_assembly_branches, allow_duplicate_assembly_leaves)
 
-    def __getitem__(self, arg):
-
-        # string input
-        if isinstance(arg, str):
-            id = -1
-            for local_id, my_assembly in enumerate(self.sub_assemblies):
-                if my_assembly.name == arg:
-                    id = local_id
-                    break
-            if id == -1:
-                print("WARNING GETTER the element is not found")
-                return
-            else:
-                return self.sub_assemblies[id]
-        elif isinstance(arg, int):
-            return self.sub_assemblies[arg]
-            # # check if value is string
-            # if isinstance(self.sub_assemblies[arg].value, str):  # type: ignore
-            #     return self.sub_assemblies[arg]
-            # else:
-            #     return self.sub_assemblies[arg].value  # type: ignore
-
-    def __setitem__(self, arg, user_object):
-        input_name = arg
-
-        if isinstance(arg, int):
-            if isinstance(user_object, Element):
-                self.sub_assemblies[arg].value = user_object  # type: ignore
-            elif isinstance(user_object, Assembly):
-                user_object.parent_assembly = self.sub_assemblies[arg].parent_assembly
-                del self.sub_assemblies[arg]
-                self.sub_assemblies.add(user_object)
-
-        else:
-            # find index of the element
-            id = -1
-            for local_id, my_assembly in enumerate(self.sub_assemblies):
-                if my_assembly.name == input_name:
-                    id = local_id
-                    break
-
-            # if the element is not found
-            if id == -1:
-                print("WARNING SETTER the element is not found")
-                return
-            else:
-                if isinstance(user_object, Element):
-                    self.sub_assemblies[input_name].value = user_object  # type: ignore
-                elif isinstance(user_object, Assembly):
-                    self.sub_assemblies[input_name] = user_object
-
-    def __add__(self, other):
-        copy = self.copy()
-        copy.merge_assembly(other)
-        return copy
-
-    def __iadd__(self, other):
-        copy = self.copy()
-        copy.merge_assembly(other)
-        return copy
-
     # ==========================================================================
-    # copy
-    # ==========================================================================
-    def _recursive_copy(self):
-        # Create a new instance with the same value
-        new_instance = Assembly(self.value)
-
-        # Recursively copy sub_assembly and its descendants
-        for sub_assembly in self.sub_assemblies:
-            child_copy = sub_assembly._recursive_copy()
-            new_instance.add_assembly(child_copy)
-
-        return new_instance
-
-    def copy(self):
-        # Create a new instance with the same value
-        new_instance = self._recursive_copy()
-
-        # Once the structure is copied run the initialization again
-        if self.parent_assembly is None:
-            new_instance.init_root()  # collects all the elements
-            new_instance.graph = copy.deepcopy(self.graph)  # transfer the connectivity
-
-        return new_instance
-
-    # ==========================================================================
-    # geometry transformations
-    # transform_to_frame, transform_from_frame_to_frame, transform and copies
-    # ==========================================================================
-    def transform_to_frame(self, target_frame):
-        # apply the transformation the value
-        if isinstance(self.value, Element):
-            self.value.transformed_to_frame(target_frame)
-
-        # recursively iterate through sub_assemblies value and transform them
-        for sub_assembly in self.sub_assemblies:
-            sub_assembly.transform_to_frame(target_frame)
-
-    def transformed_to_frame(self, target_frame):
-        new_instance = self.copy()
-        new_instance.transform_to_frame(target_frame)
-        return new_instance
-
-    def transform_from_frame_to_frame(self, source_frame, target_frame):
-        # apply the transformation the value
-        if isinstance(self.value, Element):
-            self.value.transform_from_frame_to_frame(source_frame, target_frame)
-
-        # recursively iterate through sub_assemblies value and transform them
-        for sub_assembly in self.sub_assemblies:
-            sub_assembly.transform_to_frame(source_frame, target_frame)
-
-    def transformed_from_frame_to_frame(self, source_frame, target_frame):
-        new_instance = self.copy()
-        new_instance.transformed_from_frame_to_frame(source_frame, target_frame)
-        return new_instance
-
-    def transform(self, transformation):
-        # apply the transformation the value
-        if isinstance(self.value, Element):
-            self.value.transform(transformation)
-
-        # recursively iterate through sub_assemblies value and transform them
-        for sub_assembly in self.sub_assemblies:
-            sub_assembly.transform(transformation)
-
-    def transformed(self, transformation):
-        new_instance = self.copy()
-        new_instance.transform(transformation)
-        return new_instance
-
-    # ==========================================================================
-    # bounding volumes
-    # aabb
-    # ==========================================================================
-    def child_properties(self, collection, attribute_name="_aabb"):
-        # collect attibutes
-        if isinstance(self.value, Element):
-            result = getattr(self.value, attribute_name, None)
-
-            # check possible results
-            collection.append(result)
-            if result is None:
-                print("WARNING Attribute --> " + attribute_name + " <-- not found in " + str(self.value))
-            else:
-                collection.append(result)
-
-        # recursively iterate through sub_assemblies and collect the attribute
-        for sub_assembly in self.sub_assemblies:
-            sub_assembly.child_properties(collection, attribute_name)
-
-    def child_behave(self, collection, method_name="aabb", *args, **kwargs):
-        """# Assuming self is an instance of your class
-        self.child_behave("method_name", collection, arg1, arg2, kwarg1=value1, kwarg2=value2)"""
-
-        # run the method
-
-        # Use getattr() to check if the method exists and call it
-        method_to_call = getattr(self.value, method_name, None)
-
-        # check possible results
-        if method_to_call is None or callable(method_to_call) is False:
-            print("WARNING Method --> " + method_name + " <-- not found in " + str(self.value))
-        else:
-            # Call the method with add_assemblyitional arguments
-            result = method_to_call(*args, **kwargs)
-            # check possible results
-            collection.append(result)
-
-        # recursively iterate through sub_assemblies and collect the attribute
-        for sub_assembly in self.sub_assemblies:
-            sub_assembly.child_behave(collection, method_name, *args, **kwargs)
-
-    def aabb(self, inflate=0.00):
-        # first compute the aabb and then get it
-        collection = []
-        self.child_behave(collection, "aabb", inflate)
-
-        # the output can be empty
-        if collection is None:
-            print("WARNING the bounding box is empty")
-            return collection
-
-        # flatten all bounding-boxes points
-        collection_flat = []
-        for points in collection:
-            collection_flat.extend(points)
-
-        # compute the bounding-box from all the boxes
-        points_bbox = bounding_box(collection_flat)
-
-        return points_bbox
-
-    # ==========================================================================
-    # Vizualization
-    # ==========================================================================
-    def show(
-        self,
-        collapse_level=0,
-        viewer_type="view2",
-        width=1280,
-        height=1600,
-        show_grid=False,
-        show_indices=False,
-        show_names=False,
-        show_simplices=False,
-        show_complexes=True,
-        show_aabbs=False,
-        show_oobbs=False,
-        show_convex_hulls=False,
-        show_frames=False,
-        show_fabrication=False,
-        show_structure=False,
-        text_height=30,  # type: ignore
-        display_axis_scale=0.5,
-        point_size=8,
-        line_width=2,
-        colors=[
-            Color(0.929, 0.082, 0.498),
-            Color(0.129, 0.572, 0.815),
-            Color(0.5, 0.5, 0.5),
-            Color(0.95, 0.95, 0.95),
-            Color(0, 0, 0),
-        ],
-        color_red=[],
-        measurements=[],
-        geometry=[],
-    ):
-        lists_of_elements = self.to_lists(collapse_level) if collapse_level >= 0 else self.graft("0").to_lists()
-        Viewer.show_elements(lists_of_elements=lists_of_elements, viewer_type=viewer_type)
-
-    # ==========================================================================
-    # flattening
+    # MODIFY THE TREE STRUCTURE e.g. collapse, prune, graft
     # ==========================================================================
     def collapse(self, level):
         """Iterate through sub-assemblies and adjust their levels based on user input."""
@@ -765,7 +561,7 @@ class Assembly(Data):
         return grafted_assembly
 
     def prune(self, level):
-        """Iterate through sub-assemblies and adjust their levels based on user input."""
+        """Iterate through sub-assemblies and remove all sub-assemblies deeper than the given level."""
         if level < 0:
             raise ValueError("Level must be a non-negative integer.")
 
@@ -773,7 +569,7 @@ class Assembly(Data):
         collapsed_assembly = self.copy()
 
         if level == 0:
-            collapsed_assembly.sub_assemblies = []
+            collapsed_assembly.sub_assemblies = SortedList()
 
         # Iterate through sub-assemblies.
         queue = []
@@ -781,18 +577,22 @@ class Assembly(Data):
         for sub_assembly in queue:
             # If the sub-assembly has sub-assemblies, add_assembly them to the queue.
             if sub_assembly.level >= level:
-                # find leave and add_assembly it to the sub_assembly
-                sub_assembly.sub_assemblies = []
-                # if (isinstance(sub_assembly.value, str) is not True):
-                #     sub_assembly.add_assembly(Assembly(sub_assembly.value, True))
+                # delete the branches that are deeper than a certain level
+                sub_assembly.sub_assemblies = SortedList()
             else:
                 queue.extend(sub_assembly.sub_assemblies)
 
         return collapsed_assembly
 
+    # ==========================================================================
+    # CONVERTION TO LISTS
+    # ==========================================================================
     def to_nested_list(self):
-        def _to_nested_list(assembly):
+        """convert the tree to nested lists
+        ATTENTION: in majority of practical cases use to_lists() method instead
+        it reduces the hierarchy to a list of lists"""
 
+        def _to_nested_list(assembly):
             # divide into 1) empty assemblies 2) nested ones
             result = []
 
@@ -852,114 +652,295 @@ class Assembly(Data):
         return list
 
     def flatten(self):
+        """get all elemenets of the assembly in one single list"""
         list = []
         return self._flatten(list)
 
+    # ==========================================================================
+    # OPERATORS [], +, +=
+    # ==========================================================================
+    def __getitem__(self, arg):
+        """get the assembly by name or index
+        a) my_assembly["name"] or my_assembly[0]
+        b) or nested asses my_assembly["name1"]["name2"] or my_assembly[0][0]
 
-def build_assembly_tree_0():
+        ATTENTION:
+        if you want to retrieve an element write my_assembly["name"].value"""
 
-    root = Assembly("Oktoberfest")
-    Schnitzel_Haus = Assembly("Restaurant The Taste of Berlin")
-    Bier = Assembly("Bier")
-    Bier.add_assembly(Assembly(Element(name="Water", simplex=Point(0, 0, 0), complex=Point(0, 0, 0))))
-    Bier.add_assembly(Assembly(Element(name="Wheat malt", simplex=Point(0, 0, 0), complex=Point(0, 0, 0))))
-    Bier.add_assembly(Assembly(Element(name="Noble hops", simplex=Point(0, 0, 0), complex=Point(0, 0, 0))))
-    Bier.add_assembly(Assembly(Element(name="Wheat beer yeast", simplex=Point(0, 0, 0), complex=Point(0, 0, 0))))
+        # string input
+        if isinstance(arg, str):
+            id = -1
+            for local_id, my_assembly in enumerate(self.sub_assemblies):
+                if my_assembly.name == arg:
+                    id = local_id
+                    break
+            if id == -1:
+                print("WARNING GETTER the element is not found")
+                return
+            else:
+                return self.sub_assemblies[id]
+        elif isinstance(arg, int):
+            return self.sub_assemblies[arg]
 
-    Schnitzel = Assembly("Schnitzel")
-    Chicken = Assembly(Element(name="Chicken", simplex=Point(0, 0, 0), complex=Point(0, 0, 0)))
-    # Chicken = Assembly("Chicken")
-    Salt = Assembly(Element(name="Salt", simplex=Point(0, 0, 0), complex=Point(0, 0, 0)))
-    Egg = Assembly(Element(name="Egg", simplex=Point(0, 0, 0), complex=Point(0, 0, 0)))
-    Oil = Assembly(Element(name="Oil", simplex=Point(0, 0, 0), complex=Point(0, 0, 0)))
-    Oil = Assembly(Point(0, 0, 0))
-    Schnitzel.add_assembly(Chicken)
-    Chicken.add_assembly(Salt)
-    Schnitzel.add_assembly(Egg)
-    Schnitzel.add_assembly(Oil)
-    Schnitzel_Haus.add_assembly(Bier)
-    Schnitzel_Haus.add_assembly(Schnitzel)
-    root.add_assembly(Schnitzel_Haus)
+            # INCASE YOU WANT TO OUTPUT ELEMENT NOT THE ASSEMBLY
+            # # check if value is string
+            # if isinstance(self.sub_assemblies[arg].value, str):  # type: ignore
+            #     return self.sub_assemblies[arg]
+            # else:
+            #     return self.sub_assemblies[arg].value  # type: ignore
 
-    return root
+    def __setitem__(self, arg, user_object):
+        """replace current assembly or its value with the user given one"""
+        input_name = arg
 
+        if isinstance(arg, int):
+            if isinstance(user_object, Element):
+                self.sub_assemblies[arg].value = user_object  # type: ignore
+            elif isinstance(user_object, Assembly):
+                user_object.parent_assembly = self.sub_assemblies[arg].parent_assembly
+                del self.sub_assemblies[arg]
+                self.sub_assemblies.add(user_object)
 
-def build_assembly_of_elements():
+        else:
+            # find index of the element
+            id = -1
+            for local_id, my_assembly in enumerate(self.sub_assemblies):
+                if my_assembly.name == input_name:
+                    id = local_id
+                    break
 
-    root = Assembly("model")
-    structure = Assembly("structure")
+            # if the element is not found
+            if id == -1:
+                print("WARNING SETTER the element is not found")
+                return
+            else:
+                if isinstance(user_object, Element):
+                    self.sub_assemblies[input_name].value = user_object  # type: ignore
+                elif isinstance(user_object, Assembly):
+                    self.sub_assemblies[input_name] = user_object
 
-    timber = Assembly("timber")
-    timber.add_assembly(Assembly(Element(name="beam", simplex=Point(0, 0, 0))))
-    timber.add_assembly(Assembly(Element(name="beam", simplex=Point(0, 5, 0))))
-    timber.add_assembly(Assembly(Element(name="plate", simplex=Point(0, 0, 0))))
-    timber.add_assembly(Assembly(Element(name="plate", simplex=Point(0, 7, 0))))
+    def __add__(self, other):
+        """plus sign to merge two assemblies as a copy"""
+        copy = self.copy()
+        copy.merge_assembly(other)
+        return copy
 
-    concrete = Assembly("concrete")
-    structure.add_assembly(concrete)
-    concrete.add_assembly(Assembly(Element(name="node", simplex=Point(0, 0, 0))))
-    concrete.add_assembly(Assembly(Element(name="block", simplex=Point(0, 5, 0))))
-    concrete.add_assembly(Assembly(Element(name="block", simplex=Point(0, 0, 0))))
+    def __iadd__(self, other):
+        """plus equal sign to merge two assemblies as a copy"""
+        copy = self.copy()
+        copy.merge_assembly(other)
+        return copy
 
-    structure.add_assembly(timber)
-    root.add_assembly(structure)
-    return root
+    # ==========================================================================
+    # COPY
+    # ==========================================================================
+    def _recursive_copy(self):
+        # Create a new instance with the same value
+        new_instance = Assembly(self.value)
+
+        # Recursively copy sub_assembly and its descendants
+        for sub_assembly in self.sub_assemblies:
+            child_copy = sub_assembly._recursive_copy()
+            new_instance.add_assembly(child_copy)
+
+        return new_instance
+
+    def copy(self):
+        """copy assembly and its sub_assemblies"""
+        # Create a new instance with the same value
+        new_instance = self._recursive_copy()
+
+        # Once the structure is copied run the initialization again
+        if self.parent_assembly is None:
+            new_instance.init_root()  # collects all the elements
+            new_instance.graph = copy.deepcopy(self.graph)  # transfer the connectivity
+
+        return new_instance
+
+    # ==========================================================================
+    # TRANSFORM TREE ELEMENTS
+    # transform_to_frame, transform_from_frame_to_frame, transform and copies
+    # ==========================================================================
+    def transform_to_frame(self, target_frame):
+        """Transforms the value and all sub_assemblies to the target frame."""
+        # apply the transformation the value
+        if isinstance(self.value, Element):
+            self.value.transformed_to_frame(target_frame)
+
+        # recursively iterate through sub_assemblies value and transform them
+        for sub_assembly in self.sub_assemblies:
+            sub_assembly.transform_to_frame(target_frame)
+
+    def transformed_to_frame(self, target_frame):
+        """Transforms the value and all sub_assemblies to the target frame and returns a copy."""
+        new_instance = self.copy()
+        new_instance.transform_to_frame(target_frame)
+        return new_instance
+
+    def transform_from_frame_to_frame(self, source_frame, target_frame):
+        """Transforms the value and all sub_assemblies from the source frame to the target frame."""
+        # apply the transformation the value
+        if isinstance(self.value, Element):
+            self.value.transform_from_frame_to_frame(source_frame, target_frame)
+
+        # recursively iterate through sub_assemblies value and transform them
+        for sub_assembly in self.sub_assemblies:
+            sub_assembly.transform_to_frame(source_frame, target_frame)
+
+    def transformed_from_frame_to_frame(self, source_frame, target_frame):
+        """Transforms the value and all sub_assemblies from the source frame to the target frame and returns a copy."""
+        new_instance = self.copy()
+        new_instance.transformed_from_frame_to_frame(source_frame, target_frame)
+        return new_instance
+
+    def transform(self, transformation):
+        """Transforms the value and all sub_assemblies by the given transformation."""
+        # apply the transformation the value
+        if isinstance(self.value, Element):
+            self.value.transform(transformation)
+
+        # recursively iterate through sub_assemblies value and transform them
+        for sub_assembly in self.sub_assemblies:
+            sub_assembly.transform(transformation)
+
+    def transformed(self, transformation):
+        """Transforms the value and all sub_assemblies by the given transformation and returns a copy."""
+        new_instance = self.copy()
+        new_instance.transform(transformation)
+        return new_instance
+
+    # ==========================================================================
+    # GET ALL ELEMENT PROPERTIES OR RUN THEIR METHODS
+    # ==========================================================================
+    def child_properties(self, collection, attribute_name="_aabb"):
+        """get properties from the assembly values and sub_assemblies
+        usage:
+        collection = []
+        self.child_properties(collection, "attribute_name")"""
+        # collect attibutes
+        if isinstance(self.value, Element):
+            result = getattr(self.value, attribute_name, None)
+
+            # check possible results
+            collection.append(result)
+            if result is None:
+                print("WARNING Attribute --> " + attribute_name + " <-- not found in " + str(self.value))
+            else:
+                collection.append(result)
+
+        # recursively iterate through sub_assemblies and collect the attribute
+        for sub_assembly in self.sub_assemblies:
+            sub_assembly.child_properties(collection, attribute_name)
+
+    def child_behave(self, collection, method_name="aabb", *args, **kwargs):
+        """Run methods from all the elements in the assembly and sub_assemblies
+        Assuming self is an instance of your class
+        self.child_behave(collection, "method_name", arg1, arg2, kwarg1=value1, kwarg2=value2)"""
+
+        # run the method
+
+        # Use getattr() to check if the method exists and call it
+        method_to_call = getattr(self.value, method_name, None)
+
+        # check possible results
+        if method_to_call is None or callable(method_to_call) is False:
+            print("WARNING Method --> " + method_name + " <-- not found in " + str(self.value))
+        else:
+            # Call the method with add_assemblyitional arguments
+            result = method_to_call(*args, **kwargs)
+            # check possible results
+            collection.append(result)
+
+        # recursively iterate through sub_assemblies and collect the attribute
+        for sub_assembly in self.sub_assemblies:
+            sub_assembly.child_behave(collection, method_name, *args, **kwargs)
+
+    def aabb(self, inflate=0.00):
+        """compute the axis aligned bounding box of the assembly
+        by collecting all the elements bounding boxes"""
+        # first compute the aabb and then get it
+        collection = []
+        self.child_behave(collection, "aabb", inflate)
+
+        # the output can be empty
+        if collection is None:
+            print("WARNING the bounding box is empty")
+            return collection
+
+        # flatten all bounding-boxes points
+        collection_flat = []
+        for points in collection:
+            collection_flat.extend(points)
+
+        # compute the bounding-box from all the boxes
+        points_bbox = bounding_box(collection_flat)
+
+        return points_bbox
+
+    # ==========================================================================
+    # VIZUALIZE
+    # ==========================================================================
+    def show(
+        self,
+        collapse_level=0,
+        viewer_type="view2",
+        width=1280,
+        height=1600,
+        show_grid=False,
+        show_indices=False,
+        show_names=False,
+        show_simplices=False,
+        show_complexes=True,
+        show_aabbs=False,
+        show_oobbs=False,
+        show_convex_hulls=False,
+        show_frames=False,
+        show_fabrication=False,
+        show_structure=False,
+        text_height=30,  # type: ignore
+        display_axis_scale=0.5,
+        point_size=8,
+        line_width=2,
+        colors=[
+            Color(0.929, 0.082, 0.498),
+            Color(0.129, 0.572, 0.815),
+            Color(0.5, 0.5, 0.5),
+            Color(0.95, 0.95, 0.95),
+            Color(0, 0, 0),
+        ],
+        color_red=[],
+        measurements=[],
+        geometry=[],
+    ):
+        """visualize the assembly in the viewer,
+        check the Viewer.py file for more details"""
+        lists_of_elements = self.to_lists(collapse_level) if collapse_level >= 0 else self.graft("0").to_lists()
+        Viewer.show_elements(
+            lists_of_elements=lists_of_elements,
+            viewer_type=viewer_type,
+            width=width,
+            height=height,
+            show_grid=show_grid,
+            show_indices=show_indices,
+            show_names=show_names,
+            show_simplices=show_simplices,
+            show_complexes=show_complexes,
+            show_aabbs=show_aabbs,
+            show_oobbs=show_oobbs,
+            show_convex_hulls=show_convex_hulls,
+            show_frames=show_frames,
+            show_fabrication=show_fabrication,
+            show_structure=show_structure,
+            text_height=text_height,
+            display_axis_scale=display_axis_scale,
+            point_size=point_size,
+            line_width=line_width,
+            colors=colors,
+            color_red=color_red,
+            measurements=measurements,
+            geometry=geometry,
+        )
 
 
 if __name__ == "__main__":
-
-    # --------------------------------------------------------------------------
-    # Constructor
-    # --------------------------------------------------------------------------
-    a0 = build_assembly_of_elements()
-
-    # --------------------------------------------------------------------------
-    # Collection operators
-    # --------------------------------------------------------------------------
-    mesh = Mesh.from_polyhedron(6)
-    center = Point(0, 0.2578, 0.58)
-    new_element0 = Element(name="___NEW_INSERTED_ELEMENT_0___", id=[0, 1], simplex=center, complex=mesh)
-
-    # a0["Restaurant The Taste of Berlin"]["Bier"][0] = new_element0
-    a0 = a0.collapse(2)
-    # a0 = a0.prune(3)
-    # a0.collapse_sub_assemblies(0)
-    # print(a0.to_nested_list())
-
-    # # # getter - append assembly to the current branch
-    # new_element1 = Element(name="___NEW_INSERTED_ELEMENT_1___", id=[0, 1])
-    # a0["Restaurant The Taste of Berlin"]["Bier"].add_assembly(new_element1)
-
-    # # these operators call merge_assembly method, the structure is copied internally
-    # # if you do not want to copy data just call merge_assembly method
-    # # a1 = build_assembly_tree_1()
-    # # a0.merge_assembly(a1)
-    # # a0 = a0 + a1
-    # # a0 += a0
-
-    # new_element2 = Element(name="___NEW_INSERTED_ELEMENT_2___", id=[0, 1])
-    # a0.add_by_index(new_element2, None, allow_duplicate_assembly_branches=False, allow_duplicate_assembly_leaves=True)
-    # a0.add_by_index(new_element2, None, allow_duplicate_assembly_branches=False, allow_duplicate_assembly_leaves=True)
-    # a0.add_by_index(new_element2, [0, 2])
-
-    # # -----allow_duplicate_assembly_branc---------------------------------------------------------------------
-    # a0_copy = a0.copy()
-
-    # --------------------------------------------------------------------------
-    # print the tree
-    # --------------------------------------------------------------------------
-    a0.print_tree()
-
-    # --------------------------------------------------------------------------
-    # geometry methods
-    # -------------------------------------------------------------1-------------
-    # SERIALIZATION
-    # --------------------------------------------------------------------------
-    # json_dump(data=a0, fp="src/compas_assembly2/data_sets/assembly.json", pretty=True)
-    # a0_serialized = json_load(fp="src/compas_assembly2/data_sets/assembly.json")
-    # a0_serialized.print_tree()
-    # print(a0["Restaurant The Taste of Berlin"]["Bier"][0].complex[0].number_of_vertices())
-    # print(a0_serialized["Restaurant The Taste of Berlin"]["Bier"][0].complex[0].number_of_vertices())
-    # print(a0_serialized[0][0][0])
-    # print(a0_serialized[0][0][1])
-    # print(a0_serialized[0][1][1])
+    pass
