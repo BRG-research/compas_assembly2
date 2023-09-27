@@ -120,7 +120,6 @@ from compas.datastructures import Mesh
 from compas_assembly2 import Element
 from compas.colors import Color
 from compas_assembly2.sortedlist import SortedList
-from compas.data import json_dump, json_load
 from compas_assembly2.viewer import Viewer
 
 # todo:
@@ -130,8 +129,6 @@ from compas_assembly2.viewer import Viewer
 # [ ] - 4. show method
 # [ ] - 5. write tests for transformation, copy, properties retrieval
 # [ ] - 6. create assembly from json file
-# ...
-# DROPPED: 7. create a version with a dictionary, it is not dictionary, if really needed, then it is a sorted list (for sorting you also need keys)
 
 
 class Assembly(Data):
@@ -180,7 +177,7 @@ class Assembly(Data):
             except ValueError:
                 return self.value < other.value
         else:
-            return True
+            return False
 
     # ==========================================================================
     # SERIALIZATION
@@ -241,10 +238,6 @@ class Assembly(Data):
 
         # Return the object
         return obj
-
-    def __repr__(self):
-        return self.stringify_tree()
-        return self.name
 
     @property
     def name(self):
@@ -317,7 +310,12 @@ class Assembly(Data):
                 number_of_elements += sub_assembly.number_of_elements
             else:
                 number_of_elements += 1
+                number_of_elements += sub_assembly.number_of_elements
         return number_of_elements
+
+    def __repr__(self):
+        return self.stringify_tree()
+        return self.name
 
     def _stringify_tree(self, tree_str):
         prefix = "   " * self.level
@@ -332,7 +330,7 @@ class Assembly(Data):
 
     def stringify_tree(self):
         tree_str = (
-            "======================================= ROOT ASSEMBLY =============================================\n"
+            "\n======================================= ROOT ASSEMBLY =============================================\n"
         )
         tree_str += self._stringify_tree(tree_str)
         tree_str += (
@@ -385,14 +383,14 @@ class Assembly(Data):
         # update elements
         # --------------------------------------------------------------------------
         if not self.is_group_or_assembly:
-            self.all_assemblies[self.value.guid] = self.value
+            self.all_assemblies[self.value.guid] = self.value  # type: ignore
 
         queue = [self]
         while queue:
             value = queue.pop(0)
 
             if not self.is_group_or_assembly:
-                self.all_assemblies[self.value.guid] = self.value
+                self.all_assemblies[self.value.guid] = self.value  # type: ignore
             for sub_assembly in value.sub_assemblies:
                 if not sub_assembly.is_group_or_assembly:
                     self.all_assemblies[sub_assembly.value.guid] = sub_assembly.value
@@ -422,7 +420,8 @@ class Assembly(Data):
             # Find the index where the item should be inserted based on alphabetical order
             insert_index = 0
             while (
-                insert_index < len(self.sub_assemblies) and self.sub_assemblies[insert_index].name < sub_assembly.name
+                insert_index < len(self.sub_assemblies)
+                and self.sub_assemblies[insert_index].name < sub_assembly.name  # type: ignore
             ):
                 insert_index += 1
 
@@ -495,20 +494,24 @@ class Assembly(Data):
             else:
                 return self.sub_assemblies[id]
         elif isinstance(arg, int):
-            # check if value is string
-            if isinstance(self.sub_assemblies[arg].value, str):
-                return self.sub_assemblies[arg]
-            else:
-                return self.sub_assemblies[arg].value
+            return self.sub_assemblies[arg]
+            # # check if value is string
+            # if isinstance(self.sub_assemblies[arg].value, str):  # type: ignore
+            #     return self.sub_assemblies[arg]
+            # else:
+            #     return self.sub_assemblies[arg].value  # type: ignore
 
     def __setitem__(self, arg, user_object):
         input_name = arg
 
         if isinstance(arg, int):
             if isinstance(user_object, Element):
-                self.sub_assemblies[arg].value = user_object
+                self.sub_assemblies[arg].value = user_object  # type: ignore
             elif isinstance(user_object, Assembly):
-                self.sub_assemblies[arg] = user_object
+                user_object.parent_assembly = self.sub_assemblies[arg].parent_assembly
+                del self.sub_assemblies[arg]
+                self.sub_assemblies.add(user_object)
+
         else:
             # find index of the element
             id = -1
@@ -523,16 +526,16 @@ class Assembly(Data):
                 return
             else:
                 if isinstance(user_object, Element):
-                    self.sub_assemblies[input_name].value = user_object
+                    self.sub_assemblies[input_name].value = user_object  # type: ignore
                 elif isinstance(user_object, Assembly):
                     self.sub_assemblies[input_name] = user_object
 
-    def __add_assembly__(self, other):
+    def __add__(self, other):
         copy = self.copy()
         copy.merge_assembly(other)
         return copy
 
-    def __iadd_assembly__(self, other):
+    def __iadd__(self, other):
         copy = self.copy()
         copy.merge_assembly(other)
         return copy
@@ -705,9 +708,7 @@ class Assembly(Data):
         measurements=[],
         geometry=[],
     ):
-        lists_of_elements = (
-            self.collapse(collapse_level).to_lists() if collapse_level >= 0 else self.graft("0").to_lists()
-        )
+        lists_of_elements = self.to_lists(collapse_level) if collapse_level >= 0 else self.graft("0").to_lists()
         Viewer.show_elements(lists_of_elements=lists_of_elements, viewer_type=viewer_type)
 
     # ==========================================================================
@@ -744,7 +745,8 @@ class Assembly(Data):
         return collapsed_assembly
 
     def graft(self, name="0"):
-        """iterate through the assemblies if the leaves have multiple elements in a current assembly, then split it into individual branches under the given name"""
+        """iterate through the assemblies if the leaves have multiple elements in a current assembly,
+        then split it into individual branches under the given name"""
         # Start by copying the current assembly.
         grafted_assembly = self.copy()
 
@@ -812,14 +814,17 @@ class Assembly(Data):
 
         # collapse
         if collapse_level is not None:
-            assembly = self.collapse(collapse_level)
+            if collapse_level >= 0:
+                assembly = self.collapse(collapse_level)
+            else:
+                assembly = self.graft("0")
 
         # convert the tree to nested list
         tree = assembly.to_nested_list()
 
         # convert the nested lists to list of lists
         lists = []
-        queue = list(tree)
+        queue = list(tree)  # type: ignore
         while queue:
             item = queue.pop(0)
             individual_elements = []
@@ -879,36 +884,25 @@ def build_assembly_tree_0():
     return root
 
 
-def build_assembly_tree_1():
-    # a1 value
-    root = Assembly("Oktoberfest")
-    Schnitzel_Haus = Assembly("Restaurant The Taste of Berlin")
-    Bier = Assembly("Bier")
-    Bier.add_assembly(Assembly(Element(name="Water", simplex=Point(0, 0, 0))))
-    Bier.add_assembly(Assembly(Element(name="Pilsner malt", simplex=Point(0, 0, 0))))
-    Bier.add_assembly(Assembly(Element(name="Saaz hops", simplex=Point(0, 0, 0))))
-    Bier.add_assembly(Assembly(Element(name="Lager yeast", simplex=Point(0, 0, 0))))
+def build_assembly_of_elements():
 
-    Bier2 = Assembly("Bier2")
-    Schnitzel_Haus.add_assembly(Bier2)
-    Schnitzel = Assembly("Schnitzel")
-    Veal = Assembly(Element(name="Veal", simplex=Point(0, 0, 0)))
-    Salt = Assembly(Element(name="Salt", simplex=Point(0, 0, 0)))
-    Egg = Assembly(Element(name="Egg", simplex=Point(0, 0, 0)))
-    Butter = Assembly(Element(name="Butter", simplex=Point(0, 0, 0)))
-    Lemon = Assembly(Element(name="Lemon", simplex=Point(0, 0, 0)))
+    root = Assembly("model")
+    structure = Assembly("structure")
 
-    Schnitzel.add_assembly(Veal)
-    Schnitzel.add_assembly(Salt)
-    Schnitzel.add_assembly(Egg)
-    Schnitzel.add_assembly(Egg)
-    Schnitzel.add_assembly(Butter)
-    Schnitzel.add_assembly(Lemon)
-    Schnitzel_Haus.add_assembly(Bier)
-    Schnitzel_Haus.add_assembly(Schnitzel)
-    root.add_assembly(Schnitzel_Haus)
-    # print(root.depth)
-    # print(root.sub_assemblies[0].depth)
+    timber = Assembly("timber")
+    timber.add_assembly(Assembly(Element(name="beam", simplex=Point(0, 0, 0))))
+    timber.add_assembly(Assembly(Element(name="beam", simplex=Point(0, 5, 0))))
+    timber.add_assembly(Assembly(Element(name="plate", simplex=Point(0, 0, 0))))
+    timber.add_assembly(Assembly(Element(name="plate", simplex=Point(0, 7, 0))))
+
+    concrete = Assembly("concrete")
+    structure.add_assembly(concrete)
+    concrete.add_assembly(Assembly(Element(name="node", simplex=Point(0, 0, 0))))
+    concrete.add_assembly(Assembly(Element(name="block", simplex=Point(0, 5, 0))))
+    concrete.add_assembly(Assembly(Element(name="block", simplex=Point(0, 0, 0))))
+
+    structure.add_assembly(timber)
+    root.add_assembly(structure)
     return root
 
 
@@ -917,7 +911,7 @@ if __name__ == "__main__":
     # --------------------------------------------------------------------------
     # Constructor
     # --------------------------------------------------------------------------
-    a0 = build_assembly_tree_0()
+    a0 = build_assembly_of_elements()
 
     # --------------------------------------------------------------------------
     # Collection operators
@@ -926,17 +920,17 @@ if __name__ == "__main__":
     center = Point(0, 0.2578, 0.58)
     new_element0 = Element(name="___NEW_INSERTED_ELEMENT_0___", id=[0, 1], simplex=center, complex=mesh)
 
-    a0["Restaurant The Taste of Berlin"]["Bier"][0] = new_element0
+    # a0["Restaurant The Taste of Berlin"]["Bier"][0] = new_element0
     a0 = a0.collapse(2)
     # a0 = a0.prune(3)
     # a0.collapse_sub_assemblies(0)
     # print(a0.to_nested_list())
 
-    # # # getter - append assemnbly to the current branch
+    # # # getter - append assembly to the current branch
     # new_element1 = Element(name="___NEW_INSERTED_ELEMENT_1___", id=[0, 1])
     # a0["Restaurant The Taste of Berlin"]["Bier"].add_assembly(new_element1)
 
-    # # these operators call merge_assembly method, the structure is copie internally
+    # # these operators call merge_assembly method, the structure is copied internally
     # # if you do not want to copy data just call merge_assembly method
     # # a1 = build_assembly_tree_1()
     # # a0.merge_assembly(a1)

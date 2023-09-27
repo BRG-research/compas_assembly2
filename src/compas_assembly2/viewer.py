@@ -95,10 +95,10 @@ class Viewer:
                 if len(lists_of_elements) == 0:
                     print("WARNING VIEW2 - lists_of_elements is Empty")
                     return
-                
+
                 # if there is one list then wrap it to another list for a single assembly
-                if (isinstance(lists_of_elements, list)):
-                    if (isinstance(lists_of_elements[0], list) == False):
+                if isinstance(lists_of_elements, list):
+                    if isinstance(lists_of_elements[0], list) is False:
                         lists_of_elements = [lists_of_elements]
 
                 # initialize the viewer
@@ -703,7 +703,6 @@ class Viewer:
                         o.opacity = opacity
 
                 # insertion vector visualization following the order of elements
-                start = time.time()
 
                 @viewer.button(text="run_insertion")
                 def reset_click():

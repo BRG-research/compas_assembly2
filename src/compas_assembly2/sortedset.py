@@ -145,7 +145,7 @@ class SortedSet(MutableSet, Sequence):  # type: ignore
         # Expose some set methods publicly.
 
         _set = self._set
-        self.isdisjoint = _set.isdisjoint
+        self.isdisjoint = _set.isdisjoint  # type: ignore
         self.issubset = _set.issubset
         self.issuperset = _set.issuperset
 
@@ -161,10 +161,10 @@ class SortedSet(MutableSet, Sequence):  # type: ignore
         self._reset = _list._reset
 
         if key is not None:
-            self.bisect_key_left = _list.bisect_key_left
-            self.bisect_key_right = _list.bisect_key_right
-            self.bisect_key = _list.bisect_key
-            self.irange_key = _list.irange_key
+            self.bisect_key_left = _list.bisect_key_left  # type: ignore
+            self.bisect_key_right = _list.bisect_key_right  # type: ignore
+            self.bisect_key = _list.bisect_key  # type: ignore
+            self.irange_key = _list.irange_key  # type: ignore
 
         if iterable is not None:
             self._update(iterable)
@@ -268,12 +268,12 @@ class SortedSet(MutableSet, Sequence):  # type: ignore
         def comparer(self, other):
             "Compare method for sorted set and set."
             if isinstance(other, SortedSet):
-                return set_op(self._set, other._set)
+                return set_op(self._set, other._set)  # type: ignore
             elif isinstance(other, Set):
-                return set_op(self._set, other)
+                return set_op(self._set, other)  # type: ignore
             return NotImplemented
 
-        set_op_name = set_op.__name__
+        set_op_name = set_op.__name__  # type: ignore
         comparer.__name__ = "__{0}__".format(set_op_name)
         doc_str = """Return true if and only if sorted set is {0} `other`.
 
@@ -296,7 +296,7 @@ class SortedSet(MutableSet, Sequence):  # type: ignore
     __gt__ = __make_cmp(gt, ">", "a proper superset of")  # type: ignore
     __le__ = __make_cmp(le, "<=", "a subset of")  # type: ignore
     __ge__ = __make_cmp(ge, ">=", "a superset of")  # type: ignore
-    __make_cmp = staticmethod(__make_cmp)
+    __make_cmp = staticmethod(__make_cmp)  # type: ignore
 
     def __len__(self):
         """Return the size of the sorted set.
@@ -483,7 +483,7 @@ class SortedSet(MutableSet, Sequence):  # type: ignore
         diff = self._set.difference(*iterables)
         return self._fromset(diff, key=self._key)
 
-    __sub__ = difference
+    __sub__ = difference  # type: ignore
 
     def difference_update(self, *iterables):
         """Remove all values of `iterables` from this sorted set.
@@ -514,7 +514,7 @@ class SortedSet(MutableSet, Sequence):  # type: ignore
                 _discard(value)
         return self
 
-    __isub__ = difference_update
+    __isub__ = difference_update  # type: ignore
 
     def intersection(self, *iterables):
         """Return the intersection of two or more sets as a new sorted set.
@@ -537,7 +537,7 @@ class SortedSet(MutableSet, Sequence):  # type: ignore
         intersect = self._set.intersection(*iterables)
         return self._fromset(intersect, key=self._key)
 
-    __and__ = intersection
+    __and__ = intersection  # type: ignore
     __rand__ = __and__
 
     def intersection_update(self, *iterables):
@@ -565,7 +565,7 @@ class SortedSet(MutableSet, Sequence):  # type: ignore
         _list.update(_set)
         return self
 
-    __iand__ = intersection_update
+    __iand__ = intersection_update  # type: ignore
 
     def symmetric_difference(self, other):
         """Return the symmetric difference with `other` as a new sorted set.
@@ -617,13 +617,13 @@ class SortedSet(MutableSet, Sequence):  # type: ignore
         _list.update(_set)
         return self
 
-    __ixor__ = symmetric_difference_update
+    __ixor__ = symmetric_difference_update  # type: ignore
 
     def union(self, *iterables):
         """Return new sorted set with values from itself and all `iterables`."""
         return self.__class__(chain(iter(self), *iterables), key=self._key)
 
-    __or__ = union
+    __or__ = union  # type: ignore
     __ror__ = __or__
 
     def update(self, *iterables):
@@ -642,7 +642,7 @@ class SortedSet(MutableSet, Sequence):  # type: ignore
                 _add(value)
         return self
 
-    __ior__ = update
+    __ior__ = update  # type: ignore
     _update = update
 
     def __reduce__(self):

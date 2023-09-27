@@ -179,10 +179,10 @@ class SortedDict(dict):
         self._reset = _list._reset
 
         if _key is not None:
-            self.bisect_key_left = _list.bisect_key_left
-            self.bisect_key_right = _list.bisect_key_right
-            self.bisect_key = _list.bisect_key
-            self.irange_key = _list.irange_key
+            self.bisect_key_left = _list.bisect_key_left  # type: ignore
+            self.bisect_key_right = _list.bisect_key_right  # type: ignore
+            self.bisect_key = _list.bisect_key  # type: ignore
+            self.irange_key = _list.irange_key  # type: ignore
 
         self._update(*args, **kwargs)
 
@@ -676,7 +676,7 @@ class SortedKeysView(KeysView, Sequence):  # type: ignore
         :raises IndexError: if index out of range
 
         """
-        return self._mapping._list[index]
+        return self._mapping._list[index]  # type: ignore
 
     __delitem__ = _view_delitem
 
@@ -723,7 +723,7 @@ class SortedItemsView(ItemsView, Sequence):  # type: ignore
         :raises IndexError: if index out of range
 
         """
-        _mapping = self._mapping
+        _mapping = self._mapping  # type: ignore
         _mapping_list = _mapping._list
 
         if isinstance(index, slice):
@@ -774,7 +774,7 @@ class SortedValuesView(ValuesView, Sequence):  # type: ignore
         :raises IndexError: if index out of range
 
         """
-        _mapping = self._mapping
+        _mapping = self._mapping  # type: ignore
         _mapping_list = _mapping._list
 
         if isinstance(index, slice):

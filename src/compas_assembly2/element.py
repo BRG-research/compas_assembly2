@@ -25,6 +25,7 @@ from compas.geometry import (
 from compas.datastructures import Mesh, mesh_bounding_box
 import copy
 import compas_assembly2
+from compas_assembly2.joint import Joint
 from math import fabs
 
 try:
@@ -276,7 +277,7 @@ class Element(Data):
             **data["attributes"],
         )
 
-        if (data.get("insertion", None) is not None):
+        if data.get("insertion", None) is not None:
             obj.insertion = data["insertion"]
 
         # custom properties
@@ -436,9 +437,9 @@ class Element(Data):
             return self._dimensions
         else:
             eight_points = self.oobb()
-            width = distance_point_point(eight_points[0], eight_points[1])
-            length = distance_point_point(eight_points[0], eight_points[3])
-            height = distance_point_point(eight_points[0], eight_points[4])
+            width = distance_point_point(eight_points[0], eight_points[1])  # type: ignore
+            length = distance_point_point(eight_points[0], eight_points[3])  # type: ignore
+            height = distance_point_point(eight_points[0], eight_points[4])  # type: ignore
             self._dimensions = [width, length, height]
         return self._dimensions
 
@@ -456,8 +457,8 @@ class Element(Data):
             return self._area
         else:
             eight_points = self.oobb()
-            width = distance_point_point(eight_points[0], eight_points[1])
-            length = distance_point_point(eight_points[0], eight_points[3])
+            width = distance_point_point(eight_points[0], eight_points[1])  # type: ignore
+            length = distance_point_point(eight_points[0], eight_points[3])  # type: ignore
             self._area = width * length
         return self._area
 
@@ -1053,7 +1054,7 @@ class Element(Data):
                 polygon = to_compas_polygon(matrix, intersection)
 
                 # construct joint
-                joint = compas_assembly2.Joint(
+                joint = Joint(
                     type=compas_assembly2.JOINT_NAME.FACE_TO_FACE,
                     polygon=polygon,
                     frame=self.face_frames[id_0],

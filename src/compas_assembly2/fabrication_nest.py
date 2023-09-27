@@ -30,23 +30,23 @@ class FabricationNest:
         width = {}
         height = {}
 
-        for e in cls._elements:
+        for e in cls._elements:  # type: ignore
             e.aabb(inflate)
             e.oobb(inflate)
             e.convex_hull
 
         center = Point(0, 0, 0)
-        for e in cls._elements:
+        for e in cls._elements:  # type: ignore
             center = center + e.frame.point
-        center = center / len(cls._elements)
+        center = center / len(cls._elements)  # type: ignore
 
-        for e in cls._elements:
+        for e in cls._elements:  # type: ignore
             width[e.name] = 0
 
         for index, (key, value) in enumerate(width.items()):
             height[key] = index * height_step * 0
 
-        for i, e in enumerate(cls._elements):
+        for i, e in enumerate(cls._elements):  # type: ignore
             temp_width = 0
             source_frame = e.frame.copy()
             target_frame = Frame([0, 0, 0], source_frame.xaxis, source_frame.yaxis)
@@ -123,7 +123,7 @@ class FabricationNest:
             height[key] = h
             h = h + temp_height
 
-        for e in cls._elements:
+        for e in cls._elements:  # type: ignore
             e.fabrication[FABRICATION_TYPES.NESTING].frames[1].point.x = (
                 e.fabrication[FABRICATION_TYPES.NESTING].frames[1].point.x - width[e.name] * 0.5
             )

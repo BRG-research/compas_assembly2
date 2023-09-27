@@ -90,8 +90,8 @@ class Joint(Data):
         if not self.forces:
             return lines
         frame = self.frame
-        w = frame.zaxis
-        for point, force in zip(self.polygon.points, self.forces):
+        w = frame.zaxis  # type: ignore
+        for point, force in zip(self.polygon.points, self.forces):  # type: ignore
             point = Point(*point)
             force = force["c_np"] - force["c_nn"]
             p1 = point + w * force * 0.5
@@ -105,8 +105,8 @@ class Joint(Data):
         if not self.forces:
             return lines
         frame = self.frame
-        w = frame.zaxis
-        for point, force in zip(self.polygon.points, self.forces):
+        w = frame.zaxis  # type: ignore
+        for point, force in zip(self.polygon.points, self.forces):  # type: ignore
             point = Point(*point)
             force = force["c_np"] - force["c_nn"]
             if force > 0:
@@ -121,8 +121,8 @@ class Joint(Data):
         if not self.forces:
             return lines
         frame = self.frame
-        w = frame.zaxis
-        for point, force in zip(self.polygon.points, self.forces):
+        w = frame.zaxis  # type: ignore
+        for point, force in zip(self.polygon.points, self.forces):  # type: ignore
             point = Point(*point)
             force = force["c_np"] - force["c_nn"]
             if force < 0:
@@ -137,8 +137,8 @@ class Joint(Data):
         if not self.forces:
             return lines
         frame = self.frame
-        u, v = frame.xaxis, frame.yaxis
-        for point, force in zip(self.polygon.points, self.forces):
+        u, v = frame.xaxis, frame.yaxis  # type: ignore
+        for point, force in zip(self.polygon.points, self.forces):  # type: ignore
             point = Point(*point)
             ft_uv = (u * force["c_u"] + v * force["c_v"]) * 0.5
             p1 = point + ft_uv
@@ -151,12 +151,12 @@ class Joint(Data):
         if not self.forces:
             return []
         frame = self.frame
-        w, u, v = frame.zaxis, frame.xaxis, frame.yaxis
+        w, u, v = frame.zaxis, frame.xaxis, frame.yaxis  # type: ignore
         normalcomponents = [f["c_np"] - f["c_nn"] for f in self.forces]
         sum_n = sum(normalcomponents)
         sum_u = sum(f["c_u"] for f in self.forces)
         sum_v = sum(f["c_v"] for f in self.forces)
-        position = Point(*centroid_points_weighted(self.polygon.points, normalcomponents))
+        position = Point(*centroid_points_weighted(self.polygon.points, normalcomponents))  # type: ignore
         forcevector = (w * sum_n + u * sum_u + v * sum_v) * 0.5
         p1 = position + forcevector
         p2 = position - forcevector

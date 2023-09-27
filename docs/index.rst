@@ -2,6 +2,26 @@
 compas_assembly2
 ********************************************************************************
 
+The **compas_assembly2** represents:
+
+.. image:: /_images/assembly.png
+   :width: 100%
+   :align: right
+   :alt: compas_assembly2
+
+.. rst-class:: lead
+
+   * elements:
+      * structural elements such as blocks, beams, nodes, and plates.
+      * an element is primary a description of a simple and complex geometry.
+      * initially elements do not have neither connectivity nor grouping information.
+   * assembly tree:
+      * the elements are stored in a tree structure.
+      * the grouping and connectivity is added manually by the user or automatically by collision detection.
+      * assembly can contain assemblies within assemblies to represent a hierarchy of structural elements.
+      * elements are sorted
+
+
 .. .. image:: /_images/logo.png
 ..    :width: 20%
 ..    :align: center
@@ -9,7 +29,39 @@ compas_assembly2
 
 .. .. raw::
 
-.. image:: /_images/assembly_explanation.png
+.. image:: /_images/assembly2.png
+   :width: 100%
+   :align: right
+   :alt: compas_assembly2
+
+.. rst-class:: lead
+
+And the following the overview of the Assembly data-structure:
+
+.. image:: /_images/assembly_code_visuals1.png
+   :width: 100%
+   :align: right
+   :alt: compas_assembly2
+
+.. rst-class:: lead
+
+.. image:: /_images/assembly_code_visuals2.png
+   :width: 100%
+   :align: right
+   :alt: compas_assembly2
+
+.. rst-class:: lead
+
+.. image:: /_images/assembly_code.png
+   :width: 100%
+   :align: right
+   :alt: compas_assembly2
+
+.. rst-class:: lead
+
+And the elements that are currently implemented:
+
+.. image:: /_images/element_type.png
    :width: 100%
    :align: right
    :alt: compas_assembly2
@@ -17,19 +69,6 @@ compas_assembly2
 .. rst-class:: lead
 
 
-The **compas_assembly2** represents:
-   * a collection of structural elements such as blocks, beams, nodes, and plates.
-   * it is a recursive structure is reminiscent of the Composite pattern.
-   * an element is primary a description of a simple and complex geometry.
-   * initially elements do not have neither connectivity nor grouping information.
-   * the grouping and connectivity is added manually by the user or automatically by collision detection.
-   * assembly can contain assemblies within assemblies
-   * the visual representation of the assembly structure is below:
-
-It means that the top level assembly contains:
-   * a dict of _all_elements (to query by id)
-   * a dict of assemblies (to grouping elements)
-   * a graph (for connectivity between all elements)
 
 
 

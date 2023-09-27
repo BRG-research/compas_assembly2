@@ -845,7 +845,7 @@ for i in range(len(planes_assemblys0)):
         )
     )
 
-    for temp_element in assembly[id[0]][ id[1]]:
+    for temp_element in assembly[id[0]][id[1]]:
         temp_element.insertion = top_plate_planes[0].normal
 
 # print("assembly", assembly)
@@ -987,7 +987,7 @@ else:
 assembly = assembly.graft()
 print(assembly)
 
-lists = assembly.to_lists(1) # the number is for collapse level
+lists = assembly.to_lists(3)  # the number is for collapse level
 
 color_red = [3] * assembly.number_of_elements
 color_red[0] = 0

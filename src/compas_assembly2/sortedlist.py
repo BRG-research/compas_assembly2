@@ -373,13 +373,13 @@ class SortedList(MutableSequence):  # type: ignore
         if not _maxes:
             return False
 
-        pos = bisect_left(_maxes, value)
+        pos = bisect_left(_maxes, value)  # type: ignore
 
         if pos == len(_maxes):
             return False
 
         _lists = self._lists
-        idx = bisect_left(_lists[pos], value)
+        idx = bisect_left(_lists[pos], value)  # type: ignore
 
         return _lists[pos][idx] == value
 
@@ -1525,11 +1525,11 @@ class SortedList(MutableSequence):  # type: ignore
 
             for alpha, beta in zip(self, other):
                 if alpha != beta:
-                    return seq_op(alpha, beta)
+                    return seq_op(alpha, beta)  # type: ignore
 
-            return seq_op(self_len, len_other)
+            return seq_op(self_len, len_other)  # type: ignore
 
-        seq_op_name = seq_op.__name__
+        seq_op_name = seq_op.__name__  # type: ignore
         comparer.__name__ = "__{0}__".format(seq_op_name)
         doc_str = """Return true if and only if sorted list is {0} `other`.
 
@@ -1552,7 +1552,7 @@ class SortedList(MutableSequence):  # type: ignore
     __gt__ = __make_cmp(gt, ">", "greater than")  # type: ignore
     __le__ = __make_cmp(le, "<=", "less than or equal to")  # type: ignore
     __ge__ = __make_cmp(ge, ">=", "greater than or equal to")  # type: ignore
-    __make_cmp = staticmethod(__make_cmp)
+    __make_cmp = staticmethod(__make_cmp)  # type: ignore
 
     def __reduce__(self):
         values = reduce(iadd, self._lists, [])

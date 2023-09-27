@@ -47,7 +47,7 @@ FabricationNest.pack_elements(elements=assembly.flatten(), nest_type=2, inflate=
 # VIEW2
 # ==========================================================================
 assembly.print_tree()
-assembly.show(collapse_level=2)
+assembly.show(collapse_level=1)
 
 # element_lists = assembly.collapse(2).to_lists()
 
