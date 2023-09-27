@@ -1,6 +1,5 @@
 import rhinoscriptsyntax as rs  # type: ignore https://github.com/mcneel/rhinoscriptsyntax
 import Rhino  # type: ignore
-from Rhino.Geometry import Mesh, MeshingParameters
 from compas.datastructures import Mesh
 from compas.geometry import (
     Polyline,
@@ -86,7 +85,6 @@ for i in ids:
 
 
 def partition_by_common_group_id(objects_list):
-
     # Manually count the occurrences of each integer ID in group_ids of all objects
     group_id_counts = {}
     for obj in objects_list:
@@ -266,7 +264,6 @@ class conversions:
         second_half_sorted = []
 
         for i in range(len(second_half)):
-
             distances = []
 
             for j in range(len(first_half)):
@@ -389,7 +386,6 @@ class conversions:
 
     @classmethod
     def from_rhino_mesh(cls, mesh):
-
         compas_mesh = Mesh()
         if mesh.Ngons.Count == 0:
             for vertex in mesh.Vertices:
@@ -415,10 +411,10 @@ class conversions:
 
             compas_mesh = Mesh.from_polygons(polygons)
         return compas_mesh
-    
+
     @classmethod
     def from_rhino_brep(cls, brep):
-        mesh_params = MeshingParameters.Default
+        mesh_params = Rhino.Geometry.MeshingParameters.Default
         mesh_params.JaggedSeams = False
         mesh_params.ClosedObjectPostProcess = False
         mesh_params.ComputeCurvature = False
@@ -438,7 +434,7 @@ class conversions:
         mesh.UnifyNormals()
         mesh.Compact()
         compas_mesh = conversions.from_rhino_mesh(mesh)
-        #Rhino.RhinoDoc.ActiveDoc.Objects.AddMesh(mesh)
+        # Rhino.RhinoDoc.ActiveDoc.Objects.AddMesh(mesh)
         return compas_mesh
 
 
@@ -491,7 +487,6 @@ counter = 0
 dict_id = {"BLOCK": 0, "BEAM": 1, "PLATE": 2}
 
 for group_id, subsequent_groups in grouped_objects.items():
-
     # --------------------------------------------------------------------------
     # parse the layer information
     # --------------------------------------------------------------------------
@@ -503,7 +498,7 @@ for group_id, subsequent_groups in grouped_objects.items():
     # create objects, the assignment of right properties is dependent on user
     # --------------------------------------------------------------------------
     # TODO skip certain objects
-    # create elementcop 
+    # create elementcop
     o = Element(
         # ensure that this name exists
         name=compas_assembly2.ELEMENT_NAME.exists(processed_layer_name["ELEMENT_NAME"].upper()),  # type: ignore
@@ -513,7 +508,7 @@ for group_id, subsequent_groups in grouped_objects.items():
     counter = counter + 1
 
     for obj in subsequent_groups:
-        #print(obj.layer_name, processed_layer_name["PROPERTY_TYPE"])
+        # print(obj.layer_name, processed_layer_name["PROPERTY_TYPE"])
         layer_name = obj.layer_name
         processed_layer_name = process_string(layer_name)
         # print(processed_layer_name, layer_name)
@@ -536,7 +531,6 @@ for group_id, subsequent_groups in grouped_objects.items():
         # frame
         # --------------------------------------------------------------------------
         elif processed_layer_name["PROPERTY_TYPE"] == "frame":
-
             if (
                 str(type(obj.geometry)) == "<type 'LineCurve'>"
                 or str(type(obj.geometry)) == "<type 'NurbsCurve'>"
@@ -557,8 +551,7 @@ for group_id, subsequent_groups in grouped_objects.items():
         # complex
         # --------------------------------------------------------------------------
         elif processed_layer_name["PROPERTY_TYPE"] == "complex":
-
-            #print("______________________________", type(obj.geometry))
+            # print("______________________________", type(obj.geometry))
             if str(type(obj.geometry)) == "<type 'Mesh'>":
                 o.complex.append(conversions.from_rhino_mesh(obj.geometry))
             elif str(type(obj.geometry)) == "<type 'Brep'>":
@@ -571,7 +564,7 @@ for group_id, subsequent_groups in grouped_objects.items():
                 or str(type(obj.geometry)) == "<type 'PolylineCurve'>"
             ):
                 o.complex.append(conversions.from_rhino_polyline(obj.geometry))
-            
+
         # --------------------------------------------------------------------------
         # id
         # --------------------------------------------------------------------------
@@ -599,7 +592,7 @@ for group_id, subsequent_groups in grouped_objects.items():
         # insertion line
         # --------------------------------------------------------------------------
         elif processed_layer_name["PROPERTY_TYPE"] == "insertion":
-            #print(str(type(obj.geometry)))
+            # print(str(type(obj.geometry)))
             if (
                 str(type(obj.geometry)) == "<type 'LineCurve'>"
                 or str(type(obj.geometry)) == "<type 'NurbsCurve'>"
@@ -608,7 +601,7 @@ for group_id, subsequent_groups in grouped_objects.items():
                 p0 = obj.geometry.PointAtStart
                 p1 = obj.geometry.PointAtEnd
                 o.insertion = Vector(p0.X - p1.X, p0.Y - p1.Y, p0.Z - p1.Z)
-    
+
     # --------------------------------------------------------------------------
     # reassign center incase local and global frames are not given
     # --------------------------------------------------------------------------
@@ -643,7 +636,7 @@ for group_id, subsequent_groups in grouped_objects.items():
         start = time.time()
         first_half, merged, frame = conversions.sort_polyline_pairs(o.simplex)
         end = time.time()
-        #print("time", end - start)
+        # print("time", end - start)
         # print(merged)
         # o.simplex = first_half
         o.frame = frame
@@ -652,7 +645,7 @@ for group_id, subsequent_groups in grouped_objects.items():
     # collect the element instance
     # --------------------------------------------------------------------------
     print(o)
-    #print(len(o.complex))
+    # print(len(o.complex))
     elements.append(o)
 
 
