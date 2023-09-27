@@ -89,45 +89,43 @@
         
         <section id="compas-assembly2">
 <h1>compas_assembly2</h1>
-<a class="reference internal image-reference" href="_images/assembly_explanation.png"><img alt="compas_assembly2" class="align-right" src="_images/assembly_explanation.png" style="width: 100%;" /></a>
-<dl class="lead simple">
-<dt>The <strong>compas_assembly2</strong> represents:</dt><dd><ul class="simple">
-<li><p>a collection of structural elements such as blocks, beams, nodes, and plates.</p></li>
-<li><p>it is a recursive structure is reminiscent of the Composite pattern.</p></li>
+<p>The <strong>compas_assembly2</strong> represents:</p>
+<a class="reference internal image-reference" href="_images/assembly.png"><img alt="compas_assembly2" class="align-right" src="_images/assembly.png" style="width: 100%;" /></a>
+<ul class="lead simple">
+<li><dl class="simple">
+<dt>elements:</dt><dd><ul>
+<li><p>structural elements such as blocks, beams, nodes, and plates.</p></li>
 <li><p>an element is primary a description of a simple and complex geometry.</p></li>
 <li><p>initially elements do not have neither connectivity nor grouping information.</p></li>
-<li><p>the grouping and connectivity is added manually by the user or automatically by collision detection.</p></li>
-<li><p>assembly can contain assemblies within assemblies</p></li>
-<li><p>the visual representation of the assembly structure is below:</p></li>
-</ul>
-</dd>
-<dt>It means that the top level assembly contains:</dt><dd><ul class="simple">
-<li><p>a dict of _all_elements (to query by id)</p></li>
-<li><p>a dict of assemblies (to grouping elements)</p></li>
-<li><p>a graph (for connectivity between all elements)</p></li>
 </ul>
 </dd>
 </dl>
-<section id="table-of-contents">
+</li>
+<li><dl class="simple">
+<dt>assembly tree:</dt><dd><ul>
+<li><p>the elements are stored in a tree structure.</p></li>
+<li><p>the grouping and connectivity is added manually by the user or automatically by collision detection.</p></li>
+<li><p>assembly can contain assemblies within assemblies to represent a hierarchy of structural elements.</p></li>
+<li><p>elements are sorted</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<a class="reference internal image-reference" href="_images/assembly2.png"><img alt="compas_assembly2" class="align-right" src="_images/assembly2.png" style="width: 100%;" /></a>
+<p class="lead">And the following the overview of the Assembly data-structure:</p>
+<a class="reference internal image-reference" href="_images/assembly_code_visuals1.png"><img alt="compas_assembly2" class="align-right" src="_images/assembly_code_visuals1.png" style="width: 100%;" /></a>
+<a class="lead reference internal image-reference" href="_images/assembly_code_visuals2.png"><img alt="compas_assembly2" class="lead align-right" src="_images/assembly_code_visuals2.png" style="width: 100%;" /></a>
+<a class="lead reference internal image-reference" href="_images/assembly_code.png"><img alt="compas_assembly2" class="lead align-right" src="_images/assembly_code.png" style="width: 100%;" /></a>
+<p class="lead">And the elements that are currently implemented:</p>
+<a class="reference internal image-reference" href="_images/element_type.png"><img alt="compas_assembly2" class="align-right" src="_images/element_type.png" style="width: 100%;" /></a>
+<section class="lead" id="table-of-contents">
 <h2>Table of Contents</h2>
 <div class="toctree-wrapper compound">
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="examples/test_1_element_initialization.html">test_1_element_initialization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/test_2_element_using_json_and_view2.html">test_2_element_using_json_and_view2</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/test_3_element_collision.html">test_3_element_collision</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/test_4_block_flat_arch.html">test_4_block_flat_arch</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/test_5_block_flat_arch_plates_two_ribs.html">test_5_block_flat_arch_plates_two_ribs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/test_6_block_flat_arch_plates_boxes.html">test_6_block_flat_arch_plates_boxes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/test_7_block_flat_arch_plates_segmented_ribs.html">test_7_block_flat_arch_plates_segmented_ribs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/test_8_block_flat_arch_plates_segmented_groups.html">test_8_block_flat_arch_plates_segmented_groups</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/test_9_block_flat_slab_plates_segmented_groups.html">test_9_block_flat_slab_plates_segmented_groups</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/test_10_block_flat_slab_plates_and_nodes.html">test_10_block_flat_slab_plates_and_nodes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/test_11_block_flat_slab_plates_and_ribs.html">test_11_block_flat_slab_plates_and_ribs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/test_12_block_flat_slab_plates_and_frames.html">test_12_block_flat_slab_plates_and_frames</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/test_13_block_flat_slab_plates_and_raw.html">test_13_block_flat_slab_plates_and_raw</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a><ul class="simple">
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a><ul>
@@ -172,20 +170,7 @@
           <ul class="nav flex-column collapse show active">
 <li class="toctree-l1 nav-item active"><a class="nav-link active reference internal" href="#">Introduction</a></li>
 <li class="toctree-l1 nav-item"><a class="nav-link reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1 nav-item"><a class="nav-link reference internal" href="examples.html">Examples</a><ul class="nav flex-column collapse">
-<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="examples/test_1_element_initialization.html">test_1_element_initialization</a></li>
-<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="examples/test_2_element_using_json_and_view2.html">test_2_element_using_json_and_view2</a></li>
-<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="examples/test_3_element_collision.html">test_3_element_collision</a></li>
-<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="examples/test_4_block_flat_arch.html">test_4_block_flat_arch</a></li>
-<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="examples/test_5_block_flat_arch_plates_two_ribs.html">test_5_block_flat_arch_plates_two_ribs</a></li>
-<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="examples/test_6_block_flat_arch_plates_boxes.html">test_6_block_flat_arch_plates_boxes</a></li>
-<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="examples/test_7_block_flat_arch_plates_segmented_ribs.html">test_7_block_flat_arch_plates_segmented_ribs</a></li>
-<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="examples/test_8_block_flat_arch_plates_segmented_groups.html">test_8_block_flat_arch_plates_segmented_groups</a></li>
-<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="examples/test_9_block_flat_slab_plates_segmented_groups.html">test_9_block_flat_slab_plates_segmented_groups</a></li>
-<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="examples/test_10_block_flat_slab_plates_and_nodes.html">test_10_block_flat_slab_plates_and_nodes</a></li>
-<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="examples/test_11_block_flat_slab_plates_and_ribs.html">test_11_block_flat_slab_plates_and_ribs</a></li>
-<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="examples/test_12_block_flat_slab_plates_and_frames.html">test_12_block_flat_slab_plates_and_frames</a></li>
-<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="examples/test_13_block_flat_slab_plates_and_raw.html">test_13_block_flat_slab_plates_and_raw</a></li>
+<li class="toctree-l1 nav-item"><a class="nav-link reference internal" href="examples.html">Examples</a><ul class="simple">
 </ul>
 </li>
 <li class="toctree-l1 nav-item"><a class="nav-link reference internal" href="api.html">API Reference</a><ul class="nav flex-column collapse">
