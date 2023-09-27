@@ -141,36 +141,104 @@ class Assembly(Data):
 
     Parameters
     ----------
-        value : (str - for grouping | Element or other type - for storing data)
+        value : str - for grouping | Element or other type - for storing data
             each assembly must have a value
-        make_copy : (bool)
-            if True, the value will be copied, otherwise it will be referenced
+        parent_assembly : None or Assembly
+            this values is assigned automatically
+        sub_assemblies : SortedList
+            this values is assigned automatically
 
     Attributes
     ----------
-        frame_global : :class:`~compas.geometry.Frame`
-            global plane that can be used for the element orientation in a larger assembly
-        aabb : list[:class:`~compas.geometry.Point`]:
-            a list of XYZ coordinates defining the bounding box for collision detection.
-        oobb : list[:class:`~compas.geometry.Point`]:
-            a list of XYZ coordinates defining the an oriented bounding box to the frame.
-        convex_hull : list[:class:`~compas.datastrcutures.Mesh`]:
-            a mesh computed from the complex geometries points
-        area : float
+        make_copy : bool
+            if True, the value will be copied, otherwise it will be referenced
+        name : str
+            the name of the value either
+        is_group_or_assembly : bool
+            True if the current branch value is a string
+        level : int
+            the level of the current branch
+        root : Assembly or None
+            the root of the current branch
+        depth : int
             the surface are of an element based on complex geometry
-        volume : float
-            the volume of an element based on complex 3d geometry
+        type : str
+            name GROUP if the value is string else ELEMENT
+        number_of_elements : int
+            the total number of elements in the assembly
 
-    Examples
-    --------
+    Example 1
+    ---------
+        >>> # EXAMPLE 1
         >>> my_assembly = Assembly("my_assembly"))
+        >>> print(my_assembly)
+        >>> #
+        >>> # TERMINAL:
+        ======================================= ROOT ASSEMBLY =============================================
+        GROUP --> my_assembly
+        ===================================================================================================
+
+    Example 2
+    ---------
+        >>> # EXAMPLE 2
+        >>> my_assembly = Assembly("model")
+        >>> my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 0, 0)))
+        >>> my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 5, 0)))
+        >>> my_assembly.add_assembly(Element(name="plate", simplex=Point(0, 0, 0)))
+        >>> my_assembly.add_assembly(Element(name="plate", simplex=Point(0, 7, 0)))
+        >>> print(my_assembly)
+        >>> #
+        >>> # TERMINAL:
+        ======================================= ROOT ASSEMBLY =============================================
+        GROUP --> my_assembly
+        |__ ELEMENT --> TYPE_BEAM ID_-1 GUID_7c20cc23-da06-4c4d-b1ac-6309cfb96935
+        |__ ELEMENT --> TYPE_BEAM ID_-1 GUID_cc7b0b93-44f6-4e77-b937-dd935a60d063
+        |__ ELEMENT --> TYPE_PLATE ID_-1 GUID_2276f043-add7-4528-8267-095824ba955f
+        |__ ELEMENT --> TYPE_PLATE ID_-1 GUID_174ca25a-1a37-487b-8f13-40e7d71c54f0
+        ===================================================================================================
+
+    Example 3
+    ---------
+        >>> # EXAMPLE 3
+        >>> my_assembly = Assembly("model")
+        >>> structure = Assembly("structure")
+        >>> #
+        >>> timber = Assembly("timber")
+        >>> timber.add_assembly(Assembly(Element(name="beam", simplex=Point(0, 0, 0))))
+        >>> timber.add_assembly(Assembly(Element(name="beam", simplex=Point(0, 5, 0))))
+        >>> timber.add_assembly(Assembly(Element(name="plate", simplex=Point(0, 0, 0))))
+        >>> timber.add_assembly(Assembly(Element(name="plate", simplex=Point(0, 7, 0))))
+        >>> #
+        >>> concrete = Assembly("concrete")
+        >>> structure.add_assembly(concrete)
+        >>> concrete.add_assembly(Assembly(Element(name="node", simplex=Point(0, 0, 0))))
+        >>> concrete.add_assembly(Assembly(Element(name="block", simplex=Point(0, 5, 0))))
+        >>> concrete.add_assembly(Assembly(Element(name="block", simplex=Point(0, 0, 0))))
+        >>> #
+        >>> structure.add_assembly(timber)
+        >>> my_assembly.add_assembly(structure)
+        >>> print(my_assembly)
+        >>> #
+        >>> # TERMINAL:
+        ======================================= ROOT ASSEMBLY =============================================
+        GROUP --> model
+        |__ GROUP --> structure
+            |__ GROUP --> concrete
+                |__ ELEMENT --> TYPE_NODE ID_-1 GUID_2f1b5777-7ba6-41b1-a6ac-13460ce5637e
+                |__ ELEMENT --> TYPE_BLOCK ID_-1 GUID_45b6a07c-566d-4ea0-b705-52d8d2dfb751
+                |__ ELEMENT --> TYPE_BLOCK ID_-1 GUID_407920bf-ba2e-4fb0-8155-173bc447fc41
+            |__ GROUP --> timber
+                |__ ELEMENT --> TYPE_BEAM ID_-1 GUID_d8231f79-b018-4693-9bb9-811219de383f
+                |__ ELEMENT --> TYPE_BEAM ID_-1 GUID_a134c723-9dae-4672-97cf-8733ce808a00
+                |__ ELEMENT --> TYPE_PLATE ID_-1 GUID_6657b58e-0c41-402e-8841-c756e42f697e
+                |__ ELEMENT --> TYPE_PLATE ID_-1 GUID_1f4a7641-394c-449a-b49c-714e98c87e62
+        ===================================================================================================
     """
 
     # ==========================================================================
     # CONSTRUCTOR THAt HAS A RECURSIVE DATA-STRUCTURE, DO NOT CHANGE IT!
     # ==========================================================================
     def __init__(self, value, make_copy=True):
-
         super(Assembly, self).__init__()
 
         # --------------------------------------------------------------------------
@@ -213,7 +281,7 @@ class Assembly(Data):
 
     @property
     def name(self):
-        """Returns the name the value either
+        """Returns the name of the value either
         a) the name of the group
         b) the name of the element"""
         if isinstance(self.value, str):
@@ -294,7 +362,6 @@ class Assembly(Data):
                 number_of_elements += sub_assembly.number_of_elements
         return number_of_elements
 
-
     # ==========================================================================
     # SORTED LIST METHODS
     # ==========================================================================
@@ -374,7 +441,15 @@ class Assembly(Data):
         return obj
 
     def serialize(self, fp, pretty=False):
-        """Serialize the assembly to a JSON file."""
+        """Serialize the assembly to a JSON file.
+
+        Returns:
+            None
+
+        Examples:
+            >>> my_assembly.serialize("my_assembly.json")
+        
+        """
         json_dump(data=self.data, fp=fp, pretty=pretty)
 
     @staticmethod
@@ -972,4 +1047,21 @@ class Assembly(Data):
 
 
 if __name__ == "__main__":
-    pass
+    my_assembly = Assembly("model")
+    structure = Assembly("structure")
+
+    timber = Assembly("timber")
+    timber.add_assembly(Assembly(Element(name="beam", simplex=Point(0, 0, 0))))
+    timber.add_assembly(Assembly(Element(name="beam", simplex=Point(0, 5, 0))))
+    timber.add_assembly(Assembly(Element(name="plate", simplex=Point(0, 0, 0))))
+    timber.add_assembly(Assembly(Element(name="plate", simplex=Point(0, 7, 0))))
+
+    concrete = Assembly("concrete")
+    structure.add_assembly(concrete)
+    concrete.add_assembly(Assembly(Element(name="node", simplex=Point(0, 0, 0))))
+    concrete.add_assembly(Assembly(Element(name="block", simplex=Point(0, 5, 0))))
+    concrete.add_assembly(Assembly(Element(name="block", simplex=Point(0, 0, 0))))
+
+    structure.add_assembly(timber)
+    my_assembly.add_assembly(structure)
+    print(my_assembly)
