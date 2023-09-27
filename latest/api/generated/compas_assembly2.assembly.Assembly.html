@@ -104,6 +104,91 @@ There are several ways how the data-structure can be used:
 a) the recursive structure allows to store group names as tree branches and elements as tree leaves.
 b) elememts can be nested within elements, which allows to store the assembly hierarchy.
 c) the root of assembly is responsible for storing links between elements</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value</strong> (<em>str - for grouping | Element or other type - for storing data</em>) -- each assembly must have a value</p></li>
+<li><p><strong>parent_assembly</strong> (<em>None or Assembly</em>) -- this values is assigned automatically</p></li>
+<li><p><strong>sub_assemblies</strong> (<em>SortedList</em>) -- this values is assigned automatically</p></li>
+</ul>
+</dd>
+<dt class="field-even">Attributes</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>make_copy</strong> (<em>bool</em>) -- if True, the value will be copied, otherwise it will be referenced</p></li>
+<li><p><strong>name</strong> (<em>str</em>) -- the name of the value either</p></li>
+<li><p><strong>is_group_or_assembly</strong> (<em>bool</em>) -- True if the current branch value is a string</p></li>
+<li><p><strong>level</strong> (<em>int</em>) -- the level of the current branch</p></li>
+<li><p><strong>root</strong> (<em>Assembly or None</em>) -- the root of the current branch</p></li>
+<li><p><strong>depth</strong> (<em>int</em>) -- the surface are of an element based on complex geometry</p></li>
+<li><p><strong>type</strong> (<em>str</em>) -- name GROUP if the value is string else ELEMENT</p></li>
+<li><p><strong>number_of_elements</strong> (<em>int</em>) -- the total number of elements in the assembly</p></li>
+</ul>
+</dd>
+</dl>
+<div class="doctest language-python notranslate"><div class="highlight"><pre><button class="btn copy"><i class="far fa-copy"></i></button><code><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># EXAMPLE 1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_assembly</span> <span class="o">=</span> <span class="n">Assembly</span><span class="p">(</span><span class="s2">&quot;my_assembly&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">my_assembly</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1">#</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># TERMINAL:</span>
+<span class="go">======================================= ROOT ASSEMBLY =============================================</span>
+<span class="go">GROUP --&gt; my_assembly</span>
+<span class="go">===================================================================================================</span>
+</code></pre></div>
+</div>
+<div class="doctest language-python notranslate"><div class="highlight"><pre><button class="btn copy"><i class="far fa-copy"></i></button><code><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># EXAMPLE 2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_assembly</span> <span class="o">=</span> <span class="n">Assembly</span><span class="p">(</span><span class="s2">&quot;model&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_assembly</span><span class="o">.</span><span class="n">add_assembly</span><span class="p">(</span><span class="n">Element</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;beam&quot;</span><span class="p">,</span> <span class="n">simplex</span><span class="o">=</span><span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_assembly</span><span class="o">.</span><span class="n">add_assembly</span><span class="p">(</span><span class="n">Element</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;beam&quot;</span><span class="p">,</span> <span class="n">simplex</span><span class="o">=</span><span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_assembly</span><span class="o">.</span><span class="n">add_assembly</span><span class="p">(</span><span class="n">Element</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;plate&quot;</span><span class="p">,</span> <span class="n">simplex</span><span class="o">=</span><span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_assembly</span><span class="o">.</span><span class="n">add_assembly</span><span class="p">(</span><span class="n">Element</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;plate&quot;</span><span class="p">,</span> <span class="n">simplex</span><span class="o">=</span><span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">my_assembly</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1">#</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># TERMINAL:</span>
+<span class="go">======================================= ROOT ASSEMBLY =============================================</span>
+<span class="go">GROUP --&gt; my_assembly</span>
+<span class="go">|__ ELEMENT --&gt; TYPE_BEAM ID_-1 GUID_7c20cc23-da06-4c4d-b1ac-6309cfb96935</span>
+<span class="go">|__ ELEMENT --&gt; TYPE_BEAM ID_-1 GUID_cc7b0b93-44f6-4e77-b937-dd935a60d063</span>
+<span class="go">|__ ELEMENT --&gt; TYPE_PLATE ID_-1 GUID_2276f043-add7-4528-8267-095824ba955f</span>
+<span class="go">|__ ELEMENT --&gt; TYPE_PLATE ID_-1 GUID_174ca25a-1a37-487b-8f13-40e7d71c54f0</span>
+<span class="go">===================================================================================================</span>
+</code></pre></div>
+</div>
+<div class="doctest language-python notranslate"><div class="highlight"><pre><button class="btn copy"><i class="far fa-copy"></i></button><code><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># EXAMPLE 3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_assembly</span> <span class="o">=</span> <span class="n">Assembly</span><span class="p">(</span><span class="s2">&quot;model&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">structure</span> <span class="o">=</span> <span class="n">Assembly</span><span class="p">(</span><span class="s2">&quot;structure&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1">#</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">timber</span> <span class="o">=</span> <span class="n">Assembly</span><span class="p">(</span><span class="s2">&quot;timber&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">timber</span><span class="o">.</span><span class="n">add_assembly</span><span class="p">(</span><span class="n">Assembly</span><span class="p">(</span><span class="n">Element</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;beam&quot;</span><span class="p">,</span> <span class="n">simplex</span><span class="o">=</span><span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">timber</span><span class="o">.</span><span class="n">add_assembly</span><span class="p">(</span><span class="n">Assembly</span><span class="p">(</span><span class="n">Element</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;beam&quot;</span><span class="p">,</span> <span class="n">simplex</span><span class="o">=</span><span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">))))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">timber</span><span class="o">.</span><span class="n">add_assembly</span><span class="p">(</span><span class="n">Assembly</span><span class="p">(</span><span class="n">Element</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;plate&quot;</span><span class="p">,</span> <span class="n">simplex</span><span class="o">=</span><span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">timber</span><span class="o">.</span><span class="n">add_assembly</span><span class="p">(</span><span class="n">Assembly</span><span class="p">(</span><span class="n">Element</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;plate&quot;</span><span class="p">,</span> <span class="n">simplex</span><span class="o">=</span><span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">0</span><span class="p">))))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1">#</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">concrete</span> <span class="o">=</span> <span class="n">Assembly</span><span class="p">(</span><span class="s2">&quot;concrete&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">structure</span><span class="o">.</span><span class="n">add_assembly</span><span class="p">(</span><span class="n">concrete</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">concrete</span><span class="o">.</span><span class="n">add_assembly</span><span class="p">(</span><span class="n">Assembly</span><span class="p">(</span><span class="n">Element</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;node&quot;</span><span class="p">,</span> <span class="n">simplex</span><span class="o">=</span><span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">concrete</span><span class="o">.</span><span class="n">add_assembly</span><span class="p">(</span><span class="n">Assembly</span><span class="p">(</span><span class="n">Element</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;block&quot;</span><span class="p">,</span> <span class="n">simplex</span><span class="o">=</span><span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">))))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">concrete</span><span class="o">.</span><span class="n">add_assembly</span><span class="p">(</span><span class="n">Assembly</span><span class="p">(</span><span class="n">Element</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;block&quot;</span><span class="p">,</span> <span class="n">simplex</span><span class="o">=</span><span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1">#</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">structure</span><span class="o">.</span><span class="n">add_assembly</span><span class="p">(</span><span class="n">timber</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_assembly</span><span class="o">.</span><span class="n">add_assembly</span><span class="p">(</span><span class="n">structure</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">my_assembly</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1">#</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># TERMINAL:</span>
+<span class="go">======================================= ROOT ASSEMBLY =============================================</span>
+<span class="go">GROUP --&gt; model</span>
+<span class="go">|__ GROUP --&gt; structure</span>
+<span class="go">    |__ GROUP --&gt; concrete</span>
+<span class="go">        |__ ELEMENT --&gt; TYPE_NODE ID_-1 GUID_2f1b5777-7ba6-41b1-a6ac-13460ce5637e</span>
+<span class="go">        |__ ELEMENT --&gt; TYPE_BLOCK ID_-1 GUID_45b6a07c-566d-4ea0-b705-52d8d2dfb751</span>
+<span class="go">        |__ ELEMENT --&gt; TYPE_BLOCK ID_-1 GUID_407920bf-ba2e-4fb0-8155-173bc447fc41</span>
+<span class="go">    |__ GROUP --&gt; timber</span>
+<span class="go">        |__ ELEMENT --&gt; TYPE_BEAM ID_-1 GUID_d8231f79-b018-4693-9bb9-811219de383f</span>
+<span class="go">        |__ ELEMENT --&gt; TYPE_BEAM ID_-1 GUID_a134c723-9dae-4672-97cf-8733ce808a00</span>
+<span class="go">        |__ ELEMENT --&gt; TYPE_PLATE ID_-1 GUID_6657b58e-0c41-402e-8841-c756e42f697e</span>
+<span class="go">        |__ ELEMENT --&gt; TYPE_PLATE ID_-1 GUID_1f4a7641-394c-449a-b49c-714e98c87e62</span>
+<span class="go">===================================================================================================</span>
+</code></pre></div>
+</div>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable docutils align-default">
 <colgroup>
