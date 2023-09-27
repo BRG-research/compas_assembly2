@@ -3,7 +3,7 @@
 
 <head>
   
-  <title>compas_assembly2 - Assembly.to_nested_list</title>
+  <title>compas_assembly2 - Assembly.serialize</title>
   
 
   <meta charset="utf-8" />
@@ -20,11 +20,11 @@
   <link rel="stylesheet" type="text/css" href="../../_static/css/compas-reference.css" />
 
   
-  <link rel="next" title="Assembly.transfer_root" href="compas_assembly2.assembly.Assembly.transfer_root.html" />
+  <link rel="next" title="Assembly.show" href="compas_assembly2.assembly.Assembly.show.html" />
   
 
   
-  <link rel="prev" title="Assembly.to_lists" href="compas_assembly2.assembly.Assembly.to_lists.html" />
+  <link rel="prev" title="Assembly.remove_root" href="compas_assembly2.assembly.Assembly.remove_root.html" />
   
 
   <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
@@ -88,21 +88,19 @@
             
             <li class="breadcrumb-item"><a href="compas_assembly2.assembly.Assembly.html">Assembly</a></li>
             
-            <!-- <li class="breadcrumb-item active" aria-current="page">Assembly.to_nested_list</li> -->
+            <!-- <li class="breadcrumb-item active" aria-current="page">Assembly.serialize</li> -->
           </ol>
         </nav>
         
 
         
         
-        <section class="detail" id="assembly-to-nested-list">
-<h1>Assembly.to_nested_list</h1>
+        <section class="detail" id="assembly-serialize">
+<h1>Assembly.serialize</h1>
 <dl class="py method">
-<dt class="sig sig-object py" id="compas_assembly2.assembly.Assembly.to_nested_list">
-<span class="sig-prename descclassname"><span class="pre">Assembly.</span></span><span class="sig-name descname"><span class="pre">to_nested_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BRG-research/compas_assembly2/blob/master/src/compas_assembly2/assembly.py#L590"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
-<dd><p>convert the tree to nested lists
-ATTENTION: in majority of practical cases use to_lists() method instead
-it reduces the hierarchy to a list of lists</p>
+<dt class="sig sig-object py" id="compas_assembly2.assembly.Assembly.serialize">
+<span class="sig-prename descclassname"><span class="pre">Assembly.</span></span><span class="sig-name descname"><span class="pre">serialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BRG-research/compas_assembly2/blob/master/src/compas_assembly2/assembly.py#L260"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Serialize the assembly to a JSON file.</p>
 </dd></dl>
 
 </section>
@@ -150,7 +148,7 @@ it reduces the hierarchy to a list of lists</p>
       <div class="d-none d-xl-block col-xl-2 compas-toc" role="toc">
         
         <ul class="nav flex-column" id="compas-toc">
-<li class="nav-item"><a class="nav-link reference internal" href="#">Assembly.to_nested_list</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="#">Assembly.serialize</a></li>
 </ul>
 
       </div>
@@ -162,20 +160,20 @@ it reduces the hierarchy to a list of lists</p>
   <footer class="compas-footer">
     <nav class="nav p-2">
       
-      <a href="compas_assembly2.assembly.Assembly.to_lists.html" title="Assembly.to_lists" class="nav-link footer-link float-start text-left d-flex w-50" rel="prev">
+      <a href="compas_assembly2.assembly.Assembly.remove_root.html" title="Assembly.remove_root" class="nav-link footer-link float-start text-left d-flex w-50" rel="prev">
         <div class="nav-button p-2 m-2"><i class="fas fa-arrow-left"></i></div>
         <div class="nav-title flex-grow-1 align-self-center">
           <div class="nav-direction small font-weight-light">Previous</div>
-          Assembly.to_lists
+          Assembly.remove_root
         </div>
       </a>
       
 
       
-      <a href="compas_assembly2.assembly.Assembly.transfer_root.html" title="Assembly.transfer_root" class="nav-link footer-link float-end text-right d-flex w-50" rel="next">
+      <a href="compas_assembly2.assembly.Assembly.show.html" title="Assembly.show" class="nav-link footer-link float-end text-right d-flex w-50" rel="next">
         <div class="nav-title footer-link flex-grow-1 align-self-center">
           <div class="nav-direction small font-weight-light">Next</div>
-          Assembly.transfer_root
+          Assembly.show
         </div>
         <div class="nav-button p-2 m-2"><i class="fas fa-arrow-right"></i></div>
       </a>

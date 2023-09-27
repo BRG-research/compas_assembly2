@@ -97,11 +97,13 @@
 <h1>Assembly</h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="compas_assembly2.assembly.Assembly">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_assembly2.assembly.</span></span><span class="sig-name descname"><span class="pre">Assembly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">make_copy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BRG-research/compas_assembly2/blob/master/src/compas_assembly2/assembly.py#L134"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_assembly2.assembly.</span></span><span class="sig-name descname"><span class="pre">Assembly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">make_copy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BRG-research/compas_assembly2/blob/master/src/compas_assembly2/assembly.py#L135"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://compas.dev/compas/latest/reference/generated/compas.data.Data.html#compas.data.Data" title="(in COMPAS v1.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.data.data.Data</span></code></a></p>
 <p>Assembly is a tree data-structure.
-The recursive structure allows to store group names as tree branches and elements as tree leaves.
-The root of assembly is responsible for storing links between elements</p>
+There are several ways how the data-structure can be used:
+a) the recursive structure allows to store group names as tree branches and elements as tree leaves.
+b) elememts can be nested within elements, which allows to store the assembly hierarchy.
+c) the root of assembly is responsible for storing links between elements</p>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable docutils align-default">
 <colgroup>
@@ -110,28 +112,34 @@ The root of assembly is responsible for storing links between elements</p>
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.aabb.html#compas_assembly2.assembly.Assembly.aabb" title="compas_assembly2.assembly.Assembly.aabb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">aabb</span></code></a></p></td>
-<td><p></p></td>
+<td><p>compute the axis aligned bounding box of the assembly by collecting all the elements bounding boxes</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.add_assembly.html#compas_assembly2.assembly.Assembly.add_assembly" title="compas_assembly2.assembly.Assembly.add_assembly"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_assembly</span></code></a></p></td>
-<td><p></p></td>
+<td><p>adds assembly to the current assembly sub-assemblies list, if the user inout element or any other type, it will wrap into the assembly</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.add_by_index.html#compas_assembly2.assembly.Assembly.add_by_index" title="compas_assembly2.assembly.Assembly.add_by_index"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_by_index</span></code></a></p></td>
-<td><p></p></td>
+<td><p>add element to the assembly by creating group that follows element indices otherwise user can give a list of names to add an element to the specific branch</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.child_behave.html#compas_assembly2.assembly.Assembly.child_behave" title="compas_assembly2.assembly.Assembly.child_behave"><code class="xref py py-obj docutils literal notranslate"><span class="pre">child_behave</span></code></a></p></td>
-<td><p># Assuming self is an instance of your class self.child_behave(&quot;method_name&quot;, collection, arg1, arg2, kwarg1=value1, kwarg2=value2)</p></td>
+<td><p>Run methods from all the elements in the assembly and sub_assemblies Assuming self is an instance of your class self.child_behave(collection, &quot;method_name&quot;, arg1, arg2, kwarg1=value1, kwarg2=value2)</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.child_properties.html#compas_assembly2.assembly.Assembly.child_properties" title="compas_assembly2.assembly.Assembly.child_properties"><code class="xref py py-obj docutils literal notranslate"><span class="pre">child_properties</span></code></a></p></td>
-<td><p></p></td>
+<td><p>get properties from the assembly values and sub_assemblies usage: collection = [] self.child_properties(collection, &quot;attribute_name&quot;)</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.collapse.html#compas_assembly2.assembly.Assembly.collapse" title="compas_assembly2.assembly.Assembly.collapse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">collapse</span></code></a></p></td>
 <td><p>Iterate through sub-assemblies and adjust their levels based on user input.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.copy.html#compas_assembly2.assembly.Assembly.copy" title="compas_assembly2.assembly.Assembly.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a></p></td>
-<td><p>Make an independent copy of the data object.</p></td>
+<td><p>copy assembly and its sub_assemblies</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.deserialize.html#compas_assembly2.assembly.Assembly.deserialize" title="compas_assembly2.assembly.Assembly.deserialize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">deserialize</span></code></a></p></td>
+<td><p>Deserialize the assembly from a JSON file.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.example.html#compas_assembly2.assembly.Assembly.example" title="compas_assembly2.assembly.Assembly.example"><code class="xref py py-obj docutils literal notranslate"><span class="pre">example</span></code></a></p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.flatten.html#compas_assembly2.assembly.Assembly.flatten" title="compas_assembly2.assembly.Assembly.flatten"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flatten</span></code></a></p></td>
-<td><p></p></td>
+<td><p>get all elemenets of the assembly in one single list</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.from_data.html#compas_assembly2.assembly.Assembly.from_data" title="compas_assembly2.assembly.Assembly.from_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_data</span></code></a></p></td>
 <td><p>Alternative to None default __init__ parameters.</p></td>
@@ -140,52 +148,55 @@ The root of assembly is responsible for storing links between elements</p>
 <td><p>iterate through the assemblies if the leaves have multiple elements in a current assembly, then split it into individual branches under the given name</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.init_root.html#compas_assembly2.assembly.Assembly.init_root" title="compas_assembly2.assembly.Assembly.init_root"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_root</span></code></a></p></td>
-<td><p></p></td>
+<td><p>initialize the root assembly properties</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.merge_assembly.html#compas_assembly2.assembly.Assembly.merge_assembly" title="compas_assembly2.assembly.Assembly.merge_assembly"><code class="xref py py-obj docutils literal notranslate"><span class="pre">merge_assembly</span></code></a></p></td>
-<td><p></p></td>
+<td><p>merge elements within two assemblies if the names of the groups are the same then the elements are merged in the same branch else they are added based on the a1 group names the merging have two boolean flag to allow duplicate branch names and leaves, if elements are references</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.print_tree.html#compas_assembly2.assembly.Assembly.print_tree" title="compas_assembly2.assembly.Assembly.print_tree"><code class="xref py py-obj docutils literal notranslate"><span class="pre">print_tree</span></code></a></p></td>
-<td><p></p></td>
+<td><p>prints the tree structure</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.prune.html#compas_assembly2.assembly.Assembly.prune" title="compas_assembly2.assembly.Assembly.prune"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prune</span></code></a></p></td>
-<td><p>Iterate through sub-assemblies and adjust their levels based on user input.</p></td>
+<td><p>Iterate through sub-assemblies and remove all sub-assemblies deeper than the given level.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.remove_root.html#compas_assembly2.assembly.Assembly.remove_root" title="compas_assembly2.assembly.Assembly.remove_root"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_root</span></code></a></p></td>
-<td><p></p></td>
+<td><p>remove the root assembly properties</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.show.html#compas_assembly2.assembly.Assembly.show" title="compas_assembly2.assembly.Assembly.show"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.serialize.html#compas_assembly2.assembly.Assembly.serialize" title="compas_assembly2.assembly.Assembly.serialize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">serialize</span></code></a></p></td>
+<td><p>Serialize the assembly to a JSON file.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.stringify_tree.html#compas_assembly2.assembly.Assembly.stringify_tree" title="compas_assembly2.assembly.Assembly.stringify_tree"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stringify_tree</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.show.html#compas_assembly2.assembly.Assembly.show" title="compas_assembly2.assembly.Assembly.show"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show</span></code></a></p></td>
+<td><p>visualize the assembly in the viewer, check the Viewer.py file for more details</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.to_lists.html#compas_assembly2.assembly.Assembly.to_lists" title="compas_assembly2.assembly.Assembly.to_lists"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_lists</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.stringify_tree.html#compas_assembly2.assembly.Assembly.stringify_tree" title="compas_assembly2.assembly.Assembly.stringify_tree"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stringify_tree</span></code></a></p></td>
+<td><p>returns the printed tree structure as one string</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.to_lists.html#compas_assembly2.assembly.Assembly.to_lists" title="compas_assembly2.assembly.Assembly.to_lists"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_lists</span></code></a></p></td>
 <td><p>unwrap the nested nested n times lists in one list of lists</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.to_nested_list.html#compas_assembly2.assembly.Assembly.to_nested_list" title="compas_assembly2.assembly.Assembly.to_nested_list"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_nested_list</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.to_nested_list.html#compas_assembly2.assembly.Assembly.to_nested_list" title="compas_assembly2.assembly.Assembly.to_nested_list"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_nested_list</span></code></a></p></td>
+<td><p>convert the tree to nested lists ATTENTION: in majority of practical cases use to_lists() method instead it reduces the hierarchy to a list of lists</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.transfer_root.html#compas_assembly2.assembly.Assembly.transfer_root" title="compas_assembly2.assembly.Assembly.transfer_root"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transfer_root</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.transfer_root.html#compas_assembly2.assembly.Assembly.transfer_root" title="compas_assembly2.assembly.Assembly.transfer_root"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transfer_root</span></code></a></p></td>
+<td><p>transfer the root assembly properties</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.transform.html#compas_assembly2.assembly.Assembly.transform" title="compas_assembly2.assembly.Assembly.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.transform.html#compas_assembly2.assembly.Assembly.transform" title="compas_assembly2.assembly.Assembly.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a></p></td>
+<td><p>Transforms the value and all sub_assemblies by the given transformation.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.transform_from_frame_to_frame.html#compas_assembly2.assembly.Assembly.transform_from_frame_to_frame" title="compas_assembly2.assembly.Assembly.transform_from_frame_to_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform_from_frame_to_frame</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.transform_from_frame_to_frame.html#compas_assembly2.assembly.Assembly.transform_from_frame_to_frame" title="compas_assembly2.assembly.Assembly.transform_from_frame_to_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform_from_frame_to_frame</span></code></a></p></td>
+<td><p>Transforms the value and all sub_assemblies from the source frame to the target frame.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.transform_to_frame.html#compas_assembly2.assembly.Assembly.transform_to_frame" title="compas_assembly2.assembly.Assembly.transform_to_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform_to_frame</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.transform_to_frame.html#compas_assembly2.assembly.Assembly.transform_to_frame" title="compas_assembly2.assembly.Assembly.transform_to_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform_to_frame</span></code></a></p></td>
+<td><p>Transforms the value and all sub_assemblies to the target frame.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.transformed.html#compas_assembly2.assembly.Assembly.transformed" title="compas_assembly2.assembly.Assembly.transformed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transformed</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.transformed.html#compas_assembly2.assembly.Assembly.transformed" title="compas_assembly2.assembly.Assembly.transformed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transformed</span></code></a></p></td>
+<td><p>Transforms the value and all sub_assemblies by the given transformation and returns a copy.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.transformed_from_frame_to_frame.html#compas_assembly2.assembly.Assembly.transformed_from_frame_to_frame" title="compas_assembly2.assembly.Assembly.transformed_from_frame_to_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transformed_from_frame_to_frame</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.transformed_from_frame_to_frame.html#compas_assembly2.assembly.Assembly.transformed_from_frame_to_frame" title="compas_assembly2.assembly.Assembly.transformed_from_frame_to_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transformed_from_frame_to_frame</span></code></a></p></td>
+<td><p>Transforms the value and all sub_assemblies from the source frame to the target frame and returns a copy.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.transformed_to_frame.html#compas_assembly2.assembly.Assembly.transformed_to_frame" title="compas_assembly2.assembly.Assembly.transformed_to_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transformed_to_frame</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_assembly2.assembly.Assembly.transformed_to_frame.html#compas_assembly2.assembly.Assembly.transformed_to_frame" title="compas_assembly2.assembly.Assembly.transformed_to_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transformed_to_frame</span></code></a></p></td>
+<td><p>Transforms the value and all sub_assemblies to the target frame and returns a copy.</p></td>
 </tr>
 </tbody>
 </table>
