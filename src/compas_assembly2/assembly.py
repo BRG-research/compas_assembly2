@@ -137,12 +137,40 @@ class Assembly(Data):
     There are several ways how the data-structure can be used:
     a) the recursive structure allows to store group names as tree branches and elements as tree leaves.
     b) elememts can be nested within elements, which allows to store the assembly hierarchy.
-    c) the root of assembly is responsible for storing links between elements"""
+    c) the root of assembly is responsible for storing links between elements
+
+    Parameters
+    ----------
+        value : (str - for grouping | Element or other type - for storing data)
+            each assembly must have a value
+        make_copy : (bool)
+            if True, the value will be copied, otherwise it will be referenced
+
+    Attributes
+    ----------
+        frame_global : :class:`~compas.geometry.Frame`
+            global plane that can be used for the element orientation in a larger assembly
+        aabb : list[:class:`~compas.geometry.Point`]:
+            a list of XYZ coordinates defining the bounding box for collision detection.
+        oobb : list[:class:`~compas.geometry.Point`]:
+            a list of XYZ coordinates defining the an oriented bounding box to the frame.
+        convex_hull : list[:class:`~compas.datastrcutures.Mesh`]:
+            a mesh computed from the complex geometries points
+        area : float
+            the surface are of an element based on complex geometry
+        volume : float
+            the volume of an element based on complex 3d geometry
+
+    Examples
+    --------
+        >>> my_assembly = Assembly("my_assembly"))
+    """
 
     # ==========================================================================
     # CONSTRUCTOR THAt HAS A RECURSIVE DATA-STRUCTURE, DO NOT CHANGE IT!
     # ==========================================================================
     def __init__(self, value, make_copy=True):
+
         super(Assembly, self).__init__()
 
         # --------------------------------------------------------------------------
@@ -178,6 +206,94 @@ class Assembly(Data):
         structure.add_assembly(timber)
         root.add_assembly(structure)
         return root
+
+    # ==========================================================================
+    # ATTRIBUTES
+    # ==========================================================================
+
+    @property
+    def name(self):
+        """Returns the name the value either
+        a) the name of the group
+        b) the name of the element"""
+        if isinstance(self.value, str):
+            return self.value
+        else:
+            return str(self.value)
+
+    @property
+    def is_group_or_assembly(self):
+        """Returns True if the current branch value is a string"""
+        return isinstance(self.value, str)
+
+    @property
+    def level(self):
+        """Returns the level of the current branch"""
+        level = 0
+        p = self.parent_assembly
+        while p:
+            level = level + 1
+            p = p.parent_assembly
+        return level
+
+    @property
+    def root(self):
+        """Returns the root of the current branch"""
+        current_node = self
+        while current_node.parent_assembly:
+            current_node = current_node.parent_assembly
+        return current_node
+
+    @property
+    def depth(self):
+        """Returns the depth of the current branch"""
+        # Initialize depth to 0 and start from the value node
+        depth = 0
+        current_node = self
+
+        # Backtrack to the root parent_assembly while incrementing depth
+        while current_node.parent_assembly:
+            depth = depth + 1
+            current_node = current_node.parent_assembly
+
+        # Calculate the maximum depth by traversing sub_assemblies's subtrees
+        return self._calculate_depth(self, depth)
+
+    def _calculate_depth(self, node, depth):
+        if not node.sub_assemblies:
+            # If the node has no sub_assemblies, return the value depth
+            return depth
+
+        max_child_depth = depth
+        for sub_assembly in node.sub_assemblies:
+            # Recursively calculate the depth for each sub_assembly's subtree
+            child_depth = self._calculate_depth(sub_assembly, depth + 1)
+            if child_depth > max_child_depth:
+                max_child_depth = child_depth
+
+        # Return the maximum depth among sub_assemblies's subtrees
+        return max_child_depth
+
+    @property
+    def type(self):
+        """Returns name GROUP if the value is string else ELEMENT"""
+        if isinstance(self.value, str):
+            return "GROUP"
+        else:
+            return "ELEMENT"
+
+    @property
+    def number_of_elements(self):
+        """Counts the total number of elements in the assembly"""
+        number_of_elements = 0
+        for sub_assembly in self.sub_assemblies:
+            if isinstance(sub_assembly.value, str):
+                number_of_elements += sub_assembly.number_of_elements
+            else:
+                number_of_elements += 1
+                number_of_elements += sub_assembly.number_of_elements
+        return number_of_elements
+
 
     # ==========================================================================
     # SORTED LIST METHODS
@@ -266,93 +382,6 @@ class Assembly(Data):
         """Deserialize the assembly from a JSON file."""
         data = json_load(fp=fp)
         return Assembly.from_data(data)
-
-    # ==========================================================================
-    # ATTRIBUTES
-    # ==========================================================================
-
-    @property
-    def name(self):
-        """Returns the name the value either
-        a) the name of the group
-        b) the name of the element"""
-        if isinstance(self.value, str):
-            return self.value
-        else:
-            return str(self.value)
-
-    @property
-    def is_group_or_assembly(self):
-        """Returns True if the current branch value is a string"""
-        return isinstance(self.value, str)
-
-    @property
-    def level(self):
-        """Returns the level of the current branch"""
-        level = 0
-        p = self.parent_assembly
-        while p:
-            level = level + 1
-            p = p.parent_assembly
-        return level
-
-    @property
-    def root(self):
-        """Returns the root of the current branch"""
-        current_node = self
-        while current_node.parent_assembly:
-            current_node = current_node.parent_assembly
-        return current_node
-
-    @property
-    def depth(self):
-        """Returns the depth of the current branch"""
-        # Initialize depth to 0 and start from the value node
-        depth = 0
-        current_node = self
-
-        # Backtrack to the root parent_assembly while incrementing depth
-        while current_node.parent_assembly:
-            depth = depth + 1
-            current_node = current_node.parent_assembly
-
-        # Calculate the maximum depth by traversing sub_assemblies's subtrees
-        return self._calculate_depth(self, depth)
-
-    def _calculate_depth(self, node, depth):
-        if not node.sub_assemblies:
-            # If the node has no sub_assemblies, return the value depth
-            return depth
-
-        max_child_depth = depth
-        for sub_assembly in node.sub_assemblies:
-            # Recursively calculate the depth for each sub_assembly's subtree
-            child_depth = self._calculate_depth(sub_assembly, depth + 1)
-            if child_depth > max_child_depth:
-                max_child_depth = child_depth
-
-        # Return the maximum depth among sub_assemblies's subtrees
-        return max_child_depth
-
-    @property
-    def type(self):
-        """Returns name GROUP if the value is string else ELEMENT"""
-        if isinstance(self.value, str):
-            return "GROUP"
-        else:
-            return "ELEMENT"
-
-    @property
-    def number_of_elements(self):
-        """Counts the total number of elements in the assembly"""
-        number_of_elements = 0
-        for sub_assembly in self.sub_assemblies:
-            if isinstance(sub_assembly.value, str):
-                number_of_elements += sub_assembly.number_of_elements
-            else:
-                number_of_elements += 1
-                number_of_elements += sub_assembly.number_of_elements
-        return number_of_elements
 
     # ==========================================================================
     # PRINT METHODS
