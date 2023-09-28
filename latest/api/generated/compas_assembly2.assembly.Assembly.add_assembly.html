@@ -99,9 +99,21 @@
 <h1>Assembly.add_assembly</h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="compas_assembly2.assembly.Assembly.add_assembly">
-<span class="sig-prename descclassname"><span class="pre">Assembly.</span></span><span class="sig-name descname"><span class="pre">add_assembly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sub_assembly_or_element</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BRG-research/compas_assembly2/blob/master/src/compas_assembly2/assembly.py#L541"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="sig-prename descclassname"><span class="pre">Assembly.</span></span><span class="sig-name descname"><span class="pre">add_assembly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sub_assembly_or_element</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BRG-research/compas_assembly2/blob/master/src/compas_assembly2/assembly.py#L575"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>adds assembly to the current assembly sub-assemblies list,
 if the user inout element or any other type, it will wrap into the assembly</p>
+<dl>
+<dt>Returns:</dt><dd><p>None</p>
+</dd>
+<dt>Examples:</dt><dd><div class="doctest language-python notranslate"><div class="highlight"><pre><button class="btn copy"><i class="far fa-copy"></i></button><code><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">my_assembly</span><span class="o">.</span><span class="n">add_assembly</span><span class="p">(</span><span class="n">other_assembly</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># or</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_assembly</span><span class="o">.</span><span class="n">add_assembly</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># or</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_assembly</span><span class="o">.</span><span class="n">add_assembly</span><span class="p">(</span><span class="n">any_geometry_type</span><span class="p">)</span>
+</code></pre></div>
+</div>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
