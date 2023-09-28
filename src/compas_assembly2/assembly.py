@@ -447,14 +447,22 @@ class Assembly(Data):
             None
 
         Examples:
-            >>> my_assembly.serialize("my_assembly.json")
+            >>> my_assembly.serialize("my_assembly.json", pretty=True)
         
         """
         json_dump(data=self.data, fp=fp, pretty=pretty)
 
     @staticmethod
     def deserialize(fp):
-        """Deserialize the assembly from a JSON file."""
+        """Deserialize the assembly to a JSON file.
+
+        Returns:
+            Assembly
+
+        Examples:
+            >>> my_assembly = Assembly.deserialize("my_assembly.json")
+        
+        """
         data = json_load(fp=fp)
         return Assembly.from_data(data)
 
@@ -463,10 +471,19 @@ class Assembly(Data):
     # ==========================================================================
 
     def __repr__(self):
-        """returns the printed tree structure"""
+        """print the tree structure of the Assembly
+
+        Returns:
+            None
+
+        Examples:
+            >>> print(my_assembly)
+        
+        """
         return self.stringify_tree()
 
     def _stringify_tree(self, tree_str):
+        """ private method used by stringify_tree """
         prefix = "   " * self.level
         prefix = prefix + "|__ " if self.parent_assembly else ""
         tree_str = prefix + self.type + " --> " + self.name + "\n"
@@ -478,7 +495,15 @@ class Assembly(Data):
         return tree_str
 
     def stringify_tree(self):
-        """returns the printed tree structure as one string"""
+        """returns the printed tree structure
+
+        Returns:
+            string
+
+        Examples:
+            >>> my_string = stringify_tree(my_assembly)
+        
+        """
         tree_str = (
             "\n======================================= ROOT ASSEMBLY =============================================\n"
         )
@@ -489,6 +514,7 @@ class Assembly(Data):
         return tree_str
 
     def _print_tree(self):
+        """ private method used by print_tree """
         prefix = "   " * self.level
         prefix = prefix + "|__ " if self.parent_assembly else ""
         print(prefix + self.type + " --> " + self.name)
@@ -497,7 +523,15 @@ class Assembly(Data):
                 sub_assembly._print_tree()
 
     def print_tree(self):
-        """prints the tree structure"""
+        """returns the printed tree structure
+
+        Returns:
+            None
+
+        Examples:
+            >>> my_assembly.print_tree()
+
+        """
         print("======================================= ROOT ASSEMBLY =============================================")
         self._print_tree()
         print("===================================================================================================")
@@ -540,8 +574,19 @@ class Assembly(Data):
 
     def add_assembly(self, sub_assembly_or_element):
         """adds assembly to the current assembly sub-assemblies list,
-        if the user inout element or any other type, it will wrap into the assembly"""
+        if the user inout element or any other type, it will wrap into the assembly
 
+        Returns:
+            None
+
+        Examples:
+            >>> my_assembly.add_assembly(other_assembly)
+            >>> # or
+            >>> my_assembly.add_assembly(element)
+            >>> # or
+            >>> my_assembly.add_assembly(any_geometry_type)
+
+        """
         # check if the input is an element or assembly
         sub_assembly = (
             sub_assembly_or_element
@@ -560,7 +605,17 @@ class Assembly(Data):
         """merge elements within two assemblies
         if the names of the groups are the same then the elements are merged in the same branch
         else they are added based on the a1 group names
-        the merging have two boolean flag to allow duplicate branch names and leaves, if elements are references"""
+        the merging have two boolean flag to allow duplicate branch names and leaves, if elements are references
+
+        Returns:
+            None
+
+        Examples:
+            >>> my_assembly.merge_assembly(a1)
+            >>> # or if you want to have duplicated branches with the same names
+            >>> my_assembly.merge_assembly(a1, True, True)
+
+        """
 
         # Helper function to find a node with the same name in a list of nodes
         def find_node_by_path(nodes, node_a1):
@@ -593,7 +648,17 @@ class Assembly(Data):
         self, value, name_list=None, allow_duplicate_assembly_branches=False, allow_duplicate_assembly_leaves=True
     ):
         """add element to the assembly by creating group that follows element indices
-        otherwise user can give a list of names to add an element to the specific branch"""
+        otherwise user can give a list of names to add an element to the specific branch
+        
+        Returns:
+            None
+
+        Examples:
+            >>> my_assembly.add_by_index(element)
+            >>> # or
+            >>> my_assembly.add_by_index(element, [0,5,9])
+        
+        """
         # create value
         name_list = name_list if name_list is not None else value.id
 
@@ -615,7 +680,20 @@ class Assembly(Data):
     # MODIFY THE TREE STRUCTURE e.g. collapse, prune, graft
     # ==========================================================================
     def collapse(self, level):
-        """Iterate through sub-assemblies and adjust their levels based on user input."""
+        """Iterate through sub-assemblies and adjust their levels based on user input.
+        0 - outputs one list with all elements
+        1 - keep only the first branch level
+
+        n - , where n is the deepest level, will place each element into individual branch
+
+        Returns:
+            Assembly
+
+        Examples:
+            >>> Assembly = my_assembly.collapse(2)
+
+        """
+
         if level < 0:
             raise ValueError("Level must be a non-negative integer.")
 
@@ -646,7 +724,16 @@ class Assembly(Data):
 
     def graft(self, name="0"):
         """iterate through the assemblies if the leaves have multiple elements in a current assembly,
-        then split it into individual branches under the given name"""
+        then split it into individual branches under the given name
+
+        Returns:
+            Assembly
+
+        Examples:
+            >>> Assembly = my_assembly.graft()
+
+        """
+
         # Start by copying the current assembly.
         grafted_assembly = self.copy()
 
@@ -665,7 +752,16 @@ class Assembly(Data):
         return grafted_assembly
 
     def prune(self, level):
-        """Iterate through sub-assemblies and remove all sub-assemblies deeper than the given level."""
+        """Iterate through sub-assemblies and remove all sub-assemblies deeper than the given level.
+
+        Returns:
+            Assembly
+
+        Examples:
+            >>> assembly = my_assembly.prune(2)
+
+        """
+
         if level < 0:
             raise ValueError("Level must be a non-negative integer.")
 
@@ -694,7 +790,15 @@ class Assembly(Data):
     def to_nested_list(self):
         """convert the tree to nested lists
         ATTENTION: in majority of practical cases use to_lists() method instead
-        it reduces the hierarchy to a list of lists"""
+        it reduces the hierarchy to a list of lists
+
+        Returns:
+            list(list(list(...)), list(...))
+
+        Examples:
+            >>> my_lists = my_assembly.to_nested_list()
+
+        """
 
         def _to_nested_list(assembly):
             # divide into 1) empty assemblies 2) nested ones
@@ -711,7 +815,15 @@ class Assembly(Data):
         return _to_nested_list(self)
 
     def to_lists(self, collapse_level=None):
-        """unwrap the nested nested n times lists in one list of lists"""
+        """ unwrap the nested nested n times lists in one list of lists 
+        
+        Returns:
+            list(list(element0, element1, ...), list(element0, element1, ...))
+
+        Examples:
+            >>> my_assembly.graft()
+        
+        """
 
         # references
         assembly = self
@@ -747,6 +859,7 @@ class Assembly(Data):
             return lists
 
     def _flatten(self, list):
+        """ private method used by flatten method """
         if self.sub_assemblies:
             for sub_assembly in self.sub_assemblies:
                 if isinstance(sub_assembly.value, str) is False:  # isinstance(sub_assembly.value, Element)
@@ -756,7 +869,15 @@ class Assembly(Data):
         return list
 
     def flatten(self):
-        """get all elemenets of the assembly in one single list"""
+        """ get all elemenets of the assembly in one single list 
+
+        Returns:
+            list( element0, element1, ... )
+
+        Examples:
+            >>> my_list = my_assembly.flatten()
+
+        """
         list = []
         return self._flatten(list)
 
@@ -769,7 +890,17 @@ class Assembly(Data):
         b) or nested asses my_assembly["name1"]["name2"] or my_assembly[0][0]
 
         ATTENTION:
-        if you want to retrieve an element write my_assembly["name"].value"""
+        if you want to retrieve an element write my_assembly["name"].value
+
+        Returns:
+            Assembly
+
+        Examples:
+            >>> my_sub_assembly = my_assembly[0]
+            >>> # or
+            >>> my_sub_assembly = my_assenbly[0][1]
+
+        """
 
         # string input
         if isinstance(arg, str):
