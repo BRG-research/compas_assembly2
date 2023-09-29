@@ -685,8 +685,6 @@ class Assembly(Data):
             >>> my_assembly.add_assembly(other_assembly)
             >>> # or
             >>> my_assembly.add_assembly(element)
-            >>> # or
-            >>> my_assembly.add_assembly(any_geometry_type)
 
         """
         # check if the input is an element or assembly
