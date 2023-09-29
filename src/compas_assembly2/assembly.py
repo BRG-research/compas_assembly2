@@ -571,7 +571,7 @@ class Assembly(Data):
         """print the tree structure of the Assembly
 
         Returns:
-            str: print the tree structure of the Assembly
+            str: A string representation of the Assembly.
 
         Examples:
             >>> my_assembly = Assembly("my_assembly")
@@ -596,7 +596,7 @@ class Assembly(Data):
         """returns the printed tree structure
 
         Returns:
-            string
+            str: A string representation of the Assembly.
 
         Examples:
             >>> my_assembly = Assembly("my_assembly")
