@@ -176,8 +176,6 @@ class Assembly(Data):
         >>> # EXAMPLE 1
         >>> my_assembly = Assembly("my_assembly")
         >>> print(my_assembly)
-        >>> #
-        >>> # TERMINAL:
         ======================================= ROOT ASSEMBLY =============================================
         GROUP --> my_assembly
         ===================================================================================================
@@ -191,8 +189,6 @@ class Assembly(Data):
         >>> my_assembly.add_assembly(Element(name="plate", simplex=Point(0, 0, 0)))
         >>> my_assembly.add_assembly(Element(name="plate", simplex=Point(0, 7, 0)))
         >>> print(my_assembly)
-        >>> #
-        >>> # TERMINAL:
         ======================================= ROOT ASSEMBLY =============================================
         GROUP --> my_assembly
         |__ ELEMENT --> TYPE_BEAM ID_-1 GUID_7c20cc23-da06-4c4d-b1ac-6309cfb96935
@@ -222,8 +218,6 @@ class Assembly(Data):
         >>> structure.add_assembly(timber)
         >>> my_assembly.add_assembly(structure)
         >>> print(my_assembly)
-        >>> #
-        >>> # TERMINAL:
         ======================================= ROOT ASSEMBLY =============================================
         GROUP --> model
         |__ GROUP --> structure
