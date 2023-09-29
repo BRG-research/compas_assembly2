@@ -99,10 +99,19 @@
 <h1>Assembly.child_behave</h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="compas_assembly2.assembly.Assembly.child_behave">
-<span class="sig-prename descclassname"><span class="pre">Assembly.</span></span><span class="sig-name descname"><span class="pre">child_behave</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">collection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'aabb'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BRG-research/compas_assembly2/blob/master/src/compas_assembly2/assembly.py#L1070"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="sig-prename descclassname"><span class="pre">Assembly.</span></span><span class="sig-name descname"><span class="pre">child_behave</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">collection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'aabb'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BRG-research/compas_assembly2/blob/master/src/compas_assembly2/assembly.py#L1243"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Run methods from all the elements in the assembly and sub_assemblies
-Assuming self is an instance of your class
+to know which functions exist in the assembly look at the Element class or documentation
 self.child_behave(collection, &quot;method_name&quot;, arg1, arg2, kwarg1=value1, kwarg2=value2)</p>
+<dl>
+<dt>Returns:</dt><dd><p>None</p>
+</dd>
+<dt>Examples:</dt><dd><div class="doctest language-python notranslate"><div class="highlight"><pre><button class="btn copy"><i class="far fa-copy"></i></button><code><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">output_list</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_assembly</span><span class="o">.</span><span class="n">child_properties</span><span class="p">(</span><span class="n">output_list</span><span class="p">,</span> <span class="s2">&quot;aabb&quot;</span><span class="p">,</span> <span class="n">inflate</span><span class="o">=</span><span class="mf">0.00</span><span class="p">)</span>
+</code></pre></div>
+</div>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
