@@ -191,10 +191,10 @@ class Assembly(Data):
         >>> print(my_assembly)
         ======================================= ROOT ASSEMBLY =============================================
         GROUP --> model
-            |__ ELEMENT --> TYPE_BEAM ID_-1 GUID_e47fe051-74e1-4ab6-8d0e-a57421c9c5f1
-            |__ ELEMENT --> TYPE_BEAM ID_-1 GUID_f2de9226-1b87-4dec-9a7c-c64b9f4805fb
-            |__ ELEMENT --> TYPE_PLATE ID_-1 GUID_7c0700f9-ae92-4dfc-88d1-2edee0989da5
-            |__ ELEMENT --> TYPE_PLATE ID_-1 GUID_1384368c-2992-4b83-857a-2f9343179e49
+           |__ ELEMENT --> TYPE_BEAM ID_-1 GUID_fbe2a019-d3d0-4bb0-99a8-9a3a8276a4b3
+           |__ ELEMENT --> TYPE_BEAM ID_-1 GUID_70d454cb-aa8b-4241-8cfb-cce98da476bb
+           |__ ELEMENT --> TYPE_PLATE ID_-1 GUID_274f0a58-d301-4fc2-b9d1-06afa8f02d60
+           |__ ELEMENT --> TYPE_PLATE ID_-1 GUID_cdcc2a05-d142-4a8f-a315-ef3aa2dc60ca
         ===================================================================================================
 
     Example 3
@@ -573,7 +573,9 @@ class Assembly(Data):
         Examples:
             >>> my_assembly = Assembly("my_assembly")
             >>> print(my_assembly)
-
+            ======================================= ROOT ASSEMBLY =============================================
+            GROUP --> my_assembly
+            ===================================================================================================
         """
         return self.stringify_tree()
 
@@ -1008,6 +1010,8 @@ class Assembly(Data):
         Examples:
             >>> my_assembly = Assembly("model") # for sure you need to place elements inside
             >>> my_assembly.add_assembly(Assembly("another_assembly"))
+            >>> my_assembly[0].add_assembly(Element(name="beam", simplex=Point(0, 0, 0)))
+            >>> my_assembly[0].add_assembly(Element(name="plate", simplex=Point(0, 0, 0)))
             >>> my_sub_assembly = my_assembly[0]
             >>> # or
             >>> my_sub_assembly = my_assembly[0][1]
@@ -1439,12 +1443,9 @@ class Assembly(Data):
 
 
 if __name__ == "__main__":
-    my_assembly = Assembly("model")  # for sure you need to place elements inside
-    my_assembly.add_assembly(Assembly("sub_assembly"))
-    my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 0, 0)))
-    other_assembly = Assembly("model")  # for sure you need to place elements inside
-    other_element = Element(name="plate", simplex=Point(0, 0, 0))
-    my_assembly[0] = other_assembly
-    # or
-    my_assembly[0] = other_element
-    print(my_assembly)
+        my_assembly = Assembly("model")
+        my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 0, 0)))
+        my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 5, 0)))
+        my_assembly.add_assembly(Element(name="plate", simplex=Point(0, 0, 0)))
+        my_assembly.add_assembly(Element(name="plate", simplex=Point(0, 7, 0)))
+        print(my_assembly)
