@@ -1283,6 +1283,7 @@ class Assembly(Data):
 
         Examples:
             >>> my_assembly = Assembly("model") # for sure you need to place elements inside
+            >>> my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 0, 0)))
             >>> output_list = []
             >>> my_assembly.child_properties(output_list, "frame")
 
@@ -1313,7 +1314,7 @@ class Assembly(Data):
         Examples:
             >>> my_assembly = Assembly("model") # for sure you need to place elements inside
             >>> output_list = []
-            >>> my_assembly.child_properties(output_list, "aabb", inflate=0.00)
+            >>> my_assembly.child_properties(output_list, "aabb", 0.00)
 
         """
 
@@ -1441,9 +1442,8 @@ class Assembly(Data):
 
 
 if __name__ == "__main__":
-    my_assembly = Assembly("model")
+    my_assembly = Assembly("model")  # for sure you need to place elements inside
     my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 0, 0)))
-    my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 5, 0)))
-    my_assembly.add_assembly(Element(name="plate", simplex=Point(0, 0, 0)))
-    my_assembly.add_assembly(Element(name="plate", simplex=Point(0, 7, 0)))
-    print(my_assembly)
+    output_list = []
+    my_assembly.child_properties(output_list, "aabb")
+    print(output_list)
