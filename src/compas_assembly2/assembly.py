@@ -1439,10 +1439,10 @@ class Assembly(Data):
 
 
 if __name__ == "__main__":
-    my_assembly = Assembly("model") # for sure you need to place elements inside
+    my_assembly = Assembly("model")  # for sure you need to place elements inside
     my_assembly.add_assembly(Assembly("sub_assembly"))
     my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 0, 0)))
-    other_assembly = Assembly("model") # for sure you need to place elements inside
+    other_assembly = Assembly("model")  # for sure you need to place elements inside
     other_element = Element(name="plate", simplex=Point(0, 0, 0))
     my_assembly[0] = other_assembly
     # or
