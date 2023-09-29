@@ -974,6 +974,7 @@ class Assembly(Data):
             Assembly
 
         Examples:
+            >>> my_assembly = Assembly("model") # for sure you need to place elements inside
             >>> my_sub_assembly = my_assembly[0]
             >>> # or
             >>> my_sub_assembly = my_assenbly[0][1]
@@ -1009,6 +1010,9 @@ class Assembly(Data):
             None
 
         Examples:
+            >>> my_assembly = Assembly("model") # for sure you need to place elements inside
+            >>> other_assembly = Assembly("model") # for sure you need to place elements inside
+            >>> other_element = Element()
             >>> my_assembly[0] = other_assembly
             >>> # or
             >>> my_sub_assembly[0] = other_element
@@ -1048,6 +1052,8 @@ class Assembly(Data):
             Assembly
 
         Examples:
+            >>> assembly_0 = Assembly("model") # for sure you need to place elements inside
+            >>> assembly_1 = Assembly("model") # for sure you need to place elements inside
             >>> my_sub_assembly = assembly_0 + assembly_1
         """
         copy = self.copy()
@@ -1061,6 +1067,8 @@ class Assembly(Data):
             Assembly
 
         Examples:
+            >>> my_assembly = Assembly("model") # for sure you need to place elements inside
+            >>> other_assembly = Assembly("model") # for sure you need to place elements inside
             >>> my_assembly += other_assembly
 
         """
@@ -1089,6 +1097,7 @@ class Assembly(Data):
             Assembly
 
         Examples:
+            >>> my_assembly = Assembly("model") # for sure you need to place elements inside
             >>> my_copy = my_assembly.copy()
 
         """
@@ -1120,7 +1129,9 @@ class Assembly(Data):
             None
 
         Examples:
-            >>> my_assembly.transform_all_to_frame()
+            >>> my_assembly = Assembly("model") # for sure you need to place elements inside
+            >>> t = Frame([0, 0, 10], [1, 0, 0], [0, 1, 0])
+            >>> my_assembly.transform_all_to_frame(t)
 
         """
         # apply the transformation the value
@@ -1139,7 +1150,9 @@ class Assembly(Data):
             Assembly
 
         Examples:
-            >>> transformed_assembly = my_assembly.transformed_all_to_frame()
+            >>> my_assembly = Assembly("model") # for sure you need to place elements inside
+            >>> t = Frame([0, 0, 10], [1, 0, 0], [0, 1, 0])
+            >>> transformed_assembly = my_assembly.transformed_all_to_frame(t)
 
         """
         new_instance = self.copy()
@@ -1153,7 +1166,10 @@ class Assembly(Data):
             None
 
         Examples:
-            >>> my_assembly.transform_from_frame_to_frame()
+            >>> s = Frame([0, 0, 0], [1, 0, 0], [0, 1, 0])
+            >>> t = Frame([0, 0, 10], [1, 0, 0], [0, 1, 0])
+            >>> my_assembly = Assembly("model") # for sure you need to place elements inside
+            >>> my_assembly.transform_from_frame_to_frame(s, t)
 
         """
         # apply the transformation the value
@@ -1165,13 +1181,17 @@ class Assembly(Data):
             sub_assembly.transform_to_frame(source_frame, target_frame)
 
     def transformed_from_frame_to_frame(self, source_frame, target_frame):
-        """Transforms the value and all sub_assemblies from the source frame to the target frame and returns a copy.
+        """Transforms the value and all sub_assemblies
+        from the source frame to the target frame and returns a copy.
 
         Returns:
             Assembly
 
         Examples:
-            >>> transformed_assembly = my_assembly.transformed_from_frame_to_frame()
+            >>> s = Frame([0, 0, 0], [1, 0, 0], [0, 1, 0])
+            >>> t = Frame([0, 0, 10], [1, 0, 0], [0, 1, 0])
+            >>> my_assembly = Assembly("model") # for sure you need to place elements inside
+            >>> transformed_assembly = my_assembly.transformed_from_frame_to_frame(s, t)
 
         """
         new_instance = self.copy()
@@ -1185,6 +1205,8 @@ class Assembly(Data):
             None
 
         Examples:
+            >>> transformation = Translation.from_vector([1, 2, 3])
+            >>> my_assembly = Assembly("model") # for sure you need to place elements inside
             >>> my_assembly.transform(transformation)
 
         """
@@ -1203,6 +1225,8 @@ class Assembly(Data):
             Assembly
 
         Examples:
+            >>> transformation = Translation.from_vector([1, 2, 3])
+            >>> my_assembly = Assembly("model") # for sure you need to place elements inside
             >>> transformed_assembly = my_assembly.transformed(transformation)
 
         """
@@ -1221,6 +1245,7 @@ class Assembly(Data):
             None
 
         Examples:
+            >>> my_assembly = Assembly("model") # for sure you need to place elements inside
             >>> output_list = []
             >>> my_assembly.child_properties(output_list, "frame")
 
@@ -1249,6 +1274,7 @@ class Assembly(Data):
             None
 
         Examples:
+            >>> my_assembly = Assembly("model") # for sure you need to place elements inside
             >>> output_list = []
             >>> my_assembly.child_properties(output_list, "aabb", inflate=0.00)
 
@@ -1343,6 +1369,7 @@ class Assembly(Data):
             None
 
         Examples:
+            >>> my_assembly = Assembly("model") # for sure you need to place elements inside
             >>> my_assembly.show()
             >>> # or
             >>> my_assembly.show(collapse_level=2)
