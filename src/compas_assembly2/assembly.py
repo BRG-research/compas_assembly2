@@ -191,10 +191,10 @@ class Assembly(Data):
         >>> print(my_assembly)
         ======================================= ROOT ASSEMBLY =============================================
         GROUP --> model
-        |__ ELEMENT --> TYPE_BEAM ID_-1 GUID_e47fe051-74e1-4ab6-8d0e-a57421c9c5f1
-        |__ ELEMENT --> TYPE_BEAM ID_-1 GUID_f2de9226-1b87-4dec-9a7c-c64b9f4805fb
-        |__ ELEMENT --> TYPE_PLATE ID_-1 GUID_7c0700f9-ae92-4dfc-88d1-2edee0989da5
-        |__ ELEMENT --> TYPE_PLATE ID_-1 GUID_1384368c-2992-4b83-857a-2f9343179e49
+            |__ ELEMENT --> TYPE_BEAM ID_-1 GUID_e47fe051-74e1-4ab6-8d0e-a57421c9c5f1
+            |__ ELEMENT --> TYPE_BEAM ID_-1 GUID_f2de9226-1b87-4dec-9a7c-c64b9f4805fb
+            |__ ELEMENT --> TYPE_PLATE ID_-1 GUID_7c0700f9-ae92-4dfc-88d1-2edee0989da5
+            |__ ELEMENT --> TYPE_PLATE ID_-1 GUID_1384368c-2992-4b83-857a-2f9343179e49
         ===================================================================================================
 
     Example 3
