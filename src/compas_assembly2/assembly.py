@@ -299,6 +299,9 @@ class Assembly(Data):
         Examples:
             >>> my_assembly = Assembly("my_assembly")
             >>> as_as_defined_in__repr__ = my_assembly.name
+            ======================================= ROOT ASSEMBLY =============================================
+            GROUP --> my_assembly
+            ===================================================================================================
         """
         if isinstance(self.value, str):
             return self.value
@@ -1041,11 +1044,13 @@ class Assembly(Data):
 
         Examples:
             >>> my_assembly = Assembly("model") # for sure you need to place elements inside
+            >>> my_assembly.add_assembly(Assembly("sub_assembly"))
+            >>> my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 0, 0)))
             >>> other_assembly = Assembly("model") # for sure you need to place elements inside
-            >>> other_element = Element(name="beam", simplex=Point(0, 0, 0))
+            >>> other_element = Element(name="plate", simplex=Point(0, 0, 0))
             >>> my_assembly[0] = other_assembly
             >>> # or
-            >>> my_sub_assembly[0] = other_element
+            >>> my_assembly[0] = other_element
         """
         input_name = arg
 
@@ -1434,9 +1439,12 @@ class Assembly(Data):
 
 
 if __name__ == "__main__":
-    my_assembly = Assembly("model")
+    my_assembly = Assembly("model") # for sure you need to place elements inside
+    my_assembly.add_assembly(Assembly("sub_assembly"))
     my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 0, 0)))
-    my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 5, 0)))
-    my_assembly.add_assembly(Element(name="plate", simplex=Point(0, 0, 0)))
-    my_assembly.add_assembly(Element(name="plate", simplex=Point(0, 7, 0)))
+    other_assembly = Assembly("model") # for sure you need to place elements inside
+    other_element = Element(name="plate", simplex=Point(0, 0, 0))
+    my_assembly[0] = other_assembly
+    # or
+    my_assembly[0] = other_element
     print(my_assembly)
