@@ -1443,9 +1443,9 @@ class Assembly(Data):
 
 
 if __name__ == "__main__":
-        my_assembly = Assembly("model")
-        my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 0, 0)))
-        my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 5, 0)))
-        my_assembly.add_assembly(Element(name="plate", simplex=Point(0, 0, 0)))
-        my_assembly.add_assembly(Element(name="plate", simplex=Point(0, 7, 0)))
-        print(my_assembly)
+    my_assembly = Assembly("model")
+    my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 0, 0)))
+    my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 5, 0)))
+    my_assembly.add_assembly(Element(name="plate", simplex=Point(0, 0, 0)))
+    my_assembly.add_assembly(Element(name="plate", simplex=Point(0, 7, 0)))
+    print(my_assembly)
