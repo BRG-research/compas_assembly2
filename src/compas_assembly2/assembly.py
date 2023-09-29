@@ -422,12 +422,20 @@ class Assembly(Data):
     def number_of_elements(self):
         """Counts the total number of elements in the assembly
 
-        Returns:
+        Returns: The total number of elements in the assembly.
             int
 
         Examples:
+            Create an assembly and count its elements:
             >>> my_assembly = Assembly("my_assembly")
+            >>> sub_1 = Assembly("sub_1")
+            >>> sub_2 = Assembly("sub_2")
+            >>> element = Element(name="beam", simplex=Point(0, 0, 0))
+            >>> my_assembly.add_assembly(sub_1)
+            >>> my_assembly.add_assembly(sub_2)
+            >>> my_assembly.add_element(element)
             >>> count = my_assembly.number_of_elements
+            1
 
         """
         number_of_elements = 0
