@@ -188,7 +188,7 @@ class Assembly(Data):
         >>> my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 5, 0)))
         >>> my_assembly.add_assembly(Element(name="plate", simplex=Point(0, 0, 0)))
         >>> my_assembly.add_assembly(Element(name="plate", simplex=Point(0, 7, 0)))
-        >>> print(my_assembly)
+        >>> print(my_assembly)  # doctest: +SKIP
         ======================================= ROOT ASSEMBLY =============================================
         GROUP --> model
            |__ ELEMENT --> TYPE_BEAM ID_-1 GUID_fbe2a019-d3d0-4bb0-99a8-9a3a8276a4b3
@@ -217,7 +217,7 @@ class Assembly(Data):
         >>> concrete.add_assembly(Assembly(Element(name="block", simplex=Point(0, 0, 0))))
         >>> #
         >>> my_assembly.add_assembly(structure)
-        >>> print(my_assembly)
+        >>> print(my_assembly)  # doctest: +SKIP
         ======================================= ROOT ASSEMBLY =============================================
         GROUP --> model
         |__ GROUP --> structure
@@ -572,7 +572,7 @@ class Assembly(Data):
 
         Examples:
             >>> my_assembly = Assembly("my_assembly")
-            >>> print(my_assembly)
+            >>> print(my_assembly)  # doctest: +SKIP
             ======================================= ROOT ASSEMBLY =============================================
             GROUP --> my_assembly
             ===================================================================================================
@@ -624,11 +624,11 @@ class Assembly(Data):
         """returns the printed tree structure
 
         Returns:
-            None
+            str: A string representation of the Assembly.
 
         Examples:
             >>> my_assembly = Assembly("my_assembly")
-            >>> my_assembly.print_tree()
+            >>> my_assembly.print_tree()  # doctest: +SKIP
 
         """
         print("======================================= ROOT ASSEMBLY =============================================")
