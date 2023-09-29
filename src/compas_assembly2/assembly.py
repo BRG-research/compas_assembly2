@@ -190,11 +190,11 @@ class Assembly(Data):
         >>> my_assembly.add_assembly(Element(name="plate", simplex=Point(0, 7, 0)))
         >>> print(my_assembly)
         ======================================= ROOT ASSEMBLY =============================================
-        GROUP --> my_assembly
-        |__ ELEMENT --> TYPE_BEAM ID_-1 GUID_7c20cc23-da06-4c4d-b1ac-6309cfb96935
-        |__ ELEMENT --> TYPE_BEAM ID_-1 GUID_cc7b0b93-44f6-4e77-b937-dd935a60d063
-        |__ ELEMENT --> TYPE_PLATE ID_-1 GUID_2276f043-add7-4528-8267-095824ba955f
-        |__ ELEMENT --> TYPE_PLATE ID_-1 GUID_174ca25a-1a37-487b-8f13-40e7d71c54f0
+        GROUP --> model
+        |__ ELEMENT --> TYPE_BEAM ID_-1 GUID_e47fe051-74e1-4ab6-8d0e-a57421c9c5f1
+        |__ ELEMENT --> TYPE_BEAM ID_-1 GUID_f2de9226-1b87-4dec-9a7c-c64b9f4805fb
+        |__ ELEMENT --> TYPE_PLATE ID_-1 GUID_7c0700f9-ae92-4dfc-88d1-2edee0989da5
+        |__ ELEMENT --> TYPE_PLATE ID_-1 GUID_1384368c-2992-4b83-857a-2f9343179e49
         ===================================================================================================
 
     Example 3
@@ -204,6 +204,7 @@ class Assembly(Data):
         >>> structure = Assembly("structure")
         >>> #
         >>> timber = Assembly("timber")
+        >>> structure.add_assembly(timber)
         >>> timber.add_assembly(Assembly(Element(name="beam", simplex=Point(0, 0, 0))))
         >>> timber.add_assembly(Assembly(Element(name="beam", simplex=Point(0, 5, 0))))
         >>> timber.add_assembly(Assembly(Element(name="plate", simplex=Point(0, 0, 0))))
@@ -215,7 +216,6 @@ class Assembly(Data):
         >>> concrete.add_assembly(Assembly(Element(name="block", simplex=Point(0, 5, 0))))
         >>> concrete.add_assembly(Assembly(Element(name="block", simplex=Point(0, 0, 0))))
         >>> #
-        >>> structure.add_assembly(timber)
         >>> my_assembly.add_assembly(structure)
         >>> print(my_assembly)
         ======================================= ROOT ASSEMBLY =============================================
@@ -1435,20 +1435,8 @@ class Assembly(Data):
 
 if __name__ == "__main__":
     my_assembly = Assembly("model")
-    structure = Assembly("structure")
-
-    timber = Assembly("timber")
-    timber.add_assembly(Assembly(Element(name="beam", simplex=Point(0, 0, 0))))
-    timber.add_assembly(Assembly(Element(name="beam", simplex=Point(0, 5, 0))))
-    timber.add_assembly(Assembly(Element(name="plate", simplex=Point(0, 0, 0))))
-    timber.add_assembly(Assembly(Element(name="plate", simplex=Point(0, 7, 0))))
-
-    concrete = Assembly("concrete")
-    structure.add_assembly(concrete)
-    concrete.add_assembly(Assembly(Element(name="node", simplex=Point(0, 0, 0))))
-    concrete.add_assembly(Assembly(Element(name="block", simplex=Point(0, 5, 0))))
-    concrete.add_assembly(Assembly(Element(name="block", simplex=Point(0, 0, 0))))
-
-    structure.add_assembly(timber)
-    my_assembly.add_assembly(structure)
+    my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 0, 0)))
+    my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 5, 0)))
+    my_assembly.add_assembly(Element(name="plate", simplex=Point(0, 0, 0)))
+    my_assembly.add_assembly(Element(name="plate", simplex=Point(0, 7, 0)))
     print(my_assembly)
