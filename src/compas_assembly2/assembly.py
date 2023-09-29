@@ -303,6 +303,7 @@ class Assembly(Data):
             string
 
         Examples:
+            >>> my_assembly = Assembly("my_assembly")
             >>> as_as_defined_in__repr__ = my_assembly.name
         """
         if isinstance(self.value, str):
@@ -318,6 +319,7 @@ class Assembly(Data):
             bool
 
         Examples:
+            >>> my_assembly = Assembly("my_assembly")
             >>> is_group = my_assembly.is_group_or_assembly
 
         """
@@ -331,6 +333,7 @@ class Assembly(Data):
             int
 
         Examples:
+            >>> my_assembly = Assembly("my_assembly")
             >>> level = my_assembly.level
 
         """
@@ -349,6 +352,7 @@ class Assembly(Data):
             Assembly
 
         Examples:
+            >>> my_assembly = Assembly("my_assembly")
             >>> root_assembly = my_assembly.root
 
         """
@@ -366,6 +370,7 @@ class Assembly(Data):
             int
 
         Examples:
+            >>> my_assembly = Assembly("my_assembly")
             >>> depth = my_assembly.depth
 
         """
@@ -404,6 +409,7 @@ class Assembly(Data):
             str
 
         Examples:
+            >>> my_assembly = Assembly("my_assembly")
             >>> type_name = my_assembly.type
 
         """
@@ -420,6 +426,7 @@ class Assembly(Data):
             int
 
         Examples:
+            >>> my_assembly = Assembly("my_assembly")
             >>> count = my_assembly.number_of_elements
 
         """
@@ -444,6 +451,8 @@ class Assembly(Data):
             bool
 
         Examples:
+            >>> my_assembly = Assembly("my_assembly")
+            >>> other_assembly = Assembly("other_assembly")
             >>> is_group_smaller = my_assembly < other_assembly
 
         """
@@ -525,6 +534,7 @@ class Assembly(Data):
             None
 
         Examples:
+            >>> my_assembly = Assembly("my_assembly")
             >>> my_assembly.serialize("my_assembly.json", pretty=True)
 
         """
@@ -538,6 +548,7 @@ class Assembly(Data):
             Assembly
 
         Examples:
+            >>> my_assembly = Assembly("my_assembly")
             >>> my_assembly = Assembly.deserialize("my_assembly.json")
 
         """
@@ -555,6 +566,7 @@ class Assembly(Data):
             None
 
         Examples:
+            >>> my_assembly = Assembly("my_assembly")
             >>> print(my_assembly)
 
         """
@@ -579,6 +591,7 @@ class Assembly(Data):
             string
 
         Examples:
+            >>> my_assembly = Assembly("my_assembly")
             >>> my_string = stringify_tree(my_assembly)
 
         """
@@ -607,6 +620,7 @@ class Assembly(Data):
             None
 
         Examples:
+            >>> my_assembly = Assembly("my_assembly")
             >>> my_assembly.print_tree()
 
         """
@@ -658,6 +672,9 @@ class Assembly(Data):
             None
 
         Examples:
+            >>> my_assembly = Assembly("my_assembly")
+            >>> other_assembly = Assembly("other_assembly")
+            >>> element = Element(name="beam", simplex=Point(0, 0, 0))
             >>> my_assembly.add_assembly(other_assembly)
             >>> # or
             >>> my_assembly.add_assembly(element)
@@ -689,6 +706,8 @@ class Assembly(Data):
             None
 
         Examples:
+            >>> my_assembly = Assembly("my_assembly")
+            >>> a1 = Assembly("a1")
             >>> my_assembly.merge_assembly(a1)
             >>> # or if you want to have duplicated branches with the same names
             >>> my_assembly.merge_assembly(a1, True, True)
@@ -732,6 +751,8 @@ class Assembly(Data):
             None
 
         Examples:
+            >>> my_assembly = Assembly("my_assembly")
+            >>> element = Element(name="beam", simplex=Point(0, 0, 0))
             >>> my_assembly.add_by_index(element)
             >>> # or
             >>> my_assembly.add_by_index(element, [0,5,9])
@@ -768,7 +789,8 @@ class Assembly(Data):
             Assembly
 
         Examples:
-            >>> Assembly = my_assembly.collapse(2)
+            >>> my_assembly = Assembly("my_assembly")
+            >>> collapsed_assembly = my_assembly.collapse(0)
 
         """
 
@@ -808,7 +830,8 @@ class Assembly(Data):
             Assembly
 
         Examples:
-            >>> Assembly = my_assembly.graft()
+            >>> my_assembly = Assembly("my_assembly")
+            >>> grafted_assembly = my_assembly.graft()
 
         """
 
@@ -836,7 +859,8 @@ class Assembly(Data):
             Assembly
 
         Examples:
-            >>> assembly = my_assembly.prune(2)
+            >>> my_assembly = Assembly("my_assembly")
+            >>> pruned_assembly = my_assembly.prune(2)
 
         """
 
@@ -874,6 +898,7 @@ class Assembly(Data):
             list(list(list(...)), list(...))
 
         Examples:
+            >>> my_assembly = Assembly("my_assembly")
             >>> my_lists = my_assembly.to_nested_list()
 
         """
@@ -899,7 +924,8 @@ class Assembly(Data):
             list(list(element0, element1, ...), list(element0, element1, ...))
 
         Examples:
-            >>> my_assembly.graft()
+            >>> my_assembly = Assembly("my_assembly")
+            >>> my_list = my_assembly.to_lists()
 
         """
 
@@ -953,6 +979,7 @@ class Assembly(Data):
             list( element0, element1, ... )
 
         Examples:
+            >>> my_assembly = Assembly("my_assembly")
             >>> my_list = my_assembly.flatten()
 
         """
@@ -975,6 +1002,7 @@ class Assembly(Data):
 
         Examples:
             >>> my_assembly = Assembly("model") # for sure you need to place elements inside
+            >>> my_assembly.add_assembly(Assembly("another_assembly"))
             >>> my_sub_assembly = my_assembly[0]
             >>> # or
             >>> my_sub_assembly = my_assenbly[0][1]
@@ -1012,7 +1040,7 @@ class Assembly(Data):
         Examples:
             >>> my_assembly = Assembly("model") # for sure you need to place elements inside
             >>> other_assembly = Assembly("model") # for sure you need to place elements inside
-            >>> other_element = Element()
+            >>> other_element = Element(name="beam", simplex=Point(0, 0, 0))
             >>> my_assembly[0] = other_assembly
             >>> # or
             >>> my_sub_assembly[0] = other_element
