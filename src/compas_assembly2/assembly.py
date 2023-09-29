@@ -1007,7 +1007,7 @@ class Assembly(Data):
             >>> my_assembly.add_assembly(Assembly("another_assembly"))
             >>> my_sub_assembly = my_assembly[0]
             >>> # or
-            >>> my_sub_assembly = my_assenbly[0][1]
+            >>> my_sub_assembly = my_assembly[0][1]
 
         """
 
