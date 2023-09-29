@@ -174,7 +174,7 @@ class Assembly(Data):
     Example 1
     ---------
         >>> # EXAMPLE 1
-        >>> my_assembly = Assembly("my_assembly"))
+        >>> my_assembly = Assembly("my_assembly")
         >>> print(my_assembly)
         >>> #
         >>> # TERMINAL:
