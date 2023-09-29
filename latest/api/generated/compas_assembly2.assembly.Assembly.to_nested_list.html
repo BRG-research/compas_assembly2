@@ -99,14 +99,15 @@
 <h1>Assembly.to_nested_list</h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="compas_assembly2.assembly.Assembly.to_nested_list">
-<span class="sig-prename descclassname"><span class="pre">Assembly.</span></span><span class="sig-name descname"><span class="pre">to_nested_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BRG-research/compas_assembly2/blob/master/src/compas_assembly2/assembly.py#L868"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="sig-prename descclassname"><span class="pre">Assembly.</span></span><span class="sig-name descname"><span class="pre">to_nested_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BRG-research/compas_assembly2/blob/master/src/compas_assembly2/assembly.py#L892"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>convert the tree to nested lists
 ATTENTION: in majority of practical cases use to_lists() method instead
 it reduces the hierarchy to a list of lists</p>
 <dl>
 <dt>Returns:</dt><dd><p>list(list(list(...)), list(...))</p>
 </dd>
-<dt>Examples:</dt><dd><div class="doctest language-python notranslate"><div class="highlight"><pre><button class="btn copy"><i class="far fa-copy"></i></button><code><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">my_lists</span> <span class="o">=</span> <span class="n">my_assembly</span><span class="o">.</span><span class="n">to_nested_list</span><span class="p">()</span>
+<dt>Examples:</dt><dd><div class="doctest language-python notranslate"><div class="highlight"><pre><button class="btn copy"><i class="far fa-copy"></i></button><code><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">my_assembly</span> <span class="o">=</span> <span class="n">Assembly</span><span class="p">(</span><span class="s2">&quot;my_assembly&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_lists</span> <span class="o">=</span> <span class="n">my_assembly</span><span class="o">.</span><span class="n">to_nested_list</span><span class="p">()</span>
 </code></pre></div>
 </div>
 </dd>
