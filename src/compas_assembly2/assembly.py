@@ -1295,6 +1295,7 @@ class Assembly(Data):
             # check possible results
             collection.append(result)
             if result is None:
+                pass
                 print("WARNING Attribute --> " + attribute_name + " <-- not found in " + str(self.value))
             else:
                 collection.append(result)
@@ -1312,22 +1313,22 @@ class Assembly(Data):
             None
 
         Examples:
-            >>> my_assembly = Assembly("model") # for sure you need to place elements inside
+            >>> my_assembly = Assembly("model")  # for sure you need to place elements inside
+            >>> my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 0, 0), complex=Point(0, 0, 0)))
             >>> output_list = []
-            >>> my_assembly.child_properties(output_list, "aabb", 0.00)
+            >>> my_assembly.child_behave(output_list, "aabb", 0.00)
 
         """
-
-        # run the method
 
         # Use getattr() to check if the method exists and call it
         method_to_call = getattr(self.value, method_name, None)
 
         # check possible results
         if method_to_call is None or callable(method_to_call) is False:
-            print("WARNING Method --> " + method_name + " <-- not found in " + str(self.value))
+            pass
+            # print("WARNING Method --> " + method_name + " <-- not found in " + str(self.value))
         else:
-            # Call the method with add_assemblyitional arguments
+            # Call the method with additional arguments
             result = method_to_call(*args, **kwargs)
             # check possible results
             collection.append(result)
@@ -1445,7 +1446,6 @@ class Assembly(Data):
 
 if __name__ == "__main__":
     my_assembly = Assembly("model")  # for sure you need to place elements inside
-    my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 0, 0)))
+    my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 0, 0), complex=Point(0, 0, 0)))
     output_list = []
-    my_assembly.child_properties(output_list, "aabb")
-    print(output_list)
+    my_assembly.child_behave(output_list, "aabb", 0.00)
