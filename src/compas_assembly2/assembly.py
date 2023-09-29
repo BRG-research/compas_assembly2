@@ -1344,6 +1344,8 @@ class Assembly(Data):
             list(Point)
 
         Examples:
+            >>> my_assembly = Assembly("model") # for sure you need to place elements inside
+            >>> my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 0, 0)))
             >>> bounding_box_eight_corner_points = my_assembly.aabb(inflate = 0.01)
         """
         # first compute the aabb and then get it
