@@ -1561,7 +1561,7 @@ class Assembly(Data):
             for j in range(n):
                 if i != j:
                     if elements[i].has_collision(elements[j]):
-                        print("collision between " + str(i) + " and " + str(j))
+                        # print("collision between " + str(i) + " and " + str(j))
                         self.graph.add_edge(i, j)
 
 
@@ -1597,7 +1597,24 @@ if __name__ == "__main__":
 
         my_assembly[0].add_assembly(transformed_element)
 
-    my_assembly.show()
+    # collision
+    my_assembly.collision()
+
+    # iterate nodes and add lines for graph display
+    geometry = []
+    for pair in my_assembly.graph.edges():
+        aabb0 = my_assembly[0][pair[0]].aabb()
+        c0 = Point(
+            (aabb0[0][0] + aabb0[6][0]) * 0.5, (aabb0[0][1] + aabb0[6][1]) * 0.5, (aabb0[0][2] + aabb0[6][2]) * 0.5
+        )
+        aabb1 = my_assembly[0][pair[1]].aabb()
+        c1 = Point(
+            (aabb1[0][0] + aabb1[6][0]) * 0.5, (aabb1[0][1] + aabb1[6][1]) * 0.5, (aabb1[0][2] + aabb1[6][2]) * 0.5
+        )
+        line = Line(c0, c1)
+        geometry.append(line)
+
+    my_assembly.show(geometry=geometry)
 
     # my_assembly = Assembly("model")
     # structure = Assembly("structure")
@@ -1619,7 +1636,7 @@ if __name__ == "__main__":
     # #
     # collected_paths = my_assembly.collect_paths_to_elements()
     # my_assembly.create_graph()
-    my_assembly.collision()
+
     print(my_assembly.graph)
     print(my_assembly.graph.node[0])
     print(my_assembly.graph.node[1])
