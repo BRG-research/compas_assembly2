@@ -128,7 +128,7 @@ def depth(self):
 
 import copy
 from compas.data import Data
-from compas.geometry import bounding_box, Point, Line, Frame, Transformation  # noqa: F401
+from compas.geometry import bounding_box, Point, Line, Frame, Transformation, Translation  # noqa: F401
 from compas_assembly2 import Element
 from compas.colors import Color
 from compas_assembly2.sortedlist import SortedList
@@ -1267,13 +1267,13 @@ class Assembly(Data):
     def transformed(self, transformation):
         """Transforms the value and all sub_assemblies by the given transformation and returns a copy.
 
-        # Returns:
-        #     Assembly
+        Returns:
+            Assembly
 
-        # Examples:
-        #     >>> transformation = Translation.from_vector([1, 2, 3])
-        #     >>> my_assembly = Assembly("model") # for sure you need to place elements inside
-        #     >>> transformed_assembly = my_assembly.transformed(transformation)
+        Examples:
+            >>> transformation = Translation.from_vector([1, 2, 3])
+            >>> my_assembly = Assembly("model")  # for sure you need to place elements inside
+            >>> transformed_assembly = my_assembly.transformed(transformation)
 
         """
         new_instance = self.copy()
@@ -1457,7 +1457,6 @@ class Assembly(Data):
 
 
 if __name__ == "__main__":
+    transformation = Translation.from_vector([1, 2, 3])
     my_assembly = Assembly("model")  # for sure you need to place elements inside
-    my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 0, 0), complex=Line(Point(0, 0, 0), Point(1, 0, 0))))
-    my_assembly.show()
-    my_assembly.show(collapse_level=0)
+    transformed_assembly = my_assembly.transformed(transformation)
