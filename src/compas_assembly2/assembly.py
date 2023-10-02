@@ -1583,6 +1583,7 @@ if __name__ == "__main__":
     num_copies = 200
     max_translation = 8  # Maximum translation distance from the center
     my_assembly = Assembly("model")
+    my_assembly.add_assembly("boxes")
     for _ in range(num_copies):
         # Generate random rotation and translation
         random_axis = [random.random(), random.random(), random.random()]
@@ -1594,7 +1595,9 @@ if __name__ == "__main__":
         # Apply random rotation and translation
         transformed_element = b1.transformed(random_translation * random_rotation)
 
-        my_assembly.add_assembly(transformed_element)
+        my_assembly[0].add_assembly(transformed_element)
+
+    my_assembly.show()
 
     # my_assembly = Assembly("model")
     # structure = Assembly("structure")
