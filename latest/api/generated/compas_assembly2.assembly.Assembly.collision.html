@@ -134,21 +134,21 @@ the index are integer in each level of the assebmly, e.g.
 &gt;&gt;&gt; # iterate nodes and add lines for graph display
 &gt;&gt;&gt; geometry = []
 &gt;&gt;&gt; for pair in my_assembly.graph.edges():
-&gt;&gt;&gt;     print(pair)
-&gt;&gt;&gt;     aabb0 = my_assembly[0][pair[0]].aabb()
-&gt;&gt;&gt;     c0 = Point(
-&gt;&gt;&gt;         (aabb0[0][0] + aabb0[6][0]) * 0.5,
-&gt;&gt;&gt;         (aabb0[0][1] + aabb0[6][1]) * 0.5,
-&gt;&gt;&gt;         (aabb0[0][2] + aabb0[6][2]) * 0.5
-&gt;&gt;&gt;     )
-&gt;&gt;&gt;     aabb1 = my_assembly[0][pair[1]].aabb()
-&gt;&gt;&gt;     c1 = Point(
-&gt;&gt;&gt;         (aabb1[0][0] + aabb1[6][0]) * 0.5,
-&gt;&gt;&gt;         (aabb1[0][1] + aabb1[6][1]) * 0.5,
-&gt;&gt;&gt;         (aabb1[0][2] + aabb1[6][2]) * 0.5
-&gt;&gt;&gt;     )
-&gt;&gt;&gt;     line = Line(c0, c1)
-&gt;&gt;&gt;     geometry.append(line)</p>
+...     print(pair)
+...     aabb0 = my_assembly[0][pair[0]].aabb()
+...     c0 = Point(
+...         (aabb0[0][0] + aabb0[6][0]) * 0.5,
+...         (aabb0[0][1] + aabb0[6][1]) * 0.5,
+...         (aabb0[0][2] + aabb0[6][2]) * 0.5
+...     )
+...     aabb1 = my_assembly[0][pair[1]].aabb()
+...     c1 = Point(
+...         (aabb1[0][0] + aabb1[6][0]) * 0.5,
+...         (aabb1[0][1] + aabb1[6][1]) * 0.5,
+...         (aabb1[0][2] + aabb1[6][2]) * 0.5
+...     )
+...     line = Line(c0, c1)
+...     geometry.append(line)</p>
 </dd></dl>
 
 </section>
