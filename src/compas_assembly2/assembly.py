@@ -1506,6 +1506,7 @@ class Assembly(Data):
             >>> my_assembly.add_assembly(structure)
             >>> #
             >>> collected_paths = my_assembly.collect_paths_to_elements()
+            >>> print collected_paths
             [(0, 0, 0), (0, 0, 1), (0, 0, 2), (0, 1, 0), (0, 1, 1), (0, 1, 2), (0, 1, 3)]
         """
         if current_path is None:
@@ -1546,6 +1547,7 @@ class Assembly(Data):
         3) fill the graph with the collision pairs
 
         """
+
         pass
 
 
