@@ -38,7 +38,6 @@ Assembly class
     :nosignatures:
     :member-order: bysource
     assembly.Assembly
-    
 
 Element class
 =============
