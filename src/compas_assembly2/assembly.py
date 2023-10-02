@@ -299,9 +299,6 @@ class Assembly(Data):
         Examples:
             >>> my_assembly = Assembly("my_assembly")
             >>> as_as_defined_in__repr__ = my_assembly.name
-            ======================================= ROOT ASSEMBLY =============================================
-            GROUP --> my_assembly
-            ===================================================================================================
         """
         if isinstance(self.value, str):
             return self.value
@@ -430,10 +427,8 @@ class Assembly(Data):
             >>> element = Element(name="beam", simplex=Point(0, 0, 0))
             >>> my_assembly.add_assembly(sub_1)
             >>> my_assembly.add_assembly(sub_2)
-            >>> my_assembly.add_element(element)
+            >>> my_assembly.add_assembly(element)
             >>> count = my_assembly.number_of_elements
-            1
-
         """
         number_of_elements = 0
         for sub_assembly in self.sub_assemblies:
@@ -569,7 +564,6 @@ class Assembly(Data):
 
         """
         data = json_load(fp=fp)
-        print(data)
         return Assembly.from_data(data)
 
     # ==========================================================================
@@ -611,7 +605,7 @@ class Assembly(Data):
 
         Examples:
             >>> my_assembly = Assembly("my_assembly")
-            >>> my_string = stringify_tree(my_assembly)
+            >>> my_string = my_assembly.stringify_tree(my_assembly)
 
         """
         tree_str = (
@@ -945,6 +939,9 @@ class Assembly(Data):
             >>> my_list = my_assembly.to_lists()
 
         """
+
+        if (len(self.sub_assemblies) == 0):
+            return []
 
         # references
         assembly = self
