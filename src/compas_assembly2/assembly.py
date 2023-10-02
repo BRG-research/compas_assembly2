@@ -1563,15 +1563,15 @@ class Assembly(Data):
         >>> my_assembly = Assembly("model")
         >>> my_assembly.add_assembly("boxes")
         >>> for _ in range(num_copies):
-        >>>     # Generate random rotation and translation
-        >>>     random_axis = [random.random(), random.random(), random.random()]
-        >>>     random_rotation = Rotation.from_axis_and_angle(random_axis, radians(random.uniform(0, 360)))
-        >>>     vector = [random.uniform(-max_translation, max_translation) for _ in range(3)]
-        >>>     vector[2] = 0
-        >>>     random_translation = Translation.from_vector(vector)
-        >>>     # Apply random rotation and translation
-        >>>     transformed_element = b1.transformed(random_translation * random_rotation)
-        >>>     my_assembly[0].add_assembly(transformed_element)
+        ...     # Generate random rotation and translation
+        ...     random_axis = [random.random(), random.random(), random.random()]
+        ...     random_rotation = Rotation.from_axis_and_angle(random_axis, radians(random.uniform(0, 360)))
+        ...     vector = [random.uniform(-max_translation, max_translation) for _ in range(3)]
+        ...     vector[2] = 0
+        ...     random_translation = Translation.from_vector(vector)
+        ...     # Apply random rotation and translation
+        ...     transformed_element = b1.transformed(random_translation * random_rotation)
+        ...     my_assembly[0].add_assembly(transformed_element)
         >>> #
         >>> # collision
         >>> my_assembly.collision()
