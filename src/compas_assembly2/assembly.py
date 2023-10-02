@@ -1545,6 +1545,57 @@ class Assembly(Data):
         2) iterate in a simple for loop or any other structure to detect collisions
         3) fill the graph with the collision pairs
 
+        >>> Examples:
+        >>> import random
+        >>> from math import radians
+        >>> from compas.geometry import Box
+        >>> from compas_assembly2 import ELEMENT_NAME
+        >>> #
+        >>> b1 = Element(
+        >>>     name=ELEMENT_NAME.BLOCK,
+        >>>     id=0,
+        >>>     frame=Frame.worldXY,
+        >>>     simplex=Point(0, 0, 0),
+        >>>     complex=Box.from_width_height_depth(0.5, 0.5, 0.5),
+        >>> )
+        >>> #
+        >>> num_copies = 200
+        >>> max_translation = 8  # Maximum translation distance from the center
+        >>> my_assembly = Assembly("model")
+        >>> my_assembly.add_assembly("boxes")
+        >>> print(my_assembly.graph)
+        >>> for _ in range(num_copies):
+        >>>     # Generate random rotation and translation
+        >>>     random_axis = [random.random(), random.random(), random.random()]
+        >>>     random_rotation = Rotation.from_axis_and_angle(random_axis, radians(random.uniform(0, 360)))
+        >>>     vector = [random.uniform(-max_translation, max_translation) for _ in range(3)]
+        >>>     vector[2] = 0
+        >>>     random_translation = Translation.from_vector(vector)
+        >>>     # Apply random rotation and translation
+        >>>     transformed_element = b1.transformed(random_translation * random_rotation)
+        >>>     my_assembly[0].add_assembly(transformed_element)
+        >>> #
+        >>> # collision
+        >>> my_assembly.collision()
+        >>> #
+        >>> # iterate nodes and add lines for graph display
+        >>> geometry = []
+        >>> for pair in my_assembly.graph.edges():
+        >>>     print(pair)
+        >>>     aabb0 = my_assembly[0][pair[0]].aabb()
+        >>>     c0 = Point(
+        >>>         (aabb0[0][0] + aabb0[6][0]) * 0.5,
+        >>>         (aabb0[0][1] + aabb0[6][1]) * 0.5,
+        >>>         (aabb0[0][2] + aabb0[6][2]) * 0.5
+        >>>     )
+        >>>     aabb1 = my_assembly[0][pair[1]].aabb()
+        >>>     c1 = Point(
+        >>>         (aabb1[0][0] + aabb1[6][0]) * 0.5,
+        >>>         (aabb1[0][1] + aabb1[6][1]) * 0.5,
+        >>>         (aabb1[0][2] + aabb1[6][2]) * 0.5
+        >>>     )
+        >>>     line = Line(c0, c1)
+        >>>     geometry.append(line)
         """
 
         elements = self.flatten()
@@ -1552,9 +1603,6 @@ class Assembly(Data):
 
         # initialize the graph incase it does not exist
         self.create_graph()
-
-        # add edges to the graph
-        self.graph.add_edge(0, 1)
 
         # check collision between elements, if one exists add_assembly edge to the graph
         for i in range(n):
@@ -1566,78 +1614,22 @@ class Assembly(Data):
 
 
 if __name__ == "__main__":
-
-    import random
-    from math import radians
-    from compas.geometry import Box
-    from compas_assembly2 import ELEMENT_NAME
-
-    b1 = Element(
-        name=ELEMENT_NAME.BLOCK,
-        id=0,
-        frame=Frame.worldXY,
-        simplex=Point(0, 0, 0),
-        complex=Box.from_width_height_depth(0.5, 0.5, 0.5),
-    )
-
-    num_copies = 200
-    max_translation = 8  # Maximum translation distance from the center
     my_assembly = Assembly("model")
-    my_assembly.add_assembly("boxes")
-    for _ in range(num_copies):
-        # Generate random rotation and translation
-        random_axis = [random.random(), random.random(), random.random()]
-        random_rotation = Rotation.from_axis_and_angle(random_axis, radians(random.uniform(0, 360)))
-        vector = [random.uniform(-max_translation, max_translation) for _ in range(3)]
-        vector[2] = 0
-        random_translation = Translation.from_vector(vector)
-
-        # Apply random rotation and translation
-        transformed_element = b1.transformed(random_translation * random_rotation)
-
-        my_assembly[0].add_assembly(transformed_element)
-
-    # collision
-    my_assembly.collision()
-
-    # iterate nodes and add lines for graph display
-    geometry = []
-    for pair in my_assembly.graph.edges():
-        aabb0 = my_assembly[0][pair[0]].aabb()
-        c0 = Point(
-            (aabb0[0][0] + aabb0[6][0]) * 0.5, (aabb0[0][1] + aabb0[6][1]) * 0.5, (aabb0[0][2] + aabb0[6][2]) * 0.5
-        )
-        aabb1 = my_assembly[0][pair[1]].aabb()
-        c1 = Point(
-            (aabb1[0][0] + aabb1[6][0]) * 0.5, (aabb1[0][1] + aabb1[6][1]) * 0.5, (aabb1[0][2] + aabb1[6][2]) * 0.5
-        )
-        line = Line(c0, c1)
-        geometry.append(line)
-
-    my_assembly.show(geometry=geometry)
-
-    # my_assembly = Assembly("model")
-    # structure = Assembly("structure")
-    # #
-    # timber = Assembly("timber")
-    # structure.add_assembly(timber)
-    # timber.add_assembly(Assembly(Element(name="beam", simplex=Point(0, 0, 0))))
-    # timber.add_assembly(Assembly(Element(name="beam", simplex=Point(0, 5, 0))))
-    # timber.add_assembly(Assembly(Element(name="plate", simplex=Point(0, 0, 0))))
-    # timber.add_assembly(Assembly(Element(name="plate", simplex=Point(0, 7, 0))))
-    # #
-    # concrete = Assembly("concrete")
-    # structure.add_assembly(concrete)
-    # concrete.add_assembly(Assembly(Element(name="node", simplex=Point(0, 0, 0))))
-    # concrete.add_assembly(Assembly(Element(name="block", simplex=Point(0, 5, 0))))
-    # concrete.add_assembly(Assembly(Element(name="block", simplex=Point(0, 0, 0))))
-    # #
-    # my_assembly.add_assembly(structure)
-    # #
-    # collected_paths = my_assembly.collect_paths_to_elements()
-    # my_assembly.create_graph()
-
-    print(my_assembly.graph)
-    print(my_assembly.graph.node[0])
-    print(my_assembly.graph.node[1])
-    # print(collected_paths)
+    structure = Assembly("structure")
+    #
+    timber = Assembly("timber")
+    structure.add_assembly(timber)
+    timber.add_assembly(Assembly(Element(name="beam", simplex=Point(0, 0, 0))))
+    timber.add_assembly(Assembly(Element(name="beam", simplex=Point(0, 5, 0))))
+    timber.add_assembly(Assembly(Element(name="plate", simplex=Point(0, 0, 0))))
+    timber.add_assembly(Assembly(Element(name="plate", simplex=Point(0, 7, 0))))
+    #
+    concrete = Assembly("concrete")
+    structure.add_assembly(concrete)
+    concrete.add_assembly(Assembly(Element(name="node", simplex=Point(0, 0, 0))))
+    concrete.add_assembly(Assembly(Element(name="block", simplex=Point(0, 5, 0))))
+    concrete.add_assembly(Assembly(Element(name="block", simplex=Point(0, 0, 0))))
+    #
+    my_assembly.add_assembly(structure)
+    #
+    print(my_assembly)
