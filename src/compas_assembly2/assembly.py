@@ -128,7 +128,7 @@ def depth(self):
 
 import copy
 from compas.data import Data
-from compas.geometry import bounding_box, Point, Line, Frame  # noqa: F401
+from compas.geometry import bounding_box, Point, Line, Frame, Transformation  # noqa: F401
 from compas_assembly2 import Element
 from compas.colors import Color
 from compas_assembly2.sortedlist import SortedList
@@ -1171,13 +1171,13 @@ class Assembly(Data):
         """Transforms all the elements to the target frame.
         Use it when you want to orient all elements e.g. to XY plane
 
-        # Returns:
-        #     None
+        Returns:
+            None
 
-        # Examples:
-        #     >>> my_assembly = Assembly("model") # for sure you need to place elements inside
-        #     >>> t = Frame([0, 0, 10], [1, 0, 0], [0, 1, 0])
-        #     >>> my_assembly.transform_all_to_frame(t)
+        Examples:
+            >>> my_assembly = Assembly("model") # for sure you need to place elements inside
+            >>> t = Frame([0, 0, 10], [1, 0, 0], [0, 1, 0])
+            >>> my_assembly.transform_all_to_frame(t)
 
         """
         # apply the transformation the value
@@ -1192,13 +1192,13 @@ class Assembly(Data):
         """Copies and transforms all the elements to the target frame.
         Use it when you want to orient all elements e.g. to XY plane
 
-        # Returns:
-        #     Assembly
+        Returns:
+            Assembly
 
-        # Examples:
-        #     >>> my_assembly = Assembly("model") # for sure you need to place elements inside
-        #     >>> t = Frame([0, 0, 10], [1, 0, 0], [0, 1, 0])
-        #     >>> transformed_assembly = my_assembly.transformed_all_to_frame(t)
+        Examples:
+            >>> my_assembly = Assembly("model") # for sure you need to place elements inside
+            >>> t = Frame([0, 0, 10], [1, 0, 0], [0, 1, 0])
+            >>> transformed_assembly = my_assembly.transformed_all_to_frame(t)
 
         """
         new_instance = self.copy()
@@ -1208,14 +1208,14 @@ class Assembly(Data):
     def transform_from_frame_to_frame(self, source_frame, target_frame):
         """Transforms the value and all sub_assemblies from the source frame to the target frame.
 
-        # Returns:
-        #     None
+        Returns:
+            None
 
-        # Examples:
-        #     >>> s = Frame([0, 0, 0], [1, 0, 0], [0, 1, 0])
-        #     >>> t = Frame([0, 0, 10], [1, 0, 0], [0, 1, 0])
-        #     >>> my_assembly = Assembly("model") # for sure you need to place elements inside
-        #     >>> my_assembly.transform_from_frame_to_frame(s, t)
+        Examples:
+            >>> s = Frame([0, 0, 0], [1, 0, 0], [0, 1, 0])
+            >>> t = Frame([0, 0, 10], [1, 0, 0], [0, 1, 0])
+            >>> my_assembly = Assembly("model") # for sure you need to place elements inside
+            >>> my_assembly.transform_from_frame_to_frame(s, t)
 
         """
         # apply the transformation the value
@@ -1230,14 +1230,14 @@ class Assembly(Data):
         """Transforms the value and all sub_assemblies
         from the source frame to the target frame and returns a copy.
 
-        # Returns:
-        #     Assembly
+        Returns:
+            Assembly
 
-        # Examples:
-        #     >>> s = Frame([0, 0, 0], [1, 0, 0], [0, 1, 0])
-        #     >>> t = Frame([0, 0, 10], [1, 0, 0], [0, 1, 0])
-        #     >>> my_assembly = Assembly("model") # for sure you need to place elements inside
-        #     >>> transformed_assembly = my_assembly.transformed_from_frame_to_frame(s, t)
+        Examples:
+            >>> s = Frame([0, 0, 0], [1, 0, 0], [0, 1, 0])
+            >>> t = Frame([0, 0, 10], [1, 0, 0], [0, 1, 0])
+            >>> my_assembly = Assembly("model") # for sure you need to place elements inside
+            >>> transformed_assembly = my_assembly.transformed_from_frame_to_frame(s, t)
 
         """
         new_instance = self.copy()
@@ -1247,13 +1247,13 @@ class Assembly(Data):
     def transform(self, transformation):
         """Transforms the value and all sub_assemblies by the given transformation.
 
-        # Returns:
-        #     None
+        Returns:
+            None
 
-        # Examples:
-        #     >>> transformation = Translation.from_vector([1, 2, 3])
-        #     >>> my_assembly = Assembly("model") # for sure you need to place elements inside
-        #     >>> my_assembly.transform(transformation)
+        Examples:
+            >>> transformation = Translation.from_vector([1, 2, 3])
+            >>> my_assembly = Assembly("model") # for sure you need to place elements inside
+            >>> my_assembly.transform(transformation)
 
         """
         # apply the transformation the value
@@ -1267,13 +1267,13 @@ class Assembly(Data):
     def transformed(self, transformation):
         """Transforms the value and all sub_assemblies by the given transformation and returns a copy.
 
-        # Returns:
-        #     Assembly
+        Returns:
+            Assembly
 
-        # Examples:
-        #     >>> transformation = Translation.from_vector([1, 2, 3])
-        #     >>> my_assembly = Assembly("model") # for sure you need to place elements inside
-        #     >>> transformed_assembly = my_assembly.transformed(transformation)
+        Examples:
+            >>> transformation = Translation.from_vector([1, 2, 3])
+            >>> my_assembly = Assembly("model") # for sure you need to place elements inside
+            >>> transformed_assembly = my_assembly.transformed(transformation)
 
         """
         new_instance = self.copy()
