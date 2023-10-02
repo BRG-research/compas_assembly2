@@ -129,12 +129,13 @@ def depth(self):
 
 import copy
 from compas.data import Data
-from compas.geometry import bounding_box, Point, Line, Frame, Transformation, Translation  # noqa: F401
+from compas.geometry import bounding_box, Point, Line, Frame, Transformation, Rotation, Translation  # noqa: F401
 from compas_assembly2 import Element
 from compas.colors import Color
 from compas_assembly2.sortedlist import SortedList
 from compas_assembly2.viewer import Viewer
 from compas.data import json_load, json_dump
+from compas.datastructures import Graph
 
 
 class Assembly(Data):
@@ -649,7 +650,7 @@ class Assembly(Data):
     def init_root(self):
         """initialize the root assembly properties"""
         if self.parent_assembly is None:
-            self.graph = []
+            self.graph = Graph()
 
     def remove_root(self):
         """remove the root assembly properties"""
@@ -667,8 +668,8 @@ class Assembly(Data):
         # --------------------------------------------------------------------------
         # update links
         # --------------------------------------------------------------------------
-        n = len(self.graph)
-        for pair in self.graph:
+        n = self.graph.number_of_nodes()
+        for pair in new_root.graph.edges():
             new_root.graph.append(pair[0] + n, pair[1] + n)
 
     # ==========================================================================
@@ -1526,6 +1527,12 @@ class Assembly(Data):
 
         return collected_paths
 
+    def create_graph(self):
+        self.root.graph = Graph()
+        paths = self.collect_paths_to_elements()
+        for idx, i in enumerate(paths):
+            self.root.graph.add_node(key=idx, attr_dict=None, path=i)
+
     def collision(self):
         """check collision detection between all the elements in the assembly
         the fill the grap in the root assembly with the collision pairs
@@ -1540,35 +1547,77 @@ class Assembly(Data):
 
         """
 
-        paths = self.collect_paths_to_elements()
-        elmenents = self.flatten()
+        elements = self.flatten()
+        n = len(elements)
 
-        for i, path in enumerate(paths):
-            for j, other_path in enumerate(paths):
+        # initialize the graph incase it does not exist
+        self.create_graph()
+
+        # add edges to the graph
+        self.graph.add_edge(0, 1)
+
+        # check collision between elements, if one exists add_assembly edge to the graph
+        for i in range(n):
+            for j in range(n):
                 if i != j:
-                    if elmenents[i].collision(elmenents[j]):
-                        self.root.graph.add_edge(path, other_path)
+                    if elements[i].has_collision(elements[j]):
+                        print("collision between " + str(i) + " and " + str(j))
+                        self.graph.add_edge(i, j)
 
 
 if __name__ == "__main__":
 
+    import random
+    from math import radians
+    from compas.geometry import Box
+    from compas_assembly2 import ELEMENT_NAME
+
+    b1 = Element(
+        name=ELEMENT_NAME.BLOCK,
+        id=0,
+        frame=Frame.worldXY,
+        simplex=Point(0, 0, 0),
+        complex=Box.from_width_height_depth(0.5, 0.5, 0.5),
+    )
+
+    num_copies = 200
+    max_translation = 8  # Maximum translation distance from the center
     my_assembly = Assembly("model")
-    structure = Assembly("structure")
-    #
-    timber = Assembly("timber")
-    structure.add_assembly(timber)
-    timber.add_assembly(Assembly(Element(name="beam", simplex=Point(0, 0, 0))))
-    timber.add_assembly(Assembly(Element(name="beam", simplex=Point(0, 5, 0))))
-    timber.add_assembly(Assembly(Element(name="plate", simplex=Point(0, 0, 0))))
-    timber.add_assembly(Assembly(Element(name="plate", simplex=Point(0, 7, 0))))
-    #
-    concrete = Assembly("concrete")
-    structure.add_assembly(concrete)
-    concrete.add_assembly(Assembly(Element(name="node", simplex=Point(0, 0, 0))))
-    concrete.add_assembly(Assembly(Element(name="block", simplex=Point(0, 5, 0))))
-    concrete.add_assembly(Assembly(Element(name="block", simplex=Point(0, 0, 0))))
-    #
-    my_assembly.add_assembly(structure)
-    #
-    collected_paths = my_assembly.collect_paths_to_elements()
-    print(collected_paths)
+    for _ in range(num_copies):
+        # Generate random rotation and translation
+        random_axis = [random.random(), random.random(), random.random()]
+        random_rotation = Rotation.from_axis_and_angle(random_axis, radians(random.uniform(0, 360)))
+        vector = [random.uniform(-max_translation, max_translation) for _ in range(3)]
+        vector[2] = 0
+        random_translation = Translation.from_vector(vector)
+
+        # Apply random rotation and translation
+        transformed_element = b1.transformed(random_translation * random_rotation)
+
+        my_assembly.add_assembly(transformed_element)
+
+    # my_assembly = Assembly("model")
+    # structure = Assembly("structure")
+    # #
+    # timber = Assembly("timber")
+    # structure.add_assembly(timber)
+    # timber.add_assembly(Assembly(Element(name="beam", simplex=Point(0, 0, 0))))
+    # timber.add_assembly(Assembly(Element(name="beam", simplex=Point(0, 5, 0))))
+    # timber.add_assembly(Assembly(Element(name="plate", simplex=Point(0, 0, 0))))
+    # timber.add_assembly(Assembly(Element(name="plate", simplex=Point(0, 7, 0))))
+    # #
+    # concrete = Assembly("concrete")
+    # structure.add_assembly(concrete)
+    # concrete.add_assembly(Assembly(Element(name="node", simplex=Point(0, 0, 0))))
+    # concrete.add_assembly(Assembly(Element(name="block", simplex=Point(0, 5, 0))))
+    # concrete.add_assembly(Assembly(Element(name="block", simplex=Point(0, 0, 0))))
+    # #
+    # my_assembly.add_assembly(structure)
+    # #
+    # collected_paths = my_assembly.collect_paths_to_elements()
+    # my_assembly.create_graph()
+    my_assembly.collision()
+    print(my_assembly.graph)
+    print(my_assembly.graph.node[0])
+    print(my_assembly.graph.node[1])
+    # print(collected_paths)
