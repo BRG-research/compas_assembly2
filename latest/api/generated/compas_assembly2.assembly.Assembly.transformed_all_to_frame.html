@@ -102,12 +102,16 @@
 <span class="sig-prename descclassname"><span class="pre">Assembly.</span></span><span class="sig-name descname"><span class="pre">transformed_all_to_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_frame</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BRG-research/compas_assembly2/blob/master/src/compas_assembly2/assembly.py#L1191"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Copies and transforms all the elements to the target frame.
 Use it when you want to orient all elements e.g. to XY plane</p>
-<p># Returns:
-#     Assembly</p>
-<p># Examples:
-#     &gt;&gt;&gt; my_assembly = Assembly(&quot;model&quot;) # for sure you need to place elements inside
-#     &gt;&gt;&gt; t = Frame([0, 0, 10], [1, 0, 0], [0, 1, 0])
-#     &gt;&gt;&gt; transformed_assembly = my_assembly.transformed_all_to_frame(t)</p>
+<dl>
+<dt>Returns:</dt><dd><p>Assembly</p>
+</dd>
+<dt>Examples:</dt><dd><div class="doctest language-python notranslate"><div class="highlight"><pre><button class="btn copy"><i class="far fa-copy"></i></button><code><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">my_assembly</span> <span class="o">=</span> <span class="n">Assembly</span><span class="p">(</span><span class="s2">&quot;model&quot;</span><span class="p">)</span> <span class="c1"># for sure you need to place elements inside</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">Frame</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transformed_assembly</span> <span class="o">=</span> <span class="n">my_assembly</span><span class="o">.</span><span class="n">transformed_all_to_frame</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+</code></pre></div>
+</div>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
