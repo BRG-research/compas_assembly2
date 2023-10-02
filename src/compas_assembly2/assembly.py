@@ -940,7 +940,7 @@ class Assembly(Data):
 
         """
 
-        if (len(self.sub_assemblies) == 0):
+        if len(self.sub_assemblies) == 0:
             return []
 
         # references
