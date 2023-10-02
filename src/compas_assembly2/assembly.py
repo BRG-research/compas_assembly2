@@ -539,8 +539,13 @@ class Assembly(Data):
             None
 
         Examples:
-            >>> my_assembly = Assembly("my_assembly")
-            >>> my_assembly.serialize("my_assembly.json", pretty=True)
+            >>> my_assembly = Assembly("model")
+            >>> my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 0, 0)))
+            >>> my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 5, 0)))
+            >>> my_assembly.add_assembly(Element(name="plate", simplex=Point(0, 0, 0)))
+            >>> my_assembly.add_assembly(Element(name="plate", simplex=Point(0, 7, 0)))
+            >>> fp = "src/compas_assembly2/data_sets/doc_string_example.json"
+            >>> my_assembly.serialize(fp)
 
         """
         json_dump(data=self.data, fp=fp, pretty=pretty)
@@ -553,11 +558,18 @@ class Assembly(Data):
             Assembly
 
         Examples:
-            >>> my_assembly = Assembly("my_assembly")
-            >>> my_assembly = Assembly.deserialize("my_assembly.json")
+            >>> my_assembly = Assembly("model")
+            >>> my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 0, 0)))
+            >>> my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 5, 0)))
+            >>> my_assembly.add_assembly(Element(name="plate", simplex=Point(0, 0, 0)))
+            >>> my_assembly.add_assembly(Element(name="plate", simplex=Point(0, 7, 0)))
+            >>> fp = "src/compas_assembly2/data_sets/doc_string_example.json"
+            >>> my_assembly.serialize(fp)
+            >>> my_assembly = Assembly.deserialize(fp)
 
         """
         data = json_load(fp=fp)
+        print(data)
         return Assembly.from_data(data)
 
     # ==========================================================================
@@ -1162,13 +1174,13 @@ class Assembly(Data):
         """Transforms all the elements to the target frame.
         Use it when you want to orient all elements e.g. to XY plane
 
-        Returns:
-            None
+        # Returns:
+        #     None
 
-        Examples:
-            >>> my_assembly = Assembly("model") # for sure you need to place elements inside
-            >>> t = Frame([0, 0, 10], [1, 0, 0], [0, 1, 0])
-            >>> my_assembly.transform_all_to_frame(t)
+        # Examples:
+        #     >>> my_assembly = Assembly("model") # for sure you need to place elements inside
+        #     >>> t = Frame([0, 0, 10], [1, 0, 0], [0, 1, 0])
+        #     >>> my_assembly.transform_all_to_frame(t)
 
         """
         # apply the transformation the value
@@ -1183,13 +1195,13 @@ class Assembly(Data):
         """Copies and transforms all the elements to the target frame.
         Use it when you want to orient all elements e.g. to XY plane
 
-        Returns:
-            Assembly
+        # Returns:
+        #     Assembly
 
-        Examples:
-            >>> my_assembly = Assembly("model") # for sure you need to place elements inside
-            >>> t = Frame([0, 0, 10], [1, 0, 0], [0, 1, 0])
-            >>> transformed_assembly = my_assembly.transformed_all_to_frame(t)
+        # Examples:
+        #     >>> my_assembly = Assembly("model") # for sure you need to place elements inside
+        #     >>> t = Frame([0, 0, 10], [1, 0, 0], [0, 1, 0])
+        #     >>> transformed_assembly = my_assembly.transformed_all_to_frame(t)
 
         """
         new_instance = self.copy()
@@ -1199,14 +1211,14 @@ class Assembly(Data):
     def transform_from_frame_to_frame(self, source_frame, target_frame):
         """Transforms the value and all sub_assemblies from the source frame to the target frame.
 
-        Returns:
-            None
+        # Returns:
+        #     None
 
-        Examples:
-            >>> s = Frame([0, 0, 0], [1, 0, 0], [0, 1, 0])
-            >>> t = Frame([0, 0, 10], [1, 0, 0], [0, 1, 0])
-            >>> my_assembly = Assembly("model") # for sure you need to place elements inside
-            >>> my_assembly.transform_from_frame_to_frame(s, t)
+        # Examples:
+        #     >>> s = Frame([0, 0, 0], [1, 0, 0], [0, 1, 0])
+        #     >>> t = Frame([0, 0, 10], [1, 0, 0], [0, 1, 0])
+        #     >>> my_assembly = Assembly("model") # for sure you need to place elements inside
+        #     >>> my_assembly.transform_from_frame_to_frame(s, t)
 
         """
         # apply the transformation the value
@@ -1221,14 +1233,14 @@ class Assembly(Data):
         """Transforms the value and all sub_assemblies
         from the source frame to the target frame and returns a copy.
 
-        Returns:
-            Assembly
+        # Returns:
+        #     Assembly
 
-        Examples:
-            >>> s = Frame([0, 0, 0], [1, 0, 0], [0, 1, 0])
-            >>> t = Frame([0, 0, 10], [1, 0, 0], [0, 1, 0])
-            >>> my_assembly = Assembly("model") # for sure you need to place elements inside
-            >>> transformed_assembly = my_assembly.transformed_from_frame_to_frame(s, t)
+        # Examples:
+        #     >>> s = Frame([0, 0, 0], [1, 0, 0], [0, 1, 0])
+        #     >>> t = Frame([0, 0, 10], [1, 0, 0], [0, 1, 0])
+        #     >>> my_assembly = Assembly("model") # for sure you need to place elements inside
+        #     >>> transformed_assembly = my_assembly.transformed_from_frame_to_frame(s, t)
 
         """
         new_instance = self.copy()
@@ -1238,13 +1250,13 @@ class Assembly(Data):
     def transform(self, transformation):
         """Transforms the value and all sub_assemblies by the given transformation.
 
-        Returns:
-            None
+        # Returns:
+        #     None
 
-        Examples:
-            >>> transformation = Translation.from_vector([1, 2, 3])
-            >>> my_assembly = Assembly("model") # for sure you need to place elements inside
-            >>> my_assembly.transform(transformation)
+        # Examples:
+        #     >>> transformation = Translation.from_vector([1, 2, 3])
+        #     >>> my_assembly = Assembly("model") # for sure you need to place elements inside
+        #     >>> my_assembly.transform(transformation)
 
         """
         # apply the transformation the value
@@ -1258,13 +1270,13 @@ class Assembly(Data):
     def transformed(self, transformation):
         """Transforms the value and all sub_assemblies by the given transformation and returns a copy.
 
-        Returns:
-            Assembly
+        # Returns:
+        #     Assembly
 
-        Examples:
-            >>> transformation = Translation.from_vector([1, 2, 3])
-            >>> my_assembly = Assembly("model") # for sure you need to place elements inside
-            >>> transformed_assembly = my_assembly.transformed(transformation)
+        # Examples:
+        #     >>> transformation = Translation.from_vector([1, 2, 3])
+        #     >>> my_assembly = Assembly("model") # for sure you need to place elements inside
+        #     >>> transformed_assembly = my_assembly.transformed(transformation)
 
         """
         new_instance = self.copy()
@@ -1309,14 +1321,14 @@ class Assembly(Data):
         to know which functions exist in the assembly look at the Element class or documentation
         self.child_behave(collection, "method_name", arg1, arg2, kwarg1=value1, kwarg2=value2)
 
-        Returns:
-            None
+        # Returns:
+        #     None
 
-        Examples:
-            >>> my_assembly = Assembly("model")  # for sure you need to place elements inside
-            >>> my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 0, 0), complex=Point(0, 0, 0)))
-            >>> output_list = []
-            >>> my_assembly.child_behave(output_list, "aabb", 0.00)
+        # Examples:
+        #     >>> my_assembly = Assembly("model")  # for sure you need to place elements inside
+        #     >>> my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 0, 0), complex=Point(0, 0, 0)))
+        #     >>> output_list = []
+        #     >>> my_assembly.child_behave(output_list, "aabb", 0.00)
 
         """
 
@@ -1341,13 +1353,13 @@ class Assembly(Data):
         """compute the axis aligned bounding box of the assembly
         by collecting all the elements bounding boxes
 
-        Returns:
-            list(Point)
+        # Returns:
+        #     list(Point)
 
-        Examples:
-            >>> my_assembly = Assembly("model") # for sure you need to place elements inside
-            >>> my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 0, 0)))
-            >>> bounding_box_eight_corner_points = my_assembly.aabb(inflate = 0.01)
+        # Examples:
+        #     >>> my_assembly = Assembly("model") # for sure you need to place elements inside
+        #     >>> my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 0, 0)))
+        #     >>> bounding_box_eight_corner_points = my_assembly.aabb(inflate = 0.01)
         """
         # first compute the aabb and then get it
         collection = []
@@ -1406,14 +1418,14 @@ class Assembly(Data):
         """visualize the assembly in the viewer,
         check the Viewer.py file for more details
 
-        Returns:
-            None
+        # Returns:
+        #     None
 
-        Examples:
-            >>> my_assembly = Assembly("model") # for sure you need to place elements inside
-            >>> my_assembly.show()
-            >>> # or
-            >>> my_assembly.show(collapse_level=2)
+        # Examples:
+        #     >>> my_assembly = Assembly("model") # for sure you need to place elements inside
+        #     >>> my_assembly.show()
+        #     >>> # or
+        #     >>> my_assembly.show(collapse_level=2)
 
         """
         lists_of_elements = self.to_lists(collapse_level) if collapse_level >= 0 else self.graft("0").to_lists()
@@ -1445,7 +1457,11 @@ class Assembly(Data):
 
 
 if __name__ == "__main__":
-    my_assembly = Assembly("model")  # for sure you need to place elements inside
-    my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 0, 0), complex=Point(0, 0, 0)))
-    output_list = []
-    my_assembly.child_behave(output_list, "aabb", 0.00)
+    my_assembly = Assembly("model")
+    my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 0, 0)))
+    my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 5, 0)))
+    my_assembly.add_assembly(Element(name="plate", simplex=Point(0, 0, 0)))
+    my_assembly.add_assembly(Element(name="plate", simplex=Point(0, 7, 0)))
+    fp = "src/compas_assembly2/data_sets/doc_string_example.json"
+    my_assembly.serialize(fp)
+    my_assembly = Assembly.deserialize(fp)
