@@ -1208,14 +1208,14 @@ class Assembly(Data):
     def transform_from_frame_to_frame(self, source_frame, target_frame):
         """Transforms the value and all sub_assemblies from the source frame to the target frame.
 
-        # Returns:
-        #     None
+        Returns:
+            None
 
-        # Examples:
-        #     >>> s = Frame([0, 0, 0], [1, 0, 0], [0, 1, 0])
-        #     >>> t = Frame([0, 0, 10], [1, 0, 0], [0, 1, 0])
-        #     >>> my_assembly = Assembly("model") # for sure you need to place elements inside
-        #     >>> my_assembly.transform_from_frame_to_frame(s, t)
+        Examples:
+            >>> s = Frame([0, 0, 0], [1, 0, 0], [0, 1, 0])
+            >>> t = Frame([0, 0, 10], [1, 0, 0], [0, 1, 0])
+            >>> my_assembly = Assembly("model") # for sure you need to place elements inside
+            >>> my_assembly.transform_from_frame_to_frame(s, t)
 
         """
         # apply the transformation the value
@@ -1230,18 +1230,19 @@ class Assembly(Data):
         """Transforms the value and all sub_assemblies
         from the source frame to the target frame and returns a copy.
 
-        # Returns:
-        #     Assembly
+        Returns:
+            Assembly
 
-        # Examples:
-        #     >>> s = Frame([0, 0, 0], [1, 0, 0], [0, 1, 0])
-        #     >>> t = Frame([0, 0, 10], [1, 0, 0], [0, 1, 0])
-        #     >>> my_assembly = Assembly("model") # for sure you need to place elements inside
-        #     >>> transformed_assembly = my_assembly.transformed_from_frame_to_frame(s, t)
+        Examples:
+            >>> s = Frame([0, 0, 0], [1, 0, 0], [0, 1, 0])
+            >>> t = Frame([0, 0, 10], [1, 0, 0], [0, 1, 0])
+            >>> my_assembly = Assembly("model") # for sure you need to place elements inside
+            >>> transformed_assembly = my_assembly.transformed_from_frame_to_frame(s, t)
 
         """
+
         new_instance = self.copy()
-        new_instance.transformed_from_frame_to_frame(source_frame, target_frame)
+        new_instance.transform_from_frame_to_frame(source_frame, target_frame)
         return new_instance
 
     def transform(self, transformation):
@@ -1251,7 +1252,7 @@ class Assembly(Data):
             None
 
         Examples:
-            >>> transformation = Translation.from_vector([1, 2, 3])
+            >>> transformation = Translation.from_vector([1, 2, 3])transform_from_frame_to_frame
             >>> my_assembly = Assembly("model")  # for sure you need to place elements inside
             >>> my_assembly.transform(transformation)
 
@@ -1457,6 +1458,7 @@ class Assembly(Data):
 
 
 if __name__ == "__main__":
-    transformation = Translation.from_vector([1, 2, 3])
+    s = Frame([0, 0, 0], [1, 0, 0], [0, 1, 0])
+    t = Frame([0, 0, 10], [1, 0, 0], [0, 1, 0])
     my_assembly = Assembly("model")  # for sure you need to place elements inside
-    my_assembly.transform(transformation)
+    transformed_assembly = my_assembly.transformed_from_frame_to_frame(s, t)
