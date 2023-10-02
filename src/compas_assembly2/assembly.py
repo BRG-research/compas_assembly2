@@ -1579,21 +1579,21 @@ class Assembly(Data):
         >>> # iterate nodes and add lines for graph display
         >>> geometry = []
         >>> for pair in my_assembly.graph.edges():
-        >>>     print(pair)
-        >>>     aabb0 = my_assembly[0][pair[0]].aabb()
-        >>>     c0 = Point(
-        >>>         (aabb0[0][0] + aabb0[6][0]) * 0.5,
-        >>>         (aabb0[0][1] + aabb0[6][1]) * 0.5,
-        >>>         (aabb0[0][2] + aabb0[6][2]) * 0.5
-        >>>     )
-        >>>     aabb1 = my_assembly[0][pair[1]].aabb()
-        >>>     c1 = Point(
-        >>>         (aabb1[0][0] + aabb1[6][0]) * 0.5,
-        >>>         (aabb1[0][1] + aabb1[6][1]) * 0.5,
-        >>>         (aabb1[0][2] + aabb1[6][2]) * 0.5
-        >>>     )
-        >>>     line = Line(c0, c1)
-        >>>     geometry.append(line)
+        ...     print(pair)
+        ...     aabb0 = my_assembly[0][pair[0]].aabb()
+        ...     c0 = Point(
+        ...         (aabb0[0][0] + aabb0[6][0]) * 0.5,
+        ...         (aabb0[0][1] + aabb0[6][1]) * 0.5,
+        ...         (aabb0[0][2] + aabb0[6][2]) * 0.5
+        ...     )
+        ...     aabb1 = my_assembly[0][pair[1]].aabb()
+        ...     c1 = Point(
+        ...         (aabb1[0][0] + aabb1[6][0]) * 0.5,
+        ...         (aabb1[0][1] + aabb1[6][1]) * 0.5,
+        ...         (aabb1[0][2] + aabb1[6][2]) * 0.5
+        ...     )
+        ...     line = Line(c0, c1)
+        ...     geometry.append(line)
         """
 
         elements = self.flatten()
