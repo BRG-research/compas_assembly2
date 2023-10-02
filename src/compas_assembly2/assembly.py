@@ -128,7 +128,7 @@ def depth(self):
 
 import copy
 from compas.data import Data
-from compas.geometry import bounding_box, Point
+from compas.geometry import bounding_box, Point, Line, Frame  # noqa: F401
 from compas_assembly2 import Element
 from compas.colors import Color
 from compas_assembly2.sortedlist import SortedList
@@ -1415,14 +1415,15 @@ class Assembly(Data):
         """visualize the assembly in the viewer,
         check the Viewer.py file for more details
 
-        # Returns:
-        #     None
+        Returns:
+            None
 
-        # Examples:
-        #     >>> my_assembly = Assembly("model") # for sure you need to place elements inside
-        #     >>> my_assembly.show()
-        #     >>> # or
-        #     >>> my_assembly.show(collapse_level=2)
+        Examples:
+            >>> my_assembly = Assembly("model")  # for sure you need to place elements inside
+            >>> p0 = Point(0, 0, 0)
+            >>> p1 = Point(1, 0, 0)
+            >>> my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 0, 0), complex=Line(p0, p1)))
+            >>> my_assembly.show(collapse_level=0)
 
         """
         lists_of_elements = self.to_lists(collapse_level) if collapse_level >= 0 else self.graft("0").to_lists()
@@ -1454,11 +1455,7 @@ class Assembly(Data):
 
 
 if __name__ == "__main__":
-    my_assembly = Assembly("model")
-    my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 0, 0)))
-    my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 5, 0)))
-    my_assembly.add_assembly(Element(name="plate", simplex=Point(0, 0, 0)))
-    my_assembly.add_assembly(Element(name="plate", simplex=Point(0, 7, 0)))
-    fp = "src/compas_assembly2/data_sets/doc_string_example.json"
-    my_assembly.serialize(fp)
-    my_assembly = Assembly.deserialize(fp)
+    my_assembly = Assembly("model")  # for sure you need to place elements inside
+    my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 0, 0), complex=Line(Point(0, 0, 0), Point(1, 0, 0))))
+    my_assembly.show()
+    my_assembly.show(collapse_level=0)
