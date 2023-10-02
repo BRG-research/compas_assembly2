@@ -1415,17 +1415,17 @@ class Assembly(Data):
         """visualize the assembly in the viewer,
         check the Viewer.py file for more details
 
-        Returns:
-            None
+        # Returns:
+        #     None
 
-        Examples:
-            >>> try:
-            ...     import compas_view2
-            ...     my_assembly = Assembly("model")  # for sure you need to place elements inside
-            ...     p0 = Point(0, 0, 0)
-            ...     p1 = Point(1, 0, 0)
-            ...     my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 0, 0), complex=Line(p0, p1)))
-            ...     my_assembly.show(collapse_level=0)
+        # Examples:
+        #     >>> try:
+        #     ...     import compas_view2
+        #     ...     my_assembly = Assembly("model")  # for sure you need to place elements inside
+        #     ...     p0 = Point(0, 0, 0)
+        #     ...     p1 = Point(1, 0, 0)
+        #     ...     my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 0, 0), complex=Line(p0, p1)))
+        #     ...     my_assembly.show(collapse_level=0)
 
         """
         lists_of_elements = self.to_lists(collapse_level) if collapse_level >= 0 else self.graft("0").to_lists()
