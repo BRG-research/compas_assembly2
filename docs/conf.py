@@ -68,10 +68,11 @@ autodoc_mock_imports = [
 
 autodoc_default_options = {
     "undoc-members": True,
+    "member-order": "bysource",
     "show-inheritance": True,
 }
 
-autodoc_member_order = 'bysource'
+autodoc_member_order = "bysource"
 
 autoclass_content = "class"
 

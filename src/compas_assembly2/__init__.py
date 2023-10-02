@@ -36,7 +36,7 @@ Assembly class
 .. autosummary::
     :toctree: generated/
     :nosignatures:
-    :member-order: bysource
+
     assembly.Assembly
 
 Element class

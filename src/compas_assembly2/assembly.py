@@ -1535,65 +1535,67 @@ class Assembly(Data):
 
     def collision(self):
         """check collision detection between all the elements in the assembly
-        the fill the grap in the root assembly with the collision pairs
-        the index are integer in each level of the assebmly, e.g.
-        1, 0 - 5, 1
 
-        following are the steps:
+        Notes:
+            nodes in the graph have a path attribute that is a tuple of indices:
+            self.root.graph.add_node(key=idx, attr_dict=None, path=i)
+            you can use it to retrieve individual elements from the assemnbly
+            if you do not want to flatten it
 
-        1) unwrap the assembly to a list of elements and string as levels
-        2) iterate in a simple for loop or any other structure to detect collisions
-        3) fill the graph with the collision pairs
+        Following are the steps:
+            1) unwrap the assembly to a list of elements and string as levels
+            2) iterate in a simple for loop or any other structure to detect collisions
+            3) fill the graph with the collision pairs
 
         Examples:
-        >>> import random
-        >>> from math import radians
-        >>> from compas.geometry import Box
-        >>> from compas_assembly2 import ELEMENT_NAME
-        >>> #
-        >>> b1 = Element(
-        ...     name=ELEMENT_NAME.BLOCK,
-        ...     id=0,
-        ...     frame=Frame.worldXY,
-        ...     simplex=Point(0, 0, 0),
-        ...     complex=Box.from_width_height_depth(0.5, 0.5, 0.5))
-        >>> #
-        >>> num_copies = 200
-        >>> max_translation = 8  # Maximum translation distance from the center
-        >>> my_assembly = Assembly("model")
-        >>> my_assembly.add_assembly("boxes")
-        >>> for _ in range(num_copies):
-        ...     # Generate random rotation and translation
-        ...     random_axis = [random.random(), random.random(), random.random()]
-        ...     random_rotation = Rotation.from_axis_and_angle(random_axis, radians(random.uniform(0, 360)))
-        ...     vector = [random.uniform(-max_translation, max_translation) for _ in range(3)]
-        ...     vector[2] = 0
-        ...     random_translation = Translation.from_vector(vector)
-        ...     # Apply random rotation and translation
-        ...     transformed_element = b1.transformed(random_translation * random_rotation)
-        ...     my_assembly[0].add_assembly(transformed_element)
-        >>> #
-        >>> # collision
-        >>> my_assembly.collision()
-        >>> #
-        >>> # iterate nodes and add lines for graph display
-        >>> geometry = []
-        >>> for pair in my_assembly.graph.edges():
-        ...     # print(pair)
-        ...     aabb0 = my_assembly[0][pair[0]].aabb()
-        ...     c0 = Point(
-        ...         (aabb0[0][0] + aabb0[6][0]) * 0.5,
-        ...         (aabb0[0][1] + aabb0[6][1]) * 0.5,
-        ...         (aabb0[0][2] + aabb0[6][2]) * 0.5
-        ...     )
-        ...     aabb1 = my_assembly[0][pair[1]].aabb()
-        ...     c1 = Point(
-        ...         (aabb1[0][0] + aabb1[6][0]) * 0.5,
-        ...         (aabb1[0][1] + aabb1[6][1]) * 0.5,
-        ...         (aabb1[0][2] + aabb1[6][2]) * 0.5
-        ...     )
-        ...     line = Line(c0, c1)
-        ...     geometry.append(line)
+            >>> import random
+            >>> from math import radians
+            >>> from compas.geometry import Box
+            >>> from compas_assembly2 import ELEMENT_NAME
+            >>> #
+            >>> b1 = Element(
+            ...     name=ELEMENT_NAME.BLOCK,
+            ...     id=0,
+            ...     frame=Frame.worldXY,
+            ...     simplex=Point(0, 0, 0),
+            ...     complex=Box.from_width_height_depth(0.5, 0.5, 0.5))
+            >>> #
+            >>> num_copies = 200
+            >>> max_translation = 8  # Maximum translation distance from the center
+            >>> my_assembly = Assembly("model")
+            >>> my_assembly.add_assembly("boxes")
+            >>> for _ in range(num_copies):
+            ...     # Generate random rotation and translation
+            ...     random_axis = [random.random(), random.random(), random.random()]
+            ...     random_rotation = Rotation.from_axis_and_angle(random_axis, radians(random.uniform(0, 360)))
+            ...     vector = [random.uniform(-max_translation, max_translation) for _ in range(3)]
+            ...     vector[2] = 0
+            ...     random_translation = Translation.from_vector(vector)
+            ...     # Apply random rotation and translation
+            ...     transformed_element = b1.transformed(random_translation * random_rotation)
+            ...     my_assembly[0].add_assembly(transformed_element)
+            >>> #
+            >>> # collision
+            >>> my_assembly.collision()
+            >>> #
+            >>> # iterate nodes and add lines for graph display
+            >>> geometry = []
+            >>> for pair in my_assembly.graph.edges():
+            ...     # print(pair)
+            ...     aabb0 = my_assembly[0][pair[0]].aabb()
+            ...     c0 = Point(
+            ...         (aabb0[0][0] + aabb0[6][0]) * 0.5,
+            ...         (aabb0[0][1] + aabb0[6][1]) * 0.5,
+            ...         (aabb0[0][2] + aabb0[6][2]) * 0.5
+            ...     )
+            ...     aabb1 = my_assembly[0][pair[1]].aabb()
+            ...     c1 = Point(
+            ...         (aabb1[0][0] + aabb1[6][0]) * 0.5,
+            ...         (aabb1[0][1] + aabb1[6][1]) * 0.5,
+            ...         (aabb1[0][2] + aabb1[6][2]) * 0.5
+            ...     )
+            ...     line = Line(c0, c1)
+            ...     geometry.append(line)
         """
 
         elements = self.flatten()
