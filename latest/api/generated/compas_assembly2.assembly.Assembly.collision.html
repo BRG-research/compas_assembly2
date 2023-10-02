@@ -118,15 +118,15 @@ the index are integer in each level of the assebmly, e.g.
 &gt;&gt;&gt; my_assembly = Assembly(&quot;model&quot;)
 &gt;&gt;&gt; my_assembly.add_assembly(&quot;boxes&quot;)
 &gt;&gt;&gt; for _ in range(num_copies):
-&gt;&gt;&gt;     # Generate random rotation and translation
-&gt;&gt;&gt;     random_axis = [random.random(), random.random(), random.random()]
-&gt;&gt;&gt;     random_rotation = Rotation.from_axis_and_angle(random_axis, radians(random.uniform(0, 360)))
-&gt;&gt;&gt;     vector = [random.uniform(-max_translation, max_translation) for _ in range(3)]
-&gt;&gt;&gt;     vector[2] = 0
-&gt;&gt;&gt;     random_translation = Translation.from_vector(vector)
-&gt;&gt;&gt;     # Apply random rotation and translation
-&gt;&gt;&gt;     transformed_element = b1.transformed(random_translation * random_rotation)
-&gt;&gt;&gt;     my_assembly[0].add_assembly(transformed_element)
+...     # Generate random rotation and translation
+...     random_axis = [random.random(), random.random(), random.random()]
+...     random_rotation = Rotation.from_axis_and_angle(random_axis, radians(random.uniform(0, 360)))
+...     vector = [random.uniform(-max_translation, max_translation) for _ in range(3)]
+...     vector[2] = 0
+...     random_translation = Translation.from_vector(vector)
+...     # Apply random rotation and translation
+...     transformed_element = b1.transformed(random_translation * random_rotation)
+...     my_assembly[0].add_assembly(transformed_element)
 &gt;&gt;&gt; #
 &gt;&gt;&gt; # collision
 &gt;&gt;&gt; my_assembly.collision()
