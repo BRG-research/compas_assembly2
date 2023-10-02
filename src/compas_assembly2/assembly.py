@@ -1562,7 +1562,6 @@ class Assembly(Data):
         >>> max_translation = 8  # Maximum translation distance from the center
         >>> my_assembly = Assembly("model")
         >>> my_assembly.add_assembly("boxes")
-        >>> print(my_assembly.graph)
         >>> for _ in range(num_copies):
         >>>     # Generate random rotation and translation
         >>>     random_axis = [random.random(), random.random(), random.random()]
