@@ -102,12 +102,16 @@
 <span class="sig-prename descclassname"><span class="pre">Assembly.</span></span><span class="sig-name descname"><span class="pre">aabb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inflate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BRG-research/compas_assembly2/blob/master/src/compas_assembly2/assembly.py#L1349"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>compute the axis aligned bounding box of the assembly
 by collecting all the elements bounding boxes</p>
-<p># Returns:
-#     list(Point)</p>
-<p># Examples:
-#     &gt;&gt;&gt; my_assembly = Assembly(&quot;model&quot;) # for sure you need to place elements inside
-#     &gt;&gt;&gt; my_assembly.add_assembly(Element(name=&quot;beam&quot;, simplex=Point(0, 0, 0)))
-#     &gt;&gt;&gt; bounding_box_eight_corner_points = my_assembly.aabb(inflate = 0.01)</p>
+<dl>
+<dt>Returns:</dt><dd><p>list(Point)</p>
+</dd>
+<dt>Examples:</dt><dd><div class="doctest language-python notranslate"><div class="highlight"><pre><button class="btn copy"><i class="far fa-copy"></i></button><code><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">my_assembly</span> <span class="o">=</span> <span class="n">Assembly</span><span class="p">(</span><span class="s2">&quot;model&quot;</span><span class="p">)</span> <span class="c1"># for sure you need to place elements inside</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_assembly</span><span class="o">.</span><span class="n">add_assembly</span><span class="p">(</span><span class="n">Element</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;beam&quot;</span><span class="p">,</span> <span class="n">simplex</span><span class="o">=</span><span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bounding_box_eight_corner_points</span> <span class="o">=</span> <span class="n">my_assembly</span><span class="o">.</span><span class="n">aabb</span><span class="p">(</span><span class="n">inflate</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">)</span>
+</code></pre></div>
+</div>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
