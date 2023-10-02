@@ -1252,7 +1252,7 @@ class Assembly(Data):
             None
 
         Examples:
-            >>> transformation = Translation.from_vector([1, 2, 3])transform_from_frame_to_frame
+            >>> transformation = Translation.from_vector([1, 2, 3])
             >>> my_assembly = Assembly("model")  # for sure you need to place elements inside
             >>> my_assembly.transform(transformation)
 
