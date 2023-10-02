@@ -1552,11 +1552,11 @@ class Assembly(Data):
         >>> from compas_assembly2 import ELEMENT_NAME
         >>> #
         >>> b1 = Element(
-        >>>     name=ELEMENT_NAME.BLOCK,
-        >>>     id=0,
-        >>>     frame=Frame.worldXY,
-        >>>     simplex=Point(0, 0, 0),
-        >>>     complex=Box.from_width_height_depth(0.5, 0.5, 0.5))
+        ...     name=ELEMENT_NAME.BLOCK,
+        ...     id=0,
+        ...     frame=Frame.worldXY,
+        ...     simplex=Point(0, 0, 0),
+        ...     complex=Box.from_width_height_depth(0.5, 0.5, 0.5))
         >>> #
         >>> num_copies = 200
         >>> max_translation = 8  # Maximum translation distance from the center
