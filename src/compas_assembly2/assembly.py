@@ -605,7 +605,7 @@ class Assembly(Data):
 
         Examples:
             >>> my_assembly = Assembly("my_assembly")
-            >>> my_string = my_assembly.stringify_tree(my_assembly)
+            >>> my_string = my_assembly.stringify_tree()
 
         """
         tree_str = (
