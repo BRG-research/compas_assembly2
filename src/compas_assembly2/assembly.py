@@ -1545,7 +1545,7 @@ class Assembly(Data):
         2) iterate in a simple for loop or any other structure to detect collisions
         3) fill the graph with the collision pairs
 
-        >>> Examples:
+        Examples:
         >>> import random
         >>> from math import radians
         >>> from compas.geometry import Box
