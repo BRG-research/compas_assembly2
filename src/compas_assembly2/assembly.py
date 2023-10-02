@@ -1247,13 +1247,13 @@ class Assembly(Data):
     def transform(self, transformation):
         """Transforms the value and all sub_assemblies by the given transformation.
 
-        # Returns:
-        #     None
+        Returns:
+            None
 
-        # Examples:
-        #     >>> transformation = Translation.from_vector([1, 2, 3])
-        #     >>> my_assembly = Assembly("model") # for sure you need to place elements inside
-        #     >>> my_assembly.transform(transformation)
+        Examples:
+            >>> transformation = Translation.from_vector([1, 2, 3])
+            >>> my_assembly = Assembly("model")  # for sure you need to place elements inside
+            >>> my_assembly.transform(transformation)
 
         """
         # apply the transformation the value
@@ -1459,4 +1459,4 @@ class Assembly(Data):
 if __name__ == "__main__":
     transformation = Translation.from_vector([1, 2, 3])
     my_assembly = Assembly("model")  # for sure you need to place elements inside
-    transformed_assembly = my_assembly.transformed(transformation)
+    my_assembly.transform(transformation)
