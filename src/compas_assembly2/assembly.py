@@ -1318,14 +1318,14 @@ class Assembly(Data):
         to know which functions exist in the assembly look at the Element class or documentation
         self.child_behave(collection, "method_name", arg1, arg2, kwarg1=value1, kwarg2=value2)
 
-        # Returns:
-        #     None
+        Returns:
+            None
 
-        # Examples:
-        #     >>> my_assembly = Assembly("model")  # for sure you need to place elements inside
-        #     >>> my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 0, 0), complex=Point(0, 0, 0)))
-        #     >>> output_list = []
-        #     >>> my_assembly.child_behave(output_list, "aabb", 0.00)
+        Examples:
+            >>> my_assembly = Assembly("model")  # for sure you need to place elements inside
+            >>> my_assembly.add_assembly(Element(name="beam", simplex=Point(0, 0, 0), complex=Point(0, 0, 0)))
+            >>> output_list = []
+            >>> my_assembly.child_behave(output_list, "aabb", 0.00)
 
         """
 
