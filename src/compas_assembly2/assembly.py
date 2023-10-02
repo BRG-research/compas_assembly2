@@ -125,6 +125,7 @@ def depth(self):
 # [ ] - 8.2. visualize the adjacency in the viewer simply, by drawing lines between element bbox centers
 # [ ] - 9.1. add collision detection between elements, for this you need to flatten the elements and
 # [ ] - 9.2. define collision pairs as lists of indices e.g. v0 "0,5,7", v1 "1,5,8"
+# [ ] - 10 - write contact detection between elements and fill the root graph
 
 import copy
 from compas.data import Data
@@ -1162,10 +1163,26 @@ class Assembly(Data):
     # transform_to_frame, transform_from_frame_to_frame, transform and copies
     # ==========================================================================
     def transform_to_frame(self, target_frame):
-        pass
+        """transfrom the assembly value to the target frame
+        this works if the current assembly is element,
+        meaning the elements are nested within elements
+        WARNING: do not use this function for the assembly or subassembly
+        whose value is not element, it will directly ignore it"""
+
+        if isinstance(self.value, Element):
+            self.transform_from_frame_to_frame(self.value.frame, target_frame)
+            self.value.transform_to_frame(target_frame)
 
     def transformed_to_frame(self, target_frame):
-        pass
+        """transfrom the assembly copy value to the target frame
+        this works if the current assembly is element,
+        meaning the elements are nested within elements
+        WARNING: do not use this function for the assembly or subassembly
+        whose value is not element, it will directly ignore it"""
+
+        copy = self.copy()
+        self.transform_to_frame(target_frame)
+        return copy
 
     def transform_all_to_frame(self, target_frame):
         """Transforms all the elements to the target frame.
@@ -1182,11 +1199,11 @@ class Assembly(Data):
         """
         # apply the transformation the value
         if isinstance(self.value, Element):
-            self.value.transformed_to_frame(target_frame)
+            self.value.transform_to_frame(target_frame)
 
         # recursively iterate through sub_assemblies value and transform them
         for sub_assembly in self.sub_assemblies:
-            sub_assembly.transform_to_frame(target_frame)
+            sub_assembly.transform_all_to_frame(target_frame)
 
     def transformed_all_to_frame(self, target_frame):
         """Copies and transforms all the elements to the target frame.
@@ -1224,7 +1241,7 @@ class Assembly(Data):
 
         # recursively iterate through sub_assemblies value and transform them
         for sub_assembly in self.sub_assemblies:
-            sub_assembly.transform_to_frame(source_frame, target_frame)
+            sub_assembly.transform_from_frame_to_frame(source_frame, target_frame)
 
     def transformed_from_frame_to_frame(self, source_frame, target_frame):
         """Transforms the value and all sub_assemblies

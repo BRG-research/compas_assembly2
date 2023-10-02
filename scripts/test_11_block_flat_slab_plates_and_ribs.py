@@ -2,7 +2,7 @@ from compas_assembly2 import Viewer, FabricationNest, Assembly
 
 # https://compas.dev/compas/latest/reference/generated/compas.data.Data.html
 from compas.data import json_load
-from compas.geometry import Scale
+from compas.geometry import Scale, Frame, Translation, Transformation  # noqa: F401
 from compas_assembly2.element import _
 
 try:
@@ -46,7 +46,12 @@ FabricationNest.pack_elements(elements=assembly.flatten(), nest_type=2, inflate=
 # ==========================================================================
 # VIEW2
 # ==========================================================================
-assembly.print_tree()
+# assembly.print_tree()
+translation = Translation.from_vector([0, 0, 3])
+frame0 = Frame.worldXY()
+frame1 = Frame([3, 3, 0], [0, 1, 0], [0, 0, 1])
+
+assembly = assembly.transformed_from_frame_to_frame(frame0, frame1)
 assembly.show(collapse_level=1)
 
 # element_lists = assembly.collapse(2).to_lists()
