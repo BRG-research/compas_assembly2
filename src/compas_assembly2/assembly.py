@@ -1171,13 +1171,13 @@ class Assembly(Data):
         """Transforms all the elements to the target frame.
         Use it when you want to orient all elements e.g. to XY plane
 
-        # Returns:
-        #     None
+        Returns:
+            None
 
-        # Examples:
-        #     >>> my_assembly = Assembly("model") # for sure you need to place elements inside
-        #     >>> t = Frame([0, 0, 10], [1, 0, 0], [0, 1, 0])
-        #     >>> my_assembly.transform_all_to_frame(t)
+        Examples:
+            >>> my_assembly = Assembly("model")  # for sure you need to place elements inside
+            >>> t = Frame([0, 0, 10], [1, 0, 0], [0, 1, 0])
+            >>> my_assembly.transform_all_to_frame(t)
 
         """
         # apply the transformation the value
@@ -1192,17 +1192,17 @@ class Assembly(Data):
         """Copies and transforms all the elements to the target frame.
         Use it when you want to orient all elements e.g. to XY plane
 
-        # Returns:
-        #     Assembly
+        Returns:
+            Assembly
 
-        # Examples:
-        #     >>> my_assembly = Assembly("model") # for sure you need to place elements inside
-        #     >>> t = Frame([0, 0, 10], [1, 0, 0], [0, 1, 0])
-        #     >>> transformed_assembly = my_assembly.transformed_all_to_frame(t)
+        Examples:
+            >>> my_assembly = Assembly("model")  # for sure you need to place elements inside
+            >>> t = Frame([0, 0, 10], [1, 0, 0], [0, 1, 0])
+            >>> transformed_assembly = my_assembly.transformed_all_to_frame(t)
 
         """
         new_instance = self.copy()
-        new_instance.transform_to_frame(target_frame)
+        new_instance.transform_all_to_frame(target_frame)
         return new_instance
 
     def transform_from_frame_to_frame(self, source_frame, target_frame):
@@ -1458,7 +1458,6 @@ class Assembly(Data):
 
 
 if __name__ == "__main__":
-    s = Frame([0, 0, 0], [1, 0, 0], [0, 1, 0])
-    t = Frame([0, 0, 10], [1, 0, 0], [0, 1, 0])
     my_assembly = Assembly("model")  # for sure you need to place elements inside
-    transformed_assembly = my_assembly.transformed_from_frame_to_frame(s, t)
+    t = Frame([0, 0, 10], [1, 0, 0], [0, 1, 0])
+    transformed_assembly = my_assembly.transformed_all_to_frame(t)
