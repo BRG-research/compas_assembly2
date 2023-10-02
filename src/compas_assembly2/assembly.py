@@ -120,7 +120,7 @@ def depth(self):
 # [x] - 4. show method
 # [x] - 5. write tests for transformation, copy, properties retrieval
 # [x] - 6. create assembly from json file
-# [ ] - 7. add a frame to the root assembly for transformation
+# [ ] - 7. is it necessary? -> add a frame to the root assembly for transformation
 # [ ] - 8.1. add adjacency graph in the root and write examples files, vizualize it using networkx
 # [ ] - 8.2. visualize the adjacency in the viewer simply, by drawing lines between element bbox centers
 # [ ] - 9.1. add collision detection between elements, for this you need to flatten the elements and
@@ -1070,7 +1070,7 @@ class Assembly(Data):
             if isinstance(user_object, Element):
                 self.sub_assemblies[arg].value = user_object  # type: ignore
             elif isinstance(user_object, Assembly):
-                user_object.parent_assembly = self.sub_assemblies[arg].parent_assembly
+                user_object.parent_assembly = self.sub_assemblies[arg].parent_assembly  # type: ignore
                 del self.sub_assemblies[arg]
                 self.sub_assemblies.add(user_object)
 
@@ -1473,8 +1473,101 @@ class Assembly(Data):
             geometry=geometry,
         )
 
+    # ==========================================================================
+    # COLLISION DETECTION
+    # ==========================================================================
+    def collect_paths_to_elements(self, current_path=None):
+        """
+        Recursively collect paths to elements of class type 'Element' within the tree.
+
+        Args:
+            current_path (list, optional): The current path in the tree. Defaults to None.
+
+        Returns:
+            list of tuple: A list of paths (tuples of indices) to 'Element' instances in the tree.
+
+        Examples:
+            >>> my_assembly = Assembly("model")
+            >>> structure = Assembly("structure")
+            >>> #
+            >>> timber = Assembly("timber")
+            >>> structure.add_assembly(timber)
+            >>> timber.add_assembly(Assembly(Element(name="beam", simplex=Point(0, 0, 0))))
+            >>> timber.add_assembly(Assembly(Element(name="beam", simplex=Point(0, 5, 0))))
+            >>> timber.add_assembly(Assembly(Element(name="plate", simplex=Point(0, 0, 0))))
+            >>> timber.add_assembly(Assembly(Element(name="plate", simplex=Point(0, 7, 0))))
+            >>> #
+            >>> concrete = Assembly("concrete")
+            >>> structure.add_assembly(concrete)
+            >>> concrete.add_assembly(Assembly(Element(name="node", simplex=Point(0, 0, 0))))
+            >>> concrete.add_assembly(Assembly(Element(name="block", simplex=Point(0, 5, 0))))
+            >>> concrete.add_assembly(Assembly(Element(name="block", simplex=Point(0, 0, 0))))
+            >>> #
+            >>> my_assembly.add_assembly(structure)
+            >>> #
+            >>> collected_paths = my_assembly.collect_paths_to_elements()
+            [(0, 0, 0), (0, 0, 1), (0, 0, 2), (0, 1, 0), (0, 1, 1), (0, 1, 2), (0, 1, 3)]
+        """
+        if current_path is None:
+            current_path = []
+
+        collected_paths = []
+
+        # Check if the current node is of the target class
+        if isinstance(self.value, Element):
+            collected_paths.append(tuple(current_path))
+
+        # Iterate through sub_assemblies
+        for index, sub_assembly in enumerate(self.sub_assemblies):
+            current_path.append(index)  # Append the current index to the path
+            collected_paths.extend(sub_assembly.collect_paths_to_elements(current_path))
+            current_path.pop()  # Remove the current index from the path
+
+        return collected_paths
+
+    # def all_element_levels(self, levels):
+    #     """iterate through all elements and get the level integers"""
+
+    #     for idx, sub_assembly in enumerate(self.sub_assemblies):
+    #         if isinstance(sub_assembly.value, Element):
+    #             levels.append((self.level, sub_assembly.level, idx))
+    #         sub_assembly.all_element_levels(levels)
+
+    def collision(self):
+        """check collision detection between all the elements in the assembly
+        the fill the grap in the root assembly with the collision pairs
+        the index are integer in each level of the assebmly, e.g.
+        1, 0 - 5, 1
+
+        following are the steps:
+
+        1) unwrap the assembly to a list of elements and string as levels
+        2) iterate in a simple for loop or any other structure to detect collisions
+        3) fill the graph with the collision pairs
+
+        """
+        pass
+
 
 if __name__ == "__main__":
-    my_assembly = Assembly("model")  # for sure you need to place elements inside
-    t = Frame([0, 0, 10], [1, 0, 0], [0, 1, 0])
-    transformed_assembly = my_assembly.transformed_all_to_frame(t)
+
+    my_assembly = Assembly("model")
+    structure = Assembly("structure")
+    #
+    timber = Assembly("timber")
+    structure.add_assembly(timber)
+    timber.add_assembly(Assembly(Element(name="beam", simplex=Point(0, 0, 0))))
+    timber.add_assembly(Assembly(Element(name="beam", simplex=Point(0, 5, 0))))
+    timber.add_assembly(Assembly(Element(name="plate", simplex=Point(0, 0, 0))))
+    timber.add_assembly(Assembly(Element(name="plate", simplex=Point(0, 7, 0))))
+    #
+    concrete = Assembly("concrete")
+    structure.add_assembly(concrete)
+    concrete.add_assembly(Assembly(Element(name="node", simplex=Point(0, 0, 0))))
+    concrete.add_assembly(Assembly(Element(name="block", simplex=Point(0, 5, 0))))
+    concrete.add_assembly(Assembly(Element(name="block", simplex=Point(0, 0, 0))))
+    #
+    my_assembly.add_assembly(structure)
+    #
+    collected_paths = my_assembly.collect_paths_to_elements()
+    print(collected_paths)
