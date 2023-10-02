@@ -1506,7 +1506,7 @@ class Assembly(Data):
             >>> my_assembly.add_assembly(structure)
             >>> #
             >>> collected_paths = my_assembly.collect_paths_to_elements()
-            >>> print collected_paths
+            >>> print(collected_paths)
             [(0, 0, 0), (0, 0, 1), (0, 0, 2), (0, 1, 0), (0, 1, 1), (0, 1, 2), (0, 1, 3)]
         """
         if current_path is None:
@@ -1526,14 +1526,6 @@ class Assembly(Data):
 
         return collected_paths
 
-    # def all_element_levels(self, levels):
-    #     """iterate through all elements and get the level integers"""
-
-    #     for idx, sub_assembly in enumerate(self.sub_assemblies):
-    #         if isinstance(sub_assembly.value, Element):
-    #             levels.append((self.level, sub_assembly.level, idx))
-    #         sub_assembly.all_element_levels(levels)
-
     def collision(self):
         """check collision detection between all the elements in the assembly
         the fill the grap in the root assembly with the collision pairs
@@ -1548,7 +1540,14 @@ class Assembly(Data):
 
         """
 
-        pass
+        paths = self.collect_paths_to_elements()
+        elmenents = self.flatten()
+
+        for i, path in enumerate(paths):
+            for j, other_path in enumerate(paths):
+                if i != j:
+                    if elmenents[i].collision(elmenents[j]):
+                        self.root.graph.add_edge(path, other_path)
 
 
 if __name__ == "__main__":
