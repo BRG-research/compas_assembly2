@@ -134,7 +134,7 @@ the index are integer in each level of the assebmly, e.g.
 &gt;&gt;&gt; # iterate nodes and add lines for graph display
 &gt;&gt;&gt; geometry = []
 &gt;&gt;&gt; for pair in my_assembly.graph.edges():
-...     print(pair)
+...     # print(pair)
 ...     aabb0 = my_assembly[0][pair[0]].aabb()
 ...     c0 = Point(
 ...         (aabb0[0][0] + aabb0[6][0]) * 0.5,
