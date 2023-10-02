@@ -1,7 +1,7 @@
 """
 
 .. currentmodule:: compas_assembly2
-
+        :member-order: bysource
 
 .. toctree::
     :maxdepth: 2
@@ -36,8 +36,9 @@ Assembly class
 .. autosummary::
     :toctree: generated/
     :nosignatures:
-
+    :member-order: bysource
     assembly.Assembly
+    
 
 Element class
 =============

@@ -3,3 +3,4 @@ compas_assembly2
 ********************************************************************************
 
 .. automodule:: compas_assembly2
+   :member-order: bysource
