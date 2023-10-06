@@ -29,7 +29,7 @@ def build_assembly_of_elements():
 
 def test_add_element_by_index_two_times(build_assembly_of_elements):
     assembly = build_assembly_of_elements
-    assembly = assembly.collapse(1)
+    assembly = assembly.collapse(0)
     print(assembly)
 
     # Assertions
