@@ -12,6 +12,10 @@ class ModelNode(TreeNode):
         self._children = SortedList()  # a sorted list of TreeNode objects instead of set()
         self._elements = elements  # attributes of the node
 
+    @property
+    def elements(self):
+        return self._elements
+
     def __repr__(self):
         return "ModeNode {}".format(self.name)
 
@@ -68,8 +72,12 @@ class ModelNode(TreeNode):
             raise TypeError("The node is not a TreeNode object.")
         if node not in self._children:
             self._children.add(node)
-            # for element in node._elements:
-            #     self._tree._elements[str(element.guid)] = element
+
+            # add elements from current node to the base dictionary of Model class
+            root = self.tree
+            for e in node._elements:
+                root.elements[e.guid] = e
+
         node._parent = self
 
 
@@ -84,6 +92,10 @@ class Model(Tree):
         # --------------------------------------------------------------------------
         if name != "":
             self.add(ModelNode(name=name))
+
+    @property
+    def elements(self):
+        return self._elements
 
     def __getitem__(self, index):
         # --------------------------------------------------------------------------
@@ -134,11 +146,15 @@ class Model(Tree):
             raise ValueError("The node already has a parent, remove it from that parent first.")
 
         if parent is None:
-            # add the node as a root node
+            # WARNING: custom implementation, add the node as a root node
             if self.root is not None:
                 self._root.add(node)
                 node._tree = self._root
-                return
+
+                for e in node.elements:
+                    self.root.elements[e.guid] = e
+
+                return node
                 raise ValueError("The tree already has a root node, remove it first.")
 
             self._root = node
@@ -153,6 +169,33 @@ class Model(Tree):
                 raise ValueError("The parent node is not part of this tree.")
 
             parent.add(node)
+            return node
+
+    def add_by_paths(self, element, path_names=[], duplicate=False):
+        # add element to the dictionary
+        self.elements[element.guid] = element
+        branch = self.root
+
+        node = None
+        for path_name in path_names:
+
+            # check if there are branches with the same name
+
+            found = False
+            for b in branch._children:
+                if b.name == str(path_name):
+                    node = b
+                    found = True
+                    break
+
+            if found is False:
+                node = ModelNode(name=str(path_name), elements=[])
+                branch.add(node)
+
+            branch = node
+        print("added element to node: ", node.name, " ", len(node.elements))
+        node._elements.append(element)
+        node.tree.elements[element.guid] = element
 
     def __repr__(self):
         return "Model with {} nodes".format(len(list(self.nodes)))
@@ -161,18 +204,35 @@ class Model(Tree):
         """Print the spatial hierarchy of the tree."""
 
         def _print(node, depth=0):
-            print(
-                "  " * depth
+
+            # print current data
+            print("-" * 100)
+            message = (
+                "    " * depth
                 + str(node)
                 + " "
+                + "["
                 + str(len(node._elements))
+                + "]"
+                + " | Parent: "
+                + str(node.parent)
+                + " "
                 + " | Root: "
                 + node.tree.__class__.__name__
                 + " "
                 + str(node.tree.name)
             )
+
+            if depth == 0:
+                message += " | Dict Elements: " + "{" + str(len(node.tree._elements)) + "}"
+
+            print(message)
+
+            # print elements
             for e in node._elements:
-                print("  " * (depth + 1) + str(e))
+                print("    " * (depth + 1) + str(e))
+
+            # recursively print
             for child in node.children:
                 _print(child, depth + 1)
 
@@ -190,7 +250,6 @@ def create_tree():
     branch.add(leaf1)
     branch.add(leaf2)
     print(tree, tree.__class__.__name__)
-    print("_" * 100)
     tree.print()
     return tree
 
@@ -227,7 +286,7 @@ def create_model_tree_operators():
     return tree
 
 
-def create_model_tree_and_elements_operators():
+def create_model_tree_and_elements():
     # ==========================================================================
     # create elements
     # ==========================================================================
@@ -247,18 +306,17 @@ def create_model_tree_and_elements_operators():
     tree.add(ModelNode("structure"))
     tree[0].add(ModelNode("timber", elements=[e0, e1, e2, e3]))
     tree[0].add(ModelNode("concrete", elements=[e4, e5, e6]))
+    tree.add_by_paths(e0, [2, 4])
+    tree.add_by_paths(e0, [2, 4])
+    tree.add_by_paths(e0, [2, 4])
     tree.print()
     return tree
 
 
 if __name__ == "__main__":
     # tree = create_tree()
-    model_tree = create_model_tree_and_elements_operators()
-    # print(model_tree[0]._tree)
-    # print(model_tree[0]._tree)
-
     # model_tree = create_model_tree()
-
+    # model_tree = create_model_tree_children()
     # model_tree = create_model_tree_operators()
-    # tree = create_tree_via_getter()
+    model_tree = create_model_tree_and_elements()
     pass

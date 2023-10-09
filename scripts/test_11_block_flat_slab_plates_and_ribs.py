@@ -1,4 +1,5 @@
-from compas_assembly2 import FabricationNest, Assembly
+from compas_assembly2 import FabricationNest
+from model import Model
 
 # https://compas.dev/compas/latest/reference/generated/compas.data.Data.html
 from compas.data import json_load
@@ -27,9 +28,9 @@ if __name__ == "__main__":
     # ==========================================================================
     # COLLIDE ELEMENTS
     # ==========================================================================
-    assembly = Assembly(value="elements_json")
+    model = Model("elements_json")
     for element in elements_json:
-        assembly.add_by_index(element)
+        model.add_by_paths(element, element.id)
 
     geometry = []
 
@@ -40,18 +41,18 @@ if __name__ == "__main__":
 # ==========================================================================
 # NEST ELEMENTS
 # ==========================================================================
-FabricationNest.pack_elements(elements=assembly.flatten(), nest_type=2, inflate=0.1, height_step=4)  # type: ignore
+# FabricationNest.pack_elements(elements=assembly.flatten(), nest_type=2, inflate=0.1, height_step=4)  # type: ignore
 
 # ==========================================================================
 # VIEW2
 # ==========================================================================
 # assembly.print_tree()
-translation = Translation.from_vector([0, 0, 3])
-frame0 = Frame.worldXY()
-frame1 = Frame([3, 3, 0], [0, 1, 0], [0, 0, 1])
+# translation = Translation.from_vector([0, 0, 3])
+# frame0 = Frame.worldXY()
+# frame1 = Frame([3, 3, 0], [0, 1, 0], [0, 0, 1])
 
-assembly = assembly.transformed_from_frame_to_frame(frame0, frame1)  # type: ignore
-assembly.show(collapse_level=1)
+# assembly = assembly.transformed_from_frame_to_frame(frame0, frame1)  # type: ignore
+# assembly.show(collapse_level=1)
 
 # element_lists = assembly.collapse(2).to_lists()
 
