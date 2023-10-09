@@ -4,14 +4,16 @@ from collections import OrderedDict
 from compas.datastructures import Graph
 from compas.geometry import bounding_box, Point, Line, Frame, Transformation, Rotation, Translation  # noqa: F401
 from compas_assembly2 import Element
-import copy
 
 
 class ModelNode(TreeNode):
-    def __init__(self, name=None, elements=None, attributes=None):
+    def __init__(self, name=None, elements=[], attributes=None):
         super(ModelNode, self).__init__(name=name, attributes=attributes)
         self._children = SortedList()  # a sorted list of TreeNode objects instead of set()
         self._elements = elements  # attributes of the node
+
+    def __repr__(self):
+        return "ModeNode {}".format(self.name)
 
     def __lt__(self, other):
         """Less than operator for sorting assemblies by name.
@@ -62,16 +64,18 @@ class ModelNode(TreeNode):
         None
 
         """
-        if not isinstance(node, TreeNode):
+        if not isinstance(node, ModelNode):
             raise TypeError("The node is not a TreeNode object.")
         if node not in self._children:
             self._children.add(node)
+            # for element in node._elements:
+            #     self._tree._elements[str(element.guid)] = element
         node._parent = self
 
+
 class Model(Tree):
-    def __init__(self, name="", attributes=None):
+    def __init__(self, name="root", attributes=None):
         super(Model, self).__init__(name=name, attributes=attributes)
-        self.name = name  # Set the 'name' as an instance variable
         self._elements = OrderedDict()  # a flat collection of elements - dict{GUID, Element}
         self._root = None  # hierarchical relationships between elements
         self._interactions = Graph()  # abstract linkage or connection between elements
@@ -91,7 +95,6 @@ class Model(Tree):
         # --------------------------------------------------------------------------
         # return the node
         # --------------------------------------------------------------------------
-        print("__________get__item_______")
         return self._root._children[index]
 
     def __setitem__(self, index, model_node):
@@ -115,31 +118,13 @@ class Model(Tree):
         if index == 0:
             self._root._children = self._nodes[index]
 
-    def add(self, node, parent=None):
+    def add(
+        self,
+        node,
+        parent=None,
+    ):
         """
         Add a node to the tree.
-
-        Parameters
-        ----------
-        node : :class:`~compas.datastructures.TreeNode`
-            The node to add.
-        parent : :class:`~compas.datastructures.TreeNode`, optional
-            The parent node of the node to add.
-            Default is ``None``, in which case the node is added as a root node.
-
-        Returns
-        -------
-        None
-
-        Raises
-        ------
-        TypeError
-            If the node is not a :class:`~compas.datastructures.TreeNode` object.
-            If the supplied parent node is not a :class:`~compas.datastructures.TreeNode` object.
-        ValueError
-            If the node is already part of another tree.
-            If the supplied parent node is not part of this tree.
-            If the tree already has a root node, when trying to add a root node.
 
         """
         if not isinstance(node, TreeNode):
@@ -169,6 +154,31 @@ class Model(Tree):
 
             parent.add(node)
 
+    def __repr__(self):
+        return "Model with {} nodes".format(len(list(self.nodes)))
+
+    def print(self):
+        """Print the spatial hierarchy of the tree."""
+
+        def _print(node, depth=0):
+            print(
+                "  " * depth
+                + str(node)
+                + " "
+                + str(len(node._elements))
+                + " | Root: "
+                + node.tree.__class__.__name__
+                + " "
+                + str(node.tree.name)
+            )
+            for e in node._elements:
+                print("  " * (depth + 1) + str(e))
+            for child in node.children:
+                _print(child, depth + 1)
+
+        _print(self.root)
+
+
 def create_tree():
     tree = Tree()
     root = TreeNode("root")
@@ -182,21 +192,30 @@ def create_tree():
     print(tree, tree.__class__.__name__)
     print("_" * 100)
     tree.print()
+    return tree
 
 
 def create_model_tree():
     tree = Model()
     root = ModelNode("root")
-    branch = ModelNode("branch")
-    leaf1 = ModelNode("leaf1")
-    leaf2 = ModelNode("leaf2")
+    branch = ModelNode("structure")
+    leaf1 = ModelNode("timber")
+    leaf2 = ModelNode("concrete")
     tree.add(root)
     root.add(branch)
     branch.add(leaf1)
     branch.add(leaf2)
-    print(tree, tree.__class__.__name__)
-    print("_" * 100)
     tree.print()
+    return tree
+
+
+def create_model_tree_children():
+    tree = Model("root")
+    tree.root.add(ModelNode("structure"))
+    tree.root.children[0].add(ModelNode("timber"))
+    tree.root.children[0].add(ModelNode("concrete"))
+    tree.print()
+    return tree
 
 
 def create_model_tree_operators():
@@ -204,13 +223,42 @@ def create_model_tree_operators():
     tree.add(ModelNode("structure"))
     tree[0].add(ModelNode("timber"))
     tree[0].add(ModelNode("concrete"))
-    print(tree, tree.__class__.__name__)
-    print("_" * 100)
     tree.print()
+    return tree
+
+
+def create_model_tree_and_elements_operators():
+    # ==========================================================================
+    # create elements
+    # ==========================================================================
+    e0 = Element(name="beam", simplex=Point(0, 0, 0))
+    e1 = Element(name="beam", simplex=Point(0, 5, 0))
+    e2 = Element(name="plate", simplex=Point(0, 0, 0))
+    e3 = Element(name="plate", simplex=Point(0, 0, 0))
+
+    e4 = Element(name="block", simplex=Point(0, 5, 0))
+    e5 = Element(name="block", simplex=Point(0, 0, 0))
+    e6 = Element(name="block", simplex=Point(0, 0, 0))
+
+    # ==========================================================================
+    # create Model
+    # ==========================================================================
+    tree = Model("root")
+    tree.add(ModelNode("structure"))
+    tree[0].add(ModelNode("timber", elements=[e0, e1, e2, e3]))
+    tree[0].add(ModelNode("concrete", elements=[e4, e5, e6]))
+    tree.print()
+    return tree
 
 
 if __name__ == "__main__":
     # tree = create_tree()
-    model_tree = create_model_tree_operators()
+    model_tree = create_model_tree_and_elements_operators()
+    # print(model_tree[0]._tree)
+    # print(model_tree[0]._tree)
+
+    # model_tree = create_model_tree()
+
+    # model_tree = create_model_tree_operators()
     # tree = create_tree_via_getter()
     pass
