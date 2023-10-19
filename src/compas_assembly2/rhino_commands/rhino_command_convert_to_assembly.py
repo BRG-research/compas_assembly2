@@ -1,5 +1,6 @@
 import rhinoscriptsyntax as rs  # type: ignore https://github.com/mcneel/rhinoscriptsyntax
 import Rhino  # type: ignore
+import compas
 from compas.datastructures import Mesh
 from compas.geometry import (
     Polyline,
@@ -215,6 +216,7 @@ class conversions:
             return plines
 
         # Sort polylines based on bounding box diagonal
+        
         diagonals = []
         for i in range(len(plines)):
             pts = bounding_box(plines[i].points)
@@ -222,6 +224,7 @@ class conversions:
 
         diagonals, plines = zip(*sorted(zip(diagonals, plines), reverse=True))
         plines = list(plines)
+        
 
         # orient all polylines to the first outline's plane
         frame_2d = Frame([0, 0, 0], [1, 0, 0], [0, 1, 0])
@@ -232,6 +235,7 @@ class conversions:
 
         for i in range(len(plines)):
             plines[i] = plines[i].transformed(T)
+        
         # on the first outline's plane:
         # a) make all polylines orientation anti-clockwise
         # b) split the plines list into two lists: top and bottom, based on the distance to the first outline's plane
@@ -246,11 +250,17 @@ class conversions:
             if is_clock_wise:
                 plines[i] = Polyline(reversed(plines[i].points))
 
-        plines[0] = Polyline(reversed(plines[0].points))
-        plines[1] = Polyline(reversed(plines[1].points))
-
+        points0 = list(plines[0].points)
+        points1 = list(plines[0].points)
+        points0.reverse()
+        points1.reverse()
+        plines[0] = Polyline(points0)
+        plines[1] = Polyline(points1)
+        
         # Split plines into top and bottom based on their distance to the origin point
         positions = []
+        
+        
         for i in range(len(plines)):
             positions.append(abs(plines[i][0][2]))
 
@@ -492,7 +502,7 @@ for group_id, subsequent_groups in grouped_objects.items():
     # --------------------------------------------------------------------------
     layer_name = subsequent_groups[0].layer_name
     processed_layer_name = process_string(layer_name)
-    # print(processed_layer_name)
+    #print(processed_layer_name)
 
     # --------------------------------------------------------------------------
     # create objects, the assignment of right properties is dependent on user
@@ -611,7 +621,7 @@ for group_id, subsequent_groups in grouped_objects.items():
             if isinstance(o.simplex[0], Mesh):
                 o.frame = Frame(o.simplex[0].centroid(), [1, 0, 0], [0, 1, 0])
             elif isinstance(o.simplex[0], Polyline):
-                if o.simplex[0].is_closed():
+                if o.simplex[0].is_closed:
                     o.frame = Frame(o.simplex[0][0], [1, 0, 0], [0, 1, 0])
                 else:
                     x_axis_vector, y_axis_vector = conversions.perpendicular_to(o.simplex[0][0], o.simplex[0][1])
@@ -653,4 +663,4 @@ for group_id, subsequent_groups in grouped_objects.items():
 # fill the compas_assembly_user_input with geometry and types
 # ==========================================================================
 # write data to file
-json_dump(data=elements, fp="rhino_command_convert_to_assembly_1.json", pretty=False)
+json_dump(data=elements, fp="rhino_command_convert_to_assembly_floor_0_barrel_vault_hex.json", pretty=False)

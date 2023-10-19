@@ -27,13 +27,14 @@ import copy
 import compas_assembly2
 from compas_assembly2.joint import Joint
 from math import fabs
+from compas.data import json_load
 
 try:
     from shapely.geometry import Polygon as ShapelyPolygon
 
     shapely_available = True
 except ImportError:
-    print("shapely package not available. Please install it.")
+    print("Library shapely is not installed. Please install it.")
     shapely_available = False
 
 
@@ -241,33 +242,34 @@ class Element(Data):
 
         # return the data object
         return data
+        # return {}
 
-    @data.setter
-    def data(self, data):
-        # vice versa - create the class properties from the data object
-        # call the inherited Data constructor for json serialization
+    # @data.setter
+    # def data(self, data):
+    #     # vice versa - create the class properties from the data object
+    #     # call the inherited Data constructor for json serialization
 
-        # main properties
-        self.name = data["name"]
-        self.id = data["id"]
-        self.frame = data["frame"]
-        self.simplex = data["simplex"]
-        self.complex = data["complex"]
-        self.insertion = data["insertion"]
-        self.attributes = data["attributes"]
+    #     # main properties
+    #     self.name = data["name"]
+    #     self.id = data["id"]
+    #     self.frame = data["frame"]
+    #     self.simplex = data["simplex"]
+    #     self.complex = data["complex"]
+    #     self.insertion = data["insertion"]
+    #     self.attributes = data["attributes"]
 
-        # custom properties
-        self._frame_global = data["frame_global"]
-        self._aabb = data["aabb"]
-        self._oobb = data["oobb"]
-        self._convex_hull = data["convex_hull"]
-        self._fabrication = data["fabrication"]
-        self._structure = data["structure"]
+    #     # custom properties
+    #     self._frame_global = data["frame_global"]
+    #     self._aabb = data["aabb"]
+    #     self._oobb = data["oobb"]
+    #     self._convex_hull = data["convex_hull"]
+    #     self._fabrication = data["fabrication"]
+    #     self._structure = data["structure"]
 
     @classmethod
     def from_data(cls, data):
         """Alternative to None default __init__ parameters."""
-        obj = Element(
+        obj = cls(
             name=data["name"],
             id=data["id"],
             frame=data["frame"],
@@ -288,8 +290,16 @@ class Element(Data):
         obj._fabrication = data["fabrication"]
         obj._structure = data["structure"]
 
-        # return the object
+        # # return the object
         return obj
+        # element = Element()
+        # return element
+
+    @staticmethod
+    def deserialize(path=""):
+        return json_load(
+            fp="src/compas_assembly2/rhino_commands/rhino_command_convert_to_assembly_floor_0_barrel_vault_hex.json"
+        )
 
     # ==========================================================================
     # CONSTRUCTOR OVERLOADING
@@ -765,6 +775,12 @@ class Element(Data):
 
         # return the oobb  (8 points)
         return self._oobb
+
+    def aabb_center(self, inflate=0.00):
+        points = self.aabb(inflate)
+        return Point(
+            (points[0][0] + points[6][0]) / 2, (points[0][1] + points[6][1]) / 2, (points[0][2] + points[6][2]) / 2
+        )
 
     @property
     def convex_hull(self):

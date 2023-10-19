@@ -9,6 +9,7 @@ from compas.geometry import (
     Translation,
     Frame,
     Quaternion,
+    Scale,
 )
 from compas.datastructures import Mesh
 from compas.colors import Color
@@ -78,6 +79,7 @@ class Viewer:
         color_red=[],
         measurements=[],
         geometry=[],
+        scale=1,
     ):
         if viewer_type == "view" or "view2" or "compas_view2" or "0":
             try:
@@ -160,7 +162,13 @@ class Viewer:
                 # --------------------------------------------------------------------------
                 # add text - indices
                 # --------------------------------------------------------------------------
+
                 for counter, element in enumerate(elements):
+                    # --------------------------------------------------------------------------
+                    # Scale elements
+                    # --------------------------------------------------------------------------
+                    element.transform(Scale.from_factors([scale, scale, scale]))
+
                     # --------------------------------------------------------------------------
                     # add text - indices
                     # --------------------------------------------------------------------------
@@ -542,6 +550,7 @@ class Viewer:
                 # geometry to temporary visualize during the develipment
                 # --------------------------------------------------------------------------
                 for i in range(len(geometry)):
+                    geometry[i].transform(Scale.from_factors([scale, scale, scale]))
                     o = viewer.add(
                         data=geometry[i],
                         name="geometry",
@@ -795,6 +804,48 @@ class Viewer:
                         print(selected_indices_str)
                         print(selected_indices_flattened_str)
                         viewer.info(info_message)
+
+                # --------------------------------------------------------------------------
+                # color objects by type
+                # --------------------------------------------------------------------------
+                type_colors = [
+                    Color(0.929, 0.082, 0.498),  # 0
+                    Color(0.129, 0.572, 0.815),  # 1
+                    Color(0.929, 0.082, 0.498),  # 2
+                    Color(0.129, 0.572, 0.815),  # 3
+                    Color(0.929, 0.082, 0.498),  # 4 BEAM
+                    Color(0.129, 0.572, 0.815),  # 5
+                    Color(0.929, 0.082, 0.498),  # 6
+                    Color(0.129, 0.572, 0.815),  # 7
+                    Color(0.929, 0.082, 0.498),  # 8 PLATE
+                    Color(0.129, 0.572, 0.815),  # 9
+                ]
+
+                @viewer.button(text="color_by_type")
+                def check_complexes(checked):
+
+                    for obj in viewer_objects["viewer_complexes"]:
+                        # Calculate a unique hash for the input string
+                        def custom_hash(input_string):
+                            # Seed value for consistency
+                            seed = 0
+                            for char in input_string:
+                                seed = ord(char) + (seed << 6) + (seed << 16) - seed
+
+                            return seed
+
+                        hash_value = custom_hash(dict_elements_lists_of_elements[obj.name][0].name)
+                        mapped_integer = (abs(hash_value) + 1) % 11
+
+                        obj.facecolor = type_colors[mapped_integer % len(colors)]
+                        viewer.view.update()
+
+                @viewer.button(text="color_grey")
+                def check_complexes(checked):
+
+                    for obj in viewer_objects["viewer_complexes"]:
+                        obj.facecolor = colors[3]
+                        viewer.view.update()
 
                 # --------------------------------------------------------------------------
                 # run

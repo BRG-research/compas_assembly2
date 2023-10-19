@@ -1,16 +1,21 @@
-from tree import TreeNode, Tree
 from compas_assembly2.sortedlist import SortedList
 from collections import OrderedDict
 from compas.datastructures import Graph
 from compas.geometry import bounding_box, Point, Line, Frame, Transformation, Rotation, Translation  # noqa: F401
-from compas_assembly2 import Element
+from compas_assembly2 import Element, Tree, TreeNode
+from compas.geometry import Line
 
 
 class ModelNode(TreeNode):
-    def __init__(self, name=None, elements=[], attributes=None):
+    def __init__(self, name=None, elements=None, attributes=None):
         super(ModelNode, self).__init__(name=name, attributes=attributes)
         self._children = SortedList()  # a sorted list of TreeNode objects instead of set()
-        self._elements = elements  # attributes of the node
+        self._elements = []  # attributes of the node
+
+        # --------------------------------------------------------------------------
+        # user input
+        # --------------------------------------------------------------------------
+        self.add_elements(elements)
 
     @property
     def elements(self):
@@ -58,6 +63,33 @@ class ModelNode(TreeNode):
         self._children[index]._tree = self._tree
         self._children[index]._parent = self
 
+    # ==========================================================================
+    # element properties and methods - self._elements = OrderedDict()
+    # ==========================================================================
+    def add_elements(self, elements):
+        """add an elements to the model (current node list and root dict)"""
+
+        if elements is not None:
+            for element in elements:
+                self.add_element(element)
+
+    def add_element(self, element):
+        """add an element to the model (current node list and root dict)"""
+
+        if element is not None:
+            # add elements to the current node
+            self._elements.append(element)
+
+            # update the root class
+            self.tree._elements[element.guid] = element
+
+            # add node to the graph
+            self.tree._interactions.add_node(element.guid)
+
+    # ==========================================================================
+    # interactions properties and methods - self._interactions = Graph()
+    # ==========================================================================
+
     def add(self, node):
         """
         Add a child node to this node.
@@ -82,20 +114,54 @@ class ModelNode(TreeNode):
 
 
 class Model(Tree):
-    def __init__(self, name="root", attributes=None):
+    def __init__(self, name="root", elements=None, attributes=None):
+
         super(Model, self).__init__(name=name, attributes=attributes)
-        self._elements = OrderedDict()  # a flat collection of elements - dict{GUID, Element}
+
+        # --------------------------------------------------------------------------
+        # initialize the main properties of the model
+        # --------------------------------------------------------------------------
         self._root = None  # hierarchical relationships between elements
-        self._interactions = Graph()  # abstract linkage or connection between elements
+        self._elements = OrderedDict()  # a flat collection of elements - dict{GUID, Element}
+        self._interactions = Graph()  # abstract linkage or connection between elements and nodes
+
         # --------------------------------------------------------------------------
-        # create root directly in the constructor
+        # process the user input
         # --------------------------------------------------------------------------
-        if name != "":
-            self.add(ModelNode(name=name))
+        self.add(ModelNode(name=name))  # the name can be empty
+        self.add_elements(elements)  # elements is a list of Element objects
+
+    # ==========================================================================
+    # element properties and methods - self._elements = OrderedDict()
+    # ==========================================================================
 
     @property
     def elements(self):
         return self._elements
+
+    def add_elements(self, elements):
+        """add elements to the model
+        to get the elements from the model use the.elements property"""
+
+        if elements is not None:
+            for element in elements:
+                self.add_element(element)
+
+    def add_element(self, element):
+        """add an element to the model
+        to get the elements from the model use the.elements property"""
+
+        if element is not None:
+            self.elements[element.guid] = element
+            self._interactions.add_node(element.guid)
+
+    # ==========================================================================
+    # interactions properties and methods - self._interactions = Graph()
+    # ==========================================================================
+
+    # ==========================================================================
+    # interactions properties and methods
+    # ==========================================================================
 
     def __getitem__(self, index):
         # --------------------------------------------------------------------------
@@ -237,6 +303,32 @@ class Model(Tree):
                 _print(child, depth + 1)
 
         _print(self.root)
+
+    # ==========================================================================
+    # add linkages
+    # ==========================================================================
+    def add_interaction(self, element0, element1):
+        """add an interaction between two elements"""
+
+        if element0 is not None and element1 is not None:
+            self._interactions.add_edge(element0.guid, element1.guid)
+
+    def get_interactions(self):
+        """get all interactions between elements"""
+        return list(self._interactions.edges())
+
+    def get_interactions_as_lines(self):
+        """get all interactions between elements as lines"""
+        lines = []
+        edges = self.get_interactions()
+        for i in range(len(edges)):
+            a = edges[i][0]
+            b = edges[i][1]
+            point0 = self._elements[a].aabb_center()
+            point1 = self._elements[b].aabb_center()
+            line = Line(point0, point1)
+            lines.append(line)
+        return lines
 
 
 def create_tree():

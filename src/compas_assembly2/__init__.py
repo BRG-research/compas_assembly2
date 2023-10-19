@@ -20,24 +20,24 @@ test module
 
     test.hello_compas_assembly2
 
-Assembly class
-==============
+# Assembly class
+# ==============
 
-.. image:: ../_images/assembly.png
-   :width: 85%
-   :align: right
-   :alt: compas_assembly2
+# .. image:: ../_images/assembly.png
+#    :width: 85%
+#    :align: right
+#    :alt: compas_assembly2
 
-.. image:: ../_images/assembly_sorted_dict.png
-   :width: 85%
-   :align: right
-   :alt: compas_assembly2
+# .. image:: ../_images/assembly_sorted_dict.png
+#    :width: 85%
+#    :align: right
+#    :alt: compas_assembly2
 
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
+# .. autosummary::
+#     :toctree: generated/
+#     :nosignatures:
 
-    assembly.Assembly
+#     assembly.Assembly
 
 Element class
 =============
@@ -225,7 +225,8 @@ class FABRICATION_TYPES:
 
 
 from .element import Element  # noqa
-from .assembly import Assembly  # noqa
+from .tree import Tree, TreeNode  # noqa
+from .model import Model, ModelNode  # noqa
 from .viewer import Viewer  # noqa
 from .fabrication import Fabrication  # noqa
 from .fabrication_nest import FabricationNest  # noqa

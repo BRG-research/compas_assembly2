@@ -35,7 +35,7 @@ if __name__ == "__main__":
     cloud = Pointcloud(
         [Point(random.uniform(-0.25, 0.25), random.uniform(-2, 2), random.uniform(-0.25, 0.25)) for _ in range(200)]
     )
-    box = Box(Frame([3, 0, 0], [0.866, 0.1, 0.0], [0.5, 0.866, 0.0]), 2, 4, 0.25)
+    box = Box(frame=Frame([3, 0, 0], [0.866, 0.1, 0.0], [0.5, 0.866, 0.0]), xsize=2, ysize=4, zsize=0.25)
     geo_0 = [mesh]
     geo_1 = [polyline_0, polyline_1, cloud]
     geo_2 = [box]
