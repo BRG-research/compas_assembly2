@@ -1,4 +1,5 @@
-from compas_assembly2 import Element, Viewer, Model, ModelNode
+from compas_assembly2 import Element, Model, ModelNode, ViewerModel
+
 
 if __name__ == "__main__":
     # ==========================================================================
@@ -66,30 +67,32 @@ if __name__ == "__main__":
     model.add_interaction(elements_json[15], elements_json[12])
 
     # beams connections
-    model.add_interaction(elements_json[5], elements_json[11])
-    model.add_interaction(elements_json[5], elements_json[13])
-    model.add_interaction(elements_json[5], elements_json[8])
-    model.add_interaction(elements_json[5], elements_json[4])
-    model.add_interaction(elements_json[5], elements_json[0])
-    model.add_interaction(elements_json[5], elements_json[1])
-    model.add_interaction(elements_json[5], elements_json[2])
-    model.add_interaction(elements_json[5], elements_json[3])
+    # model.add_interaction(elements_json[5], elements_json[11])
+    # model.add_interaction(elements_json[5], elements_json[13])
+    # model.add_interaction(elements_json[5], elements_json[8])
+    # model.add_interaction(elements_json[5], elements_json[4])
+    # model.add_interaction(elements_json[5], elements_json[0])
+    # model.add_interaction(elements_json[5], elements_json[1])
+    # model.add_interaction(elements_json[5], elements_json[2])
+    # model.add_interaction(elements_json[5], elements_json[3])
 
-    model.add_interaction(elements_json[22], elements_json[16])
-    model.add_interaction(elements_json[22], elements_json[14])
-    model.add_interaction(elements_json[22], elements_json[17])
-    model.add_interaction(elements_json[22], elements_json[21])
-    model.add_interaction(elements_json[22], elements_json[23])
-    model.add_interaction(elements_json[22], elements_json[24])
-    model.add_interaction(elements_json[22], elements_json[20])
-    model.add_interaction(elements_json[22], elements_json[19])
+    # model.add_interaction(elements_json[22], elements_json[16])
+    # model.add_interaction(elements_json[22], elements_json[14])
+    # model.add_interaction(elements_json[22], elements_json[17])
+    # model.add_interaction(elements_json[22], elements_json[21])
+    # model.add_interaction(elements_json[22], elements_json[23])
+    # model.add_interaction(elements_json[22], elements_json[24])
+    # model.add_interaction(elements_json[22], elements_json[20])
+    # model.add_interaction(elements_json[22], elements_json[19])
 
     # collumns connections
     geometry = model.get_interactions_as_lines()
+    model.print()
 
 # ==========================================================================
 # VIEW2
 # ==========================================================================
 # model.print()
 # print(model._interactions)
-Viewer.show_elements(elements_json, show_grid=True, scale=0.001, geometry=geometry)
+# Viewer.show_elements(elements_json, show_grid=True, scale=0.001, geometry=geometry)
+ViewerModel.run(model)

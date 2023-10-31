@@ -28,6 +28,7 @@ import compas_assembly2
 from compas_assembly2.joint import Joint
 from math import fabs
 from compas.data import json_load
+from collections import OrderedDict
 
 try:
     from shapely.geometry import Polygon as ShapelyPolygon
@@ -213,6 +214,80 @@ class Element(Data):
         # --------------------------------------------------------------------------
         self.aabb(0.00)
         self.oobb(0.00)
+
+    # ==========================================================================
+    # DISPLAY
+    # ==========================================================================
+    @property
+    def display_schema(self):
+        """Display schema of the element.
+
+        Returns
+        -------
+        dict
+            The display schema of the element.
+
+        """
+        ordered_dict = OrderedDict(
+            [
+                (
+                    "simplex",
+                    {
+                        "color": [0.0, 0.0, 0.0],
+                        "opacity": 1.0,
+                        "edges": True,
+                        "is_visible": False,
+                    },
+                ),
+                (
+                    "complex",
+                    {
+                        "color": [0.0, 0.0, 0.0],
+                        "opacity": 0.75,
+                        "edges": True,
+                        "is_visible": False,
+                    },
+                ),
+                (
+                    "frame",
+                    {
+                        "color": [0.0, 0.0, 0.0],
+                        "opacity": 1.0,
+                        "edges": True,
+                        "is_visible": False,
+                    },
+                ),
+                (
+                    "aabb_mesh",
+                    {
+                        "color": [0.0, 0.0, 0.0],
+                        "opacity": 0.25,
+                        "edges": True,
+                        "is_visible": False,
+                    },
+                ),
+                (
+                    "oobb_mesh",
+                    {
+                        "color": [0.0, 0.0, 0.0],
+                        "opacity": 0.25,
+                        "edges": True,
+                        "is_visible": False,
+                    },
+                ),
+                (
+                    "convex_hull",
+                    {
+                        "color": [0.0, 0.0, 0.0],
+                        "opacity": 0.25,
+                        "edges": True,
+                        "is_visible": False,
+                    },
+                ),
+            ]
+        )
+
+        return ordered_dict
 
     # ==========================================================================
     # SERIALIZATION
@@ -629,6 +704,25 @@ class Element(Data):
     # ==========================================================================
     # METHODS - COLLIDE
     # ==========================================================================
+    @property
+    def aabb_mesh(self):
+        """Compute axis-aligned-bounding-box of all objects"""
+        aabb = self.aabb()
+        aabb_mesh = Mesh.from_vertices_and_faces(
+            aabb,
+            [[0, 1, 2, 3], [4, 5, 6, 7], [0, 1, 5, 4], [1, 2, 6, 5], [2, 3, 7, 6], [3, 0, 4, 7]],
+        )
+        return aabb_mesh
+
+    @property
+    def oobb_mesh(self):
+        """Compute axis-aligned-bounding-box of all objects"""
+        oobb = self.oobb()
+        oobb_mesh = Mesh.from_vertices_and_faces(
+            oobb,
+            [[0, 1, 2, 3], [4, 5, 6, 7], [0, 1, 5, 4], [1, 2, 6, 5], [2, 3, 7, 6], [3, 0, 4, 7]],
+        )
+        return oobb_mesh
 
     def aabb(self, inflate=0.00):
         """Compute bounding box based on complex geometries points"""
