@@ -51,6 +51,12 @@ class ViewerModel:
         ViewerModel.visibility_of_class_properties(viewer, elements_by_type)
 
         # ==========================================================================
+        #  Display adjacency
+        # ==========================================================================
+        interactions = model.get_interactions_as_readable_info()
+        ViewerModel.adjacency(viewer, interactions)
+
+        # ==========================================================================
         # run the viewer
         # ==========================================================================
         viewer.show()
@@ -144,5 +150,61 @@ class ViewerModel:
                     viewer.view.update()
 
     @classmethod
-    def adjacency(cls, viewer):
-        pass
+    def adjacency(cls, viewer, interactions):
+
+        print("adjacency form")
+
+
+        # Define the function that will be called when an item is pressed
+        def select(self, entry):
+            # print(self, entry)
+            viewer.selector.reset()
+            entry["data"][0].is_selected = True
+            entry["data"][1].is_selected = True
+            viewer.view.update()
+
+
+        # # Create the data
+        data = []
+
+        # for i in range(10):
+        #     obj1 = viewer.add(basic_box.transformed(Translation.from_vector((i, 0, 0))))
+        #     obj2 = viewer.add(basic_box.transformed(Translation.from_vector((i, 1, 0))))
+        #     data.append({"object1": i, "object2": 2 * i, "on_item_pressed": select, "data": [obj1, obj2]})
+
+        # Add the treeform
+        treeform2 = viewer.treeform("Objects", location="left", data=data, show_headers=True, columns=["object1", "object2"])
+
+        # tabs = [
+        #     {
+        #         "name": "adjancency",
+        #         "data": [
+        #             {
+        #                 "node_0": "a",
+        #                 "node_1": 1,
+        #             },
+        #             {
+        #                 "node_0": "b",
+        #                 "node_1": 2,
+        #             },
+        #             {
+        #                 "node_0": "c",
+        #                 "node_1": 3,
+        #             },
+        #         ],
+        #     },
+        # ]
+
+        # if(isinstance(adjacency, list)):
+        
+
+        # treeform2 = viewer.tabsform(
+        #     "Adjacency Form",
+        #     location="left",
+        #     tabs=tabs,
+        #     show_headers=True,
+        #     columns=["node_0", "node_1"],
+        #     striped_rows=True,
+        # )
+
+        

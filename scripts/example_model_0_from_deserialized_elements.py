@@ -87,7 +87,9 @@ if __name__ == "__main__":
 
     # collumns connections
     geometry = model.get_interactions_as_lines()
-    model.print()
+    interactions = model.get_interactions_as_readable_info()
+    print(interactions)
+    # model.print()
 
 # ==========================================================================
 # VIEW2
