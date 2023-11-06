@@ -2,8 +2,16 @@ from compas.geometry import (
     Scale,
 )
 
-from compas_view2.objects import MeshObject
-from compas_view2.collections import Collection
+
+try:
+    from compas_view2.app import App
+    from compas_view2.collections import Collection
+    from compas_view2.objects import MeshObject
+
+    compas_view2_imported = True
+except ImportError:
+    print("compas_view2 is not installed. Skipping the code. ---> Use pip install compas_view <---")
+    compas_view2_imported = False
 
 
 class ViewerModel:
@@ -17,12 +25,7 @@ class ViewerModel:
         # --------------------------------------------------------------------------
         # import viwer library
         # --------------------------------------------------------------------------
-
-        try:
-            from compas_view2.app import App
-
-        except ImportError:
-            print("compas_view2 is not installed. Skipping the code. ---> Use pip install compas_view <---")
+        if not compas_view2_imported:
             return
 
         # --------------------------------------------------------------------------
