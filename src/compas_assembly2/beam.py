@@ -2,7 +2,7 @@ import math
 
 from compas.datastructures import Mesh
 from compas.geometry import Box
-from compas.geometry import Brep
+# from compas.geometry import Brep
 from compas.geometry import Frame
 from compas.geometry import Line
 from compas.geometry import Plane

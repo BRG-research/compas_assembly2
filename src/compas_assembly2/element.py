@@ -84,7 +84,7 @@ class Element(Data):
     Examples
     --------
         >>> element = Element("BLOCK", 0, Frame.worldXY(), Point(0,0,0), \
-                            Box(Frame.worldXY(), 1.0, 2.0, 3.0), \
+                            Box(frame=Frame([3, 0, 0], [0.866, 0.1, 0.0], [0.5, 0.866, 0.0]), xsize=2, ysize=4, zsize=0.25), \
                             [Vector(0, 0, 1), 0])
     """
 
@@ -233,25 +233,31 @@ class Element(Data):
                 (
                     "simplex",
                     {
-                        "color": [0.0, 0.0, 0.0],
+                        "facecolor": [0.0, 0.0, 0.0],
+                        "linecolor": [0.0, 0.0, 0.0],
+                        "linewidth": 3,
                         "opacity": 1.0,
                         "edges": True,
-                        "is_visible": False,
+                        "is_visible": True,
                     },
                 ),
                 (
                     "complex",
                     {
-                        "color": [0.0, 0.0, 0.0],
+                        "facecolor": [0.85, 0.85, 0.85],
+                        "linecolor": [0.0, 0.0, 0.0],
+                        "linewidth": 1,
                         "opacity": 0.75,
-                        "edges": True,
-                        "is_visible": False,
+                        "edges": False,
+                        "is_visible": True,
                     },
                 ),
                 (
                     "frame",
                     {
-                        "color": [0.0, 0.0, 0.0],
+                        "facecolor": [0.0, 0.0, 0.0],
+                        "linecolor": [1.0, 1.0, 1.0],
+                        "linewidth": 1,
                         "opacity": 1.0,
                         "edges": True,
                         "is_visible": False,
@@ -260,7 +266,9 @@ class Element(Data):
                 (
                     "aabb_mesh",
                     {
-                        "color": [0.0, 0.0, 0.0],
+                        "facecolor": [0.0, 0.0, 0.0],
+                        "linecolor": [1.0, 1.0, 1.0],
+                        "linewidth": 1,
                         "opacity": 0.25,
                         "edges": True,
                         "is_visible": False,
@@ -269,7 +277,9 @@ class Element(Data):
                 (
                     "oobb_mesh",
                     {
-                        "color": [0.0, 0.0, 0.0],
+                        "facecolor": [0.0, 0.0, 0.0],
+                        "linecolor": [1.0, 1.0, 1.0],
+                        "linewidth": 1,
                         "opacity": 0.25,
                         "edges": True,
                         "is_visible": False,
@@ -278,7 +288,9 @@ class Element(Data):
                 (
                     "convex_hull",
                     {
-                        "color": [0.0, 0.0, 0.0],
+                        "facecolor": [0.0, 0.0, 0.0],
+                        "linecolor": [1.0, 1.0, 1.0],
+                        "linewidth": 1,
                         "opacity": 0.25,
                         "edges": True,
                         "is_visible": False,

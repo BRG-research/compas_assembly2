@@ -168,11 +168,8 @@ class TreeNode(Data):
         ----------
         strategy : {"depthfirst", "breadthfirst"}, optional
             The traversal strategy.
-            Default is ``"depthfirst"``.
-
         order : {"preorder", "postorder"}, optional
             The traversal order. This parameter is only used for depth-first traversal.
-            Default is ``"preorder"``.
 
         Yields
         ------
@@ -210,9 +207,7 @@ class TreeNode(Data):
 
 
 class Tree(Datastructure):
-    """A hierarchical data structure that organizes elements into
-    parent-child relationships. The tree starts from a unique root node,
-    and every node (excluding the root) has exactly one parent.
+    """A hierarchical data structure that organizes elements into parent-child relationships. The tree starts from a unique root node, and every node (excluding the root) has exactly one parent.
 
     Parameters
     ----------
@@ -247,12 +242,12 @@ class Tree(Datastructure):
     >>> branch.add(leaf1)
     >>> branch.add(leaf2)
     >>> print(tree)
-    <Tree with 4 nodes, 1 branches, and 2 leaves>
+    <Tree with 4 nodes>
     >>> tree.print()
     <TreeNode root>
         <TreeNode branch>
-            <TreeNode leaf2>
             <TreeNode leaf1>
+            <TreeNode leaf2>
 
     """
 
@@ -381,11 +376,8 @@ class Tree(Datastructure):
         ----------
         strategy : {"depthfirst", "breadthfirst"}, optional
             The traversal strategy.
-            Default is ``"depthfirst"``.
-
         order : {"preorder", "postorder"}, optional
             The traversal order. This parameter is only used for depth-first traversal.
-            Default is ``"preorder"``.
 
         Yields
         ------

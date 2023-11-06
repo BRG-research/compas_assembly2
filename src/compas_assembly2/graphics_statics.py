@@ -58,7 +58,8 @@ class materials:
 
 def design_loads(live_load, dead_load):
     """Design loads are the maximum loads expected to be produced by the structure's intended use.
-    live_load - loads produced by use and occupancy of the building or other structure and do not include construction or environmental loads such as wind load, snow load, rain load, earthquake load or dead load.
+    live_load - loads produced by use and occupancy of the building or other structure and do not include construction
+    or environmental loads such as wind load, snow load, rain load, earthquake load or dead load.
     dead_load - the static load caused by the weight of the contents, fixtures and fittings of a structure."""
     return live_load * materials.safety_factor_gamma_live_load + dead_load * materials.safety_factor_gamma_dead_load
 
@@ -66,17 +67,18 @@ def design_loads(live_load, dead_load):
 def stiffness_from_force_and_length(N, delta_l):
     """Stiffness is the extent to which an object resists deformation in response to an applied force.
     N - force on the body
-    delta_l - displacement produced by the force along the same degree of freedom (for instance, the change in length of a stretched spring)"""
+    delta_l - displacement produced by the force along the same degree of freedom (for instance, the change in length
+    of a stretched spring)"""
     S = N / delta_l
     return S
 
 
-def stiffness_from_area_length_and_youngs_modulus(E, A, l):
+def stiffness_from_area_length_and_youngs_modulus(E, A, length):
     """Stiffness is the extent to which an object resists deformation in response to an applied force.
     A - cross-sectional area of the body
     l - length of the body
     E - Young's modulus of the material"""
-    S = (E * A) / l
+    S = (E * A) / length
     return S
 
 
@@ -107,7 +109,8 @@ def stress_from_youngs_modulus_and_length_change(E, l1, l0):
 
 
 def strain_from_length_and_original_length(l1, l0):
-    """Strain is the ratio of the change in length of a body to the original length, typically expressed in parts per million.
+    """Strain is the ratio of the change in length of a body to the original length,
+    typically expressed in parts per million.
     l1 - deformed length of the body
     l0 - original length of the body"""
     delta_l = l1 - l0
@@ -116,7 +119,8 @@ def strain_from_length_and_original_length(l1, l0):
 
 
 def ultimate_limit_state(N, A, gamma_M0=1.0):
-    """Ultimate limit state (ULS) is a design criterion used in engineering design which describes the ultimate load a structure must be able to sustain without suffering a structural failure.
+    """Ultimate limit state (ULS) is a design criterion used in engineering design which describes the ultimate load
+    a structure must be able to sustain without suffering a structural failure.
     N - force on the body
     A - cross-sectional area of the body
     gamma_M0 - partial safety factor"""

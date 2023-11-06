@@ -1,6 +1,5 @@
 import rhinoscriptsyntax as rs  # type: ignore https://github.com/mcneel/rhinoscriptsyntax
 import Rhino  # type: ignore
-import compas
 from compas.datastructures import Mesh
 from compas.geometry import (
     Polyline,
@@ -216,7 +215,7 @@ class conversions:
             return plines
 
         # Sort polylines based on bounding box diagonal
-        
+
         diagonals = []
         for i in range(len(plines)):
             pts = bounding_box(plines[i].points)
@@ -224,7 +223,6 @@ class conversions:
 
         diagonals, plines = zip(*sorted(zip(diagonals, plines), reverse=True))
         plines = list(plines)
-        
 
         # orient all polylines to the first outline's plane
         frame_2d = Frame([0, 0, 0], [1, 0, 0], [0, 1, 0])
@@ -235,7 +233,7 @@ class conversions:
 
         for i in range(len(plines)):
             plines[i] = plines[i].transformed(T)
-        
+
         # on the first outline's plane:
         # a) make all polylines orientation anti-clockwise
         # b) split the plines list into two lists: top and bottom, based on the distance to the first outline's plane
@@ -256,11 +254,10 @@ class conversions:
         points1.reverse()
         plines[0] = Polyline(points0)
         plines[1] = Polyline(points1)
-        
+
         # Split plines into top and bottom based on their distance to the origin point
         positions = []
-        
-        
+
         for i in range(len(plines)):
             positions.append(abs(plines[i][0][2]))
 
@@ -502,7 +499,6 @@ for group_id, subsequent_groups in grouped_objects.items():
     # --------------------------------------------------------------------------
     layer_name = subsequent_groups[0].layer_name
     processed_layer_name = process_string(layer_name)
-    #print(processed_layer_name)
 
     # --------------------------------------------------------------------------
     # create objects, the assignment of right properties is dependent on user

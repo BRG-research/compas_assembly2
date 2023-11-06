@@ -822,7 +822,7 @@ class Viewer:
                 ]
 
                 @viewer.button(text="color_by_type")
-                def check_complexes(checked):
+                def color_by_type(checked):
 
                     for obj in viewer_objects["viewer_complexes"]:
                         # Calculate a unique hash for the input string
@@ -841,7 +841,7 @@ class Viewer:
                         viewer.view.update()
 
                 @viewer.button(text="color_grey")
-                def check_complexes(checked):
+                def color_grey(checked):
 
                     for obj in viewer_objects["viewer_complexes"]:
                         obj.facecolor = colors[3]

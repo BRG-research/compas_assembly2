@@ -3,7 +3,6 @@ from collections import OrderedDict
 from compas.datastructures import Graph
 from compas.geometry import bounding_box, Point, Line, Frame, Transformation, Rotation, Translation  # noqa: F401
 from compas_assembly2 import Element, Tree, TreeNode
-from compas.geometry import Line
 
 
 class ModelNode(TreeNode):
@@ -60,8 +59,8 @@ class ModelNode(TreeNode):
         # change the node of the tree and update the node's tree and parent
         # --------------------------------------------------------------------------
         self._children[index] = model_node
-        self._children[index]._tree = self._tree
-        self._children[index]._parent = self
+        self._children[index]._tree = self._tree  # type: ignore
+        self._children[index]._parent = self  # type: ignore
 
     # ==========================================================================
     # element properties and methods - self._elements = OrderedDict()
@@ -111,7 +110,7 @@ class ModelNode(TreeNode):
             # add elements from current node to the base dictionary of Model class
             root = self.tree
             for e in node._elements:
-                root._model.elements[e.guid] = e
+                root._model.elements[e.guid] = e  # type: ignore
 
         node._parent = self
 
@@ -147,7 +146,7 @@ class ModelTree(Tree):
         # --------------------------------------------------------------------------
         # return the node
         # --------------------------------------------------------------------------
-        return self._root._children[index]
+        return self._root._children[index]  # type: ignore
 
     def __setitem__(self, index, model_node):
 
@@ -160,15 +159,15 @@ class ModelTree(Tree):
         # --------------------------------------------------------------------------
         # change the node of the tree and update the node's tree and parent
         # --------------------------------------------------------------------------
-        self._root._children.add(model_node)
-        self._nodes[index]._tree = self
-        self._nodes[index]._parent = self
+        self._root._children.add(model_node)  # type: ignore
+        self._nodes[index]._tree = self  # type: ignore
+        self._nodes[index]._parent = self  # type: ignore
 
         # --------------------------------------------------------------------------
         # if index is 0, then set all properties related to the root node
         # --------------------------------------------------------------------------
         if index == 0:
-            self._root._children = self._nodes[index]
+            self._root._children = self._nodes[index]  # type: ignore
 
     def add(
         self,
@@ -189,17 +188,17 @@ class ModelTree(Tree):
 
             # WARNING: custom implementation, add the node as a root node
             if self.root is not None:
-                self._root.add(node)
-                node._tree = self._root
+                self._root.add(node)  # type: ignore
+                node._tree = self._root  # type: ignore
 
-                for e in node.elements:
-                    self.root.elements[e.guid] = e
+                for e in node.elements:  # type: ignore
+                    self.root.elements[e.guid] = e  # type: ignore
 
                 return node
                 raise ValueError("The tree already has a root node, remove it first.")
 
             self._root = node
-            node._tree = self
+            node._tree = self  # type: ignore
 
         else:
             # add the node as a child of the parent node
@@ -223,7 +222,7 @@ class ModelTree(Tree):
             # check if there are branches with the same name
 
             found = False
-            for b in branch._children:
+            for b in branch._children:  # type: ignore
                 if b.name == str(path_name):
                     node = b
                     found = True
@@ -231,12 +230,12 @@ class ModelTree(Tree):
 
             if found is False:
                 node = ModelNode(name=str(path_name), elements=[])
-                branch.add(node)
+                branch.add(node)  # type: ignore
 
             branch = node
-        print("added element to node: ", node.name, " ", len(node.elements))
-        node._elements.append(element)
-        node.tree.elements[element.guid] = element
+        print("added element to node: ", node.name, " ", len(node.elements))  # type: ignore
+        node._elements.append(element)  # type: ignore
+        node.tree.elements[element.guid] = element  # type: ignore
 
     def __repr__(self):
         return "ModelTree with {} nodes".format(len(list(self.nodes)))
@@ -286,11 +285,11 @@ class ModelTree(Tree):
         """add an interaction between two elements"""
 
         if element0 is not None and element1 is not None:
-            self._interactions.add_edge(element0.guid, element1.guid)
+            self._interactions.add_edge(element0.guid, element1.guid)  # type: ignore
 
     def get_interactions(self):
         """get all interactions between elements"""
-        return list(self._interactions.edges())
+        return list(self._interactions.edges())  # type: ignore
 
     def get_interactions_as_readable_info(self):
         """elements are stored in guid which is not readable,
@@ -299,7 +298,7 @@ class ModelTree(Tree):
         # create dictionary of elements ids
         dict_guid_and_index = {}
         counter = 0
-        for key in self._elements:
+        for key in self._elements:  # type: ignore
             dict_guid_and_index[key] = counter
             counter = counter + 1
 
@@ -308,8 +307,8 @@ class ModelTree(Tree):
         for i in range(len(edges)):
             a = edges[i][0]
             b = edges[i][1]
-            obj0 = self._elements[a].name + " " + str(dict_guid_and_index[a])
-            obj1 = self._elements[b].name + " " + str(dict_guid_and_index[b])
+            obj0 = self._elements[a].name + " " + str(dict_guid_and_index[a])  # type: ignore
+            obj1 = self._elements[b].name + " " + str(dict_guid_and_index[b])  # type: ignore
             readable_edges.append((obj0, obj1))
         return readable_edges
 
@@ -320,8 +319,8 @@ class ModelTree(Tree):
         for i in range(len(edges)):
             a = edges[i][0]
             b = edges[i][1]
-            point0 = self._elements[a].aabb_center()
-            point1 = self._elements[b].aabb_center()
+            point0 = self._elements[a].aabb_center()  # type: ignore
+            point1 = self._elements[b].aabb_center()  # type: ignore
             line = Line(point0, point1)
             lines.append(line)
         return lines
@@ -397,15 +396,15 @@ class Model:
         # --------------------------------------------------------------------------
         # change the node of the tree and update the node's tree and parent
         # --------------------------------------------------------------------------
-        self._hierarchy._root._children.add(model_node)
-        self._hierarchy._nodes[index]._tree = self
-        self._hierarchy._nodes[index]._parent = self
+        self._hierarchy._root._children.add(model_node)  # type: ignore
+        self._hierarchy._nodes[index]._tree = self  # type: ignore
+        self._hierarchy._nodes[index]._parent = self  # type: ignore
 
         # --------------------------------------------------------------------------
         # if index is 0, then set all properties related to the root node
         # --------------------------------------------------------------------------
         if index == 0:
-            self._hierarchy._root._children = self._nodes[index]
+            self._hierarchy._root._children = self._nodes[index]  # type: ignore
 
     def __repr__(self):
         return "Model" + " with {} elements".format(len(list(self.elements)))
@@ -434,7 +433,7 @@ class Model:
             )
 
             if depth == 0:
-                message += " | Dict Elements: " + "{" + str(len(node.tree._elements)) + "}"
+                message += " | Dict Elements: " + "{" + str(len(node.tree._model._elements)) + "}"
 
             print(message)
 
@@ -527,9 +526,9 @@ def create_model_tree():
 
 def create_model_tree_children():
     tree = Model("root")
-    tree._hierarchy.root.add(ModelNode("structure"))
-    tree._hierarchy.root.children[0].add(ModelNode("timber"))
-    tree._hierarchy.root.children[0].add(ModelNode("concrete"))
+    tree._hierarchy.root.add(ModelNode("structure"))  # type: ignore
+    tree._hierarchy.root.children[0].add(ModelNode("timber"))  # type: ignore
+    tree._hierarchy.root.children[0].add(ModelNode("concrete"))  # type: ignore
     tree.print()
     return tree
 
@@ -575,9 +574,9 @@ def create_model_tree_and_elements():
     # create Model
     # ==========================================================================
     model = Model("my_model")  # the root of hierarchy automatically initializes the root node as <my_model>
-    model._hierarchy._root.add(ModelNode("structure"))
-    model._hierarchy._root.children[0].add(ModelNode("timber", elements=[e0, e1, e2, e3]))
-    model._hierarchy._root.children[0].add(ModelNode("concrete", elements=[e4, e5, e6]))
+    model._hierarchy._root.add(ModelNode("structure"))  # type: ignore
+    model._hierarchy._root.children[0].add(ModelNode("timber", elements=[e0, e1, e2, e3]))  # type: ignore
+    model._hierarchy._root.children[0].add(ModelNode("concrete", elements=[e4, e5, e6]))  # type: ignore
     model._hierarchy.print()
     return model
 
@@ -586,6 +585,6 @@ if __name__ == "__main__":
     # tree = create_tree()
     # model_tree = create_model_tree()
     # model_tree = create_model_tree_children()
-    model_tree = create_model_tree_operators()
+    # model_tree = create_model_tree_operators()
     # model_tree = create_model_tree_and_elements()
     pass
