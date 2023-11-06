@@ -10,7 +10,7 @@ try:
 
     compas_view2_imported = True
 except ImportError:
-    print("compas_view2 is not installed. Skipping the code. ---> Use pip install compas_view <---")
+    print("WARNING: compas_view2 is not installed!!!")
     compas_view2_imported = False
 
 
