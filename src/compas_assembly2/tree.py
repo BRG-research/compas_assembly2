@@ -235,8 +235,7 @@ class Tree(Datastructure):
 
     Examples
     --------
-    >>> from compas.datastructures import Tree, TreeNode
-    >>> tree = Tree()
+    >>> tree = Tree(name='tree')
     >>> root = TreeNode('root')
     >>> branch = TreeNode('branch')
     >>> leaf1 = TreeNode('leaf1')
