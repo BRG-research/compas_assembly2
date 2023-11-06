@@ -168,8 +168,11 @@ class TreeNode(Data):
         ----------
         strategy : {"depthfirst", "breadthfirst"}, optional
             The traversal strategy.
+            Default is ``"depthfirst"``.
+
         order : {"preorder", "postorder"}, optional
             The traversal order. This parameter is only used for depth-first traversal.
+            Default is ``"preorder"``.
 
         Yields
         ------
@@ -232,7 +235,8 @@ class Tree(Datastructure):
 
     Examples
     --------
-    >>> tree = Tree(name="my_name")
+    >>> from compas.datastructures import Tree, TreeNode
+    >>> tree = Tree()
     >>> root = TreeNode('root')
     >>> branch = TreeNode('branch')
     >>> leaf1 = TreeNode('leaf1')
@@ -376,8 +380,11 @@ class Tree(Datastructure):
         ----------
         strategy : {"depthfirst", "breadthfirst"}, optional
             The traversal strategy.
+            Default is ``"depthfirst"``.
+
         order : {"preorder", "postorder"}, optional
             The traversal order. This parameter is only used for depth-first traversal.
+            Default is ``"preorder"``.
 
         Yields
         ------
