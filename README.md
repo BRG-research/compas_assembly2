@@ -1,5 +1,7 @@
 # compas_assembly2
 
+This package use compas>=2.0.0a1.
+
 ## TODO
 
 - [ ] When adding assemblies or elements all the parents must have child and grandchilnders elements
