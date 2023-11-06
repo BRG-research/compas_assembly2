@@ -3,6 +3,7 @@ import math
 from compas.datastructures import Mesh
 from compas.geometry import Box
 # from compas.geometry import Brep
+
 from compas.geometry import Frame
 from compas.geometry import Line
 from compas.geometry import Plane
@@ -118,9 +119,9 @@ def _create_mesh_shape(xsize, ysize, zsize):
     return Mesh.from_vertices_and_faces(*box.to_vertices_and_faces(True))
 
 
-def _create_brep_shape(xsize, ysize, zsize):
-    box = _create_box(Frame.worldXY(), xsize, ysize, zsize)
-    return Brep.from_box(box)
+# def _create_brep_shape(xsize, ysize, zsize):
+#     box = _create_box(Frame.worldXY(), xsize, ysize, zsize)
+#     return Brep.from_box(box)
 
 
 class Beam(Element):
@@ -185,7 +186,7 @@ class Beam(Element):
 
     SHAPE_FACTORIES = {
         "mesh": _create_mesh_shape,
-        "brep": _create_brep_shape,
+        # "brep": _create_brep_shape,
     }
 
     def __init__(self, frame, length, width, height, geometry_type, **kwargs):

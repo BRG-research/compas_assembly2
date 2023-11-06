@@ -207,7 +207,8 @@ class TreeNode(Data):
 
 
 class Tree(Datastructure):
-    """A hierarchical data structure that organizes elements into parent-child relationships. The tree starts from a unique root node, and every node (excluding the root) has exactly one parent.
+    """A hierarchical data structure that organizes elements into parent-child relationships.
+    The tree starts from a unique root node, and every node (excluding the root) has exactly one parent.
 
     Parameters
     ----------

@@ -84,7 +84,9 @@ class Element(Data):
     Examples
     --------
         >>> element = Element("BLOCK", 0, Frame.worldXY(), Point(0,0,0), \
-                            Box(frame=Frame([3, 0, 0], [0.866, 0.1, 0.0], [0.5, 0.866, 0.0]), xsize=2, ysize=4, zsize=0.25), \
+                            Box( \
+                                frame=Frame([3, 0, 0], [0.866, 0.1, 0.0], [0.5, 0.866, 0.0]), \
+                                xsize=2, ysize=4, zsize=0.25), \
                             [Vector(0, 0, 1), 0])
     """
 
