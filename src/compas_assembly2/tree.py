@@ -232,7 +232,7 @@ class Tree(Datastructure):
 
     Examples
     --------
-    >>> tree = Tree()
+    >>> tree = Tree(name="my_name")
     >>> root = TreeNode('root')
     >>> branch = TreeNode('branch')
     >>> leaf1 = TreeNode('leaf1')
