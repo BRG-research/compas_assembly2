@@ -25,7 +25,6 @@ from compas.geometry import (
 from compas.datastructures import Mesh, mesh_bounding_box
 import copy
 import compas_assembly2
-from compas_assembly2.joint import Joint
 from math import fabs
 from compas.data import json_load
 from collections import OrderedDict
@@ -1178,7 +1177,7 @@ class Element(Data):
                 polygon = to_compas_polygon(matrix, intersection)
 
                 # construct joint
-                joint = Joint(
+                joint = compas_assembly2.Joint(
                     type=compas_assembly2.JOINT_NAME.FACE_TO_FACE,
                     polygon=polygon,
                     frame=self.face_frames[id_0],

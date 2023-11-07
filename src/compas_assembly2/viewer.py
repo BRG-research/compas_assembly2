@@ -5,7 +5,7 @@ from compas.geometry import (
     Line,
     Vector,
     Pointcloud,
-    Transformation,
+    # Transformation,
     Translation,
     Frame,
     Quaternion,
@@ -13,7 +13,8 @@ from compas.geometry import (
 )
 from compas.datastructures import Mesh
 from compas.colors import Color
-from compas_assembly2.fabrication import FABRICATION_TYPES
+
+# from compas_assembly2.fabrication import FABRICATION_TYPES
 import math
 import time
 
@@ -684,12 +685,12 @@ class Viewer:
                     # try to find fabrication data in the name of nesting
                     # this matrix will be then applied to multiple objects
                     dict_matrices = {}
-                    for id, element in enumerate(elements):
-                        for key, value in element.fabrication.items():
-                            if key == FABRICATION_TYPES.NESTING:
-                                target_frame = interpolate_frames(value.frames[0], value.frames[1], t / 100)
-                                compas_matrix = Transformation.from_frame_to_frame(value.frames[0], target_frame)
-                                dict_matrices[element.guid] = compas_matrix.matrix
+                    # for id, element in enumerate(elements):
+                    #     for key, value in element.fabrication.items():
+                    #         if key == FABRICATION_TYPES.NESTING:
+                    #             target_frame = interpolate_frames(value.frames[0], value.frames[1], t / 100)
+                    #             compas_matrix = Transformation.from_frame_to_frame(value.frames[0], target_frame)
+                    #             dict_matrices[element.guid] = compas_matrix.matrix
 
                     # change positions of elements
                     if dict_matrices:
