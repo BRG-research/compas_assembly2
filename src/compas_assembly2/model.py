@@ -2,6 +2,10 @@ from collections import OrderedDict
 from compas.datastructures import Graph
 from compas.geometry import Line  # noqa: F401
 from compas_assembly2 import Tree, TreeNode
+from copy import deepcopy
+
+# ToDo:
+# replace an element in the graph
 
 
 class ModelNode(TreeNode):
@@ -125,8 +129,16 @@ class ModelNode(TreeNode):
             # Remove all elements from the current node
             node.remove_all_elements_from_the_current_node()
         """
+
+        # remove elements from the element dictionary
         for e in self._elements:
             del self.tree._model._elements[e.guid]  # type: ignore
+
+        # remove the node from the graph
+        for e in self._elements:
+            self.tree._model._interactions.delete_node(e.guid)  # type: ignore
+
+        # clear the current node list of elements
         self._elements.clear()
 
     def remove_all_children_from_the_current_node(self):
@@ -166,6 +178,7 @@ class ModelNode(TreeNode):
         """
         for e in modelnode._elements:
             self.tree._model._elements[e.guid] = e  # type: ignore
+            self.tree._model.add_interaction_node(e)  # type: ignore
 
         for childnode in modelnode._children:
             childnode.add_elements_to_the_model_dictionary(childnode)
@@ -173,6 +186,7 @@ class ModelNode(TreeNode):
     def __setitem__(self, index, modelnode):
         """
         Set the child element at the specified index to the given ModelNode.
+        WARNING: if the interactions property has edges, they are not updated
 
         This method allows you to replace a child element at the specified index with the provided ModelNode.
 
@@ -198,11 +212,9 @@ class ModelNode(TreeNode):
         if not isinstance(index, int):
             raise TypeError("The index must be an integer")
 
-        print("ModelNode setter is called")
         # --------------------------------------------------------------------------
         # Step 1 - remove elements from the old node and the Model _elements dictionary
         # --------------------------------------------------------------------------
-        print(self.name)
         self._children[index].remove_all_elements_from_the_current_node()
 
         # --------------------------------------------------------------------------
@@ -267,6 +279,7 @@ class ModelNode(TreeNode):
     def set_element(self, index, other_element):
         """
         Set the element of the current node to the given element.
+        WARNING: if the interactions property has edges, they are not updated
 
         Parameters:
             other_element: The element to set for the current node.
@@ -287,6 +300,13 @@ class ModelNode(TreeNode):
         # then add the new element to the Model _elements dictionary
         # --------------------------------------------------------------------------
         self.tree._model.elements[other_element.guid] = other_element  # type: ignore
+
+        # --------------------------------------------------------------------------
+        # then apdate the graph
+        # --------------------------------------------------------------------------
+
+        self.tree._model._interactions.delete_node(self._elements[index].guid)  # type: ignore
+        self.tree._model._interactions.add_node(other_element.guid)  # type: ignore
 
         # --------------------------------------------------------------------------
         # then update the element in the current node
@@ -392,6 +412,10 @@ class ModelNode(TreeNode):
             root = self.tree
             for e in node._elements:
                 root._model.elements[e.guid] = e  # type: ignore
+
+            # add the node to the graph
+            for e in node._elements:
+                root._model.add_interaction_node(e)  # type: ignore
 
             node._parent = self
 
@@ -750,7 +774,6 @@ class ModelTree(Tree):
         # --------------------------------------------------------------------------
         # return the node
         # --------------------------------------------------------------------------
-        print("ModelTree getter is called")
         return self._root._children[index]  # type: ignore
 
     def __setitem__(self, index, model_node):
@@ -987,7 +1010,6 @@ class Model:
             element_guid = element_copy.guid
             self.elements[element_guid] = element_copy
             self.add_interaction_node(element_copy)
-            #print("added node", element_guid, "to the graph")
             return element_copy
 
     # ==========================================================================
@@ -1105,7 +1127,9 @@ class Model:
 
         This method prints all elements in the model to the console.
         """
-        print("================================== {} ===================================".format(self.interactions.name))
+        print(
+            "================================== {} ===================================".format(self.interactions.name)
+        )
         graph_nodes = list(self._interactions.nodes())
         for idx, e in enumerate(self._elements):
             print("element_guid: " + str(self._elements[e].guid) + " graph_node: " + str(graph_nodes[idx]))
@@ -1116,14 +1140,13 @@ class Model:
 
         This method prints all interactions between elements in the model to the console.
         """
-        print("================================== {} ===================================".format(self.interactions.name))
+        print(
+            "================================== {} ===================================".format(self.interactions.name)
+        )
         edges = list(self._interactions.edges())
         for i in range(len(edges)):
             a = edges[i][0]
             b = edges[i][1]
-            print(a, " ", b)
-            #print("nodes", a, b)
-            #error here the elements guids are not the as graph eded guids
             print("print_interactions ", self._elements[a].guid, " ", self._elements[b].guid)
 
     # ==========================================================================
@@ -1297,8 +1320,11 @@ class Model:
             + "<"
             + name
             + ">"
-            + " with {} elements, {} children, {} interactions".format(
-                self.number_of_elements, self.number_of_childs_in_hierarchy, self.number_of_edges
+            + " with {} elements, {} children, {} interactions, {} nodes".format(
+                self.number_of_elements,
+                self.number_of_childs_in_hierarchy,
+                self.number_of_edges,
+                self._interactions.number_of_nodes(),
             )
         )
 
@@ -1312,16 +1338,8 @@ class Model:
             A user-friendly string containing information about the model,
             including its name, number of elements, child nodes, and interactions.
         """
-        name = self._hierarchy.name
-        return (
-            "Model "
-            + "<"
-            + name
-            + ">"
-            + " with {} elements, {} children, {} interactions".format(
-                self.number_of_elements, self.number_of_childs_in_hierarchy, self.number_of_edges
-            )
-        )
+
+        return self.__repr__()
 
     def print(self):
         """
@@ -1371,10 +1389,19 @@ class Model:
     # copy model
     # ==========================================================================
     def copy(self):
-        pass
+        """copy the model"""
+        return deepcopy(self)
 
     def transform(self, transformation):
-        pass
+        """transform the model"""
+        for e in self._elements.values():
+            e.transform(transformation)
+
+    def transformed(self, transformation):
+        """transform the copy of the model"""
+        copy = self.copy()
+        copy.transform(transformation)
+        return copy
 
     # ==========================================================================
     # merge models

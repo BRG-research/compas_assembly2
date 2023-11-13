@@ -64,20 +64,21 @@ def create_model_tree_operators():
     model._hierarchy[0].add(ModelNode("timber", elements=[e0, e1, e2, e3]))
     model._hierarchy[0].add(ModelNode("concrete", elements=[e4, e5, e6]))
 
-    # ==========================================================================
-    # get ModelNode by index
-    # ==========================================================================
-    model._hierarchy[0]
+    # # ==========================================================================
+    # # get ModelNode by index
+    # # ==========================================================================
+    # model._hierarchy[0]
 
-    # # ==========================================================================
-    # # set ModelNode by index
-    # # ==========================================================================
+    # # # ==========================================================================
+    # # # set ModelNode by index
+    # # # ==========================================================================
     model._hierarchy[0][0] = ModelNode("concrete2", elements=[e2, e2, e2, e2, e2])
 
-    # ==========================================================================
-    # get and set ModelNode element by index
-    # ==========================================================================
+    # # ==========================================================================
+    # # get and set ModelNode element by index
+    # # ==========================================================================
     model.hierarchy[0][0].set_element(0, e8)
+    print(model)
 
     # ==========================================================================
     # get aModelNode element by index, you can also using call operator
@@ -144,8 +145,8 @@ def merge_models_different_structure():
     model1._hierarchy._root.children[0].add(ModelNode("concrete1", elements=[e2]))  # type: ignore
     model1.add_interaction(e0, e1)
     model1.add_interaction(e0, e2)
-    #model1.print_elements()
-    #model1.print_interactions()
+    # model1.print_elements()
+    # model1.print_interactions()
 
     # ==========================================================================
     # create Model2
@@ -153,12 +154,12 @@ def merge_models_different_structure():
     model2 = Model("my_model2")  # the root of hierarchy automatically initializes the root node as <my_model>
     model2._hierarchy._root.add(ModelNode("structure1"))  # type: ignore
     model2._hierarchy._root.children[0].add(ModelNode("timber1", elements=[e3, e4]))  # type: ignore
-    model2._hierarchy._root.children[0].add(ModelNode("concrete1", elements=[e5, e6]))  # type: ignore
+    model2._hierarchy._root.children[0].add(ModelNode("concrete2", elements=[e5, e6]))  # type: ignore
     model2.add_interaction(e3, e4)
     model2.add_interaction(e3, e5)
     model2.add_interaction(e5, e6)
-    #model2.print_elements()
-    #model2.print_interactions()
+    # model2.print_elements()
+    # model2.print_interactions()
 
     # ==========================================================================
     # merge models
@@ -180,11 +181,11 @@ def copy_model():
 def when_elements_are_removed_or_replaced_the_graph_nodes_must_be_updated():
     pass
 
+
 if __name__ == "__main__":
     # tree = create_tree()
     # model_tree = create_model_tree()
     # model_tree = create_model_tree_children()
-    # model_tree = create_model_tree_operators()
-    # model_tree.interactions.number_of_edges()
+    model_tree = create_model_tree_operators()
     # print(model_tree)
-    merge_models_different_structure()
+    # merge_models_different_structure()
