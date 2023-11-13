@@ -530,7 +530,7 @@ class ModelTree(Tree):
     def data(self):
         return {
             "name": self.name,
-            "root": self.root.data,
+            "root": self.root.data,  # type: ignore
             "attributes": self.attributes,
         }
 
@@ -1099,6 +1099,11 @@ class Model(Data):
         element : Element
             The element to be added to the model.
 
+        Returns
+        -------
+        Element
+            The added element.
+
         Example
         -------
         model = Model()
@@ -1493,7 +1498,48 @@ class Model(Data):
     # ==========================================================================
     def copy(self):
         """copy the model"""
-        return deepcopy(self)
+
+        # --------------------------------------------------------------------------
+        # create the empty model
+        # --------------------------------------------------------------------------
+        copy = Model(name=self.name)
+
+        # --------------------------------------------------------------------------
+        # copy the elements
+        # --------------------------------------------------------------------------
+        dict_old_guid_and_new_element = {}
+        for e in self._elements.values():
+            dict_old_guid_and_new_element[str(e.guid)] = copy.add_element(e, True)
+
+        # --------------------------------------------------------------------------
+        # copy the hierarchy
+        # --------------------------------------------------------------------------
+        def copy_nodes(main_node_childs, other_node_childs):
+
+            # recursively copy nodes
+            for idx, other_node_child in enumerate(other_node_childs):
+
+                # copy the child elements
+                elements_copied = []
+                for element in main_node_childs[idx].elements:
+                    elements_copied.append(dict_old_guid_and_new_element[str(element.guid)])
+
+                copy._hierarchy.add(ModelNode(name=main_node_childs[idx].name, elements=elements_copied))
+
+                # recursively copy nodes
+                copy_nodes(main_node_childs[idx].children, other_node_child.children)
+
+        copy_nodes(self._hierarchy.root.children, self._hierarchy.root.children)  # type: ignore
+
+        # --------------------------------------------------------------------------
+        # copy the interactions, nodes should be added previously
+        # --------------------------------------------------------------------------
+        for edge in self._interactions.edges():
+            node0 = dict_old_guid_and_new_element[edge[0]]
+            node1 = dict_old_guid_and_new_element[edge[1]]
+            copy.add_interaction(node0, node1)
+
+        return copy
 
     def transform(self, transformation):
         """transform the model"""
@@ -1521,7 +1567,7 @@ class Model(Data):
         for element in other_model.elements.values():
             old_guid = str(element.guid)
             added_element = self.add_element(element, True)
-            dict_old_guid_and_new_guid[old_guid] = str(added_element.guid)
+            dict_old_guid_and_new_guid[old_guid] = str(added_element.guid)  # type: ignore
             dict_old_guid_and_new_element[old_guid] = added_element
 
         # --------------------------------------------------------------------------
@@ -1575,4 +1621,4 @@ class Model(Data):
                 if found is False:
                     main_node_childs.append(other_node_child)
 
-        add_nodes(self._hierarchy.root.children, other_model._hierarchy.root.children)
+        add_nodes(self._hierarchy.root.children, other_model._hierarchy.root.children)  # type: ignore

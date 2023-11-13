@@ -275,16 +275,18 @@ def copy_model():
     model = Model("my_model")  # the root of hierarchy automatically initializes the root node as <my_model>
     model._hierarchy.add(model_node_0)
     model._hierarchy.add(model_node_1)
+    model.add_interaction(e0, e1)
 
     print("BEFORE COPY")
     model.print()
-
+    model.print_interactions()
     # ==========================================================================
     # copy the model
     # ==========================================================================
     print("AFTER COPY")
     model_copy = model.copy()
     model_copy.print()
+    model_copy.print_interactions()
 
 
 def when_elements_are_removed_or_replaced_the_graph_nodes_must_be_updated():
