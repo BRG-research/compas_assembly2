@@ -363,7 +363,7 @@ class ModelNode(TreeNode):
                 self.tree._model._elements[element.guid] = element
 
                 # add the node to the graph
-                self.tree._model._interactions.add_node(element.guid)
+                self.tree._model.add_interaction_node(element)
 
     # ==========================================================================
     # interactions properties and methods - self._interactions = Graph()
@@ -947,14 +947,19 @@ class Model:
         # --------------------------------------------------------------------------
         # Depending on whether the condition is met, add elements to the tree or make individual copies.
         # --------------------------------------------------------------------------
+        added_elements = []
         for element in user_elements:
             if not all_elements_are_unique:
                 element_copy = element.copy()
                 self.add_element(element_copy)
+                added_elements.append(element_copy)
             else:
                 self.add_element(element)
+                added_elements.append(element)
 
-    def add_element(self, element):
+        return added_elements
+
+    def add_element(self, element, copy_element=False):
         """
         Adds an element to the model.
 
@@ -978,12 +983,18 @@ class Model:
         """
 
         if element is not None:
-            self.elements[element.guid] = element
-            self._interactions.add_node(element.guid)
+            element_copy = element.copy() if copy_element else element
+            element_guid = element_copy.guid
+            self.elements[element_guid] = element_copy
+            self.add_interaction_node(element_copy)
+            #print("added node", element_guid, "to the graph")
+            return element_copy
 
     # ==========================================================================
     # interactions properties and methods - self._interactions = Graph()
     # ==========================================================================
+    def add_interaction_node(self, element):
+        self._interactions.add_node(element.guid)
 
     def add_interaction(self, element0, element1):
         """
@@ -1087,6 +1098,33 @@ class Model:
             line = Line(point0, point1)
             lines.append(line)
         return lines
+
+    def print_elements(self):
+        """
+        Print all elements in the model.
+
+        This method prints all elements in the model to the console.
+        """
+        print("================================== {} ===================================".format(self.interactions.name))
+        graph_nodes = list(self._interactions.nodes())
+        for idx, e in enumerate(self._elements):
+            print("element_guid: " + str(self._elements[e].guid) + " graph_node: " + str(graph_nodes[idx]))
+
+    def print_interactions(self):
+        """
+        Print all interactions between elements.
+
+        This method prints all interactions between elements in the model to the console.
+        """
+        print("================================== {} ===================================".format(self.interactions.name))
+        edges = list(self._interactions.edges())
+        for i in range(len(edges)):
+            a = edges[i][0]
+            b = edges[i][1]
+            print(a, " ", b)
+            #print("nodes", a, b)
+            #error here the elements guids are not the as graph eded guids
+            print("print_interactions ", self._elements[a].guid, " ", self._elements[b].guid)
 
     # ==========================================================================
     # operators
@@ -1328,3 +1366,83 @@ class Model:
                 _print(child, depth + 1)
 
         _print(self._hierarchy.root)
+
+    # ==========================================================================
+    # copy model
+    # ==========================================================================
+    def copy(self):
+        pass
+
+    def transform(self, transformation):
+        pass
+
+    # ==========================================================================
+    # merge models
+    # ==========================================================================
+    def merge(self, other_model, copy_elements=False):
+        """merge current model with the other model"""
+
+        # --------------------------------------------------------------------------
+        # merge elements
+        # collect the added elements and their guids, incase they are copied
+        # --------------------------------------------------------------------------
+        dict_old_guid_and_new_guid = {}
+        dict_old_guid_and_new_element = {}
+        for element in other_model.elements.values():
+            old_guid = element.guid
+            added_element = self.add_element(element, True)
+            dict_old_guid_and_new_guid[old_guid] = added_element.guid
+            dict_old_guid_and_new_element[old_guid] = added_element
+
+        # --------------------------------------------------------------------------
+        # merge interactions
+        # add the graph edges based on the new mapping
+        # --------------------------------------------------------------------------
+        other_model_edges = other_model._interactions.edges()
+        for edge in other_model_edges:
+            node0 = dict_old_guid_and_new_element[edge[0]]
+            node1 = dict_old_guid_and_new_element[edge[1]]
+            self.add_interaction(node0, node1)
+
+        # self.print_elements()
+        # self.print_interactions()
+
+        # --------------------------------------------------------------------------
+        # merge hierarchy
+        # replace the elements with the new ones
+        # there can be two cases:
+        # 1. the other model has the same
+        # 2. the other model has similar hierarchy
+        # 3. the other model has a different hierarchy
+        # --------------------------------------------------------------------------
+
+        # step 1 replace the elements with the new ones, incase they are copied
+        def replace_elements(node):
+            for element in node.elements:
+                element = dict_old_guid_and_new_element[element.guid]
+
+            # recursively replace elements
+            for child in node.children:
+                replace_elements(child)
+
+        replace_elements(other_model.hierarchy.root)
+
+        # step 2 add nodes to the tree
+        def add_nodes(main_node_childs, other_node_childs):
+            # step one check if there nodes with the same name, if it is just merge the elements
+
+            for other_node_child in other_node_childs:
+                found = False
+                for idx, main_node_child in enumerate(main_node_childs):
+                    if main_node_child.name == other_node_child.name:
+                        found = True
+                        # add elements from the current node to the base dictionary of Model class
+                        main_node_child._elements = main_node_child.elements + other_node_child.elements
+                        # and recusively repeat the process
+                        add_nodes(main_node_child.children, other_node_child.children)
+                        break
+                # if no matching name was found, add the whole node to the tree
+                if found is False:
+                    main_node_childs.append(other_node_child)
+
+        add_nodes(self._hierarchy.root.children, other_model._hierarchy.root.children)
