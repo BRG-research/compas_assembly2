@@ -2,7 +2,6 @@ from collections import OrderedDict
 from compas.datastructures import Graph
 from compas.geometry import Line  # noqa: F401
 from compas_assembly2 import Tree, TreeNode
-from copy import deepcopy
 from compas.data import json_load, json_dump
 from compas.data import Data
 
