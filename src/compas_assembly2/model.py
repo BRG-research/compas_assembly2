@@ -3,9 +3,12 @@ from compas.datastructures import Graph
 from compas.geometry import Line  # noqa: F401
 from compas_assembly2 import Tree, TreeNode
 from copy import deepcopy
+from compas.data import json_load, json_dump
+from compas.data import Data
 
 # ToDo:
 # replace an element in the graph
+# create a DATASCHEMA for the model
 
 
 class ModelNode(TreeNode):
@@ -33,6 +36,33 @@ class ModelNode(TreeNode):
         # user input - add elements to the current node and base tree model, if it exists
         # --------------------------------------------------------------------------
         self.add_elements(elements)
+
+    # ==========================================================================
+    # Serialization
+    # ==========================================================================
+    @property
+    def data(self):
+        return {
+            "name": self.name,
+            "attributes": self.attributes,
+            "children": [child.data for child in self.children],
+            "elements": self.elements,
+        }
+
+    @classmethod
+    def from_data(cls, data):
+        elements = data["elements"]
+        node = cls(name=data["name"], elements=elements, attributes=data["attributes"])
+        for child in data["children"]:
+            node.add(cls.from_data(child))
+        return node
+
+    def serialize(self, file_path=""):
+        json_dump(data=self, fp=file_path, pretty=True)
+
+    @staticmethod
+    def deserialize(file_path=""):
+        return json_load(fp=file_path)
 
     # ==========================================================================
     # properties
@@ -132,11 +162,11 @@ class ModelNode(TreeNode):
 
         # remove elements from the element dictionary
         for e in self._elements:
-            del self.tree._model._elements[e.guid]  # type: ignore
+            del self.tree._model._elements[str(e.guid)]  # type: ignore
 
         # remove the node from the graph
         for e in self._elements:
-            self.tree._model._interactions.delete_node(e.guid)  # type: ignore
+            self.tree._model._interactions.delete_node(str(e.guid))  # type: ignore
 
         # clear the current node list of elements
         self._elements.clear()
@@ -177,7 +207,7 @@ class ModelNode(TreeNode):
             node.add_elements_to_the_model_dictionary()
         """
         for e in modelnode._elements:
-            self.tree._model._elements[e.guid] = e  # type: ignore
+            self.tree._model._elements[str(e.guid)] = e  # type: ignore
             self.tree._model.add_interaction_node(e)  # type: ignore
 
         for childnode in modelnode._children:
@@ -294,19 +324,19 @@ class ModelNode(TreeNode):
         # --------------------------------------------------------------------------
         # first delete the old element from the Model _elements dictionary
         # --------------------------------------------------------------------------
-        del self.tree._model.elements[self._elements[index].guid]  # type: ignore
+        del self.tree._model.elements[str(self._elements[index].guid)]  # type: ignore
 
         # --------------------------------------------------------------------------
         # then add the new element to the Model _elements dictionary
         # --------------------------------------------------------------------------
-        self.tree._model.elements[other_element.guid] = other_element  # type: ignore
+        self.tree._model.elements[str(other_element.guid)] = other_element  # type: ignore
 
         # --------------------------------------------------------------------------
         # then apdate the graph
         # --------------------------------------------------------------------------
 
-        self.tree._model._interactions.delete_node(self._elements[index].guid)  # type: ignore
-        self.tree._model._interactions.add_node(other_element.guid)  # type: ignore
+        self.tree._model._interactions.delete_node(str(self._elements[index].guid))  # type: ignore
+        self.tree._model._interactions.add_node(str(other_element.guid))  # type: ignore
 
         # --------------------------------------------------------------------------
         # then update the element in the current node
@@ -340,11 +370,11 @@ class ModelNode(TreeNode):
         temp_guid_dict = {}
         all_elements_are_unique = True
         for e in user_elements:
-            if e.guid in temp_guid_dict:
+            if str(e.guid) in temp_guid_dict:
                 all_elements_are_unique = False
                 break
             else:
-                temp_guid_dict[e.guid] = e
+                temp_guid_dict[str(e.guid)] = e
 
         if all_elements_are_unique is False:
             print(
@@ -380,7 +410,7 @@ class ModelNode(TreeNode):
             # if the node is part of a tree, then add elements to the base dictionary of Model class
             if self.tree:
                 # update the root class
-                self.tree._model._elements[element.guid] = element
+                self.tree._model._elements[str(element.guid)] = element
 
                 # add the node to the graph
                 self.tree._model.add_interaction_node(element)
@@ -408,14 +438,16 @@ class ModelNode(TreeNode):
         if node not in self._children:
             self._children.append(node)
 
-            # add elements from the current node to the base dictionary of Model class
-            root = self.tree
-            for e in node._elements:
-                root._model.elements[e.guid] = e  # type: ignore
+            if self.tree is not None:
+                if self.tree._model is not None:
+                    # add elements from the current node to the base dictionary of Model class
+                    root = self.tree
+                    for e in node._elements:
+                        root._model.elements[str(e.guid)] = e  # type: ignore
 
-            # add the node to the graph
-            for e in node._elements:
-                root._model.add_interaction_node(e)  # type: ignore
+                    # add the node to the graph
+                    for e in node._elements:
+                        root._model.add_interaction_node(e)  # type: ignore
 
             node._parent = self
 
@@ -465,7 +497,7 @@ class ModelTree(Tree):
         model_tree = ModelTree(model_instance, name="custom_tree")
     """
 
-    def __init__(self, model, name="root", elements=None, attributes=None):
+    def __init__(self, model, name="root", attributes=None):
         """
         Initialize a new ModelTree instance.
 
@@ -480,6 +512,7 @@ class ModelTree(Tree):
         # --------------------------------------------------------------------------
         # initialize the main properties of the model
         # --------------------------------------------------------------------------
+        self.name = name  # the name of the tree
         self._root = None  # the root ModelNode of the tree
         self._model = model  # variable that points to the model class
 
@@ -487,7 +520,33 @@ class ModelTree(Tree):
         # process the user input
         # --------------------------------------------------------------------------
         self.add(ModelNode(name=name))  # the name can be empty
-        self._model.add_elements(elements)  # elements is a list of Element objects
+        # if self._model is not None:
+        #     self._model.add_elements(elements)  # elements is a list of Element objects
+
+    # ==========================================================================
+    # Serialization
+    # ==========================================================================
+    @property
+    def data(self):
+        return {
+            "name": self.name,
+            "root": self.root.data,
+            "attributes": self.attributes,
+        }
+
+    @classmethod
+    def from_data(cls, data):
+        model_tree = cls(model=None, name=data["name"], attributes=data["attributes"])
+        root = ModelNode.from_data(data["root"])
+        model_tree.add(root)
+        return model_tree
+
+    def serialize(self, file_path=""):
+        json_dump(data=self, fp=file_path, pretty=True)
+
+    @staticmethod
+    def deserialize(file_path=""):
+        return json_load(fp=file_path)
 
     # ==========================================================================
     # hierarchy methods: add ModelNode, add_by_poath
@@ -528,8 +587,9 @@ class ModelTree(Tree):
                 self._root.add(node)  # type: ignore
                 node._tree = self._root  # type: ignore
 
-                for e in node.elements:  # type: ignore
-                    self.root.elements[e.guid] = e  # type: ignore
+                if self._model is not None:
+                    for e in node.elements:  # type: ignore
+                        self._model.elements[str(e.guid)] = e  # type: ignore
 
                 return node
                 raise ValueError("The tree already has a root node, remove it first.")
@@ -539,8 +599,8 @@ class ModelTree(Tree):
 
         else:
             # add the node as a child of the parent node
-            if not isinstance(parent, TreeNode):
-                raise TypeError("The parent node is not a TreeNode object.")
+            if not isinstance(parent, ModelNode):
+                raise TypeError("The parent node is not a ModelNode object.")
 
             if parent.tree is not self:
                 raise ValueError("The parent node is not part of this tree.")
@@ -563,7 +623,7 @@ class ModelTree(Tree):
         """
 
         # add element to the dictionary
-        self._model.elements[element.guid] = element
+        self._model.elements[str(element.guid)] = element
         branch = self.root
 
         node = None
@@ -585,7 +645,7 @@ class ModelTree(Tree):
             branch = node
         print("added element to node: ", node.name, " ", len(node.elements))  # type: ignore
         node._elements.append(element)  # type: ignore
-        node.tree.elements[element.guid] = element  # type: ignore
+        node.tree.elements[str(element.guid)] = element  # type: ignore
 
     # ==========================================================================
     # print statements
@@ -646,7 +706,7 @@ class ModelTree(Tree):
                 + str(node.tree.name)
             )
 
-            if depth == 0:
+            if depth == 0 and node.tree._model is not None:
                 message += " | Dict Elements: " + "{" + str(len(node.tree._model._elements)) + "}"
 
             print(message)
@@ -678,7 +738,7 @@ class ModelTree(Tree):
         """
 
         if element0 is not None and element1 is not None:
-            self._interactions.add_edge(element0.guid, element1.guid)  # type: ignore
+            self._interactions.add_edge(str(element0.guid), str(element1.guid))  # type: ignore
 
     def get_interactions(self):
         """
@@ -827,7 +887,7 @@ class ModelTree(Tree):
             self._root.set_element(index, value)  # type: ignore
 
 
-class Model:
+class Model(Data):
     """
     A class representing a model with elements, hierarchy, and interactions.
 
@@ -865,9 +925,12 @@ class Model:
             copy_elements (bool, optional): If True, elements are copied during initialization; if False, elements are
                 added by reference. Default is False.
         """
+        super(Model, self).__init__()
+
         # --------------------------------------------------------------------------
         # initialize the main properties of the model
         # --------------------------------------------------------------------------
+        self._name = name  # the name of the model
         self._elements = OrderedDict()  # a flat collection of elements - dict{GUID, Element}
         self._hierarchy = ModelTree(self, name)  # hierarchical relationships between elements
         self._interactions = Graph(name=name)  # abstract linkage or connection between elements and nodes
@@ -878,8 +941,48 @@ class Model:
         self.add_elements(elements, copy_elements)  # elements is a list of Element objects
 
     # ==========================================================================
+    # Serialization
+    # ==========================================================================
+    @property
+    def data(self):
+
+        return {
+            "name": self._name,
+            "elements": self._elements,
+            "hierarchy": self._hierarchy.data,
+            "interactions": self._interactions.data,
+        }
+
+    @classmethod
+    def from_data(cls, data):
+        model = cls(data["name"])
+        model._elements = data["elements"]
+        model._hierarchy = ModelTree.from_data(data["hierarchy"])
+        model._hierarchy._model = model  # variable that points to the model class
+        model._interactions = Graph.from_data(data["interactions"])
+        return model
+
+    def serialize(self, file_path=""):
+        json_dump(data=self, fp=file_path, pretty=True)
+
+    @staticmethod
+    def deserialize(file_path=""):
+        return json_load(fp=file_path)
+
+    # ==========================================================================
     # Key property getters
     # ==========================================================================
+    @property
+    def name(self):
+        """
+        Retrieve the name of the model.
+
+        Returns
+        -------
+        str
+            The name of the model.
+        """
+        return self._name
 
     @property
     def elements(self):
@@ -953,11 +1056,11 @@ class Model:
         all_elements_are_unique = True
         if not copy_elements:
             for e in user_elements:
-                if e.guid in temp_guid_dict:
+                if str(e.guid) in temp_guid_dict:
                     all_elements_are_unique = False
                     break
                 else:
-                    temp_guid_dict[e.guid] = e
+                    temp_guid_dict[str(e.guid)] = e
 
             if not all_elements_are_unique:
                 print(
@@ -1007,7 +1110,7 @@ class Model:
 
         if element is not None:
             element_copy = element.copy() if copy_element else element
-            element_guid = element_copy.guid
+            element_guid = str(element_copy.guid)
             self.elements[element_guid] = element_copy
             self.add_interaction_node(element_copy)
             return element_copy
@@ -1016,7 +1119,7 @@ class Model:
     # interactions properties and methods - self._interactions = Graph()
     # ==========================================================================
     def add_interaction_node(self, element):
-        self._interactions.add_node(element.guid)
+        self._interactions.add_node(str(element.guid))
 
     def add_interaction(self, element0, element1):
         """
@@ -1048,7 +1151,7 @@ class Model:
         """
 
         if element0 is not None and element1 is not None:
-            return self._interactions.add_edge(element0.guid, element1.guid)
+            return self._interactions.add_edge(str(element0.guid), str(element1.guid))
 
     def get_interactions(self):
         """
@@ -1147,7 +1250,7 @@ class Model:
         for i in range(len(edges)):
             a = edges[i][0]
             b = edges[i][1]
-            print("print_interactions ", self._elements[a].guid, " ", self._elements[b].guid)
+            print("print_interactions ", str(self._elements[a].guid), " ", str(self._elements[b].guid))
 
     # ==========================================================================
     # operators
@@ -1416,9 +1519,9 @@ class Model:
         dict_old_guid_and_new_guid = {}
         dict_old_guid_and_new_element = {}
         for element in other_model.elements.values():
-            old_guid = element.guid
+            old_guid = str(element.guid)
             added_element = self.add_element(element, True)
-            dict_old_guid_and_new_guid[old_guid] = added_element.guid
+            dict_old_guid_and_new_guid[old_guid] = str(added_element.guid)
             dict_old_guid_and_new_element[old_guid] = added_element
 
         # --------------------------------------------------------------------------
@@ -1446,7 +1549,7 @@ class Model:
         # step 1 replace the elements with the new ones, incase they are copied
         def replace_elements(node):
             for element in node.elements:
-                element = dict_old_guid_and_new_element[element.guid]
+                element = dict_old_guid_and_new_element[str(element.guid)]
 
             # recursively replace elements
             for child in node.children:

@@ -226,7 +226,7 @@ class FABRICATION_TYPES:
 
 from .element import Element  # noqa
 from .tree import Tree, TreeNode  # noqa
-from .model import Model, ModelNode  # noqa
+from .model import Model, ModelTree, ModelNode  # noqa
 from .viewer_model import ViewerModel  # noqa
 from .viewer import Viewer  # noqa
 from .element_types.joint import Joint  # noqa
