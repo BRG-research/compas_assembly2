@@ -5,8 +5,7 @@ from compas_assembly2 import Tree, TreeNode
 from compas.data import json_load, json_dump
 from compas.data import Data
 
-# ToDo:
-# replace an element in the graph
+# To-Do:
 # create a DATASCHEMA for the model
 
 
@@ -318,8 +317,6 @@ class ModelNode(TreeNode):
             node.set_element(other_element)
         """
 
-        print("set_element_method")
-
         # --------------------------------------------------------------------------
         # first delete the old element from the Model _elements dictionary
         # --------------------------------------------------------------------------
@@ -332,10 +329,28 @@ class ModelNode(TreeNode):
 
         # --------------------------------------------------------------------------
         # then apdate the graph
+        # step 1 - get connected edges to the current node
+        # step 2 - replace the node in the edges with the new one - do not need to delete edges
+        # step 3 - delete the node from the graph
+        # step 4 - add the new node to the graph
         # --------------------------------------------------------------------------
+
+        edges = self.tree._model._interactions.connected_edges(str(self._elements[index].guid))  # type: ignore
+        new_edges = []
+
+        for edge in edges:
+            if edge[0] == str(self._elements[index].guid):
+                new_edges.append((str(other_element.guid), edge[1]))
+            elif edge[1] == str(self._elements[index].guid):
+                new_edges.append((edge[0], str(other_element.guid)))
+            else:
+                new_edges.append((edge[0], edge[1]))  # type: ignore
 
         self.tree._model._interactions.delete_node(str(self._elements[index].guid))  # type: ignore
         self.tree._model._interactions.add_node(str(other_element.guid))  # type: ignore
+
+        for edge in new_edges:
+            self.tree._model._interactions.add_edge(edge[0], edge[1])  # type: ignore
 
         # --------------------------------------------------------------------------
         # then update the element in the current node

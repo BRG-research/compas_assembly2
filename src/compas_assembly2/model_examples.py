@@ -64,20 +64,24 @@ def create_model_tree_operators():
     model._hierarchy[0].add(ModelNode("timber", elements=[e0, e1, e2, e3]))
     model._hierarchy[0].add(ModelNode("concrete", elements=[e4, e5, e6]))
 
-    # # ==========================================================================
-    # # get ModelNode by index
-    # # ==========================================================================
-    # model._hierarchy[0]
+    # ==========================================================================
+    # get ModelNode by index
+    # ==========================================================================
+    model._hierarchy[0]
 
-    # # # ==========================================================================
-    # # # set ModelNode by index
-    # # # ==========================================================================
-    model._hierarchy[0][0] = ModelNode("concrete2", elements=[e2, e2, e2, e2, e2])
+    # ==========================================================================
+    # set ModelNode by index
+    # ==========================================================================
+    model._hierarchy[0][1] = ModelNode("concrete2", elements=[e4, e4, e4, e4, e4])
 
-    # # ==========================================================================
-    # # get and set ModelNode element by index
-    # # ==========================================================================
+    # ==========================================================================
+    # get and set ModelNode element by index
+    # ==========================================================================
+    model.add_interaction(e0, e1)
+    model.print_interactions()
     model.hierarchy[0][0].set_element(0, e8)
+    model.print_interactions()
+
     print(model)
 
     # ==========================================================================
@@ -390,11 +394,11 @@ if __name__ == "__main__":
     # tree = create_tree()
     # model_tree = create_model_tree()
     # model_tree = create_model_tree_children()
-    # model_tree = create_model_tree_operators()
+    model_tree = create_model_tree_operators()
     # merge_models_same_structure()
     # merge_models_different_structure()
     # merge_models_similar_structure()
     # serialize_model_node()
     # serialize_model_tree()
     # serialize_model()
-    copy_model()
+    # copy_model()
