@@ -4,7 +4,7 @@ from __future__ import division
 
 from compas.geometry import dot_vectors
 import compas_assembly2
-from compas_assembly2.element import Element
+from compas_assembly2 import Element
 
 
 class Block(Element):

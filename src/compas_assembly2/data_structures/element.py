@@ -26,7 +26,7 @@ from compas.datastructures import Mesh, mesh_bounding_box
 import copy
 import compas_assembly2
 from math import fabs
-from compas.data import json_load
+from compas.data import json_load, json_dump
 from collections import OrderedDict
 
 try:
@@ -384,10 +384,11 @@ class Element(Data):
         # return element
 
     @staticmethod
-    def deserialize(path=""):
-        return json_load(
-            fp="src/compas_assembly2/rhino_commands/rhino_command_convert_to_assembly_floor_0_barrel_vault_hex.json"
-        )
+    def deserialize(file_path=""):
+        return json_load(fp=file_path)
+
+    def serialize(self, file_path=""):
+        json_dump(data=self, fp=file_path, pretty=True)
 
     # ==========================================================================
     # CONSTRUCTOR OVERLOADING

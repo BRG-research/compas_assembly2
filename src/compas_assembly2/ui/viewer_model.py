@@ -48,7 +48,6 @@ class ViewerModel:
         # --------------------------------------------------------------------------
         #  Display adjacency
         # --------------------------------------------------------------------------
-
         ViewerModel.adjacency(viewer, model, elements_by_guid)
 
         # --------------------------------------------------------------------------
@@ -175,25 +174,6 @@ class ViewerModel:
         elements_by_type,
     ):
         """add object to the viewer and apply display options"""
-
-        # --------------------------------------------------------------------------
-        # scale the object
-        # --------------------------------------------------------------------------
-        scale_xform = Scale.from_factors([scale_factor, scale_factor, scale_factor])
-        obj.transform(scale_xform)
-
-        # --------------------------------------------------------------------------
-        # add object to the viewer
-        # ---------------------------------------------------------------------------
-        viewer_obj = viewer.add(
-            obj,
-            name=name,
-            facecolor=display_options["facecolor"],
-            linecolor=display_options["linecolor"],
-            linewidth=display_options["linewidth"],
-            opacity=display_options["opacity"],
-            is_visible=display_options["is_visible"],
-        )
 
         # --------------------------------------------------------------------------
         # hide the lines of the mesh

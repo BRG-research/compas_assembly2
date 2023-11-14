@@ -23,7 +23,7 @@ from compas.geometry import dot_vectors
 from compas.geometry import subtract_vectors
 from compas.geometry import scale_vector
 
-from compas_assembly2.element import Element
+from compas_assembly2 import Element
 
 
 def _close(x, y, tol=1e-12):

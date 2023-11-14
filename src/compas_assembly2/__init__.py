@@ -224,14 +224,14 @@ class FABRICATION_TYPES:
     CUSTOM = "CUSTOM"
 
 
-from .element import Element  # noqa
-from .tree import Tree, TreeNode  # noqa
-from .model import Model, ModelTree, ModelNode  # noqa
-from .viewer_model import ViewerModel  # noqa
-from .viewer import Viewer  # noqa
-from .element_types.joint import Joint  # noqa
-from .element_types.block import Block  # noqa
-from .element_types.beam import Beam  # noqa
+from .data_structures.element import Element  # noqa
+from .data_structures.tree import Tree, TreeNode  # noqa
+from .data_structures.model import Model, ModelTree, ModelNode  # noqa
+from .ui.viewer_model import ViewerModel  # noqa
+from .ui.viewer import Viewer  # noqa
+from .data_structures.element_types.joint import Joint  # noqa
+from .data_structures.element_types.block import Block  # noqa
+from .data_structures.element_types.beam import Beam  # noqa
 
 # from .fabrication import Fabrication  # noqa
 # from .fabrication_nest import FabricationNest  # noqa
