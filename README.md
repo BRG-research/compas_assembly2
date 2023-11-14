@@ -4,19 +4,11 @@ This package use compas>=2.0.0a1.
 
 ## TODO
 
-- [ ] When adding assemblies or elements all the parents must have child and grandchilnders elements
-- [ ] Serialization of assembly data-structure and child assembly structure
-- [ ] Assembly.py review the "add_element_by_index" method. Example, elements are added not by element index, but assemblies can be created by b) adding assemblies within the assembly, c) manually grouping when first grandchilds are created and then childs can be added, then parents, so it is a reversed scheme.
 - [ ] Create different Element classes e.g. Beam, Plate, Block, Glulam, etc. Use OCC for curved geometries
-- [ ] Create a viewer class that iterates through existing properties and visualizes them
-- [ ] Create Rhino Layout to toggle on/off object attributes, also create parametric objects, e.g. a beam that can be changed in length, width, height, etc.
 - [ ] Element.py - Interface detection using compas_assembly shapely library for outlines for complex
-- [ ] Element.py - Interace detection using Line and Polyline proximity for simplex
+- [ ] Element.py - Interface detection using Line and Polyline proximity for simplex
 - [ ] Fast Tree search that is native to Python
-- [ ] Test and Viewer - Insertion vectors
-- [ ] Assembly.py - start drafting the assembly data-strcuture, by including the collide method that otput collision pairs, for simple implementation use 2xfor loop, once you find fast tree, you will be able to enhance (do not forget serialozation)
-- [ ] implmement other assemblies to check how well the data structure is currently been developed.
-- [ ] test_6_block_flat_arch_plates_boxes.py example shows clearly the need of grouping into boxes e.g. (0,0) (0,1) ..., there can be in a viewer selection by group depending on an index -> hierarchy 0, 1, 2 that shows the partitioning thing, there can be groups of boxes too.
+- [ ] Go over the other assembly data-structure.
 
 A data structure is needed to represent a model consisting of structural elements like blocks, beams, nodes, and plates, as well as fabrication elements for subtractive and additive processes. This data structure should also facilitate the computation and storage of adjacency and joinery information, as well as interfaces between these elements. Additionally, it should allow for the transfer of data between the model, structural simulation, and fabrication processes.
 
@@ -24,15 +16,9 @@ A data structure is needed to represent a model consisting of structural element
 
 ![Untitled Diagram drawio](https://github.com/BRG-research/compas_assembly2/assets/18013985/fc6ddbbd-8b30-49be-aa69-705e9e1eee0e)
 
-
 ![image](https://github.com/BRG-research/compas_assembly2/assets/18013985/ef00db99-6557-4fe5-a1cd-39caad9bd7ca)
 
 ![image](https://github.com/BRG-research/compas_assembly2/assets/18013985/0ce85ba1-2c01-40d5-8a5b-40f017bd787b)
-
-
-## TODO
-
-- [ ] Start developing fabrication class from "fabrication"
 
 
 ## Getting started with this project
