@@ -24,22 +24,11 @@ from compas.geometry import (
     intersection_plane_plane_plane,
     centroid_polyhedron,
     volume_polyhedron,
-    transform_points,
 )
 from compas.datastructures import Mesh, mesh_bounding_box
 import copy
-from math import fabs
 from collections import OrderedDict
-from compas_assembly2 import ELEMENT_NAME, JOINT_NAME
-from compas_assembly2.joint import Joint
-
-try:
-    from shapely.geometry import Polygon as ShapelyPolygon
-
-    shapely_available = True
-except ImportError:
-    print("Library shapely is not installed. Please install it.")
-    shapely_available = False
+from compas_assembly2 import ELEMENT_NAME
 
 
 class Element(Data):
@@ -1004,176 +993,176 @@ class Element(Data):
     # METHODS - FACE-TO-FACE DETECTION
     # ==========================================================================
 
-    @property
-    def face_polygons(self):
-        """Get Polygons from the geometry
-        WARNING: currently the face polygons do not consider elements with holes"""
+    # @property
+    # def face_polygons(self):
+    #     """Get Polygons from the geometry
+    #     WARNING: currently the face polygons do not consider elements with holes"""
 
-        # --------------------------------------------------------------------------
-        # sanity check
-        # --------------------------------------------------------------------------
-        if hasattr(self, "_face_polygons"):
-            return self._face_polygons
+    #     # --------------------------------------------------------------------------
+    #     # sanity check
+    #     # --------------------------------------------------------------------------
+    #     if hasattr(self, "_face_polygons"):
+    #         return self._face_polygons
 
-        if len(self.geometry) == 0:
-            raise AssertionError("You must assign geometry geometry to the element")
+    #     if len(self.geometry) == 0:
+    #         raise AssertionError("You must assign geometry geometry to the element")
 
-        if not isinstance(self.geometry[0], Mesh):
-            raise AssertionError("The geometry must be a mesh")
+    #     if not isinstance(self.geometry[0], Mesh):
+    #         raise AssertionError("The geometry must be a mesh")
 
-        # --------------------------------------------------------------------------
-        # get polylines from the mesh faces
-        # --------------------------------------------------------------------------
+    #     # --------------------------------------------------------------------------
+    #     # get polylines from the mesh faces
+    #     # --------------------------------------------------------------------------
 
-        temp = self.geometry[0].to_polygons()
-        self._face_polygons = []
-        for point_list in temp:
-            self._face_polygons.append(Polygon(point_list))
+    #     temp = self.geometry[0].to_polygons()
+    #     self._face_polygons = []
+    #     for point_list in temp:
+    #         self._face_polygons.append(Polygon(point_list))
 
-        return self._face_polygons
+    #     return self._face_polygons
 
-    @property
-    def face_frames(self):
-        """Get Frames from the geometry
-        WARNING: currently the face polylines do not consider elements with holes
-        for this you need to add face attributes to conside the holes"""
-        # --------------------------------------------------------------------------
-        # sanity check
-        # --------------------------------------------------------------------------
-        if hasattr(self, "_face_frames"):
-            return self._face_frames
+    # @property
+    # def face_frames(self):
+    #     """Get Frames from the geometry
+    #     WARNING: currently the face polylines do not consider elements with holes
+    #     for this you need to add face attributes to conside the holes"""
+    #     # --------------------------------------------------------------------------
+    #     # sanity check
+    #     # --------------------------------------------------------------------------
+    #     if hasattr(self, "_face_frames"):
+    #         return self._face_frames
 
-        if len(self.geometry) == 0:
-            raise AssertionError("You must assign geometry geometry to the element")
+    #     if len(self.geometry) == 0:
+    #         raise AssertionError("You must assign geometry geometry to the element")
 
-        if not isinstance(self.geometry[0], Mesh):
-            raise AssertionError("The geometry must be a mesh")
+    #     if not isinstance(self.geometry[0], Mesh):
+    #         raise AssertionError("The geometry must be a mesh")
 
-        # --------------------------------------------------------------------------
-        # compute the frames of each mesh face
-        # --------------------------------------------------------------------------
-        self._face_frames = []
+    #     # --------------------------------------------------------------------------
+    #     # compute the frames of each mesh face
+    #     # --------------------------------------------------------------------------
+    #     self._face_frames = []
 
-        for i in range(self.geometry[0].number_of_faces()):
-            xyz = self.geometry[0].face_coordinates(i)
-            o = self.geometry[0].face_center(i)
-            w = self.geometry[0].face_normal(i)
-            u = [xyz[1][i] - xyz[0][i] for i in range(3)]  # align with longest edge instead?
-            v = cross_vectors(w, u)
-            frame = Frame(o, u, v)
-            self._face_frames.append(frame)
+    #     for i in range(self.geometry[0].number_of_faces()):
+    #         xyz = self.geometry[0].face_coordinates(i)
+    #         o = self.geometry[0].face_center(i)
+    #         w = self.geometry[0].face_normal(i)
+    #         u = [xyz[1][i] - xyz[0][i] for i in range(3)]  # align with longest edge instead?
+    #         v = cross_vectors(w, u)
+    #         frame = Frame(o, u, v)
+    #         self._face_frames.append(frame)
 
-        return self._face_frames
+    #     return self._face_frames
 
-    def face_to_face(self, other, tmax=1e-6, amin=1e-1):
-        """construct intefaces by intersecting coplanar mesh faces
-        Parameters
-        ----------
-        assembly : compas_assembly.datastructures.Assembly
-            An assembly of discrete blocks.
-        nmax : int, optional
-            Maximum number of neighbours per block.
-        tmax : float, optional
-            Maximum deviation from the perfectly flat interface plane.
-        amin : float, optional
-            Minimum area of a "face-face" interface.
+    # def face_to_face(self, other, tmax=1e-6, amin=1e-1):
+    #     """construct intefaces by intersecting coplanar mesh faces
+    #     Parameters
+    #     ----------
+    #     assembly : compas_assembly.datastructures.Assembly
+    #         An assembly of discrete blocks.
+    #     nmax : int, optional
+    #         Maximum number of neighbours per block.
+    #     tmax : float, optional
+    #         Maximum deviation from the perfectly flat interface plane.
+    #     amin : float, optional
+    #         Minimum area of a "face-face" interface.
 
-        Returns
-        -------
-        Polygon of the Interface - :class:`compas.geometry.Polygon`
-        Current Element ID - list[int]
-        Other Element ID - list[int]
-        Current Element Face Index - int
-        Other Element Face Index - int
-        """
+    #     Returns
+    #     -------
+    #     Polygon of the Interface - :class:`compas.geometry.Polygon`
+    #     Current Element ID - list[int]
+    #     Other Element ID - list[int]
+    #     Current Element Face Index - int
+    #     Other Element Face Index - int
+    #     """
 
-        # --------------------------------------------------------------------------
-        # sanity check
-        # --------------------------------------------------------------------------
-        if shapely_available is False:
-            return []
+    #     # --------------------------------------------------------------------------
+    #     # sanity check
+    #     # --------------------------------------------------------------------------
+    #     if shapely_available is False:
+    #         return []
 
-        if len(self.geometry) == 0 or len(other.geometry) == 0:
-            raise AssertionError("You must assign geometry geometry to the element")
+    #     if len(self.geometry) == 0 or len(other.geometry) == 0:
+    #         raise AssertionError("You must assign geometry geometry to the element")
 
-        if not isinstance(self.geometry[0], Mesh) or not isinstance(other.geometry[0], Mesh):
-            raise AssertionError("The geometry must be a mesh")
+    #     if not isinstance(self.geometry[0], Mesh) or not isinstance(other.geometry[0], Mesh):
+    #         raise AssertionError("The geometry must be a mesh")
 
-        # --------------------------------------------------------------------------
-        # iterate face polygons and get intersection area
-        # DEPENDENCY: shapely library
-        # --------------------------------------------------------------------------
+    #     # --------------------------------------------------------------------------
+    #     # iterate face polygons and get intersection area
+    #     # DEPENDENCY: shapely library
+    #     # --------------------------------------------------------------------------
 
-        def to_shapely_polygon(matrix, polygon, tmax=1e-6, amin=1e-1):
-            """convert a compas polygon to shapely polygon on xy plane"""
+    #     def to_shapely_polygon(matrix, polygon, tmax=1e-6, amin=1e-1):
+    #         """convert a compas polygon to shapely polygon on xy plane"""
 
-            # orient points to the xy plane
-            projected = transform_points(polygon.points, matrix)
+    #         # orient points to the xy plane
+    #         projected = transform_points(polygon.points, matrix)
 
-            # check if the oriented point is on the xy plane within the tolerance
-            # then return the shapely polygon
-            if not all(fabs(point[2]) < tmax for point in projected):
-                return None
-            elif polygon.area < amin:
-                return None
-            else:
-                return ShapelyPolygon(projected)
+    #         # check if the oriented point is on the xy plane within the tolerance
+    #         # then return the shapely polygon
+    #         if not all(fabs(point[2]) < tmax for point in projected):
+    #             return None
+    #         elif polygon.area < amin:
+    #             return None
+    #         else:
+    #             return ShapelyPolygon(projected)
 
-        def to_compas_polygon(matrix, shapely_polygon):
-            """convert a shapely polygon to compas polygon back to the frame"""
+    #     def to_compas_polygon(matrix, shapely_polygon):
+    #         """convert a shapely polygon to compas polygon back to the frame"""
 
-            # convert coordiantes to 3D by adding the z coordinate
-            coords = [[x, y, 0.0] for x, y, _ in intersection.exterior.coords]
+    #         # convert coordiantes to 3D by adding the z coordinate
+    #         coords = [[x, y, 0.0] for x, y, _ in intersection.exterior.coords]
 
-            # orient points to the original first mesh frame
-            coords = transform_points(coords, matrix.inverted())[:-1]
+    #         # orient points to the original first mesh frame
+    #         coords = transform_points(coords, matrix.inverted())[:-1]
 
-            # convert to compas polygon
-            return Polygon(coords)
+    #         # convert to compas polygon
+    #         return Polygon(coords)
 
-        joints = []
+    #     joints = []
 
-        for id_0, face_polygon_0 in enumerate(self.face_polygons):
-            # get the transformation matrix
-            matrix = Transformation.from_change_of_basis(Frame.worldXY(), self.face_frames[id_0])
+    #     for id_0, face_polygon_0 in enumerate(self.face_polygons):
+    #         # get the transformation matrix
+    #         matrix = Transformation.from_change_of_basis(Frame.worldXY(), self.face_frames[id_0])
 
-            # get the shapely polygon
-            shapely_polygon_0 = to_shapely_polygon(matrix, face_polygon_0)
-            if shapely_polygon_0 is None:
-                continue
+    #         # get the shapely polygon
+    #         shapely_polygon_0 = to_shapely_polygon(matrix, face_polygon_0)
+    #         if shapely_polygon_0 is None:
+    #             continue
 
-            for id_1, face_polygon_1 in enumerate(other.face_polygons):
-                # get the shapely polygon
-                shapely_polygon_1 = to_shapely_polygon(matrix, face_polygon_1)
-                if shapely_polygon_1 is None:
-                    continue
+    #         for id_1, face_polygon_1 in enumerate(other.face_polygons):
+    #             # get the shapely polygon
+    #             shapely_polygon_1 = to_shapely_polygon(matrix, face_polygon_1)
+    #             if shapely_polygon_1 is None:
+    #                 continue
 
-                # check if polygons intersect
-                if not shapely_polygon_0.intersects(shapely_polygon_1):
-                    continue
+    #             # check if polygons intersect
+    #             if not shapely_polygon_0.intersects(shapely_polygon_1):
+    #                 continue
 
-                # get intersection area and check if it is big enough within the given tolerance
-                intersection = shapely_polygon_0.intersection(shapely_polygon_1)
-                area = intersection.area
-                if area < amin:
-                    continue
+    #             # get intersection area and check if it is big enough within the given tolerance
+    #             intersection = shapely_polygon_0.intersection(shapely_polygon_1)
+    #             area = intersection.area
+    #             if area < amin:
+    #                 continue
 
-                # convert shapely polygon to compas polygon
-                polygon = to_compas_polygon(matrix, intersection)
+    #             # convert shapely polygon to compas polygon
+    #             polygon = to_compas_polygon(matrix, intersection)
 
-                # construct joint
-                joint = Joint(
-                    type=JOINT_NAME.FACE_TO_FACE,
-                    polygon=polygon,
-                    frame=self.face_frames[id_0],
-                    surface_area=area,
-                )
+    #             # construct joint
+    #             joint = Joint(
+    #                 type=JOINT_NAME.FACE_TO_FACE,
+    #                 polygon=polygon,
+    #                 frame=self.face_frames[id_0],
+    #                 surface_area=area,
+    #             )
 
-                # there can be more than one interface so store them in a list
-                joints.append(joint)
+    #             # there can be more than one interface so store them in a list
+    #             joints.append(joint)
 
-        # output
-        return joints
+    #     # output
+    #     return joints
 
     # ==========================================================================
     # METHODS - AXIS-TO-AXIS DETECTION
