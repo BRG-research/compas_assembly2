@@ -128,7 +128,7 @@ class Dome:
                 x_axis = Vector.from_start_end(vertices[3], vertices[0])
                 y_axis = Vector.from_start_end(vertices[4], vertices[0])
                 frame = Frame(mid_point, x_axis, y_axis)
-                element = Element(simplex=[mid_point], complex=[block], frame=frame)
+                element = Element(geometry_simplified=[mid_point], geometry=[block], frame=frame)
                 elements.append(element)
 
         # --------------------------------------------------------------------------

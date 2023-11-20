@@ -144,7 +144,7 @@
             "id": [
                 0
             ],
-            "simplex": [
+            "geometry_simplified": [
                 {
                     "dtype": "compas.geometry/Polyline",
                     "guid": "4d642d22-902b-47f3-95bf-271a43decd1e",
@@ -302,7 +302,7 @@
                 }
             },
             "attributes": {},
-            "complex": [
+            "geometry": [
                 {
                     "dtype": "compas.datastructures/Mesh",
                     "guid": "d41d653e-1611-4102-a7cf-b88052f9faa0",
@@ -558,7 +558,7 @@
             "id": [
                 1
             ],
-            "simplex": [
+            "geometry_simplified": [
                 {
                     "dtype": "compas.geometry/Polyline",
                     "guid": "90833f9e-8890-4833-aeac-ae5e18feb595",
@@ -716,7 +716,7 @@
                 }
             },
             "attributes": {},
-            "complex": [
+            "geometry": [
                 {
                     "dtype": "compas.datastructures/Mesh",
                     "guid": "e7e14313-39d8-4f32-b2e5-3783bde08c7a",
@@ -972,7 +972,7 @@
             "id": [
                 2
             ],
-            "simplex": [
+            "geometry_simplified": [
                 {
                     "dtype": "compas.geometry/Polyline",
                     "guid": "b09b619b-b77f-4162-bc39-31ef1779c8c0",
@@ -1130,7 +1130,7 @@
                 }
             },
             "attributes": {},
-            "complex": [
+            "geometry": [
                 {
                     "dtype": "compas.datastructures/Mesh",
                     "guid": "3d202acb-0143-4622-b920-55bac1d4e6bc",
@@ -1386,7 +1386,7 @@
             "id": [
                 3
             ],
-            "simplex": [
+            "geometry_simplified": [
                 {
                     "dtype": "compas.geometry/Polyline",
                     "guid": "94152aa8-77c5-4dac-9da3-b524a2ed53a0",
@@ -1544,7 +1544,7 @@
                 }
             },
             "attributes": {},
-            "complex": [
+            "geometry": [
                 {
                     "dtype": "compas.datastructures/Mesh",
                     "guid": "68ac3b0e-a036-423f-9967-fc24dbc9ddf7",
@@ -1800,7 +1800,7 @@
             "id": [
                 4
             ],
-            "simplex": [
+            "geometry_simplified": [
                 {
                     "dtype": "compas.geometry/Polyline",
                     "guid": "53e098e9-48da-4b4e-b403-6e603b57744f",
@@ -1958,7 +1958,7 @@
                 }
             },
             "attributes": {},
-            "complex": [
+            "geometry": [
                 {
                     "dtype": "compas.datastructures/Mesh",
                     "guid": "c608eb5d-fe3f-4e88-8dba-e849ea0d9fb8",
@@ -2214,7 +2214,7 @@
             "id": [
                 5
             ],
-            "simplex": [
+            "geometry_simplified": [
                 {
                     "dtype": "compas.geometry/Polyline",
                     "guid": "79336f0b-d9a4-4170-9362-a5ead3835782",
@@ -2578,7 +2578,7 @@
                 }
             },
             "attributes": {},
-            "complex": [
+            "geometry": [
                 {
                     "dtype": "compas.datastructures/Mesh",
                     "guid": "57d6b64a-4bc2-462e-96fc-a53b6361aa36",
@@ -3168,7 +3168,7 @@
             "id": [
                 6
             ],
-            "simplex": [
+            "geometry_simplified": [
                 {
                     "dtype": "compas.geometry/Polyline",
                     "guid": "f2b6e0f3-75cb-42c6-a347-fdabb62d5ba5",
@@ -3465,7 +3465,7 @@
                 }
             },
             "attributes": {},
-            "complex": [
+            "geometry": [
                 {
                     "dtype": "compas.datastructures/Mesh",
                     "guid": "ab9af067-a30a-4b48-96e6-176506146708",
@@ -3770,7 +3770,7 @@
             "id": [
                 7
             ],
-            "simplex": [
+            "geometry_simplified": [
                 {
                     "dtype": "compas.geometry/Polyline",
                     "guid": "bf3a8385-8224-407c-995b-6acd9cf3343b",
@@ -4064,7 +4064,7 @@
                 }
             },
             "attributes": {},
-            "complex": [
+            "geometry": [
                 {
                     "dtype": "compas.datastructures/Mesh",
                     "guid": "ea8f404a-1bb5-422d-bfc8-8f5ff7c4100b",
@@ -4388,7 +4388,7 @@
             "id": [
                 8
             ],
-            "simplex": [
+            "geometry_simplified": [
                 {
                     "dtype": "compas.geometry/Polyline",
                     "guid": "79057c7a-8857-4c9a-b346-369e9ba66c54",
@@ -4633,7 +4633,7 @@
                 }
             },
             "attributes": {},
-            "complex": [
+            "geometry": [
                 {
                     "dtype": "compas.datastructures/Mesh",
                     "guid": "85765ec1-d93b-4d90-a4df-2e71d81f51a0",
@@ -4928,7 +4928,7 @@
             "id": [
                 9
             ],
-            "simplex": [
+            "geometry_simplified": [
                 {
                     "dtype": "compas.geometry/Polyline",
                     "guid": "f21acc14-ac62-4753-813d-7799b7356fa4",
@@ -5231,7 +5231,7 @@
                 }
             },
             "attributes": {},
-            "complex": [
+            "geometry": [
                 {
                     "dtype": "compas.datastructures/Mesh",
                     "guid": "d604ee78-90f1-4e1f-b291-edb0e1b42829",
@@ -5536,7 +5536,7 @@
             "id": [
                 10
             ],
-            "simplex": [
+            "geometry_simplified": [
                 {
                     "dtype": "compas.geometry/Polyline",
                     "guid": "77c0a609-18ea-4982-99a8-bd7294dd66af",
@@ -5830,7 +5830,7 @@
                 }
             },
             "attributes": {},
-            "complex": [
+            "geometry": [
                 {
                     "dtype": "compas.datastructures/Mesh",
                     "guid": "27d335f3-78a2-4636-b3ea-4aa1e60eb569",
@@ -6154,7 +6154,7 @@
             "id": [
                 11
             ],
-            "simplex": [
+            "geometry_simplified": [
                 {
                     "dtype": "compas.geometry/Polyline",
                     "guid": "1f9df2be-fdca-4d4a-abaf-6c2d19f8165d",
@@ -6360,7 +6360,7 @@
                 }
             },
             "attributes": {},
-            "complex": [
+            "geometry": [
                 {
                     "dtype": "compas.datastructures/Mesh",
                     "guid": "f67daba3-5379-47cd-9d08-35f6c539e12d",
@@ -6626,7 +6626,7 @@
             "id": [
                 12
             ],
-            "simplex": [
+            "geometry_simplified": [
                 {
                     "dtype": "compas.geometry/Polyline",
                     "guid": "5f97e7a1-c0f1-4e47-9f20-4923abe77925",
@@ -7035,7 +7035,7 @@
                 }
             },
             "attributes": {},
-            "complex": [
+            "geometry": [
                 {
                     "dtype": "compas.datastructures/Mesh",
                     "guid": "227d7751-1bff-460f-8e3c-d4c061357ae8",
@@ -7432,7 +7432,7 @@
             "id": [
                 13
             ],
-            "simplex": [
+            "geometry_simplified": [
                 {
                     "dtype": "compas.geometry/Polyline",
                     "guid": "15700b00-64a2-4b59-8e70-e62d70216ca0",
@@ -7682,7 +7682,7 @@
                 }
             },
             "attributes": {},
-            "complex": [
+            "geometry": [
                 {
                     "dtype": "compas.datastructures/Mesh",
                     "guid": "69920e55-ef05-47fc-af9e-6d33f8f27dec",
@@ -7982,7 +7982,7 @@
             "id": [
                 14
             ],
-            "simplex": [
+            "geometry_simplified": [
                 {
                     "dtype": "compas.geometry/Polyline",
                     "guid": "737a0c76-987e-4243-93f4-f12df3e42c8d",
@@ -8232,7 +8232,7 @@
                 }
             },
             "attributes": {},
-            "complex": [
+            "geometry": [
                 {
                     "dtype": "compas.datastructures/Mesh",
                     "guid": "d3e42d66-88e7-4def-8ff7-7a5aaa763413",
@@ -8532,7 +8532,7 @@
             "id": [
                 15
             ],
-            "simplex": [
+            "geometry_simplified": [
                 {
                     "dtype": "compas.geometry/Polyline",
                     "guid": "7bb37814-a15b-4c48-bbc7-102109a3775a",
@@ -8826,7 +8826,7 @@
                 }
             },
             "attributes": {},
-            "complex": [
+            "geometry": [
                 {
                     "dtype": "compas.datastructures/Mesh",
                     "guid": "b1d07f1f-2a43-4f9c-b80b-9805d210f2f5",
@@ -9150,7 +9150,7 @@
             "id": [
                 16
             ],
-            "simplex": [
+            "geometry_simplified": [
                 {
                     "dtype": "compas.geometry/Polyline",
                     "guid": "54568214-4f15-4561-8e5c-35154f679477",
@@ -9356,7 +9356,7 @@
                 }
             },
             "attributes": {},
-            "complex": [
+            "geometry": [
                 {
                     "dtype": "compas.datastructures/Mesh",
                     "guid": "f4ca70ab-667f-4f4f-91a0-a66c0f9bd08b",
@@ -9622,7 +9622,7 @@
             "id": [
                 17
             ],
-            "simplex": [
+            "geometry_simplified": [
                 {
                     "dtype": "compas.geometry/Polyline",
                     "guid": "2e274d03-ee37-452b-8398-6598a7cdc176",
@@ -9867,7 +9867,7 @@
                 }
             },
             "attributes": {},
-            "complex": [
+            "geometry": [
                 {
                     "dtype": "compas.datastructures/Mesh",
                     "guid": "13ffb554-5536-4bf7-97c2-d57bc50d1ae2",
@@ -10162,7 +10162,7 @@
             "id": [
                 18
             ],
-            "simplex": [
+            "geometry_simplified": [
                 {
                     "dtype": "compas.geometry/Polyline",
                     "guid": "ce1bc7bd-77e1-4502-8ccd-58e0cae01bfe",
@@ -10456,7 +10456,7 @@
                 }
             },
             "attributes": {},
-            "complex": [
+            "geometry": [
                 {
                     "dtype": "compas.datastructures/Mesh",
                     "guid": "e808b63f-2973-4a27-a045-16671190ea47",
@@ -10780,7 +10780,7 @@
             "id": [
                 19
             ],
-            "simplex": [
+            "geometry_simplified": [
                 {
                     "dtype": "compas.geometry/Polyline",
                     "guid": "0f8c43ad-e843-420d-9ef5-e11b284aaa20",
@@ -10938,7 +10938,7 @@
                 }
             },
             "attributes": {},
-            "complex": [
+            "geometry": [
                 {
                     "dtype": "compas.datastructures/Mesh",
                     "guid": "c03398c0-4572-426a-b5bc-ce490bbb7b0c",
@@ -11194,7 +11194,7 @@
             "id": [
                 20
             ],
-            "simplex": [
+            "geometry_simplified": [
                 {
                     "dtype": "compas.geometry/Polyline",
                     "guid": "90ede448-79e7-4c91-844b-69288a47849f",
@@ -11352,7 +11352,7 @@
                 }
             },
             "attributes": {},
-            "complex": [
+            "geometry": [
                 {
                     "dtype": "compas.datastructures/Mesh",
                     "guid": "042d884e-803d-4233-9e54-dfb7ca39e1cb",
@@ -11608,7 +11608,7 @@
             "id": [
                 21
             ],
-            "simplex": [
+            "geometry_simplified": [
                 {
                     "dtype": "compas.geometry/Polyline",
                     "guid": "c624968e-de54-4495-ac05-c1a047e980ff",
@@ -11766,7 +11766,7 @@
                 }
             },
             "attributes": {},
-            "complex": [
+            "geometry": [
                 {
                     "dtype": "compas.datastructures/Mesh",
                     "guid": "0f9cd95c-05e8-4f0b-8c40-fc99b734426c",
@@ -12022,7 +12022,7 @@
             "id": [
                 22
             ],
-            "simplex": [
+            "geometry_simplified": [
                 {
                     "dtype": "compas.geometry/Polyline",
                     "guid": "e8041f41-3d14-448a-a67a-0c559c0059d5",
@@ -12386,7 +12386,7 @@
                 }
             },
             "attributes": {},
-            "complex": [
+            "geometry": [
                 {
                     "dtype": "compas.datastructures/Mesh",
                     "guid": "43182100-c0a5-4919-a3b3-80ce6f2dfa60",
@@ -12976,7 +12976,7 @@
             "id": [
                 23
             ],
-            "simplex": [
+            "geometry_simplified": [
                 {
                     "dtype": "compas.geometry/Polyline",
                     "guid": "703d0ac9-2654-4f30-bc47-f507b0c9c82b",
@@ -13134,7 +13134,7 @@
                 }
             },
             "attributes": {},
-            "complex": [
+            "geometry": [
                 {
                     "dtype": "compas.datastructures/Mesh",
                     "guid": "23dffb64-852e-4ddc-ab99-35a13589d0d6",
@@ -13390,7 +13390,7 @@
             "id": [
                 24
             ],
-            "simplex": [
+            "geometry_simplified": [
                 {
                     "dtype": "compas.geometry/Polyline",
                     "guid": "6ef0118a-1887-48d8-a9f6-633a31a57ddc",
@@ -13548,7 +13548,7 @@
                 }
             },
             "attributes": {},
-            "complex": [
+            "geometry": [
                 {
                     "dtype": "compas.datastructures/Mesh",
                     "guid": "6d73fe5e-cbe2-433a-968e-637a9d5fbea2",

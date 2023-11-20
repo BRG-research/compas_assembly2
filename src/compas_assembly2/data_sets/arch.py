@@ -102,7 +102,7 @@ class Arch:
             x_axis = Vector.from_start_end(vertices[1], vertices[0])
             y_axis = Vector.from_start_end(vertices[4], vertices[0])
             frame = Frame(mid_point, x_axis, y_axis)
-            element = Element(simplex=mid_point, complex=[mesh], frame=frame)
+            element = Element(geometry_simplified=mid_point, geometry=[mesh], frame=frame)
             elements.append(element)
 
         # --------------------------------------------------------------------------

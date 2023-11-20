@@ -13,7 +13,7 @@ The **compas_assembly2** represents:
 
    * elements:
       * structural elements such as blocks, beams, nodes, and plates.
-      * an element is primary a description of a simple and complex geometry.
+      * an element is primary a description of a simple and geometry geometry.
       * initially elements do not have neither connectivity nor grouping information.
    * assembly tree:
       * the elements are stored in a tree structure.

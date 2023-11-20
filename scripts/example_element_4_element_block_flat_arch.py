@@ -122,7 +122,7 @@ p_t_0 = move_points_to_target_z(p_b_0, normals, height)
 p_b_0, p_b_1 = move_points_in_two_opposite_directions(p_b_0, [0, 1, 0], offset)
 p_t_0, p_t_1 = move_points_in_two_opposite_directions(p_t_0, [0, 1, 0], offset)
 pts = p_b_0 + p_b_1 + p_t_0 + p_t_1
-elements = Element.from_simplices_and_complexes(pts)
+elements = Element.from_simplices_and_geometryes(pts)
 
 # ==========================================================================
 # MEASUREMENT
@@ -172,7 +172,7 @@ for i in range(n - 1):
     # --------------------------------------------------------------------------
     # Create the element
     # --------------------------------------------------------------------------
-    element = Element(id=1, simplex=center, complex=mesh)
+    element = Element(id=1, geometry_simplified=center, geometry=mesh)
     elements.append(element)
 
 # ==========================================================================

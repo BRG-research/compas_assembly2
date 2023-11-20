@@ -1,0 +1,841 @@
+{
+    "data": {
+        "elements": {
+            "1f58550d-7edf-417d-bcf4-e5cd0c54bb84": {
+                "data": {
+                    "aabb": null,
+                    "attributes": {},
+                    "convex_hull": {
+                        "data": {
+                            "attributes": {
+                                "name": "Mesh"
+                            },
+                            "dea": {},
+                            "dfa": {},
+                            "dva": {
+                                "x": 0.0,
+                                "y": 0.0,
+                                "z": 0.0
+                            },
+                            "edgedata": {},
+                            "face": {},
+                            "facedata": {},
+                            "max_face": -1,
+                            "max_vertex": -1,
+                            "vertex": {}
+                        },
+                        "dtype": "compas.datastructures/Mesh",
+                        "guid": "7d0d7c93-e6bf-462c-94db-2ad8e2c3fa99"
+                    },
+                    "fabrication": {},
+                    "frame": {
+                        "data": {
+                            "point": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "xaxis": [
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            "yaxis": [
+                                0.0,
+                                1.0,
+                                0.0
+                            ]
+                        },
+                        "dtype": "compas.geometry/Frame",
+                        "guid": "72549fd8-eacc-44a3-85e1-b976780fe0c4"
+                    },
+                    "frame_global": {
+                        "data": {
+                            "point": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "xaxis": [
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            "yaxis": [
+                                0.0,
+                                1.0,
+                                0.0
+                            ]
+                        },
+                        "dtype": "compas.geometry/Frame",
+                        "guid": "86c5eeee-8a8a-4fbb-a21c-73aaf9bd9a61"
+                    },
+                    "geometry": [],
+                    "geometry_simplified": [
+                        {
+                            "data": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "dtype": "compas.geometry/Point",
+                            "guid": "7cc8d3fd-9ca6-4c5c-98f7-be08a563ca52"
+                        }
+                    ],
+                    "id": [
+                        -1
+                    ],
+                    "insertion": {
+                        "data": [
+                            0.0,
+                            0.0,
+                            1.0
+                        ],
+                        "dtype": "compas.geometry/Vector",
+                        "guid": "40b4fde3-e75f-45d5-9597-ff78026a74d5"
+                    },
+                    "name": "BEAM",
+                    "oobb": null,
+                    "structure": {}
+                },
+                "dtype": "compas_assembly2.element/Element",
+                "guid": "1f58550d-7edf-417d-bcf4-e5cd0c54bb84"
+            },
+            "ab2740f8-3984-4c8f-b210-d381b6f21ef8": {
+                "data": {
+                    "aabb": null,
+                    "attributes": {},
+                    "convex_hull": {
+                        "data": {
+                            "attributes": {
+                                "name": "Mesh"
+                            },
+                            "dea": {},
+                            "dfa": {},
+                            "dva": {
+                                "x": 0.0,
+                                "y": 0.0,
+                                "z": 0.0
+                            },
+                            "edgedata": {},
+                            "face": {},
+                            "facedata": {},
+                            "max_face": -1,
+                            "max_vertex": -1,
+                            "vertex": {}
+                        },
+                        "dtype": "compas.datastructures/Mesh",
+                        "guid": "faf10c90-32c0-49b4-9a68-7ed3bd21df1f"
+                    },
+                    "fabrication": {},
+                    "frame": {
+                        "data": {
+                            "point": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "xaxis": [
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            "yaxis": [
+                                0.0,
+                                1.0,
+                                0.0
+                            ]
+                        },
+                        "dtype": "compas.geometry/Frame",
+                        "guid": "bf6f123f-1f8e-4a4f-be72-f3d35bff42bb"
+                    },
+                    "frame_global": {
+                        "data": {
+                            "point": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "xaxis": [
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            "yaxis": [
+                                0.0,
+                                1.0,
+                                0.0
+                            ]
+                        },
+                        "dtype": "compas.geometry/Frame",
+                        "guid": "6ec5370c-3c71-43f3-a43a-3b639b050e50"
+                    },
+                    "geometry": [],
+                    "geometry_simplified": [
+                        {
+                            "data": [
+                                0.0,
+                                5.0,
+                                0.0
+                            ],
+                            "dtype": "compas.geometry/Point",
+                            "guid": "4f99b336-955d-4f16-89e9-194881bf93c8"
+                        }
+                    ],
+                    "id": [
+                        -1
+                    ],
+                    "insertion": {
+                        "data": [
+                            0.0,
+                            0.0,
+                            1.0
+                        ],
+                        "dtype": "compas.geometry/Vector",
+                        "guid": "dd944fab-066c-4d0b-9ded-567bde49f924"
+                    },
+                    "name": "BLOCK",
+                    "oobb": null,
+                    "structure": {}
+                },
+                "dtype": "compas_assembly2.element/Element",
+                "guid": "ab2740f8-3984-4c8f-b210-d381b6f21ef8"
+            },
+            "eb0409aa-2af8-44db-bc6c-e975978f7472": {
+                "data": {
+                    "aabb": null,
+                    "attributes": {},
+                    "convex_hull": {
+                        "data": {
+                            "attributes": {
+                                "name": "Mesh"
+                            },
+                            "dea": {},
+                            "dfa": {},
+                            "dva": {
+                                "x": 0.0,
+                                "y": 0.0,
+                                "z": 0.0
+                            },
+                            "edgedata": {},
+                            "face": {},
+                            "facedata": {},
+                            "max_face": -1,
+                            "max_vertex": -1,
+                            "vertex": {}
+                        },
+                        "dtype": "compas.datastructures/Mesh",
+                        "guid": "5c5a2311-70c5-4f64-8fc0-c9316cce7a45"
+                    },
+                    "fabrication": {},
+                    "frame": {
+                        "data": {
+                            "point": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "xaxis": [
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            "yaxis": [
+                                0.0,
+                                1.0,
+                                0.0
+                            ]
+                        },
+                        "dtype": "compas.geometry/Frame",
+                        "guid": "93353398-4097-4503-8556-aaa7898d9873"
+                    },
+                    "frame_global": {
+                        "data": {
+                            "point": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "xaxis": [
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            "yaxis": [
+                                0.0,
+                                1.0,
+                                0.0
+                            ]
+                        },
+                        "dtype": "compas.geometry/Frame",
+                        "guid": "7ac33e9e-fe3c-4b13-98af-d550ba71caf3"
+                    },
+                    "geometry": [],
+                    "geometry_simplified": [
+                        {
+                            "data": [
+                                0.0,
+                                5.0,
+                                0.0
+                            ],
+                            "dtype": "compas.geometry/Point",
+                            "guid": "90d239d1-994a-42f6-a3ba-e676b2af1721"
+                        }
+                    ],
+                    "id": [
+                        -1
+                    ],
+                    "insertion": {
+                        "data": [
+                            0.0,
+                            0.0,
+                            1.0
+                        ],
+                        "dtype": "compas.geometry/Vector",
+                        "guid": "3ee07438-60e4-4aa4-b00e-15c24ec75f7e"
+                    },
+                    "name": "BEAM",
+                    "oobb": null,
+                    "structure": {}
+                },
+                "dtype": "compas_assembly2.element/Element",
+                "guid": "eb0409aa-2af8-44db-bc6c-e975978f7472"
+            },
+            "ebb9be8d-d257-4e96-a175-64beb4b0eea9": {
+                "data": {
+                    "aabb": null,
+                    "attributes": {},
+                    "convex_hull": {
+                        "data": {
+                            "attributes": {
+                                "name": "Mesh"
+                            },
+                            "dea": {},
+                            "dfa": {},
+                            "dva": {
+                                "x": 0.0,
+                                "y": 0.0,
+                                "z": 0.0
+                            },
+                            "edgedata": {},
+                            "face": {},
+                            "facedata": {},
+                            "max_face": -1,
+                            "max_vertex": -1,
+                            "vertex": {}
+                        },
+                        "dtype": "compas.datastructures/Mesh",
+                        "guid": "86976220-c1a6-4a12-aff8-a129461c80e6"
+                    },
+                    "fabrication": {},
+                    "frame": {
+                        "data": {
+                            "point": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "xaxis": [
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            "yaxis": [
+                                0.0,
+                                1.0,
+                                0.0
+                            ]
+                        },
+                        "dtype": "compas.geometry/Frame",
+                        "guid": "052dcd07-fa95-4934-a07e-dbb7de5f0054"
+                    },
+                    "frame_global": {
+                        "data": {
+                            "point": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "xaxis": [
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            "yaxis": [
+                                0.0,
+                                1.0,
+                                0.0
+                            ]
+                        },
+                        "dtype": "compas.geometry/Frame",
+                        "guid": "5668849b-4086-42c1-8a30-d541b5e2034b"
+                    },
+                    "geometry": [],
+                    "geometry_simplified": [
+                        {
+                            "data": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "dtype": "compas.geometry/Point",
+                            "guid": "573d2df7-6dbd-4094-a4a0-2791f5882d4b"
+                        }
+                    ],
+                    "id": [
+                        -1
+                    ],
+                    "insertion": {
+                        "data": [
+                            0.0,
+                            0.0,
+                            1.0
+                        ],
+                        "dtype": "compas.geometry/Vector",
+                        "guid": "14ab332c-5a66-4470-94fa-d8c63c13f3a4"
+                    },
+                    "name": "BLOCK",
+                    "oobb": null,
+                    "structure": {}
+                },
+                "dtype": "compas_assembly2.element/Element",
+                "guid": "ebb9be8d-d257-4e96-a175-64beb4b0eea9"
+            }
+        },
+        "hierarchy": {
+            "attributes": {
+                "name": "root"
+            },
+            "name": "root",
+            "nodes": [
+                {
+                    "attributes": {},
+                    "children": [],
+                    "elements": [
+                        {
+                            "data": {
+                                "aabb": null,
+                                "attributes": {},
+                                "convex_hull": {
+                                    "data": {
+                                        "attributes": {
+                                            "name": "Mesh"
+                                        },
+                                        "dea": {},
+                                        "dfa": {},
+                                        "dva": {
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        },
+                                        "edgedata": {},
+                                        "face": {},
+                                        "facedata": {},
+                                        "max_face": -1,
+                                        "max_vertex": -1,
+                                        "vertex": {}
+                                    },
+                                    "dtype": "compas.datastructures/Mesh",
+                                    "guid": "2cae6ea6-1f5e-4377-a0f0-f86fb7cf84bd"
+                                },
+                                "fabrication": {},
+                                "frame": {
+                                    "data": {
+                                        "point": [
+                                            0.0,
+                                            0.0,
+                                            0.0
+                                        ],
+                                        "xaxis": [
+                                            1.0,
+                                            0.0,
+                                            0.0
+                                        ],
+                                        "yaxis": [
+                                            0.0,
+                                            1.0,
+                                            0.0
+                                        ]
+                                    },
+                                    "dtype": "compas.geometry/Frame",
+                                    "guid": "72549fd8-eacc-44a3-85e1-b976780fe0c4"
+                                },
+                                "frame_global": {
+                                    "data": {
+                                        "point": [
+                                            0.0,
+                                            0.0,
+                                            0.0
+                                        ],
+                                        "xaxis": [
+                                            1.0,
+                                            0.0,
+                                            0.0
+                                        ],
+                                        "yaxis": [
+                                            0.0,
+                                            1.0,
+                                            0.0
+                                        ]
+                                    },
+                                    "dtype": "compas.geometry/Frame",
+                                    "guid": "86c5eeee-8a8a-4fbb-a21c-73aaf9bd9a61"
+                                },
+                                "geometry": [],
+                                "geometry_simplified": [
+                                    {
+                                        "data": [
+                                            0.0,
+                                            0.0,
+                                            0.0
+                                        ],
+                                        "dtype": "compas.geometry/Point",
+                                        "guid": "7cc8d3fd-9ca6-4c5c-98f7-be08a563ca52"
+                                    }
+                                ],
+                                "id": [
+                                    -1
+                                ],
+                                "insertion": {
+                                    "data": [
+                                        0.0,
+                                        0.0,
+                                        1.0
+                                    ],
+                                    "dtype": "compas.geometry/Vector",
+                                    "guid": "40b4fde3-e75f-45d5-9597-ff78026a74d5"
+                                },
+                                "name": "BEAM",
+                                "oobb": null,
+                                "structure": {}
+                            },
+                            "dtype": "compas_assembly2.element/Element",
+                            "guid": "1f58550d-7edf-417d-bcf4-e5cd0c54bb84"
+                        },
+                        {
+                            "data": {
+                                "aabb": null,
+                                "attributes": {},
+                                "convex_hull": {
+                                    "data": {
+                                        "attributes": {
+                                            "name": "Mesh"
+                                        },
+                                        "dea": {},
+                                        "dfa": {},
+                                        "dva": {
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        },
+                                        "edgedata": {},
+                                        "face": {},
+                                        "facedata": {},
+                                        "max_face": -1,
+                                        "max_vertex": -1,
+                                        "vertex": {}
+                                    },
+                                    "dtype": "compas.datastructures/Mesh",
+                                    "guid": "d2116b82-c2b7-4818-873a-75e79c9bcbd0"
+                                },
+                                "fabrication": {},
+                                "frame": {
+                                    "data": {
+                                        "point": [
+                                            0.0,
+                                            0.0,
+                                            0.0
+                                        ],
+                                        "xaxis": [
+                                            1.0,
+                                            0.0,
+                                            0.0
+                                        ],
+                                        "yaxis": [
+                                            0.0,
+                                            1.0,
+                                            0.0
+                                        ]
+                                    },
+                                    "dtype": "compas.geometry/Frame",
+                                    "guid": "93353398-4097-4503-8556-aaa7898d9873"
+                                },
+                                "frame_global": {
+                                    "data": {
+                                        "point": [
+                                            0.0,
+                                            0.0,
+                                            0.0
+                                        ],
+                                        "xaxis": [
+                                            1.0,
+                                            0.0,
+                                            0.0
+                                        ],
+                                        "yaxis": [
+                                            0.0,
+                                            1.0,
+                                            0.0
+                                        ]
+                                    },
+                                    "dtype": "compas.geometry/Frame",
+                                    "guid": "7ac33e9e-fe3c-4b13-98af-d550ba71caf3"
+                                },
+                                "geometry": [],
+                                "geometry_simplified": [
+                                    {
+                                        "data": [
+                                            0.0,
+                                            5.0,
+                                            0.0
+                                        ],
+                                        "dtype": "compas.geometry/Point",
+                                        "guid": "90d239d1-994a-42f6-a3ba-e676b2af1721"
+                                    }
+                                ],
+                                "id": [
+                                    -1
+                                ],
+                                "insertion": {
+                                    "data": [
+                                        0.0,
+                                        0.0,
+                                        1.0
+                                    ],
+                                    "dtype": "compas.geometry/Vector",
+                                    "guid": "3ee07438-60e4-4aa4-b00e-15c24ec75f7e"
+                                },
+                                "name": "BEAM",
+                                "oobb": null,
+                                "structure": {}
+                            },
+                            "dtype": "compas_assembly2.element/Element",
+                            "guid": "eb0409aa-2af8-44db-bc6c-e975978f7472"
+                        }
+                    ],
+                    "name": "timber1"
+                },
+                {
+                    "attributes": {},
+                    "children": [],
+                    "elements": [
+                        {
+                            "data": {
+                                "aabb": null,
+                                "attributes": {},
+                                "convex_hull": {
+                                    "data": {
+                                        "attributes": {
+                                            "name": "Mesh"
+                                        },
+                                        "dea": {},
+                                        "dfa": {},
+                                        "dva": {
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        },
+                                        "edgedata": {},
+                                        "face": {},
+                                        "facedata": {},
+                                        "max_face": -1,
+                                        "max_vertex": -1,
+                                        "vertex": {}
+                                    },
+                                    "dtype": "compas.datastructures/Mesh",
+                                    "guid": "9cb55be3-90c9-41f8-ac57-86d66a3f7b6d"
+                                },
+                                "fabrication": {},
+                                "frame": {
+                                    "data": {
+                                        "point": [
+                                            0.0,
+                                            0.0,
+                                            0.0
+                                        ],
+                                        "xaxis": [
+                                            1.0,
+                                            0.0,
+                                            0.0
+                                        ],
+                                        "yaxis": [
+                                            0.0,
+                                            1.0,
+                                            0.0
+                                        ]
+                                    },
+                                    "dtype": "compas.geometry/Frame",
+                                    "guid": "052dcd07-fa95-4934-a07e-dbb7de5f0054"
+                                },
+                                "frame_global": {
+                                    "data": {
+                                        "point": [
+                                            0.0,
+                                            0.0,
+                                            0.0
+                                        ],
+                                        "xaxis": [
+                                            1.0,
+                                            0.0,
+                                            0.0
+                                        ],
+                                        "yaxis": [
+                                            0.0,
+                                            1.0,
+                                            0.0
+                                        ]
+                                    },
+                                    "dtype": "compas.geometry/Frame",
+                                    "guid": "5668849b-4086-42c1-8a30-d541b5e2034b"
+                                },
+                                "geometry": [],
+                                "geometry_simplified": [
+                                    {
+                                        "data": [
+                                            0.0,
+                                            0.0,
+                                            0.0
+                                        ],
+                                        "dtype": "compas.geometry/Point",
+                                        "guid": "573d2df7-6dbd-4094-a4a0-2791f5882d4b"
+                                    }
+                                ],
+                                "id": [
+                                    -1
+                                ],
+                                "insertion": {
+                                    "data": [
+                                        0.0,
+                                        0.0,
+                                        1.0
+                                    ],
+                                    "dtype": "compas.geometry/Vector",
+                                    "guid": "14ab332c-5a66-4470-94fa-d8c63c13f3a4"
+                                },
+                                "name": "BLOCK",
+                                "oobb": null,
+                                "structure": {}
+                            },
+                            "dtype": "compas_assembly2.element/Element",
+                            "guid": "ebb9be8d-d257-4e96-a175-64beb4b0eea9"
+                        },
+                        {
+                            "data": {
+                                "aabb": null,
+                                "attributes": {},
+                                "convex_hull": {
+                                    "data": {
+                                        "attributes": {
+                                            "name": "Mesh"
+                                        },
+                                        "dea": {},
+                                        "dfa": {},
+                                        "dva": {
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        },
+                                        "edgedata": {},
+                                        "face": {},
+                                        "facedata": {},
+                                        "max_face": -1,
+                                        "max_vertex": -1,
+                                        "vertex": {}
+                                    },
+                                    "dtype": "compas.datastructures/Mesh",
+                                    "guid": "4682a4b3-745a-487d-a149-be47733cdde4"
+                                },
+                                "fabrication": {},
+                                "frame": {
+                                    "data": {
+                                        "point": [
+                                            0.0,
+                                            0.0,
+                                            0.0
+                                        ],
+                                        "xaxis": [
+                                            1.0,
+                                            0.0,
+                                            0.0
+                                        ],
+                                        "yaxis": [
+                                            0.0,
+                                            1.0,
+                                            0.0
+                                        ]
+                                    },
+                                    "dtype": "compas.geometry/Frame",
+                                    "guid": "bf6f123f-1f8e-4a4f-be72-f3d35bff42bb"
+                                },
+                                "frame_global": {
+                                    "data": {
+                                        "point": [
+                                            0.0,
+                                            0.0,
+                                            0.0
+                                        ],
+                                        "xaxis": [
+                                            1.0,
+                                            0.0,
+                                            0.0
+                                        ],
+                                        "yaxis": [
+                                            0.0,
+                                            1.0,
+                                            0.0
+                                        ]
+                                    },
+                                    "dtype": "compas.geometry/Frame",
+                                    "guid": "6ec5370c-3c71-43f3-a43a-3b639b050e50"
+                                },
+                                "geometry": [],
+                                "geometry_simplified": [
+                                    {
+                                        "data": [
+                                            0.0,
+                                            5.0,
+                                            0.0
+                                        ],
+                                        "dtype": "compas.geometry/Point",
+                                        "guid": "4f99b336-955d-4f16-89e9-194881bf93c8"
+                                    }
+                                ],
+                                "id": [
+                                    -1
+                                ],
+                                "insertion": {
+                                    "data": [
+                                        0.0,
+                                        0.0,
+                                        1.0
+                                    ],
+                                    "dtype": "compas.geometry/Vector",
+                                    "guid": "dd944fab-066c-4d0b-9ded-567bde49f924"
+                                },
+                                "name": "BLOCK",
+                                "oobb": null,
+                                "structure": {}
+                            },
+                            "dtype": "compas_assembly2.element/Element",
+                            "guid": "ab2740f8-3984-4c8f-b210-d381b6f21ef8"
+                        }
+                    ],
+                    "name": "timber2"
+                }
+            ]
+        },
+        "interactions": {
+            "attributes": {
+                "name": "root"
+            },
+            "dea": {},
+            "dna": {},
+            "edge": {},
+            "max_node": -1,
+            "node": {}
+        },
+        "name": "root"
+    },
+    "dtype": "compas_assembly2.model/Model",
+    "guid": "352015a4-8320-4c66-898c-6b9ee5b98962"
+}

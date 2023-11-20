@@ -46,7 +46,7 @@
                 ]
             ],
             "attributes": {},
-            "complex": [
+            "geometry": [
                 {
                     "dtype": "compas.datastructures/Mesh",
                     "guid": "031d5353-b88b-4646-a681-cadf3c97e5a4",
@@ -277,7 +277,7 @@
                 ]
             ],
             "outlines": [],
-            "simplex": [
+            "geometry_simplified": [
                 {
                     "dtype": "compas.geometry/Point",
                     "guid": "a6ede755-941d-4e50-b21d-5288b3025226",
@@ -338,7 +338,7 @@
                 ]
             ],
             "attributes": {},
-            "complex": [
+            "geometry": [
                 {
                     "dtype": "compas.geometry/Polyline",
                     "guid": "1f7fa3c8-b320-42d2-9c6b-eab18cb5fd75",
@@ -2652,7 +2652,7 @@
                 ]
             ],
             "outlines": [],
-            "simplex": [
+            "geometry_simplified": [
                 {
                     "dtype": "compas.geometry/Line",
                     "guid": "a2b07174-2f1b-457f-b08d-f6887e130683",
@@ -2720,7 +2720,7 @@
                 ]
             ],
             "attributes": {},
-            "complex": [
+            "geometry": [
                 {
                     "dtype": "compas.geometry/Box",
                     "guid": "9fd7f0b0-40b0-4eaf-931e-533a6f482a65",
@@ -2976,7 +2976,7 @@
                 ]
             ],
             "outlines": [],
-            "simplex": [
+            "geometry_simplified": [
                 {
                     "dtype": "compas.geometry/Polyline",
                     "guid": "dcae0f67-95c4-4a51-a6df-e1123858cae7",

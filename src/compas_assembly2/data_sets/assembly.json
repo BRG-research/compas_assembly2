@@ -64,7 +64,7 @@
                                             ]
                                         ],
                                         "attributes": {},
-                                        "complex": [
+                                        "geometry": [
                                             {
                                                 "dtype": "compas.datastructures/Mesh",
                                                 "guid": "71285b23-cf2a-47f0-b199-d724e1e5f227",
@@ -409,7 +409,7 @@
                                                 1.1547005383792517
                                             ]
                                         ],
-                                        "simplex": [
+                                        "geometry_simplified": [
                                             {
                                                 "dtype": "compas.geometry/Point",
                                                 "guid": "bffac537-baf1-4634-b877-bd99572ca9c4",
@@ -475,7 +475,7 @@
                                             ]
                                         ],
                                         "attributes": {},
-                                        "complex": [
+                                        "geometry": [
                                             {
                                                 "dtype": "compas.geometry/Point",
                                                 "guid": "6efab5ca-e596-40f9-9109-76efec646fb7",
@@ -565,7 +565,7 @@
                                         },
                                         "name": "WHEAT MALT",
                                         "oobb": null,
-                                        "simplex": [
+                                        "geometry_simplified": [
                                             {
                                                 "dtype": "compas.geometry/Point",
                                                 "guid": "e9bea0dd-5b9f-4e9b-a6f9-72d00746780f",
@@ -631,7 +631,7 @@
                                             ]
                                         ],
                                         "attributes": {},
-                                        "complex": [
+                                        "geometry": [
                                             {
                                                 "dtype": "compas.geometry/Point",
                                                 "guid": "e8daff6b-f372-4a90-bf72-79eb5b7a89c0",
@@ -721,7 +721,7 @@
                                         },
                                         "name": "NOBLE HOPS",
                                         "oobb": null,
-                                        "simplex": [
+                                        "geometry_simplified": [
                                             {
                                                 "dtype": "compas.geometry/Point",
                                                 "guid": "f8e2c203-a961-4c97-872d-75ce90a5d32c",
@@ -787,7 +787,7 @@
                                             ]
                                         ],
                                         "attributes": {},
-                                        "complex": [
+                                        "geometry": [
                                             {
                                                 "dtype": "compas.geometry/Point",
                                                 "guid": "7aa86e62-bd42-490f-98c1-00e97e160a82",
@@ -877,7 +877,7 @@
                                         },
                                         "name": "WHEAT BEER YEAST",
                                         "oobb": null,
-                                        "simplex": [
+                                        "geometry_simplified": [
                                             {
                                                 "dtype": "compas.geometry/Point",
                                                 "guid": "4db92484-c265-47de-a46a-a790e4a2befc",
@@ -950,7 +950,7 @@
                                             ]
                                         ],
                                         "attributes": {},
-                                        "complex": [
+                                        "geometry": [
                                             {
                                                 "dtype": "compas.geometry/Point",
                                                 "guid": "2a06d99c-08aa-4335-94b2-f42745287938",
@@ -1040,7 +1040,7 @@
                                         },
                                         "name": "CHICKEN",
                                         "oobb": null,
-                                        "simplex": [
+                                        "geometry_simplified": [
                                             {
                                                 "dtype": "compas.geometry/Point",
                                                 "guid": "cb0c9907-455e-4f19-97f5-960477bac1fd",
@@ -1106,7 +1106,7 @@
                                             ]
                                         ],
                                         "attributes": {},
-                                        "complex": [
+                                        "geometry": [
                                             {
                                                 "dtype": "compas.geometry/Point",
                                                 "guid": "2bb5fe76-bd0c-45c5-a33e-674445ae7985",
@@ -1196,7 +1196,7 @@
                                         },
                                         "name": "SALT",
                                         "oobb": null,
-                                        "simplex": [
+                                        "geometry_simplified": [
                                             {
                                                 "dtype": "compas.geometry/Point",
                                                 "guid": "0417fb13-91c0-4026-9b55-085e7ad42a3c",
@@ -1262,7 +1262,7 @@
                                             ]
                                         ],
                                         "attributes": {},
-                                        "complex": [
+                                        "geometry": [
                                             {
                                                 "dtype": "compas.geometry/Point",
                                                 "guid": "5aa421c9-cf16-4381-9138-878abaca1b5e",
@@ -1352,7 +1352,7 @@
                                         },
                                         "name": "EGG",
                                         "oobb": null,
-                                        "simplex": [
+                                        "geometry_simplified": [
                                             {
                                                 "dtype": "compas.geometry/Point",
                                                 "guid": "af868379-c68f-4ccb-a978-62a838fb49f9",

@@ -5,8 +5,8 @@ This package use compas>=2.0.0a1.
 ## TODO
 
 - [ ] Create different Element classes e.g. Beam, Plate, Block, Glulam, etc. Use OCC for curved geometries
-- [ ] Element.py - Interface detection using compas_assembly shapely library for outlines for complex
-- [ ] Element.py - Interface detection using Line and Polyline proximity for simplex
+- [ ] Element.py - Interface detection using compas_assembly shapely library for outlines for geometry
+- [ ] Element.py - Interface detection using Line and Polyline proximity for geometry_simplified
 - [ ] Fast Tree search that is native to Python
 - [ ] Go over the other assembly data-structure.
 

@@ -17,8 +17,8 @@ b1 = Element(
     name=ELEMENT_NAME.BLOCK,
     id=0,
     frame=Frame.worldXY,
-    simplex=Point(0, 0, 0),
-    complex=Box.from_width_height_depth(0.5, 0.5, 0.5),
+    geometry_simplified=Point(0, 0, 0),
+    geometry=Box.from_width_height_depth(0.5, 0.5, 0.5),
 )
 
 # ==========================================================================

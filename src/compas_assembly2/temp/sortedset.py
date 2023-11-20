@@ -117,7 +117,7 @@
 #         argument to Python's `sorted` function, extracts a comparison key from
 #         each value. The default, none, compares values directly.
 
-#         Runtime complexity: `O(n*log(n))`
+#         Runtime geometryity: `O(n*log(n))`
 
 #         >>> ss = SortedSet([3, 1, 2, 5, 4])
 #         >>> ss
@@ -195,7 +195,7 @@
 
 #         ``ss.__contains__(value)`` <==> ``value in ss``
 
-#         Runtime complexity: `O(1)`
+#         Runtime geometryity: `O(1)`
 
 #         >>> ss = SortedSet([1, 2, 3, 4, 5])
 #         >>> 3 in ss
@@ -214,7 +214,7 @@
 
 #         Supports slicing.
 
-#         Runtime complexity: `O(log(n))` -- approximate.
+#         Runtime geometryity: `O(log(n))` -- approximate.
 
 #         >>> ss = SortedSet('abcde')
 #         >>> ss[2]
@@ -238,7 +238,7 @@
 
 #         Supports slicing.
 
-#         Runtime complexity: `O(log(n))` -- approximate.
+#         Runtime geometryity: `O(log(n))` -- approximate.
 
 #         >>> ss = SortedSet('abcde')
 #         >>> del ss[2]
@@ -281,7 +281,7 @@
 
 #         Comparisons use subset and superset semantics as with sets.
 
-#         Runtime complexity: `O(n)`
+#         Runtime geometryity: `O(n)`
 
 #         :param other: `other` set
 #         :return: true if sorted set is {0} `other`
@@ -333,7 +333,7 @@
 #     def add(self, value):
 #         """Add `value` to sorted set.
 
-#         Runtime complexity: `O(log(n))` -- approximate.
+#         Runtime geometryity: `O(log(n))` -- approximate.
 
 #         >>> ss = SortedSet()
 #         >>> ss.add(3)
@@ -355,7 +355,7 @@
 #     def clear(self):
 #         """Remove all values from sorted set.
 
-#         Runtime complexity: `O(n)`
+#         Runtime geometryity: `O(n)`
 
 #         """
 #         self._set.clear()
@@ -364,7 +364,7 @@
 #     def copy(self):
 #         """Return a shallow copy of the sorted set.
 
-#         Runtime complexity: `O(n)`
+#         Runtime geometryity: `O(n)`
 
 #         :return: new sorted set
 
@@ -376,7 +376,7 @@
 #     def count(self, value):
 #         """Return number of occurrences of `value` in the sorted set.
 
-#         Runtime complexity: `O(1)`
+#         Runtime geometryity: `O(1)`
 
 #         >>> ss = SortedSet([1, 2, 3, 4, 5])
 #         >>> ss.count(3)
@@ -393,7 +393,7 @@
 
 #         If `value` is not a member, do nothing.
 
-#         Runtime complexity: `O(log(n))` -- approximate.
+#         Runtime geometryity: `O(log(n))` -- approximate.
 
 #         >>> ss = SortedSet([1, 2, 3, 4, 5])
 #         >>> ss.discard(5)
@@ -419,7 +419,7 @@
 
 #         Negative indices are supported.
 
-#         Runtime complexity: `O(log(n))` -- approximate.
+#         Runtime geometryity: `O(log(n))` -- approximate.
 
 #         >>> ss = SortedSet('abcde')
 #         >>> ss.pop()
@@ -444,7 +444,7 @@
 
 #         If `value` is not a member, raise :exc:`KeyError`.
 
-#         Runtime complexity: `O(log(n))` -- approximate.
+#         Runtime geometryity: `O(log(n))` -- approximate.
 
 #         >>> ss = SortedSet([1, 2, 3, 4, 5])
 #         >>> ss.remove(5)
@@ -671,7 +671,7 @@
 #     def _check(self):
 #         """Check invariants of sorted set.
 
-#         Runtime complexity: `O(n)`
+#         Runtime geometryity: `O(n)`
 
 #         """
 #         _set = self._set

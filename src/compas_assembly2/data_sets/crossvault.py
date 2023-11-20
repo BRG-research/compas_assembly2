@@ -6,14 +6,14 @@ if __name__ == "__main__":
 
     meshes = json_load("src/compas_assembly2/data_sets/cross_vault_compas2.json")
 
-    # convert meshes to elements and the simplex is the mesh center
+    # convert meshes to elements and the geometry_simplified is the mesh center
     elements = []
     for mesh in meshes:
         mid_point = mesh.centroid()
         x_axis = mesh.face_normal(0)
         y_axis = mesh.face_normal(1)
         frame = Frame(point=mid_point, xaxis=x_axis, yaxis=y_axis)
-        element = Element(simplex=mid_point, complex=[mesh], frame=frame)
+        element = Element(geometry_simplified=mid_point, geometry=[mesh], frame=frame)
         elements.append(element)
 
     # --------------------------------------------------------------------------

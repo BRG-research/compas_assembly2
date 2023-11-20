@@ -47,23 +47,23 @@ if __name__ == "__main__":
         name=ELEMENT_NAME.BLOCK,
         id=[0, 1],
         frame=Frame([-3, 0, 0], [0.866, 0.1, 0.0], [0.5, 0.866, 0.0]),
-        simplex=[Point(-3, 0, 0)],
-        complex=geo_0,
+        geometry_simplified=[Point(-3, 0, 0)],
+        geometry=geo_0,
     )
 
     elem_1 = Element(
         name=ELEMENT_NAME.BEAM,
         id=[0, 2],
         frame=Frame([0, 0, 0], [0, 1, 0.0], [1, 0, 0.0]),
-        simplex=[Line((0, -2, 0), (0, 2, 0))],
-        complex=geo_1,
+        geometry_simplified=[Line((0, -2, 0), (0, 2, 0))],
+        geometry=geo_1,
     )
 
     elem_2 = Element(
         name=ELEMENT_NAME.PLATE,
         id=[3, 0],
         frame=Frame([3, 0, 0], [0.866, 0.1, 0.0], [0.5, 0.866, 0.0]),
-        simplex=[
+        geometry_simplified=[
             Polyline(
                 [
                     Point(2.236, -2.102, -0.125),
@@ -74,7 +74,7 @@ if __name__ == "__main__":
                 ]
             )
         ],
-        complex=geo_2,
+        geometry=geo_2,
     )
 
     # ==========================================================================

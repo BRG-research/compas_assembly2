@@ -219,7 +219,7 @@
 
 #         """Remove all items from sorted dict.
 
-#         Runtime complexity: `O(n)`
+#         Runtime geometryity: `O(n)`
 
 #         """
 #         dict.clear(self)
@@ -230,7 +230,7 @@
 
 #         ``sd.__delitem__(key)`` <==> ``del sd[key]``
 
-#         Runtime complexity: `O(log(n))` -- approximate.
+#         Runtime geometryity: `O(log(n))` -- approximate.
 
 #         >>> sd = SortedDict({'a': 1, 'b': 2, 'c': 3})
 #         >>> del sd['b']
@@ -275,7 +275,7 @@
 
 #         ``sd.__setitem__(key, value)`` <==> ``sd[key] = value``
 
-#         Runtime complexity: `O(log(n))` -- approximate.
+#         Runtime geometryity: `O(log(n))` -- approximate.
 
 #         >>> sd = SortedDict()
 #         >>> sd['c'] = 3
@@ -313,7 +313,7 @@
 #     def copy(self):
 #         """Return a shallow copy of the sorted dict.
 
-#         Runtime complexity: `O(n)`
+#         Runtime geometryity: `O(n)`
 
 #         :return: new sorted dict
 
@@ -329,7 +329,7 @@
 #         Items in the sorted dict have keys from `iterable` and values equal to
 #         `value`.
 
-#         Runtime complexity: `O(n*log(n))`
+#         Runtime geometryity: `O(n*log(n))`
 
 #         :return: new sorted dict
 
@@ -404,7 +404,7 @@
 #         If the `key` is not found then return `default` if given. If `default`
 #         is not given then raise :exc:`KeyError`.
 
-#         Runtime complexity: `O(log(n))` -- approximate.
+#         Runtime geometryity: `O(log(n))` -- approximate.
 
 #         >>> sd = SortedDict({'a': 1, 'b': 2, 'c': 3})
 #         >>> sd.pop('c')
@@ -440,7 +440,7 @@
 
 #         If the `index` is out of range, raises :exc:`IndexError`.
 
-#         Runtime complexity: `O(log(n))`
+#         Runtime geometryity: `O(log(n))`
 
 #         >>> sd = SortedDict({'a': 1, 'b': 2, 'c': 3})
 #         >>> sd.popitem()
@@ -475,7 +475,7 @@
 
 #         If the `index` is out of range, raises :exc:`IndexError`.
 
-#         Runtime complexity: `O(log(n))`
+#         Runtime geometryity: `O(log(n))`
 
 #         >>> sd = SortedDict({'a': 1, 'b': 2, 'c': 3})
 #         >>> sd.peekitem()
@@ -504,7 +504,7 @@
 
 #         Optional argument `default` defaults to none.
 
-#         Runtime complexity: `O(log(n))` -- approximate.
+#         Runtime geometryity: `O(log(n))` -- approximate.
 
 #         >>> sd = SortedDict()
 #         >>> sd.setdefault('a', 1)
@@ -587,7 +587,7 @@
 #     def _check(self):
 #         """Check invariants of sorted dict.
 
-#         Runtime complexity: `O(n)`
+#         Runtime geometryity: `O(n)`
 
 #         """
 #         _list = self._list
@@ -603,7 +603,7 @@
 
 #     Supports slicing.
 
-#     Runtime complexity: `O(log(n))` -- approximate.
+#     Runtime geometryity: `O(log(n))` -- approximate.
 
 #     >>> sd = SortedDict({'a': 1, 'b': 2, 'c': 3})
 #     >>> view = sd.keys()
@@ -656,7 +656,7 @@
 
 #         Supports slicing.
 
-#         Runtime complexity: `O(log(n))` -- approximate.
+#         Runtime geometryity: `O(log(n))` -- approximate.
 
 #         >>> sd = SortedDict({'a': 1, 'b': 2, 'c': 3})
 #         >>> skv = sd.keys()
@@ -703,7 +703,7 @@
 
 #         Supports slicing.
 
-#         Runtime complexity: `O(log(n))` -- approximate.
+#         Runtime geometryity: `O(log(n))` -- approximate.
 
 #         >>> sd = SortedDict({'a': 1, 'b': 2, 'c': 3})
 #         >>> siv = sd.items()
@@ -754,7 +754,7 @@
 
 #         Supports slicing.
 
-#         Runtime complexity: `O(log(n))` -- approximate.
+#         Runtime geometryity: `O(log(n))` -- approximate.
 
 #         >>> sd = SortedDict({'a': 2, 'b': 1, 'c': 3})
 #         >>> svv = sd.values()

@@ -150,7 +150,7 @@
 #         Optional `iterable` argument provides an initial iterable of values to
 #         initialize the sorted list.
 
-#         Runtime complexity: `O(n*log(n))`
+#         Runtime geometryity: `O(n*log(n))`
 
 #         >>> sl = SortedList()
 #         >>> sl
@@ -224,7 +224,7 @@
 #         See :doc:`implementation` and :doc:`performance-scale` for more
 #         information.
 
-#         Runtime complexity: `O(n)`
+#         Runtime geometryity: `O(n)`
 
 #         :param int load: load-factor for sorted list sublists
 
@@ -237,7 +237,7 @@
 #     def clear(self):
 #         """Remove all values from sorted list.
 
-#         Runtime complexity: `O(n)`
+#         Runtime geometryity: `O(n)`
 
 #         """
 #         self._len = 0
@@ -251,7 +251,7 @@
 #     def add(self, value):
 #         """Add `value` to sorted list.
 
-#         Runtime complexity: `O(log(n))` -- approximate.
+#         Runtime geometryity: `O(log(n))` -- approximate.
 
 #         >>> sl = SortedList()
 #         >>> sl.add(3)
@@ -319,7 +319,7 @@
 #     def update(self, iterable):
 #         """Update sorted list by adding all values from `iterable`.
 
-#         Runtime complexity: `O(k*log(n))` -- approximate.
+#         Runtime geometryity: `O(k*log(n))` -- approximate.
 
 #         >>> sl = SortedList()
 #         >>> sl.update([3, 1, 2])
@@ -358,7 +358,7 @@
 
 #         ``sl.__contains__(value)`` <==> ``value in sl``
 
-#         Runtime complexity: `O(log(n))`
+#         Runtime geometryity: `O(log(n))`
 
 #         >>> sl = SortedList([1, 2, 3, 4, 5])
 #         >>> 3 in sl
@@ -388,7 +388,7 @@
 
 #         If `value` is not a member, do nothing.
 
-#         Runtime complexity: `O(log(n))` -- approximate.
+#         Runtime geometryity: `O(log(n))` -- approximate.
 
 #         >>> sl = SortedList([1, 2, 3, 4, 5])
 #         >>> sl.discard(5)
@@ -420,7 +420,7 @@
 
 #         If `value` is not a member, raise ValueError.
 
-#         Runtime complexity: `O(log(n))` -- approximate.
+#         Runtime geometryity: `O(log(n))` -- approximate.
 
 #         >>> sl = SortedList([1, 2, 3, 4, 5])
 #         >>> sl.remove(5)
@@ -755,7 +755,7 @@
 
 #         Supports slicing.
 
-#         Runtime complexity: `O(log(n))` -- approximate.
+#         Runtime geometryity: `O(log(n))` -- approximate.
 
 #         >>> sl = SortedList('abcde')
 #         >>> del sl[2]
@@ -806,7 +806,7 @@
 
 #         Supports slicing.
 
-#         Runtime complexity: `O(log(n))` -- approximate.
+#         Runtime geometryity: `O(log(n))` -- approximate.
 
 #         >>> sl = SortedList('abcde')
 #         >>> sl[1]
@@ -1147,7 +1147,7 @@
 
 #         Similar to the `bisect` module in the standard library.
 
-#         Runtime complexity: `O(log(n))` -- approximate.
+#         Runtime geometryity: `O(log(n))` -- approximate.
 
 #         >>> sl = SortedList([10, 11, 12, 13, 14])
 #         >>> sl.bisect_left(12)
@@ -1178,7 +1178,7 @@
 
 #         Similar to the `bisect` module in the standard library.
 
-#         Runtime complexity: `O(log(n))` -- approximate.
+#         Runtime geometryity: `O(log(n))` -- approximate.
 
 #         >>> sl = SortedList([10, 11, 12, 13, 14])
 #         >>> sl.bisect_right(12)
@@ -1207,7 +1207,7 @@
 #     def count(self, value):
 #         """Return number of occurrences of `value` in the sorted list.
 
-#         Runtime complexity: `O(log(n))` -- approximate.
+#         Runtime geometryity: `O(log(n))` -- approximate.
 
 #         >>> sl = SortedList([1, 2, 2, 3, 3, 3, 4, 4, 4, 4])
 #         >>> sl.count(3)
@@ -1246,7 +1246,7 @@
 #     def copy(self):
 #         """Return a shallow copy of the sorted list.
 
-#         Runtime complexity: `O(n)`
+#         Runtime geometryity: `O(n)`
 
 #         :return: new sorted list
 
@@ -1293,7 +1293,7 @@
 
 #         Negative indices are supported.
 
-#         Runtime complexity: `O(log(n))` -- approximate.
+#         Runtime geometryity: `O(log(n))` -- approximate.
 
 #         >>> sl = SortedList('abcde')
 #         >>> sl.pop()
@@ -1355,7 +1355,7 @@
 
 #         Negative indices are supported.
 
-#         Runtime complexity: `O(log(n))` -- approximate.
+#         Runtime geometryity: `O(log(n))` -- approximate.
 
 #         >>> sl = SortedList('abcde')
 #         >>> sl.index('d')
@@ -1427,7 +1427,7 @@
 
 #         Values in `other` do not need to be in sorted order.
 
-#         Runtime complexity: `O(n*log(n))`
+#         Runtime geometryity: `O(n*log(n))`
 
 #         >>> sl1 = SortedList('bat')
 #         >>> sl2 = SortedList('cat')
@@ -1451,7 +1451,7 @@
 
 #         Values in `other` do not need to be in sorted order.
 
-#         Runtime complexity: `O(k*log(n))` -- approximate.
+#         Runtime geometryity: `O(k*log(n))` -- approximate.
 
 #         >>> sl = SortedList('bat')
 #         >>> sl += 'cat'
@@ -1470,7 +1470,7 @@
 
 #         ``sl.__mul__(num)`` <==> ``sl * num``
 
-#         Runtime complexity: `O(n*log(n))`
+#         Runtime geometryity: `O(n*log(n))`
 
 #         >>> sl = SortedList('abc')
 #         >>> sl * 3
@@ -1490,7 +1490,7 @@
 
 #         ``sl.__imul__(num)`` <==> ``sl *= num``
 
-#         Runtime complexity: `O(n*log(n))`
+#         Runtime geometryity: `O(n*log(n))`
 
 #         >>> sl = SortedList('abc')
 #         >>> sl *= 3
@@ -1537,7 +1537,7 @@
 
 #         Comparisons use lexicographical order as with sequences.
 
-#         Runtime complexity: `O(n)`
+#         Runtime geometryity: `O(n)`
 
 #         :param other: `other` sequence
 #         :return: true if sorted list is {0} `other`
@@ -1572,7 +1572,7 @@
 #     def _check(self):
 #         """Check invariants of sorted list.
 
-#         Runtime complexity: `O(n)`
+#         Runtime geometryity: `O(n)`
 
 #         """
 #         try:
@@ -1684,7 +1684,7 @@
 #         argument to Python's `sorted` function, extracts a comparison key from
 #         each value. The default is the identity function.
 
-#         Runtime complexity: `O(n*log(n))`
+#         Runtime geometryity: `O(n*log(n))`
 
 #         >>> from operator import neg
 #         >>> skl = SortedKeyList(key=neg)
@@ -1721,7 +1721,7 @@
 #     def clear(self):
 #         """Remove all values from sorted-key list.
 
-#         Runtime complexity: `O(n)`
+#         Runtime geometryity: `O(n)`
 
 #         """
 #         self._len = 0
@@ -1735,7 +1735,7 @@
 #     def add(self, value):
 #         """Add `value` to sorted-key list.
 
-#         Runtime complexity: `O(log(n))` -- approximate.
+#         Runtime geometryity: `O(log(n))` -- approximate.
 
 #         >>> from operator import neg
 #         >>> skl = SortedKeyList(key=neg)
@@ -1816,7 +1816,7 @@
 #     def update(self, iterable):
 #         """Update sorted-key list by adding all values from `iterable`.
 
-#         Runtime complexity: `O(k*log(n))` -- approximate.
+#         Runtime geometryity: `O(k*log(n))` -- approximate.
 
 #         >>> from operator import neg
 #         >>> skl = SortedKeyList(key=neg)
@@ -1858,7 +1858,7 @@
 
 #         ``skl.__contains__(value)`` <==> ``value in skl``
 
-#         Runtime complexity: `O(log(n))`
+#         Runtime geometryity: `O(log(n))`
 
 #         >>> from operator import neg
 #         >>> skl = SortedKeyList([1, 2, 3, 4, 5], key=neg)
@@ -1906,7 +1906,7 @@
 
 #         If `value` is not a member, do nothing.
 
-#         Runtime complexity: `O(log(n))` -- approximate.
+#         Runtime geometryity: `O(log(n))` -- approximate.
 
 #         >>> from operator import neg
 #         >>> skl = SortedKeyList([5, 4, 3, 2, 1], key=neg)
@@ -1954,7 +1954,7 @@
 
 #         If `value` is not a member, raise ValueError.
 
-#         Runtime complexity: `O(log(n))` -- approximate.
+#         Runtime geometryity: `O(log(n))` -- approximate.
 
 #         >>> from operator import neg
 #         >>> skl = SortedKeyList([1, 2, 3, 4, 5], key=neg)
@@ -2188,7 +2188,7 @@
 
 #         Similar to the `bisect` module in the standard library.
 
-#         Runtime complexity: `O(log(n))` -- approximate.
+#         Runtime geometryity: `O(log(n))` -- approximate.
 
 #         >>> from operator import neg
 #         >>> skl = SortedKeyList([5, 4, 3, 2, 1], key=neg)
@@ -2209,7 +2209,7 @@
 
 #         Similar to the `bisect` module in the standard library.
 
-#         Runtime complexity: `O(log(n))` -- approximate.
+#         Runtime geometryity: `O(log(n))` -- approximate.
 
 #         >>> from operator import neg
 #         >>> skl = SortedList([5, 4, 3, 2, 1], key=neg)
@@ -2232,7 +2232,7 @@
 
 #         Similar to the `bisect` module in the standard library.
 
-#         Runtime complexity: `O(log(n))` -- approximate.
+#         Runtime geometryity: `O(log(n))` -- approximate.
 
 #         >>> from operator import neg
 #         >>> skl = SortedKeyList([5, 4, 3, 2, 1], key=neg)
@@ -2267,7 +2267,7 @@
 
 #         Similar to the `bisect` module in the standard library.
 
-#         Runtime complexity: `O(log(n))` -- approximate.
+#         Runtime geometryity: `O(log(n))` -- approximate.
 
 #         >>> from operator import neg
 #         >>> skl = SortedList([5, 4, 3, 2, 1], key=neg)
@@ -2298,7 +2298,7 @@
 #     def count(self, value):
 #         """Return number of occurrences of `value` in the sorted-key list.
 
-#         Runtime complexity: `O(log(n))` -- approximate.
+#         Runtime geometryity: `O(log(n))` -- approximate.
 
 #         >>> from operator import neg
 #         >>> skl = SortedKeyList([4, 4, 4, 4, 3, 3, 3, 2, 2, 1], key=neg)
@@ -2343,7 +2343,7 @@
 #     def copy(self):
 #         """Return a shallow copy of the sorted-key list.
 
-#         Runtime complexity: `O(n)`
+#         Runtime geometryity: `O(n)`
 
 #         :return: new sorted-key list
 
@@ -2363,7 +2363,7 @@
 
 #         Negative indices are supported.
 
-#         Runtime complexity: `O(log(n))` -- approximate.
+#         Runtime geometryity: `O(log(n))` -- approximate.
 
 #         >>> from operator import neg
 #         >>> skl = SortedKeyList([5, 4, 3, 2, 1], key=neg)
@@ -2443,7 +2443,7 @@
 
 #         Values in `other` do not need to be in sorted-key order.
 
-#         Runtime complexity: `O(n*log(n))`
+#         Runtime geometryity: `O(n*log(n))`
 
 #         >>> from operator import neg
 #         >>> skl1 = SortedKeyList([5, 4, 3], key=neg)
@@ -2466,7 +2466,7 @@
 
 #         ``skl.__mul__(num)`` <==> ``skl * num``
 
-#         Runtime complexity: `O(n*log(n))`
+#         Runtime geometryity: `O(n*log(n))`
 
 #         >>> from operator import neg
 #         >>> skl = SortedKeyList([3, 2, 1], key=neg)
@@ -2499,7 +2499,7 @@
 #     def _check(self):
 #         """Check invariants of sorted-key list.
 
-#         Runtime complexity: `O(n)`
+#         Runtime geometryity: `O(n)`
 
 #         """
 #         try:

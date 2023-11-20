@@ -465,7 +465,7 @@ p_t_0 = move_points_to_target_z(p_b_0, normals, height)
 p_b_0, p_b_1 = move_points_in_two_opposite_directions(p_b_0, [0, 1, 0], offset)
 p_t_0, p_t_1 = move_points_in_two_opposite_directions(p_t_0, [0, 1, 0], offset)
 pts = p_b_0 + p_b_1 + p_t_0 + p_t_1
-elements = Element.from_simplices_and_complexes(pts)
+elements = Element.from_simplices_and_geometryes(pts)
 
 # ==========================================================================
 # MEASUREMENT
@@ -564,11 +564,11 @@ for i in range(n - 1):
         mesh, center = mesh_box_from_eight_points(outline)
         return center, mesh
 
-    elements.append(Element.from_simplex_and_complex(*create_plate(box, f=0)))
-    # elements.append(Element.from_simplex_and_complex(*create_plate(box, f=2)))
-    # elements.append(Element.from_simplex_and_complex(*create_plate(box, f=4)))
-    # elements.append(Element.from_simplex_and_complex(*create_plate(box, f=5)))
-    # elements.append(Element.from_simplex_and_complex(*create_plate(box, f=3)))
+    elements.append(Element.from_geometry_simplified_and_geometry(*create_plate(box, f=0)))
+    # elements.append(Element.from_geometry_simplified_and_geometry(*create_plate(box, f=2)))
+    # elements.append(Element.from_geometry_simplified_and_geometry(*create_plate(box, f=4)))
+    # elements.append(Element.from_geometry_simplified_and_geometry(*create_plate(box, f=5)))
+    # elements.append(Element.from_geometry_simplified_and_geometry(*create_plate(box, f=3)))
 
 
 def points_from_side_plane(plane, side_planes):
@@ -587,7 +587,7 @@ rib_plane1 = Plane(rib_center + normal * plate_thickness * 0.5, normal)
 points0 = points_from_side_plane(rib_plane0, side_planes_for_beams)
 points1 = points_from_side_plane(rib_plane1, side_planes_for_beams)
 mesh_rib = _.Triagulator.from_loft_two_polygons(points0, points1)
-element = Element(id=i, simplex=mesh_rib.centroid(), complex=mesh_rib)
+element = Element(id=i, geometry_simplified=mesh_rib.centroid(), geometry=mesh_rib)
 elements.append(element)
 
 # second rib
@@ -598,7 +598,7 @@ rib_plane1 = Plane(rib_center + normal * plate_thickness * 0.5, normal)
 points0 = points_from_side_plane(rib_plane0, side_planes_for_beams)
 points1 = points_from_side_plane(rib_plane1, side_planes_for_beams)
 mesh_rib = _.Triagulator.from_loft_two_polygons(points0, points1)
-element = Element(id=i, simplex=mesh_rib.centroid(), complex=mesh_rib)
+element = Element(id=i, geometry_simplified=mesh_rib.centroid(), geometry=mesh_rib)
 elements.append(element)
 
 
