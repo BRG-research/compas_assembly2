@@ -5,7 +5,7 @@ from __future__ import division
 from math import cos, sin, pi
 from compas.geometry import Vector, Frame
 from compas.datastructures import Mesh
-from compas_assembly2 import Element, Model, ModelNode, ViewerModel
+from compas_assembly2 import Element, Model, Node, ViewerModel
 
 
 def geom_dome(ro, theta, phi):
@@ -135,7 +135,7 @@ class Dome:
         # create model
         # --------------------------------------------------------------------------
         model = Model(name="arch")
-        model.hierarchy.add(ModelNode("blocks", elements=elements))
+        model.add_node(Node("blocks", elements=elements))
 
         # --------------------------------------------------------------------------
         # add interactions

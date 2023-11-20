@@ -11,7 +11,7 @@ from compas.geometry import angle_vectors
 from compas.geometry import Frame
 from compas.geometry import Vector
 from compas.datastructures import Mesh
-from compas_assembly2 import Element, Model, ModelNode, ViewerModel
+from compas_assembly2 import Element, Model, Node, ViewerModel
 
 
 class Arch:
@@ -109,7 +109,7 @@ class Arch:
         # create model
         # --------------------------------------------------------------------------
         model = Model(name="arch")
-        model.hierarchy.add(ModelNode("blocks", elements=elements))
+        model.add_node(Node("blocks", elements=elements))
 
         # --------------------------------------------------------------------------
         # add interactions

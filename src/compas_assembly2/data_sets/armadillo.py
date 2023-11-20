@@ -1,6 +1,6 @@
 from compas.data import json_load
 from compas.geometry import Frame
-from compas_assembly2 import Element, Model, ModelNode, ViewerModel
+from compas_assembly2 import Element, Model, Node, ViewerModel
 
 if __name__ == "__main__":
 
@@ -20,7 +20,7 @@ if __name__ == "__main__":
     # create model
     # --------------------------------------------------------------------------
     model = Model(name="cross_vault")
-    model.hierarchy.add(ModelNode("blocks", elements=elements))
+    model.add_node(Node("blocks", elements=elements))
     model.print()
 
     # --------------------------------------------------------------------------

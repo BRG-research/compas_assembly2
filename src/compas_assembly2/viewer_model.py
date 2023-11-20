@@ -71,7 +71,7 @@ class ViewerModel:
             """recursive function to create the spatial structure of the model"""
 
             # --------------------------------------------------------------------------
-            # Create an empty object to store the ModelNode name
+            # Create an empty object to store the Node name
             # --------------------------------------------------------------------------
             node_geo = viewer.add(Collection([]), name="node_" + node.name)  # type: ignore
 
