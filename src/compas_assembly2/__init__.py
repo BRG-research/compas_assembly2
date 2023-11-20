@@ -229,6 +229,6 @@ from .tree import Tree, TreeNode  # noqa
 from .model import Model, ElementTree, Node  # noqa
 from .viewer_model import ViewerModel  # noqa
 from .viewer import Viewer  # noqa
-from .joint import Joint  # noqa
+# from .joint import Joint  # noqa
 from .block import Block  # noqa
 from .beam import Beam  # noqa

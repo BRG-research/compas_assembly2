@@ -31,7 +31,7 @@ import copy
 from math import fabs
 from collections import OrderedDict
 from compas_assembly2 import ELEMENT_NAME, JOINT_NAME
-from compas_assembly2 import Joint
+from compas_assembly2.joint import Joint
 
 try:
     from shapely.geometry import Polygon as ShapelyPolygon
