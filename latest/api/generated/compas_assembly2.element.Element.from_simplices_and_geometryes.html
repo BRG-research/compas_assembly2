@@ -3,7 +3,7 @@
 
 <head>
   
-  <title>compas_assembly2 - Element.axis_to_axis</title>
+  <title>compas_assembly2 - Element.from_simplices_and_geometryes</title>
   
 
   <meta charset="utf-8" />
@@ -20,11 +20,11 @@
   <link rel="stylesheet" type="text/css" href="../../_static/css/compas-reference.css" />
 
   
-  <link rel="next" title="Element.copy" href="compas_assembly2.element.Element.copy.html" />
+  <link rel="next" title="Element.has_collision" href="compas_assembly2.element.Element.has_collision.html" />
   
 
   
-  <link rel="prev" title="Element.aabb_center" href="compas_assembly2.element.Element.aabb_center.html" />
+  <link rel="prev" title="Element.from_plate_points" href="compas_assembly2.element.Element.from_plate_points.html" />
   
 
   <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
@@ -88,19 +88,20 @@
             
             <li class="breadcrumb-item"><a href="compas_assembly2.element.Element.html">Element</a></li>
             
-            <!-- <li class="breadcrumb-item active" aria-current="page">Element.axis_to_axis</li> -->
+            <!-- <li class="breadcrumb-item active" aria-current="page">Element.from_simplices_and_geometryes</li> -->
           </ol>
         </nav>
         
 
         
         
-        <section class="detail" id="element-axis-to-axis">
-<h1>Element.axis_to_axis</h1>
+        <section class="detail" id="element-from-simplices-and-geometryes">
+<h1>Element.from_simplices_and_geometryes</h1>
 <dl class="py method">
-<dt class="sig sig-object py" id="compas_assembly2.element.Element.axis_to_axis">
-<span class="sig-prename descclassname"><span class="pre">Element.</span></span><span class="sig-name descname"><span class="pre">axis_to_axis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BRG-research/compas_assembly2/blob/master/src/compas_assembly2/element.py#L1182"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="compas_assembly2.element.Element.from_simplices_and_geometryes">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Element.</span></span><span class="sig-name descname"><span class="pre">from_simplices_and_geometryes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simplices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometryes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>convert a list of geometries to elements, with assumtion that other property will be filled later</p>
+</dd></dl>
 
 </section>
 
@@ -144,7 +145,7 @@
       <div class="d-none d-xl-block col-xl-2 compas-toc" role="toc">
         
         <ul class="nav flex-column" id="compas-toc">
-<li class="nav-item"><a class="nav-link reference internal" href="#">Element.axis_to_axis</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="#">Element.from_simplices_and_geometryes</a></li>
 </ul>
 
       </div>
@@ -156,20 +157,20 @@
   <footer class="compas-footer">
     <nav class="nav p-2">
       
-      <a href="compas_assembly2.element.Element.aabb_center.html" title="Element.aabb_center" class="nav-link footer-link float-start text-left d-flex w-50" rel="prev">
+      <a href="compas_assembly2.element.Element.from_plate_points.html" title="Element.from_plate_points" class="nav-link footer-link float-start text-left d-flex w-50" rel="prev">
         <div class="nav-button p-2 m-2"><i class="fas fa-arrow-left"></i></div>
         <div class="nav-title flex-grow-1 align-self-center">
           <div class="nav-direction small font-weight-light">Previous</div>
-          Element.aabb_center
+          Element.from_plate_points
         </div>
       </a>
       
 
       
-      <a href="compas_assembly2.element.Element.copy.html" title="Element.copy" class="nav-link footer-link float-end text-right d-flex w-50" rel="next">
+      <a href="compas_assembly2.element.Element.has_collision.html" title="Element.has_collision" class="nav-link footer-link float-end text-right d-flex w-50" rel="next">
         <div class="nav-title footer-link flex-grow-1 align-self-center">
           <div class="nav-direction small font-weight-light">Next</div>
-          Element.copy
+          Element.has_collision
         </div>
         <div class="nav-button p-2 m-2"><i class="fas fa-arrow-right"></i></div>
       </a>
