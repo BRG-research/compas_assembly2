@@ -3,25 +3,9 @@ from __future__ import absolute_import
 from __future__ import division
 
 from compas.geometry import Point  # noqa: F401
-from compas_assembly2 import Tree, TreeNode
 from compas_assembly2 import Element
 from compas_assembly2 import Model, Node, ElementTree
 from compas.data.json import json_dump, json_load
-
-
-def create_tree():
-    tree = Tree()
-    root = TreeNode("root")
-    branch = TreeNode("branch")
-    leaf1 = TreeNode("leaf1")
-    leaf2 = TreeNode("leaf2")
-    tree.add(root)
-    root.add(branch)
-    branch.add(leaf1)
-    branch.add(leaf2)
-    print(tree, tree.__class__.__name__)
-    tree.print()
-    return tree
 
 
 def create_model():
@@ -505,7 +489,6 @@ def serialize_model():
 
 
 if __name__ == "__main__":
-    # tree = create_tree()
     # model_tree = create_model()
     # model_tree = insert_nodes()
     # model_tree = insert_element()
