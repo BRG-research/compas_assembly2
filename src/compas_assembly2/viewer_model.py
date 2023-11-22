@@ -1,17 +1,20 @@
 from compas.geometry import (
     Scale,
 )
+import compas
 
+if (compas.is_windows() or compas.is_blender()) is False:
+    try:
 
-try:
-    from compas_view2.app import App
-    from compas_view2.collections import Collection
-    from compas_view2.objects import MeshObject
+        from compas_view2.app import App
+        from compas_view2.collections import Collection
+        from compas_view2.objects import MeshObject
 
-    compas_view2_imported = True
-except ImportError:
-    print("WARNING: compas_view2 is not installed!!!")
-    compas_view2_imported = False
+        compas_view2_imported = True
+    except ImportError:
+
+        print("WARNING: compas_view2 is not installed!!!")
+        compas_view2_imported = False
 
 
 class ViewerModel:
@@ -31,7 +34,7 @@ class ViewerModel:
         # --------------------------------------------------------------------------
         # initialize the viewer
         # --------------------------------------------------------------------------
-        viewer = App(enable_sceneform=True, enable_propertyform=True, viewmode="lighted")
+        viewer = App(show_grid=False, enable_sceneform=True, enable_propertyform=True, viewmode="lighted")
 
         # --------------------------------------------------------------------------
         # create a sceneform to display a tree structure
