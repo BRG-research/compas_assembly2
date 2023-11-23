@@ -1327,6 +1327,7 @@ class Element(Data):
             str: The string representation of the Element.
         """
         return """TYPE_{0} ID_{1} GUID_{2}""".format(self.name, "_".join(map(str, self.id)), self.guid)
+        # return self.name
 
 
 class _:

@@ -3,18 +3,18 @@ from compas.geometry import (
 )
 import compas
 
-if (compas.is_windows() or compas.is_blender()) is False:
-    try:
+compas_view2_imported = False
 
+if not (compas.is_rhino() or compas.is_blender()):
+    try:
         from compas_view2.app import App
         from compas_view2.collections import Collection
         from compas_view2.objects import MeshObject
 
         compas_view2_imported = True
-    except ImportError:
 
+    except ImportError:
         print("WARNING: compas_view2 is not installed!!!")
-        compas_view2_imported = False
 
 
 class ViewerModel:
@@ -255,7 +255,7 @@ class ViewerModel:
     @classmethod
     def adjacency(cls, viewer, model, elements_by_guid):
         """create a tab on the left side to display the adjacency of the elements
-        when clicked geometryes are highlighted"""
+        when clicked geometries are highlighted"""
 
         # --------------------------------------------------------------------------
         # Get the adjacency from the model

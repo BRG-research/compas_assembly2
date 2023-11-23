@@ -533,6 +533,16 @@ class Node(TreeNode):
         """
         return self._elements
 
+    def clear_elements(self):
+        """
+        Clear the list of elements or attributes associated with the Node.
+
+        Returns
+        -------
+        None
+        """
+        self._elements = []
+
     @property
     def children(self):
         """
@@ -545,9 +555,25 @@ class Node(TreeNode):
         """
         return self._children
 
+    def clear_children(self):
+        """
+        Clear the list of elements or attributes associated with the Node.
+
+        Returns
+        -------
+        None
+        """
+        self._children = []
+
     # ==========================================================================
     # less than to add elements to the SortedList
     # ==========================================================================
+
+    def __contains__(self, item):
+        for child in self._children:
+            if child.name == item.name:
+                return True
+        return False
 
     def __lt__(self, other):
         """
@@ -1524,6 +1550,12 @@ class Model(Data):
     # element properties and methods - self._elements = OrderedDict()
     # ==========================================================================
 
+    def contains_node(self, node_name):
+        for child in self.hierarchy.root._children:  # type: ignore
+            if child.name == node_name:
+                return True
+        return False
+
     def add_elements(self, user_elements, copy_elements=False):
         """
         Add a list of elements to the model, ensuring GUID uniqueness.
@@ -1710,6 +1742,138 @@ class Model(Data):
 
     def insert_element(self, node, path=[], duplicate=False):
         self._hierarchy.insert_element(node, path, duplicate)
+
+    def merge(self, other_model, copy_elements=False):
+        """merge current model with the other model"""
+
+        # --------------------------------------------------------------------------
+        # merge elements
+        # collect the added elements and their guids, incase they are copied
+        # --------------------------------------------------------------------------
+        dict_old_guid_and_new_guid = {}
+        dict_old_guid_and_new_element = {}
+        for element in other_model.elements.values():
+            old_guid = str(element.guid)
+            added_element = self.add_element(element, True)
+            dict_old_guid_and_new_guid[old_guid] = str(added_element.guid)  # type: ignore
+            dict_old_guid_and_new_element[old_guid] = added_element
+
+        # --------------------------------------------------------------------------
+        # merge interactions
+        # add the graph edges based on the new mapping
+        # --------------------------------------------------------------------------
+        other_model_edges = other_model._interactions.edges()
+        for edge in other_model_edges:
+            node0 = dict_old_guid_and_new_element[edge[0]]
+            node1 = dict_old_guid_and_new_element[edge[1]]
+            self.add_interaction(node0, node1)
+
+        # self.print_elements()
+        # self.print_interactions()
+
+        # --------------------------------------------------------------------------
+        # merge hierarchy
+        # replace the elements with the new ones
+        # there can be two cases:
+        # 1. the other model has the same
+        # 2. the other model has similar hierarchy
+        # 3. the other model has a different hierarchy
+        # --------------------------------------------------------------------------
+
+        # step 1 replace the elements with the new ones, incase they are copied
+        def replace_elements(node):
+            for element in node.elements:
+                element = dict_old_guid_and_new_element[str(element.guid)]
+
+            # recursively replace elements
+            for child in node.children:
+                replace_elements(child)
+
+        replace_elements(other_model.hierarchy.root)
+
+        # step 2 add nodes to the tree
+        def add_nodes(main_node_childs, other_node_childs):
+            # step one check if there nodes with the same name, if it is just merge the elements
+
+            for other_node_child in other_node_childs:
+                found = False
+                for idx, main_node_child in enumerate(main_node_childs):
+                    if main_node_child.name == other_node_child.name:
+                        found = True
+                        # add elements from the current node to the base dictionary of Model class
+                        main_node_child._elements = main_node_child.elements + other_node_child.elements
+                        # and recusively repeat the process
+                        add_nodes(main_node_child.children, other_node_child.children)
+                        break
+                # if no matching name was found, add the whole node to the tree
+                if found is False:
+                    main_node_childs.append(other_node_child)
+
+        add_nodes(self._hierarchy.root.children, other_model._hierarchy.root.children)  # type: ignore
+
+    def flatten(self, flatenned_node_name="flat_node"):
+        """flatten the hierarchy structure"""
+
+        # step1 - get elements from the hierarchy
+        all_node_elements = []
+        all_node_elements.extend(self.hierarchy.root.elements)
+
+        def collect_elements(node):
+            for child in node.children:
+                all_node_elements.extend(child.elements)
+                collect_elements(child)
+
+        collect_elements(self.hierarchy.root)
+        # step2 - remove all nodes from the hierarchy
+        self.hierarchy.root.clear_children()  # type: ignore
+
+        # step3 - create a new node with the collected elements
+        self.hierarchy.add_node(node=Node(name=flatenned_node_name, elements=all_node_elements))
+
+    def _graft_node(self, node):
+        if len(node.elements) > 1:
+            for idx, element in enumerate(node.elements):
+                grafted_node = Node(name=str(idx), elements=[element])
+                self.hierarchy.add_node(node=grafted_node, parent=node)
+            node.elements.clear()
+
+        for child in node.children:
+            self._graft_node(child)
+
+    def graft(self):
+        """in hierarchy structure place elements into separate nodes"""
+        for child in self.hierarchy.root.children:  # type: ignore
+            self._graft_node(child)
+
+    def prune(self, level=0):
+        # Prune the tree by moving elements from child nodes to parent nodes and deleting child nodes.
+        if level == 0:
+            self.flatten()
+            return
+
+        def flatten_the_deeper_level_while_taking_all_the_elements(node):
+            if len(node.children) == 0:
+                return
+            else:
+                for child in node.children:
+                    flatten_the_deeper_level_while_taking_all_the_elements(child)
+                for child in node.children:
+                    node.elements.extend(child.elements)
+                node.clear_children()
+
+        def traverse_the_tree_and_prune(node, current_level):
+            if current_level == 0:
+                flatten_the_deeper_level_while_taking_all_the_elements(node)
+            else:
+                for child in node.children:
+                    traverse_the_tree_and_prune(child, current_level - 1)
+
+        # Ensure the specified level is within the valid range of the tree.
+        if level < 0:
+            raise ValueError("Level must be a non-negative integer.")
+
+        # Start pruning from the root node.
+        traverse_the_tree_and_prune(self.hierarchy.root, level)
 
     # ==========================================================================
     # interactions properties and methods - self._interactions = Graph()
@@ -2126,74 +2290,3 @@ class Model(Data):
         copy = self.copy()
         copy.transform(transformation)
         return copy
-
-    # ==========================================================================
-    # merge models
-    # ==========================================================================
-    def merge(self, other_model, copy_elements=False):
-        """merge current model with the other model"""
-
-        # --------------------------------------------------------------------------
-        # merge elements
-        # collect the added elements and their guids, incase they are copied
-        # --------------------------------------------------------------------------
-        dict_old_guid_and_new_guid = {}
-        dict_old_guid_and_new_element = {}
-        for element in other_model.elements.values():
-            old_guid = str(element.guid)
-            added_element = self.add_element(element, True)
-            dict_old_guid_and_new_guid[old_guid] = str(added_element.guid)  # type: ignore
-            dict_old_guid_and_new_element[old_guid] = added_element
-
-        # --------------------------------------------------------------------------
-        # merge interactions
-        # add the graph edges based on the new mapping
-        # --------------------------------------------------------------------------
-        other_model_edges = other_model._interactions.edges()
-        for edge in other_model_edges:
-            node0 = dict_old_guid_and_new_element[edge[0]]
-            node1 = dict_old_guid_and_new_element[edge[1]]
-            self.add_interaction(node0, node1)
-
-        # self.print_elements()
-        # self.print_interactions()
-
-        # --------------------------------------------------------------------------
-        # merge hierarchy
-        # replace the elements with the new ones
-        # there can be two cases:
-        # 1. the other model has the same
-        # 2. the other model has similar hierarchy
-        # 3. the other model has a different hierarchy
-        # --------------------------------------------------------------------------
-
-        # step 1 replace the elements with the new ones, incase they are copied
-        def replace_elements(node):
-            for element in node.elements:
-                element = dict_old_guid_and_new_element[str(element.guid)]
-
-            # recursively replace elements
-            for child in node.children:
-                replace_elements(child)
-
-        replace_elements(other_model.hierarchy.root)
-
-        # step 2 add nodes to the tree
-        def add_nodes(main_node_childs, other_node_childs):
-            # step one check if there nodes with the same name, if it is just merge the elements
-
-            for other_node_child in other_node_childs:
-                found = False
-                for idx, main_node_child in enumerate(main_node_childs):
-                    if main_node_child.name == other_node_child.name:
-                        found = True
-                        # add elements from the current node to the base dictionary of Model class
-                        main_node_child._elements = main_node_child.elements + other_node_child.elements
-                        # and recusively repeat the process
-                        add_nodes(main_node_child.children, other_node_child.children)
-                        break
-                # if no matching name was found, add the whole node to the tree
-                if found is False:
-                    main_node_childs.append(other_node_child)
-
-        add_nodes(self._hierarchy.root.children, other_model._hierarchy.root.children)  # type: ignore
