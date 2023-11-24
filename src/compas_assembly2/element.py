@@ -993,66 +993,79 @@ class Element(Data):
     # METHODS - FACE-TO-FACE DETECTION
     # ==========================================================================
 
-    # @property
-    # def face_polygons(self):
-    #     """Get Polygons from the geometry
-    #     WARNING: currently the face polygons do not consider elements with holes"""
+    @property
+    def face_polygons(self):
+        """Get Polygons from the geometry
+        WARNING: currently the face polygons do not consider elements with holes"""
 
-    #     # --------------------------------------------------------------------------
-    #     # sanity check
-    #     # --------------------------------------------------------------------------
-    #     if hasattr(self, "_face_polygons"):
-    #         return self._face_polygons
+        # --------------------------------------------------------------------------
+        # sanity check
+        # --------------------------------------------------------------------------
+        if hasattr(self, "_face_polygons"):
+            return self._face_polygons
 
-    #     if len(self.geometry) == 0:
-    #         raise AssertionError("You must assign geometry geometry to the element")
+        if len(self.geometry) == 0:
+            raise AssertionError("You must assign geometry geometry to the element")
 
-    #     if not isinstance(self.geometry[0], Mesh):
-    #         raise AssertionError("The geometry must be a mesh")
+        if not isinstance(self.geometry[0], Mesh):
+            raise AssertionError("The geometry must be a mesh")
 
-    #     # --------------------------------------------------------------------------
-    #     # get polylines from the mesh faces
-    #     # --------------------------------------------------------------------------
+        # --------------------------------------------------------------------------
+        # get polylines from the mesh faces
+        # --------------------------------------------------------------------------
 
-    #     temp = self.geometry[0].to_polygons()
-    #     self._face_polygons = []
-    #     for point_list in temp:
-    #         self._face_polygons.append(Polygon(point_list))
+        temp = self.geometry[0].to_polygons()
+        self._face_polygons = []
+        for point_list in temp:
+            self._face_polygons.append(Polygon(point_list))
 
-    #     return self._face_polygons
+        return self._face_polygons
 
-    # @property
-    # def face_frames(self):
-    #     """Get Frames from the geometry
-    #     WARNING: currently the face polylines do not consider elements with holes
-    #     for this you need to add face attributes to conside the holes"""
-    #     # --------------------------------------------------------------------------
-    #     # sanity check
-    #     # --------------------------------------------------------------------------
-    #     if hasattr(self, "_face_frames"):
-    #         return self._face_frames
+    @property
+    def face_frames(self):
+        """Get Frames from the geometry
+        WARNING: currently the face polylines do not consider elements with holes
+        for this you need to add face attributes to conside the holes"""
+        # --------------------------------------------------------------------------
+        # sanity check
+        # --------------------------------------------------------------------------
+        if hasattr(self, "_face_frames"):
+            return self._face_frames
 
-    #     if len(self.geometry) == 0:
-    #         raise AssertionError("You must assign geometry geometry to the element")
+        if len(self.geometry) == 0:
+            raise AssertionError("You must assign geometry geometry to the element")
 
-    #     if not isinstance(self.geometry[0], Mesh):
-    #         raise AssertionError("The geometry must be a mesh")
+        if not isinstance(self.geometry[0], Mesh):
+            raise AssertionError("The geometry must be a mesh")
 
-    #     # --------------------------------------------------------------------------
-    #     # compute the frames of each mesh face
-    #     # --------------------------------------------------------------------------
-    #     self._face_frames = []
+        # --------------------------------------------------------------------------
+        # compute the frames of each mesh face
+        # --------------------------------------------------------------------------
+        self._face_frames = []
 
-    #     for i in range(self.geometry[0].number_of_faces()):
-    #         xyz = self.geometry[0].face_coordinates(i)
-    #         o = self.geometry[0].face_center(i)
-    #         w = self.geometry[0].face_normal(i)
-    #         u = [xyz[1][i] - xyz[0][i] for i in range(3)]  # align with longest edge instead?
-    #         v = cross_vectors(w, u)
-    #         frame = Frame(o, u, v)
-    #         self._face_frames.append(frame)
+        mesh = self.geometry[0]
 
-    #     return self._face_frames
+        for fkey in mesh.faces():
+            xyz = mesh.face_coordinates(fkey)
+            o = mesh.face_center(fkey)
+            w = mesh.face_normal(fkey)
+            u = [xyz[1][i] - xyz[0][i] for i in range(3)]  # align with longest edge instead?
+            v = cross_vectors(w, u)
+            frame = Frame(o, u, v)
+            self._face_frames.append(frame)
+
+        # return [self.face_coordinates(fkey) for fkey in self.faces()]
+
+        # for i in range(self.geometry[0].number_of_faces()):
+        #     xyz = self.geometry[0].face_coordinates(i)
+        #     o = self.geometry[0].face_center(i)
+        #     w = self.geometry[0].face_normal(i)
+        #     u = [xyz[1][i] - xyz[0][i] for i in range(3)]  # align with longest edge instead?
+        #     v = cross_vectors(w, u)
+        #     frame = Frame(o, u, v)
+        #     self._face_frames.append(frame)
+
+        return self._face_frames
 
     # def face_to_face(self, other, tmax=1e-6, amin=1e-1):
     #     """construct intefaces by intersecting coplanar mesh faces

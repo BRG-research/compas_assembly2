@@ -1,7 +1,7 @@
 import math
 
 
-class Node:
+class KDTree_Node:
     def __init__(self, data=None, left=None, right=None, parent=None, axis=None, depth=None, id=None):
         self.id = id
         self.data = data
@@ -60,7 +60,7 @@ class KDTree:
             split_index -= 1
         split_point = point_sorted_list[split_index]
 
-        node = Node()
+        node = KDTree_Node()
         node.data = split_point.xyz
         node.id = split_point.id
         node.left = self._build(point_sorted_list[:split_index], depth + 1, node)

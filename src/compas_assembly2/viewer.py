@@ -553,9 +553,12 @@ class Viewer:
                 # geometry to temporary visualize during the develipment
                 # --------------------------------------------------------------------------
                 for i in range(len(geometry)):
-                    geometry[i].transform(Scale.from_factors([scale, scale, scale]))
+                    # copy, because if you add two objects with the same guid
+                    # they will be scale two times
+                    geometry_copy = geometry[i].copy()
+                    geometry_copy.transform(Scale.from_factors([scale, scale, scale]))
                     o = viewer.add(
-                        data=geometry[i],
+                        data=geometry_copy,
                         name="geometry",
                         is_selected=False,
                         is_visible=True,

@@ -661,4 +661,4 @@ for group_id, subsequent_groups in grouped_objects.items():
 # fill the compas_assembly_user_input with geometry and types
 # ==========================================================================
 # write data to file
-json_dump(data=elements, fp="element_compas_timber_3.json", pretty=False)
+json_dump(data=elements, fp="element_alessandro_1.json", pretty=False)
