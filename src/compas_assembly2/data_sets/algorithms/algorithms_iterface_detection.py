@@ -131,19 +131,41 @@ class Algorithms:
         diagonal_distances = []
         for e in elements:
             points.append(e.aabb_center(0.01))
-            diagonal_distances.append(distance_point_point(e.aabb()[0], e.aabb()[6]) * 0.6)
+            diagonal_distances.append(distance_point_point(e.aabb()[0], e.aabb()[6]))
 
         from numpy import asarray
         from scipy.spatial import cKDTree
 
-        def find_nearest_neighbours(cloud, nmax, dims=3):
+        def find_nearest_neighbours(cloud, nmax, distance_list, dims=3):
             cloud = asarray(cloud)[:, :dims]
             tree = cKDTree(cloud)
             nnbrs = [tree.query(root, nmax) for root in cloud]
             nnbrs = [(d.flatten().tolist(), n.flatten().tolist()) for d, n in nnbrs]
-            return nnbrs
 
-        # result = find_nearest_neighbours(points, nmax=100)
+            # remove the root from the list of nearest neighbours that are too far aways
+            my_set = set()
+            nnbrs_culled = []
+            for idx, nnbr in enumerate(nnbrs):
+                local_culled = []
+                nnbr_distances_without_self = nnbr[0][1:]
+                nnbr_indices_without_self = nnbr[1][1:]
+                for jdx, nnbr_distance_without_self in enumerate(nnbr_distances_without_self):
+                    if nnbr_distance_without_self < distance_list[idx]:
+                        local_culled.append(nnbr_indices_without_self[jdx])
+
+                        # sort the indices to avoid duplicates and output the set of tuples
+                        sorted_idx = idx
+                        sorted_jdx = nnbr_indices_without_self[jdx]
+                        if sorted_idx > sorted_jdx:
+                            sorted_idx, sorted_jdx = sorted_jdx, sorted_idx
+                            my_set.add((sorted_idx, sorted_jdx))
+                nnbrs_culled.append(local_culled)
+
+            return my_set
+
+        result = find_nearest_neighbours(points, 10, diagonal_distances)
+        print(result)
+        return result
 
         # # construct the kd-tree
         # kd_tree = KDTree(points, num_dims=3)
