@@ -1650,6 +1650,15 @@ class Model(Data):
             self.add_interaction_node(element_copy)
             return element_copy
 
+    def get_element(self, key):
+        return self.elements[key]
+
+    def element_at(self, id):
+        return list(self.elements.values())[id]
+
+    def element_key_at(self, id):
+        return list(self.elements.keys())[id]
+
     # ==========================================================================
     # hierarchy methods: add Node, add_by_poath
     # ==========================================================================

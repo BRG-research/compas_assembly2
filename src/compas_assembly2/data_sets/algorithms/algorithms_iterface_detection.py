@@ -10,7 +10,7 @@ from compas.geometry import (
     distance_point_point,
 )
 from compas_assembly2 import Element, ELEMENT_NAME, JOINT_NAME, Model
-from compas_assembly2 import ViewerModel  # type: ignore
+from compas_assembly2 import Viewer  # type: ignore ViewerModel
 from compas.datastructures import Mesh
 from math import fabs
 
@@ -330,8 +330,39 @@ class Algorithms:
         pass
 
     @staticmethod
-    def find_support(model):
-        pass
+    def shortest_path(model, element0, element1):
+
+        # ==========================================================================
+        # convert model graph to networkx graph
+        # ==========================================================================
+        import networkx as nx
+
+        networkx_graph = model.interactions.to_networkx()
+
+        # ==========================================================================
+        # compute the shortest path using netowrkx, output the element list
+        # ==========================================================================
+        node_start_name = str(element0.guid)
+        node_end_name = str(element1.guid)
+
+        # Check if the nodes exist in the graph
+        if node_start_name in networkx_graph.nodes and node_end_name in networkx_graph.nodes:
+
+            # Find the shortest path using node names
+            keys_of_elements = nx.shortest_path(networkx_graph, source=node_start_name, target=node_end_name)
+
+            # convert to strings to elements list
+            elements = []
+            for key in keys_of_elements:
+                elements.append(model.get_element(key))
+
+            # print the result
+            print(f"The shortest path from {node_start_name} to {node_end_name} is: {keys_of_elements}")
+
+            # output
+            return elements
+        else:
+            print("One or both of the specified nodes do not exist in the graph.")
 
 
 if __name__ == "__main__":
@@ -370,13 +401,26 @@ if __name__ == "__main__":
     # ==========================================================================
     # SHORTEST PATH BETWEEN ELEMENTS
     # ==========================================================================
+
+    # create model
     model = Model()
     model.add_elements(elements_json)
     for collision_pair in collision_pairs:
         model.add_interaction(elements_json[collision_pair[0]], elements_json[collision_pair[1]])
 
+    # run the shortest path
+    elements = Algorithms.shortest_path(model, model.element_at(0), model.element_at(7))
+
+    # vizualize the shortest path, in this case colorize mesh faces as polygons
+    geometry = []
+    for element in elements:
+        mesh = element.geometry[0]  # mesh in this case
+        polygons = mesh.to_polygons()
+        for polygon in polygons:
+            geometry.append(Polygon(polygon))
+
     # ==========================================================================
     # VIEWER
     # ==========================================================================
-    ViewerModel.run(model, scale_factor=0.001)
-    # Viewer.show_elements(elements_json, show_grid=False, scale=0.001, geometry=geometry)
+    # ViewerModel.run(model, scale_factor=0.001)
+    Viewer.show_elements(elements_json, show_grid=False, scale=0.001, geometry=geometry)
