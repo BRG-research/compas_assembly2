@@ -43,6 +43,19 @@ class ViewerModel:
         elements_by_guid = {}
         ViewerModel.create_spatial_structure(model, viewer, scale_factor, elements_by_type, elements_by_guid)
 
+        # add elements that are not in the hierarchy
+        for idx, element in enumerate(model.elements.values()):
+            print(element)
+            if element not in elements_by_guid.values():
+                ViewerModel.add_element_to_viewer(
+                    viewer=viewer,
+                    element=element,
+                    scale_factor=scale_factor,
+                    elements_by_guid=elements_by_guid,
+                    elements_by_type=elements_by_type,
+                    idx=idx,
+                )
+
         # --------------------------------------------------------------------------
         # Create the form to toggle on and off the elements
         # --------------------------------------------------------------------------
@@ -65,6 +78,75 @@ class ViewerModel:
             dict[key].append(value)
         else:
             dict[key] = [value]
+
+    @classmethod
+    def add_element_to_viewer(cls, viewer, element, scale_factor, elements_by_guid, elements_by_type, idx=0):
+        """add element to the viewer"""
+
+        # --------------------------------------------------------------------------
+        # Create an empty object to store the Node name
+        # --------------------------------------------------------------------------
+        # node_geo = viewer.add(Collection([]), name="node_" + node.name)  # type: ignore
+
+        # --------------------------------------------------------------------------
+        # object that contains all the geometry properties of the element
+        # --------------------------------------------------------------------------
+        element_geo = viewer.add(
+            Collection([]), name="element " + str.lower(element.name) + " " + str(idx)  # type: ignore
+        )
+        # node_geo.add(element_geo)
+
+        # --------------------------------------------------------------------------
+        # geometrical properties of an element
+        # --------------------------------------------------------------------------
+
+        display_schema = element.display_schema  # get the display schema from the element
+
+        for idx, attr in enumerate(display_schema.items()):
+
+            obj_name = attr[0]  # the geometrical attribute name
+            display_options = attr[1]  # the display options of the attribute
+            property_value = getattr(element, obj_name)
+
+            # --------------------------------------------------------------------------
+            # display the contents of the object
+            # if the geometrical propery is stored in a list add a branch to it
+            # --------------------------------------------------------------------------
+            if isinstance(property_value, list):
+
+                # an additiona branch
+                sub_element_geo = viewer.add(Collection([]), name="property_" + obj_name)  # type: ignore
+                element_geo.add(sub_element_geo)
+
+                # individual geometry properties
+                for obj in property_value:
+
+                    ViewerModel.add_object(
+                        viewer,
+                        obj,
+                        str.lower("property_" + type(obj).__name__),
+                        display_options,
+                        scale_factor,
+                        sub_element_geo,
+                        elements_by_guid,
+                        obj_name + str(element.guid),
+                        elements_by_type,
+                    )
+
+            else:
+
+                ViewerModel.add_object(
+                    viewer,
+                    property_value,
+                    "property_" + obj_name,
+                    display_options,
+                    scale_factor,
+                    element_geo,
+                    elements_by_guid,
+                    obj_name + str(element.guid),
+                    elements_by_type,
+                )
+        return element_geo
 
     @classmethod
     def create_spatial_structure(cls, model, viewer, scale_factor, elements_by_type, elements_by_guid):
@@ -262,6 +344,7 @@ class ViewerModel:
         # --------------------------------------------------------------------------
         interactions_readable = model.get_interactions_as_readable_info()
         interactions = model.get_interactions()
+        print(elements_by_guid)
 
         # --------------------------------------------------------------------------
         # Define the function that will be called when an item is pressed

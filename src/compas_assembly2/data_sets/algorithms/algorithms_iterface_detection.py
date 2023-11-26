@@ -9,8 +9,8 @@ from compas.geometry import (
     transform_points,
     distance_point_point,
 )
-from compas_assembly2 import Element, ELEMENT_NAME, JOINT_NAME
-from compas_assembly2 import Viewer  # type: ignore
+from compas_assembly2 import Element, ELEMENT_NAME, JOINT_NAME, Model
+from compas_assembly2 import ViewerModel  # type: ignore
 from compas.datastructures import Mesh
 from math import fabs
 
@@ -342,10 +342,11 @@ if __name__ == "__main__":
     elements_json = json_load(path)
 
     # ==========================================================================
-    # KDTREE
+    # KDTREE SEARCH
     # ==========================================================================
     collision_pairs_kd_tree = Algorithms.get_collision_pairs_kdtree(elements_json, max_neighbours=8)
     print(collision_pairs_kd_tree)
+
     # ==========================================================================
     # NEAREST NEIGHBOR
     # ==========================================================================
@@ -356,8 +357,8 @@ if __name__ == "__main__":
     collision_pairs = Algorithms.get_collision_pairs_with_attributes(elements_json, attributes)
     print(collision_pairs)
 
-    # ===================================a=======================================
-    # FACE
+    # ==========================================================================
+    # FACE TO FACE DETECTION
     # ==========================================================================
     displayed_elements = []
     for idx, collision_pair in enumerate(collision_pairs):
@@ -366,10 +367,16 @@ if __name__ == "__main__":
             if result:
                 geometry.append(r[1])
 
-    # print(elements_json)
+    # ==========================================================================
+    # SHORTEST PATH BETWEEN ELEMENTS
+    # ==========================================================================
+    model = Model()
+    model.add_elements(elements_json)
+    for collision_pair in collision_pairs:
+        model.add_interaction(elements_json[collision_pair[0]], elements_json[collision_pair[1]])
 
     # ==========================================================================
     # VIEWER
     # ==========================================================================
-
-    Viewer.show_elements(elements_json, show_grid=False, scale=0.001, geometry=geometry)
+    ViewerModel.run(model, scale_factor=0.001)
+    # Viewer.show_elements(elements_json, show_grid=False, scale=0.001, geometry=geometry)

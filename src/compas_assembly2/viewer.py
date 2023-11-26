@@ -80,7 +80,7 @@ class Viewer:
         color_red=[],
         measurements=[],
         geometry=[],
-        scale=1,
+        scale=1.0,
     ):
         if viewer_type == "view" or "view2" or "compas_view2" or "0":
             try:
