@@ -10,8 +10,7 @@ from compas.geometry import (
     distance_point_point,
 )
 from compas_assembly2 import Element, ELEMENT_NAME, JOINT_NAME
-
-# from compas_assembly2 import View  # type: ignore
+from compas_assembly2 import Viewer  # type: ignore
 from compas.datastructures import Mesh
 from math import fabs
 
@@ -83,10 +82,14 @@ class Algorithms:
     # METHODS - FACE-TO-FACE DETECTION
     # ==========================================================================
     @staticmethod
-    def get_collision_pairs(elements):
+    def get_collision_pairs(elements, aabb_and_oobb_infliation=0.01):
         # ==========================================================================
         # SIMPLE FOR LOOP
         # ==========================================================================
+        for e in elements:
+            e.aabb(aabb_and_oobb_infliation)
+            e.oobb(aabb_and_oobb_infliation)
+
         collision_pairs = []
         for i in range(len(elements)):
             for j in range(i + 1, len(elements)):
@@ -95,10 +98,14 @@ class Algorithms:
         return collision_pairs
 
     @staticmethod
-    def get_collision_pairs_with_attributes(elements, attributes=[], skip_the_same=True):
+    def get_collision_pairs_with_attributes(elements, attributes=[], aabb_and_oobb_infliation=0.01, skip_the_same=True):
         if len(elements) != len(attributes):
             print("WARNING: the number of attributes must be equal to the number of elements")
-            return []
+            return Algorithms.get_collision_pairs(elements, aabb_and_oobb_infliation)
+
+        for e in elements:
+            e.aabb(aabb_and_oobb_infliation)
+            e.oobb(aabb_and_oobb_infliation)
 
         collision_pairs = []
         for i in range(len(elements)):
@@ -125,12 +132,12 @@ class Algorithms:
         return element_collisions
 
     @staticmethod
-    def get_collision_pairs_kdtree(elements):
+    def get_collision_pairs_kdtree(elements, max_neighbours=10, check_element_collsion=True):
         # get points
         points = []
         diagonal_distances = []
         for e in elements:
-            points.append(e.aabb_center(0.01))
+            points.append(e.aabb_center())
             diagonal_distances.append(distance_point_point(e.aabb()[0], e.aabb()[6]))
 
         from numpy import asarray
@@ -159,21 +166,21 @@ class Algorithms:
                         if sorted_idx > sorted_jdx:
                             sorted_idx, sorted_jdx = sorted_jdx, sorted_idx
                             my_set.add((sorted_idx, sorted_jdx))
+                            # check collision
+                            if check_element_collsion:
+                                if elements[sorted_idx].has_collision(elements[sorted_jdx]):
+                                    my_set.add((sorted_idx, sorted_jdx))
+                            else:
+                                my_set.add((sorted_idx, sorted_jdx))
                 nnbrs_culled.append(local_culled)
 
             return my_set
 
-        result = find_nearest_neighbours(points, 10, diagonal_distances)
-        print(result)
-        return result
-
-        # # construct the kd-tree
-        # kd_tree = KDTree(points, num_dims=3)
-
-        # # find neighbors
-        # for idx, p in enumerate(points):
-        #     result = kd_tree.k(p, diagonal_distances[idx])
-        #     print(result)
+        tuple_set = find_nearest_neighbours(points, max_neighbours, diagonal_distances)
+        list_of_lists = [list(tup) for tup in tuple_set]
+        # sort the lists by the first item and the second item
+        list_of_lists.sort(key=lambda x: (x[0], x[1]))
+        return list_of_lists
 
     @staticmethod
     def face_to_face(element0, element1, tmax=1e-2, amin=1e1):
@@ -337,16 +344,17 @@ if __name__ == "__main__":
     # ==========================================================================
     # KDTREE
     # ==========================================================================
-    collision_pairs = Algorithms.get_collision_pairs_kdtree(elements_json)
-
+    collision_pairs_kd_tree = Algorithms.get_collision_pairs_kdtree(elements_json, max_neighbours=8)
+    print(collision_pairs_kd_tree)
     # ==========================================================================
     # NEAREST NEIGHBOR
     # ==========================================================================
     attributes = []
-    for e in elements_json:
-        attributes.append(e.id[0])
+    # for e in elements_json:
+    #     attributes.append(e.id[0])
 
     collision_pairs = Algorithms.get_collision_pairs_with_attributes(elements_json, attributes)
+    print(collision_pairs)
 
     # ===================================a=======================================
     # FACE
@@ -364,4 +372,4 @@ if __name__ == "__main__":
     # VIEWER
     # ==========================================================================
 
-    # Viewer.show_elements(elements_json, show_grid=False, scale=0.001, geometry=geometry)
+    Viewer.show_elements(elements_json, show_grid=False, scale=0.001, geometry=geometry)
