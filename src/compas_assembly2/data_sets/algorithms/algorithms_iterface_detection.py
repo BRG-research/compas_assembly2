@@ -236,18 +236,18 @@ def example_model_shortest_path_from_mesh():
     geometry = []
     elements, geometry = model.find_shortest_path(elements_json[4], elements_json[180], True)
     geometry_links.extend(geometry)
-    elements, geometry = model.find_shortest_path(elements_json[91], elements_json[181], True)
-    geometry_links.extend(geometry)
-    elements, geometry = model.find_shortest_path(elements_json[92], elements_json[182], True)
-    geometry_links.extend(geometry)
-    elements, geometry = model.find_shortest_path(elements_json[3], elements_json[183], True)
-    geometry_links.extend(geometry)
+    # elements, geometry = model.find_shortest_path(elements_json[91], elements_json[181], True)
+    # geometry_links.extend(geometry)
+    # elements, geometry = model.find_shortest_path(elements_json[92], elements_json[182], True)
+    # geometry_links.extend(geometry)
+    # elements, geometry = model.find_shortest_path(elements_json[3], elements_json[183], True)
+    # geometry_links.extend(geometry)
 
     # ==========================================================================
     # Vizualize the interactions
     # ==========================================================================
     # Viewer.show_elements(elements_json, show_grid=False, scale=1, geometry=geometry)
-    ViewerModel.run(model, scale_factor=1, geometry=geometry_links)
+    ViewerModel.run(model, scale_factor=0.01, geometry=geometry_links)
 
 
 if __name__ == "__main__":

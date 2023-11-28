@@ -2029,6 +2029,14 @@ class Model(Data):
             b = edges[i][1]
             print("print_interactions ", str(self._elements[a].guid), " ", str(self._elements[b].guid))
 
+    def get_interactions_as_nodes_and_neighbors_lists(self):
+        nodes = []
+        neighberhoods = []
+        for node in self._interactions.nodes():
+            nodes.append(node)
+            neighberhoods.append(self._interactions.neighborhood(node))
+        return (nodes, neighberhoods)
+
     # ==========================================================================
     # operators
     # ==========================================================================

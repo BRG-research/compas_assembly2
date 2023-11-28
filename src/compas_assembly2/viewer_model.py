@@ -345,11 +345,73 @@ class ViewerModel:
         """create a tab on the left side to display the adjacency of the elements
         when clicked geometries are highlighted"""
 
+        def show_attributes_form(self, entry):
+            print(self, self.app)
+            # when data is a dict, it is automatically converted to a list of key, value pairs
+            viewer.treeform("Attribute Form", data=entry["attributes"], floating=True)
+
+        data = [
+            {
+                "key": "a",
+                "on_item_double_clicked": show_attributes_form,
+                "attributes": {"attribute1": 1, "attribute2": 2, "attribute3": 3},
+            },
+            {
+                "key": "b",
+                "on_item_double_clicked": show_attributes_form,
+                "attributes": {"attribute4": 4, "attribute5": 5, "attribute6": 6},
+                "children": [
+                    {
+                        "key": "c",
+                        "on_item_double_clicked": show_attributes_form,
+                        "attributes": {"attribute7": 7, "attribute8": 8, "attribute9": 9},
+                        "color": (100, 100, 0),  # This assigns a color to the entrie row of this entry
+                    },
+                ],
+            },
+        ]
+
         # --------------------------------------------------------------------------
         # Get the adjacency from the model
         # --------------------------------------------------------------------------
         interactions_readable = model.get_interactions_as_readable_info()
         interactions = model.get_interactions()
+
+        # --------------------------------------------------------------------------
+        # vertex neighborhoods
+        # --------------------------------------------------------------------------
+        interactions_vertex_neighbors = model.get_interactions_as_nodes_and_neighbors_lists()
+
+        dict_guid_and_index = {}
+        counter = 0
+        for key in model.elements:
+            dict_guid_and_index[key] = counter
+            counter = counter + 1
+
+        my_contents_form_data = []
+        for idx, node in enumerate(interactions_vertex_neighbors[0]):
+            neighbors = interactions_vertex_neighbors[1][idx]
+
+            node_text = dict_guid_and_index[node]
+            my_contents_form_data_current = {
+                "key": node_text,
+                "on_item_double_clicked": show_attributes_form,
+                "attributes": {str.lower(str(interactions_readable[idx][1]))},
+                "children": [],
+            }
+
+            for n in neighbors:
+                neighbor_text = dict_guid_and_index[n]
+
+                my_contents_form_data_current["children"].append(
+                    {
+                        "key": neighbor_text,
+                        "on_item_double_clicked": show_attributes_form,
+                        "attributes": {"attribute7": 7, "attribute8": 8, "attribute9": 9},
+                        # "color": (0, 0, 100),  # This assigns a color to the entrie row of this entry
+                    }
+                )
+            my_contents_form_data.append(my_contents_form_data_current)
 
         # --------------------------------------------------------------------------
         # Define the function that will be called when an item is pressed
@@ -382,6 +444,7 @@ class ViewerModel:
         # --------------------------------------------------------------------------
         # Add the treeform
         # --------------------------------------------------------------------------
+        viewer.treeform("Vertex-to-vertex", data=my_contents_form_data, show_headers=False, columns=["key"])
         viewer.treeform("Objects", location="left", data=data, show_headers=True, columns=["object1", "object2"])
 
     @classmethod
