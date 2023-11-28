@@ -242,14 +242,6 @@ def example_model_shortest_path_from_mesh():
     geometry_links.extend(geometry)
     elements, geometry = model.find_shortest_path(elements_json[3], elements_json[183], True)
     geometry_links.extend(geometry)
-    # elements, geometry = model.find_shortest_path(elements_json[3], elements_json[135], True)
-    # geometry_links.extend(geometry)
-    # elements, geometry = model.find_shortest_path(elements_json[330], elements_json[135], True)
-    # geometry_links.extend(geometry)
-    # elements, geometry = model.find_shortest_path(elements_json[330], elements_json[0], True)
-    # geometry_links.extend(geometry)
-    # elements, geometry = model.find_shortest_path(elements_json[4], elements_json[37], True)
-    # geometry_links.extend(geometry)
 
     # ==========================================================================
     # Vizualize the interactions
