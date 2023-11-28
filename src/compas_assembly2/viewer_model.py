@@ -19,7 +19,7 @@ if not (compas.is_rhino() or compas.is_blender()):
 
 class ViewerModel:
     @classmethod
-    def run(cls, model, scale_factor=0.001):
+    def run(cls, model, scale_factor=0.001, geometry=[]):
         """display the model:
         a) right side shows the tree structure and element properties
         b) left side shows its adjacency
@@ -43,19 +43,6 @@ class ViewerModel:
         elements_by_guid = {}
         ViewerModel.create_spatial_structure(model, viewer, scale_factor, elements_by_type, elements_by_guid)
 
-        # add elements that are not in the hierarchy
-        for idx, element in enumerate(model.elements.values()):
-            print(element)
-            if element not in elements_by_guid.values():
-                ViewerModel.add_element_to_viewer(
-                    viewer=viewer,
-                    element=element,
-                    scale_factor=scale_factor,
-                    elements_by_guid=elements_by_guid,
-                    elements_by_type=elements_by_type,
-                    idx=idx,
-                )
-
         # --------------------------------------------------------------------------
         # Create the form to toggle on and off the elements
         # --------------------------------------------------------------------------
@@ -65,6 +52,11 @@ class ViewerModel:
         #  Display adjacency
         # --------------------------------------------------------------------------
         ViewerModel.adjacency(viewer, model, elements_by_guid)
+
+        # --------------------------------------------------------------------------
+        #  Geometry that is not part of the model
+        # --------------------------------------------------------------------------
+        ViewerModel.add_geometry(viewer, scale_factor, geometry)
 
         # --------------------------------------------------------------------------
         # run the viewer
@@ -245,6 +237,20 @@ class ViewerModel:
         # --------------------------------------------------------------------------
         _create_spatial_structure(model._hierarchy.root, viewer, None, elements_by_type, elements_by_guid)
 
+        # --------------------------------------------------------------------------
+        # add elements that are not in the hierarchy
+        # --------------------------------------------------------------------------
+        for idx, element in enumerate(model.elements.values()):
+            if element not in elements_by_guid.values():
+                ViewerModel.add_element_to_viewer(
+                    viewer=viewer,
+                    element=element,
+                    scale_factor=scale_factor,
+                    elements_by_guid=elements_by_guid,
+                    elements_by_type=elements_by_type,
+                    idx=idx,
+                )
+
     @classmethod
     def add_object(
         cls,
@@ -344,7 +350,6 @@ class ViewerModel:
         # --------------------------------------------------------------------------
         interactions_readable = model.get_interactions_as_readable_info()
         interactions = model.get_interactions()
-        print(elements_by_guid)
 
         # --------------------------------------------------------------------------
         # Define the function that will be called when an item is pressed
@@ -378,3 +383,14 @@ class ViewerModel:
         # Add the treeform
         # --------------------------------------------------------------------------
         viewer.treeform("Objects", location="left", data=data, show_headers=True, columns=["object1", "object2"])
+
+    @classmethod
+    def add_geometry(cls, viewer, scale_factor, geometry=[]):
+        group = viewer.add(Collection([]), name="non_model_geometry")
+        for obj in geometry:
+            # --------------------------------------------------------------------------
+            # scale the object
+            # --------------------------------------------------------------------------
+            scale_xform = Scale.from_factors([scale_factor, scale_factor, scale_factor])
+            obj.transform(scale_xform)
+            group.add(obj, name="geometry", facecolor=(0, 0.6, 1), linecolor=(0, 0, 0), linewidth=1, opacity=1)

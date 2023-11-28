@@ -242,10 +242,10 @@ class Element(Data):
                 (
                     "geometry",
                     {
-                        "facecolor": [0.85, 0.85, 0.85],
+                        "facecolor": [0.9, 0.9, 0.9],
                         "linecolor": [0.0, 0.0, 0.0],
                         "linewidth": 1,
-                        "opacity": 0.75,
+                        "opacity": 0.5,
                         "edges": False,
                         "is_visible": True,
                     },

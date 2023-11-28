@@ -224,7 +224,10 @@ class FABRICATION_TYPES:
     CUSTOM = "CUSTOM"
 
 
+global_geometry = []
+
 from .element import Element  # noqa
+from .algorithms import Algorithms  # noqa
 from .model import Model, ElementTree, Node  # noqa
 from .viewer_model import ViewerModel  # noqa
 from .viewer import Viewer  # noqa

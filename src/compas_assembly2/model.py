@@ -4,10 +4,11 @@ from __future__ import division
 
 from collections import OrderedDict
 from compas.datastructures import Graph
-from compas.geometry import Line  # noqa: F401
-from compas_assembly2 import Element  # noqa: F401
+from compas.geometry import Line, Polygon, distance_point_point  # noqa: F401
+from compas_assembly2 import Algorithms  # noqa: F401
 from compas.datastructures import Datastructure
 from compas.data import Data
+from compas.datastructures import Mesh
 
 # main functionality:
 # the tree data-structure cannot have have nodes with the sam name to keep the order tidy
@@ -1890,7 +1891,7 @@ class Model(Data):
     def add_interaction_node(self, element):
         self._interactions.add_node(str(element.guid))
 
-    def add_interaction(self, element0, element1):
+    def add_interaction(self, element0, element1, geometry=None):
         """
         Adds an interaction between two elements in the model.
 
@@ -1920,7 +1921,10 @@ class Model(Data):
         """
 
         if element0 is not None and element1 is not None:
-            return self._interactions.add_edge(str(element0.guid), str(element1.guid))
+            attribute_dict = {}
+            attribute_dict["geometry"] = geometry
+            attribute_dict["weight"] = distance_point_point(element0.aabb_center(), element1.aabb_center())
+            return self._interactions.add_edge(str(element0.guid), str(element1.guid), attribute_dict)
 
     def get_interactions(self):
         """
@@ -1935,6 +1939,10 @@ class Model(Data):
             identifiers for the elements involved in the interaction.
         """
         return list(self._interactions.edges())
+
+    def get_interactions_geometry(self):
+        """get geometric features within the interactions, if they exist"""
+        return self._interactions.edges_attribute("geometry")
 
     def get_interactions_as_readable_info(self):
         """
@@ -2299,3 +2307,92 @@ class Model(Data):
         copy = self.copy()
         copy.transform(transformation)
         return copy
+
+    # ==========================================================================
+    # Algorithms
+    # ==========================================================================
+    def find_interactions(
+        self,
+        simple_or_tree_search=True,
+        detection_type=0,
+        tmax=1e-2,
+        amin=1e1,
+        aaab_inflation=0.01,
+        max_neighbors=8,
+        attributes=[],
+        skip_the_same=True,
+    ):
+        # ==========================================================================
+        # ELEMENTS FROM JSON
+        # ==========================================================================
+        elements_list = list(self._elements.values())
+
+        # ==========================================================================
+        # FIND NEAREST OBJECTS BY
+        # 1) SIMPLE 2X FOR LOOP
+        # 2) KD-TREE
+        # ==========================================================================
+        collision_pairs = []
+        if simple_or_tree_search:
+            collision_pairs = Algorithms.get_collision_pairs_with_attributes(
+                elements_list, attributes, aaab_inflation, skip_the_same
+            )
+        else:
+            collision_pairs = Algorithms.get_collision_pairs_kdtree(
+                elements_list, max_neighbors, True, attributes, skip_the_same
+            )
+
+        # ==========================================================================
+        # INTERFACE DETECTION
+        # 0 - face_to_face
+        # 1 - polyline_to_polyline
+        # 2 - face_to_plane
+        # 3 - face_to_polyline
+        # ==========================================================================
+        output = []
+        geometry_feature_detected = False
+        if detection_type == 0:
+            for idx, collision_pair in enumerate(collision_pairs):
+                result = Algorithms.face_to_face(
+                    elements_list[collision_pair[0]], elements_list[collision_pair[1]], tmax, amin
+                )
+                # print("face_to_face", collision_pair)
+                # output: type, collission pair, face pair, intersection polygon
+                for r in result:
+                    if result:
+                        output.append([collision_pair, r[0], r[1]])
+            geometry_feature_detected = True
+
+        # ==========================================================================
+        # ADD GRAPH EDGES
+        # ==========================================================================
+        if geometry_feature_detected:
+            for o in output:
+                id0 = o[0][0]
+                id1 = o[0][1]
+                geometric_features = o[2]
+                self.add_interaction(elements_list[id0], elements_list[id1], geometric_features)
+        else:
+            for idx, collision_pair in enumerate(collision_pairs):
+                self.add_interaction(elements_list[collision_pair[0]], elements_list[collision_pair[1]])
+                # self.add_interaction(elements_list[collision_pair[1]], elements_list[collision_pair[0]])
+
+        # ==========================================================================
+        # OUTPUT
+        # ==========================================================================
+        return output
+
+    def find_shortest_path(self, element0, element1, output_display_geometry=False):
+        elements = Algorithms.shortest_path(self, element0, element1)
+
+        if output_display_geometry:
+            # vizualize the shortest path, in this case colorize mesh faces as polygons
+            geometry = []
+            for element in elements:  # type: ignore
+                if isinstance(element.geometry[0], Mesh):
+                    polygons = element.geometry[0].to_polygons()
+                    for polygon in polygons:
+                        geometry.append(Polygon(polygon))
+            return elements, geometry
+        else:
+            return elements
