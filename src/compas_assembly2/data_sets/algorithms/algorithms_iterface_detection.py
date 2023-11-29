@@ -247,7 +247,34 @@ def example_model_shortest_path_from_mesh():
     # Vizualize the interactions
     # ==========================================================================
     # Viewer.show_elements(elements_json, show_grid=False, scale=1, geometry=geometry)
-    ViewerModel.run(model, scale_factor=0.01, geometry=geometry_links)
+    ViewerModel.run(model, scale_factor=0.01, geometry=geometry_links)  # geometry_links
+
+
+def example_model_face_to_face_interactions_from_mesh():
+    # ==========================================================================
+    # ELEMENTS FROM JSON
+    # ==========================================================================
+    path = "src/compas_assembly2/data_sets/mesh/cross_vault.json"
+    meshes_json = json_load(path)
+    elements_json = []
+    for idx, mesh in enumerate(meshes_json):
+        frame = Frame(mesh.centroid(), mesh.face_normal(0), mesh.face_normal(1))
+        element = Element(id=idx, geometry=mesh, geometry_simplified=mesh.centroid(), frame=frame)
+        elements_json.append(element)
+
+    # ==========================================================================
+    # CREATE MODEL
+    # ==========================================================================
+    model = Model()
+    model.add_elements(elements_json)
+    model.find_interactions(detection_type=0, aaab_inflation=0.1, tmax=0.1, amin=1e1 / 10)
+    geometry_links = model.get_interactions_as_lines()
+
+    # ==========================================================================
+    # Vizualize the interactions
+    # ==========================================================================
+    # Viewer.show_elements(elements_json, show_grid=False, scale=1, geometry=geometry)
+    ViewerModel.run(model, scale_factor=0.01, geometry=geometry_links)  # geometry_links
 
 
 if __name__ == "__main__":
@@ -258,5 +285,6 @@ if __name__ == "__main__":
     # example_shortest_path()
     # example_model_interfaces()
     # example_model_interfaces_cross_vault()
-    example_model_shortest_path_from_mesh()
     # example_model_shortest_path()
+    # example_model_shortest_path_from_mesh()
+    example_model_face_to_face_interactions_from_mesh()

@@ -245,8 +245,8 @@ class Element(Data):
                         "facecolor": [0.9, 0.9, 0.9],
                         "linecolor": [0.0, 0.0, 0.0],
                         "linewidth": 1,
-                        "opacity": 0.5,
-                        "edges": False,
+                        "opacity": 0.75,
+                        "edges": True,
                         "is_visible": True,
                     },
                 ),
@@ -857,7 +857,7 @@ class Element(Data):
         # return the oobb  (8 points)
         return self._oobb
 
-    def aabb_center(self, inflate=0.00):
+    def aabb_center(self, inflate=0.001):
         points = self.aabb(inflate)
         return Point(
             (points[0][0] + points[6][0]) / 2, (points[0][1] + points[6][1]) / 2, (points[0][2] + points[6][2]) / 2

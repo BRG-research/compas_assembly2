@@ -1,6 +1,7 @@
-from compas.geometry import (
-    Scale,
-)
+from compas.geometry import Scale
+
+from compas.colors import Color
+
 import compas
 
 compas_view2_imported = False
@@ -15,6 +16,15 @@ if not (compas.is_rhino() or compas.is_blender()):
 
     except ImportError:
         print("WARNING: compas_view2 is not installed!!!")
+
+
+colors = [
+    Color(0.929, 0.082, 0.498),
+    Color(0.129, 0.572, 0.815),
+    Color(0.5, 0.5, 0.5),
+    Color(0.95, 0.95, 0.95),
+    Color(0, 0, 0),
+]
 
 
 class ViewerModel:
@@ -293,7 +303,7 @@ class ViewerModel:
         # hide the lines of the mesh
         # --------------------------------------------------------------------------
         if isinstance(viewer_obj, MeshObject):
-            viewer_obj.show_lines = False
+            viewer_obj.show_lines = True
 
         # --------------------------------------------------------------------------
         # add object to the sub_object
@@ -345,37 +355,24 @@ class ViewerModel:
         """create a tab on the left side to display the adjacency of the elements
         when clicked geometries are highlighted"""
 
+        object_colors = {}
+        for obj in viewer.view.objects:
+            object_colors[obj] = (obj.facecolor, obj.opacity, obj)
+
+        def reset_colors(self, entry):
+            for key, value in object_colors.items():
+                value[2].facecolor = value[0]
+                value[2].opacity = value[1]
+            viewer.view.update()
+
         def show_attributes_form(self, entry):
-            print(self, self.app)
-            # when data is a dict, it is automatically converted to a list of key, value pairs
-            viewer.treeform("Attribute Form", data=entry["attributes"], floating=True)
-
-        data = [
-            {
-                "key": "a",
-                "on_item_double_clicked": show_attributes_form,
-                "attributes": {"attribute1": 1, "attribute2": 2, "attribute3": 3},
-            },
-            {
-                "key": "b",
-                "on_item_double_clicked": show_attributes_form,
-                "attributes": {"attribute4": 4, "attribute5": 5, "attribute6": 6},
-                "children": [
-                    {
-                        "key": "c",
-                        "on_item_double_clicked": show_attributes_form,
-                        "attributes": {"attribute7": 7, "attribute8": 8, "attribute9": 9},
-                        "color": (100, 100, 0),  # This assigns a color to the entrie row of this entry
-                    },
-                ],
-            },
-        ]
-
-        # --------------------------------------------------------------------------
-        # Get the adjacency from the model
-        # --------------------------------------------------------------------------
-        interactions_readable = model.get_interactions_as_readable_info()
-        interactions = model.get_interactions()
+            reset_colors(self, entry)
+            entry["data"][0].facecolor = colors[0]
+            entry["data"][0].opacity = 1
+            for idx in range(1, len(entry["data"])):
+                entry["data"][idx].facecolor = colors[1]
+                entry["data"][idx].opacity = 1
+            viewer.view.update()
 
         # --------------------------------------------------------------------------
         # vertex neighborhoods
@@ -392,60 +389,75 @@ class ViewerModel:
         for idx, node in enumerate(interactions_vertex_neighbors[0]):
             neighbors = interactions_vertex_neighbors[1][idx]
 
+            vertex_neighbors_to_select = [elements_by_guid["geometry" + str(node)]]
+            vertex_vertex_to_select = []
+            for n in neighbors:
+                vertex_neighbors_to_select.append(elements_by_guid["geometry" + str(n)])
+                vertex_vertex_to_select.append(
+                    [elements_by_guid["geometry" + str(node)], elements_by_guid["geometry" + str(n)]]
+                )
+
             node_text = dict_guid_and_index[node]
             my_contents_form_data_current = {
                 "key": node_text,
-                "on_item_double_clicked": show_attributes_form,
-                "attributes": {str.lower(str(interactions_readable[idx][1]))},
+                "on_item_double_clicked": reset_colors,
+                "on_item_pressed": show_attributes_form,
+                "data": vertex_neighbors_to_select,
+                # "attributes": {str.lower(str(interactions_readable[idx][1]))},
                 "children": [],
+                "attributes": {},
             }
 
-            for n in neighbors:
+            for jdx, n in enumerate(neighbors):
                 neighbor_text = dict_guid_and_index[n]
 
                 my_contents_form_data_current["children"].append(
                     {
                         "key": neighbor_text,
-                        "on_item_double_clicked": show_attributes_form,
-                        "attributes": {"attribute7": 7, "attribute8": 8, "attribute9": 9},
+                        "on_item_double_clicked": reset_colors,
+                        "on_item_pressed": show_attributes_form,
+                        "data": vertex_vertex_to_select[jdx],
+                        "children": [],
+                        "attributes": {},
+                        # "attributes": {"attribute7": 7, "attribute8": 8, "attribute9": 9},
                         # "color": (0, 0, 100),  # This assigns a color to the entrie row of this entry
                     }
                 )
             my_contents_form_data.append(my_contents_form_data_current)
 
-        # --------------------------------------------------------------------------
-        # Define the function that will be called when an item is pressed
-        # --------------------------------------------------------------------------
-        def select(self, entry):
-            viewer.selector.reset()
-            entry["data"][0].is_selected = True  # here geometry is selected
-            entry["data"][1].is_selected = True
-            viewer.view.update()
+        # # --------------------------------------------------------------------------
+        # # Define the function that will be called when an item is pressed
+        # # --------------------------------------------------------------------------
+        # def select(self, entry):
+        #     viewer.selector.reset()
+        #     entry["data"][0].is_selected = True  # here geometry is selected
+        #     entry["data"][1].is_selected = True
+        #     viewer.view.update()
 
-        # --------------------------------------------------------------------------
-        # Create the data
-        # by iterating the interactions list that contains the guids of the geometryes
-        # whereas the interactions_readable contains the names of the geometryes
-        # --------------------------------------------------------------------------
-        data = []
+        # # --------------------------------------------------------------------------
+        # # Create the data
+        # # by iterating the interactions list that contains the guids of the geometryes
+        # # whereas the interactions_readable contains the names of the geometryes
+        # # --------------------------------------------------------------------------
+        # data = []
 
-        for idx, tuple_of_guids in enumerate(interactions):
-            obj1 = elements_by_guid["geometry" + str(tuple_of_guids[0])]
-            obj2 = elements_by_guid["geometry" + str(tuple_of_guids[1])]
-            data.append(
-                {
-                    "object1": str.lower(str(interactions_readable[idx][0])),
-                    "object2": str.lower(str(interactions_readable[idx][1])),
-                    "on_item_pressed": select,
-                    "data": [obj1, obj2],
-                }
-            )
+        # for idx, tuple_of_guids in enumerate(interactions):
+        #     obj1 = elements_by_guid["geometry" + str(tuple_of_guids[0])]
+        #     obj2 = elements_by_guid["geometry" + str(tuple_of_guids[1])]
+        #     data.append(
+        #         {
+        #             "object1": str.lower(str(interactions_readable[idx][0])),
+        #             "object2": str.lower(str(interactions_readable[idx][1])),
+        #             "on_item_pressed": select,
+        #             "data": [obj1, obj2],
+        #         }
+        #     )
 
         # --------------------------------------------------------------------------
         # Add the treeform
         # --------------------------------------------------------------------------
-        viewer.treeform("Vertex-to-vertex", data=my_contents_form_data, show_headers=False, columns=["key"])
-        viewer.treeform("Objects", location="left", data=data, show_headers=True, columns=["object1", "object2"])
+        viewer.treeform("Adjacency", data=my_contents_form_data, show_headers=False, columns=["key"])
+        # viewer.treeform("Objects", location="left", data=data, show_headers=True, columns=["object1", "object2"])
 
     @classmethod
     def add_geometry(cls, viewer, scale_factor, geometry=[]):

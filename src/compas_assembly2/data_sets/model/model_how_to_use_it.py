@@ -40,6 +40,55 @@ def create_model():
     return model
 
 
+def create_model_with_elements():
+
+    # --------------------------------------------------------------------------
+    # create model
+    # --------------------------------------------------------------------------
+    model = Model()
+
+    # --------------------------------------------------------------------------
+    # elements
+    # --------------------------------------------------------------------------
+    e0 = Element(name="beam", geometry_simplified=Point(0, 0, 0))
+    e1 = Element(name="beam", geometry_simplified=Point(0, 5, 0))
+    e2 = Element(name="plate", geometry_simplified=Point(0, 0, 0))
+    e3 = Element(name="plate", geometry_simplified=Point(0, 0, 0))
+
+    # --------------------------------------------------------------------------
+    # create nodes
+    # --------------------------------------------------------------------------
+    branch = Node(
+        "structure",
+    )
+    sub_branch_0 = Node("timber", elements=[e0, e1])
+    sub_branch_1 = Node("concrete", elements=[e2, e3])
+
+    # --------------------------------------------------------------------------
+    # add nodes to model
+    # --------------------------------------------------------------------------
+    model.add_node(branch)
+    branch.add_node(sub_branch_0)
+    branch.add_node(sub_branch_1)
+
+    # --------------------------------------------------------------------------
+    # add interactions
+    # --------------------------------------------------------------------------
+    model.add_interaction(e0, e1)
+    model.add_interaction(e2, e0)
+    model.add_interaction(e1, e2)
+
+    # --------------------------------------------------------------------------
+    # print the model
+    # --------------------------------------------------------------------------
+    model.print()
+
+    # --------------------------------------------------------------------------
+    # output
+    # --------------------------------------------------------------------------
+    return model
+
+
 def insert_nodes():
     # --------------------------------------------------------------------------
     # create model
@@ -490,6 +539,7 @@ def serialize_model():
 
 if __name__ == "__main__":
     # model_tree = create_model()
+    model_tree = create_model_with_elements()
     # model_tree = insert_nodes()
     # model_tree = insert_element()
     # model_tree = create_model_tree_operators()
