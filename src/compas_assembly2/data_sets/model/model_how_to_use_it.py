@@ -4,88 +4,130 @@ from __future__ import division
 
 from compas.geometry import Point  # noqa: F401
 from compas_assembly2 import Element
-from compas_assembly2 import Model, Node, ElementTree
+from compas_assembly2 import Model, ElementTree, GroupNode, ElementNode
 from compas.data.json import json_dump, json_load
 
 
 def create_model():
 
-    # --------------------------------------------------------------------------
     # create model
-    # --------------------------------------------------------------------------
     model = Model()
 
-    # --------------------------------------------------------------------------
-    # create nodes
-    # --------------------------------------------------------------------------
-    branch = Node("structure")
-    sub_branch_0 = Node("timber")
-    sub_branch_1 = Node("concrete")
+    # add group nodes - a typical tree node with a name and geometry
+    car = model.add_group(name="car", geometry=None)  # type: ignore
+    wheel = car.add_group(name="wheel", geometry=Point(0, 0, 0))  # type: ignore
 
-    # --------------------------------------------------------------------------
-    # add nodes to model
-    # --------------------------------------------------------------------------
-    model.add_node(branch)
-    branch.add_node(sub_branch_0)
-    branch.add_node(sub_branch_1)
+    # add element nodes - a "special" tree node with a name and element
+    wheel.add_element(name="spoke1", element=Element.from_frame(1, 10, 1))  # type: ignore
+    wheel.add_element(name="spoke2", element=Element.from_frame(5, 10, 1))  # type: ignore
 
-    # --------------------------------------------------------------------------
-    # print the model
-    # --------------------------------------------------------------------------
+    # print the model to preview the tree structure
     model.print()
 
-    # --------------------------------------------------------------------------
     # output
-    # --------------------------------------------------------------------------
     return model
 
 
-def create_model_with_elements():
+def create_model_with_interactions():
 
-    # --------------------------------------------------------------------------
     # create model
-    # --------------------------------------------------------------------------
     model = Model()
 
-    # --------------------------------------------------------------------------
-    # elements
-    # --------------------------------------------------------------------------
+    # add group nodes - a typical tree node with a name and geometry
+    car = model.add_group(name="car", geometry=None)  # type: ignore
+    wheel = car.add_group(name="wheel", geometry=Point(0, 0, 0))  # type: ignore
+
+    # add element nodes - a "special" tree node with a name and element
+    spoke1 = wheel.add_element(name="spoke1", element=Element.from_frame(1, 10, 1))  # type: ignore
+    spoke2 = wheel.add_element(name="spoke2", element=Element.from_frame(5, 10, 1))  # type: ignore
+    spoke3 = wheel.add_element(name="spoke3", element=Element.from_frame(10, 10, 1))  # type: ignore
+
+    # add interactions
+    model.add_interaction(spoke1, spoke2)
+    model.add_interaction(spoke1, spoke3)
+    model.add_interaction(spoke2, spoke3)
+
+    # print the model to preview the tree structure
+    model.print()
+
+    # output
+    return model
+
+
+def create_model_without_hierarchy():
+
+    # create model
+    model = Model()
+
+    # add element nodes - a "special" tree node with a name and element
+    spoke1 = model.add_element(name="spoke1", element=Element.from_frame(1, 10, 1))  # type: ignore
+    spoke2 = model.add_element(name="spoke2", element=Element.from_frame(5, 10, 1))  # type: ignore
+    spoke3 = model.add_element(name="spoke3", element=Element.from_frame(10, 10, 1))  # type: ignore
+
+    # add interactions
+    model.add_interaction(spoke1, spoke2)
+    model.add_interaction(spoke1, spoke3)
+    model.add_interaction(spoke2, spoke3)
+
+    # print the model to preview the tree structure
+    model.hierarchy.print()
+    # model.print()
+
+    # output
+    return model
+
+
+def create_model_tree_operators():
+    # ==========================================================================
+    # create elements
+    # ==========================================================================
     e0 = Element(name="beam", geometry_simplified=Point(0, 0, 0))
     e1 = Element(name="beam", geometry_simplified=Point(0, 5, 0))
     e2 = Element(name="plate", geometry_simplified=Point(0, 0, 0))
     e3 = Element(name="plate", geometry_simplified=Point(0, 0, 0))
 
-    # --------------------------------------------------------------------------
-    # create nodes
-    # --------------------------------------------------------------------------
-    branch = Node(
-        "structure",
-    )
-    sub_branch_0 = Node("timber", elements=[e0, e1])
-    sub_branch_1 = Node("concrete", elements=[e2, e3])
+    e4 = Element(name="block", geometry_simplified=Point(0, 5, 0))
+    e5 = Element(name="block", geometry_simplified=Point(0, 0, 0))
+    e6 = Element(name="block", geometry_simplified=Point(0, 0, 0))
+    e7 = Element(name="block", geometry_simplified=Point(0, 0, 0))
+    e8 = Element(name="glulam", geometry_simplified=Point(0, 0, 0))
 
-    # --------------------------------------------------------------------------
-    # add nodes to model
-    # --------------------------------------------------------------------------
-    model.add_node(branch)
-    branch.add_node(sub_branch_0)
-    branch.add_node(sub_branch_1)
+    # ==========================================================================
+    # create Model
+    # ==========================================================================
+    model = Model()  # the root of hierarchy automatically initializes the root node as <my_model>
+    model.add_node(Node("structure"))
+    model.hierarchy["structure"].add_node(Node("timber", elements=[e0, e1, e2, e3]))
+    model.hierarchy["structure"].add_node(Node("concrete", elements=[e4, e5, e6]))
 
-    # --------------------------------------------------------------------------
-    # add interactions
-    # --------------------------------------------------------------------------
+    # ==========================================================================
+    # get Node by index
+    # ==========================================================================
+    print(model.hierarchy["structure"])
+
+    # ==========================================================================
+    # set Node by index
+    # ==========================================================================
+    model.hierarchy["structure"]["concrete"] = Node("concrete2", elements=[e4, e4, e4, e4, e4])
+
+    # ==========================================================================
+    # get and set Node element by index
+    # ==========================================================================
     model.add_interaction(e0, e1)
-    model.add_interaction(e2, e0)
-    model.add_interaction(e1, e2)
+    model.print_interactions()
+    model.hierarchy["structure"]["timber"].set_element(0, e8)
+    model.print_interactions()
 
-    # --------------------------------------------------------------------------
-    # print the model
-    # --------------------------------------------------------------------------
-    model.print()
+    # ==========================================================================
+    # get and set a Node element by index, you can also using call operator
+    # ==========================================================================
+    model.hierarchy["structure"]["timber"].get_element(0)  # type: ignore
+    model.hierarchy["structure"]["timber"].set_element(1, e7)
 
-    # --------------------------------------------------------------------------
-    # output
-    # --------------------------------------------------------------------------
+    # ==========================================================================
+    # print the result
+    # ==========================================================================
+    model.hierarchy.print()
     return model
 
 
@@ -155,60 +197,6 @@ def insert_element():
     # output
     # --------------------------------------------------------------------------
     return tree
-
-
-def create_model_tree_operators():
-    # ==========================================================================
-    # create elements
-    # ==========================================================================
-    e0 = Element(name="beam", geometry_simplified=Point(0, 0, 0))
-    e1 = Element(name="beam", geometry_simplified=Point(0, 5, 0))
-    e2 = Element(name="plate", geometry_simplified=Point(0, 0, 0))
-    e3 = Element(name="plate", geometry_simplified=Point(0, 0, 0))
-
-    e4 = Element(name="block", geometry_simplified=Point(0, 5, 0))
-    e5 = Element(name="block", geometry_simplified=Point(0, 0, 0))
-    e6 = Element(name="block", geometry_simplified=Point(0, 0, 0))
-    e7 = Element(name="block", geometry_simplified=Point(0, 0, 0))
-    e8 = Element(name="glulam", geometry_simplified=Point(0, 0, 0))
-
-    # ==========================================================================
-    # create Model
-    # ==========================================================================
-    model = Model()  # the root of hierarchy automatically initializes the root node as <my_model>
-    model.add_node(Node("structure"))
-    model.hierarchy["structure"].add_node(Node("timber", elements=[e0, e1, e2, e3]))
-    model.hierarchy["structure"].add_node(Node("concrete", elements=[e4, e5, e6]))
-
-    # ==========================================================================
-    # get Node by index
-    # ==========================================================================
-    print(model.hierarchy["structure"])
-
-    # ==========================================================================
-    # set Node by index
-    # ==========================================================================
-    model.hierarchy["structure"]["concrete"] = Node("concrete2", elements=[e4, e4, e4, e4, e4])
-
-    # ==========================================================================
-    # get and set Node element by index
-    # ==========================================================================
-    model.add_interaction(e0, e1)
-    model.print_interactions()
-    model.hierarchy["structure"]["timber"].set_element(0, e8)
-    model.print_interactions()
-
-    # ==========================================================================
-    # get and set a Node element by index, you can also using call operator
-    # ==========================================================================
-    model.hierarchy["structure"]["timber"].get_element(0)  # type: ignore
-    model.hierarchy["structure"]["timber"].set_element(1, e7)
-
-    # ==========================================================================
-    # print the result
-    # ==========================================================================
-    model.hierarchy.print()
-    return model
 
 
 def create_model_tree_and_elements():
@@ -538,8 +526,9 @@ def serialize_model():
 
 
 if __name__ == "__main__":
-    # model_tree = create_model()
-    model_tree = create_model_with_elements()
+    # model = create_model()
+    # model_tree = create_model_with_interactions()
+    model_tree = create_model_without_hierarchy()
     # model_tree = insert_nodes()
     # model_tree = insert_element()
     # model_tree = create_model_tree_operators()

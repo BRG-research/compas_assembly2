@@ -391,15 +391,21 @@ class Element(Data):
         )
 
     @classmethod
-    def from_frame(cls, width, height, depth):
+    def from_frame(cls, width, height, depth, frame=None):
         """method create a frame element at the origin point with the frame at worldXY"""
-        return Element(
-            name=ELEMENT_NAME.BLOCK,
+        box = Box.from_width_height_depth(width, height, depth)
+        v, f = box.to_vertices_and_faces()
+        mesh = Mesh.from_vertices_and_faces(v, f)
+        element = Element(
+            name=ELEMENT_NAME.BEAM,
             id=0,
             frame=Frame.worldXY,
             geometry_simplified=Line(Point(-width, 0, 0), Point(width, 0, 0)),
-            geometry=Box.from_width_height_depth(width, height, depth),
+            geometry=mesh,
         )
+        if frame:
+            element.transform_to_frame(frame)
+        return element
 
     @classmethod
     def from_plate(cls, polylines):
@@ -1339,7 +1345,7 @@ class Element(Data):
         Returns:
             str: The string representation of the Element.
         """
-        return """TYPE_{0} ID_{1} GUID_{2}""".format(self.name, "_".join(map(str, self.id)), self.guid)
+        return """{0} {1} {2}""".format(self.name, "_".join(map(str, self.id)), self.guid)
         # return self.name
 
 

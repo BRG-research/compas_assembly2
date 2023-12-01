@@ -5,8 +5,7 @@ from __future__ import division
 from collections import OrderedDict
 from compas.datastructures import Graph
 from compas.geometry import Line, Polygon, distance_point_point  # noqa: F401
-from compas_assembly2 import Algorithms  # noqa: F401
-from compas.datastructures import Datastructure
+from compas_assembly2 import Element  # noqa: F401
 from compas.data import Data
 from compas.datastructures import Mesh
 
@@ -23,7 +22,7 @@ from compas.datastructures import Mesh
 # create a DATASCHEMA for the model
 
 
-class TreeNode(Data):
+class Node(Data):
     """A node of a tree data structure.
 
     Parameters
@@ -39,9 +38,9 @@ class TreeNode(Data):
         The name of the datastructure.
     attributes : dict[str, Any]
         User-defined attributes of the datastructure.
-    parent : :class:`~compas.datastructures.TreeNode`
+    parent : :class:`~compas.datastructures.Node`
         The parent node of the tree node.
-    children : list[:class:`~compas.datastructures.TreeNode`]
+    children : list[:class:`~compas.datastructures.Node`]
         The children of the tree node.
     tree : :class:`~compas.datastructures.Tree`
         The tree to which the node belongs.
@@ -51,9 +50,9 @@ class TreeNode(Data):
         True if the node is a leaf node of the tree.
     is_branch : bool
         True if the node is a branch node of the tree.
-    acestors : generator[:class:`~compas.datastructures.TreeNode`]
+    acestors : generator[:class:`~compas.datastructures.Node`]
         A generator of the acestors of the tree node.
-    descendants : generator[:class:`~compas.datastructures.TreeNode`]
+    descendants : generator[:class:`~compas.datastructures.Node`]
         A generator of the descendants of the tree node, using a depth-first preorder traversal.
 
     """
@@ -63,21 +62,23 @@ class TreeNode(Data):
         "$recursiveAnchor": True,
         "properties": {
             "name": {"type": "string"},
+            "object": {"type": "object"},
             "attributes": {"type": "object"},
             "children": {"type": "array", "items": {"$recursiveRef": "#"}},
         },
-        "required": ["name", "attributes", "children"],
+        "required": ["name", "mydata", "attributes", "children"],
     }
 
-    def __init__(self, name=None, attributes=None):
-        super(TreeNode, self).__init__(name=name)
+    def __init__(self, name=None, my_object=None, attributes=None):
+        super(Node, self).__init__(name=name)
+        self._my_object = my_object
         self.attributes = attributes or {}
         self._parent = None
         self._children = []
         self._tree = None
 
     def __repr__(self):
-        return "<TreeNode {}>".format(self.name)
+        return "<Node {}>".format(self.name)
 
     @property
     def is_root(self):
@@ -107,16 +108,21 @@ class TreeNode(Data):
             return self.parent.tree
 
     @property
+    def my_object(self):
+        return self._my_object
+
+    @property
     def data(self):
         return {
             "name": self.name,
+            "object": self.my_object,
             "attributes": self.attributes,
             "children": [child.data for child in self.children],
         }
 
     @classmethod
     def from_data(cls, data):
-        node = cls(data["name"], data["attributes"])
+        node = cls(data["name"], data["object"], data["attributes"])
         for child in data["children"]:
             node.add(cls.from_data(child))
         return node
@@ -127,7 +133,7 @@ class TreeNode(Data):
 
         Parameters
         ----------
-        node : :class:`~compas.datastructures.TreeNode`
+        node : :class:`~compas.datastructures.Node`
             The node to add.
 
         Returns
@@ -137,11 +143,11 @@ class TreeNode(Data):
         Raises
         ------
         TypeError
-            If the node is not a :class:`~compas.datastructures.TreeNode` object.
+            If the node is not a :class:`~compas.datastructures.Node` object.
 
         """
-        if not isinstance(node, TreeNode):
-            raise TypeError("The node is not a TreeNode object.")
+        if not isinstance(node, Node):
+            raise TypeError("The node is not a Node object.")
         if node not in self._children:
             self._children.append(node)
         node._parent = self
@@ -152,7 +158,7 @@ class TreeNode(Data):
 
         Parameters
         ----------
-        node : :class:`~compas.datastructures.TreeNode`
+        node : :class:`~compas.datastructures.Node`
             The node to remove.
 
         Returns
@@ -193,7 +199,7 @@ class TreeNode(Data):
 
         Yields
         ------
-        :class:`~compas.datastructures.TreeNode`
+        :class:`~compas.datastructures.Node`
             The next node in the traversal.
 
         Raises
@@ -226,7 +232,7 @@ class TreeNode(Data):
             raise ValueError("Unknown traversal strategy: {}".format(strategy))
 
 
-class Tree(Datastructure):
+class Tree(Data):
     """A hierarchical data structure that organizes elements into parent-child relationships.
     The tree starts from a unique root node, and every node (excluding the root) has exactly one parent.
 
@@ -243,20 +249,20 @@ class Tree(Datastructure):
         The name of the datastructure.
     attributes : dict[str, Any]
         User-defined attributes of the datastructure.
-    root : :class:`~compas.datastructures.TreeNode`
+    root : :class:`~compas.datastructures.Node`
         The root node of the tree.
-    nodes : generator[:class:`~compas.datastructures.TreeNode`]
+    nodes : generator[:class:`~compas.datastructures.Node`]
         The nodes of the tree.
-    leaves : generator[:class:`~compas.datastructures.TreeNode`]
+    leaves : generator[:class:`~compas.datastructures.Node`]
         A generator of the leaves of the tree.
 
     Examples
     --------
     >>> tree = Tree(name='tree')
-    >>> root = TreeNode('root')
-    >>> branch = TreeNode('branch')
-    >>> leaf1 = TreeNode('leaf1')
-    >>> leaf2 = TreeNode('leaf2')
+    >>> root = Node('root')
+    >>> branch = Node('branch')
+    >>> leaf1 = Node('leaf1')
+    >>> leaf2 = Node('leaf2')
     >>> tree.add(root)
     >>> root.add(branch)
     >>> branch.add(leaf1)
@@ -264,10 +270,10 @@ class Tree(Datastructure):
     >>> print(tree)
     <Tree with 4 nodes>
     >>> tree.print()
-    <TreeNode root>
-        <TreeNode branch>
-            <TreeNode leaf1>
-            <TreeNode leaf2>
+    <Node root>
+        <Node branch>
+            <Node leaf1>
+            <Node leaf2>
 
     """
 
@@ -275,7 +281,7 @@ class Tree(Datastructure):
         "type": "object",
         "properties": {
             "name": {"type": "string"},
-            "root": TreeNode.DATASCHEMA,
+            "root": Node.DATASCHEMA,
             "attributes": {"type": "object"},
         },
         "required": ["name", "root", "attributes"],
@@ -283,21 +289,22 @@ class Tree(Datastructure):
 
     def __init__(self, name=None, attributes=None):
         super(Tree, self).__init__(name=name)
-        self.attributes.update(attributes or {})
+        self.attributes = attributes or {}
         self._root = None
 
     @property
     def data(self):
         return {
             "name": self.name,
-            "root": self.root.data,
+            "object": self.object,
             "attributes": self.attributes,
+            "children": [child.data for child in self.children],
         }
 
     @classmethod
     def from_data(cls, data):
         tree = cls(data["name"], data["attributes"])
-        root = TreeNode.from_data(data["root"])
+        root = Node.from_data(data["root"])
         tree.add(root)
         return tree
 
@@ -311,9 +318,9 @@ class Tree(Datastructure):
 
         Parameters
         ----------
-        node : :class:`~compas.datastructures.TreeNode`
+        node : :class:`~compas.datastructures.Node`
             The node to add.
-        parent : :class:`~compas.datastructures.TreeNode`, optional
+        parent : :class:`~compas.datastructures.Node`, optional
             The parent node of the node to add.
             Default is ``None``, in which case the node is added as a root node.
 
@@ -324,16 +331,16 @@ class Tree(Datastructure):
         Raises
         ------
         TypeError
-            If the node is not a :class:`~compas.datastructures.TreeNode` object.
-            If the supplied parent node is not a :class:`~compas.datastructures.TreeNode` object.
+            If the node is not a :class:`~compas.datastructures.Node` object.
+            If the supplied parent node is not a :class:`~compas.datastructures.Node` object.
         ValueError
             If the node is already part of another tree.
             If the supplied parent node is not part of this tree.
             If the tree already has a root node, when trying to add a root node.
 
         """
-        if not isinstance(node, TreeNode):
-            raise TypeError("The node is not a TreeNode object.")
+        if not isinstance(node, Node):
+            raise TypeError("The node is not a Node object.")
 
         if node.parent:
             raise ValueError("The node already has a parent, remove it from that parent first.")
@@ -348,8 +355,8 @@ class Tree(Datastructure):
 
         else:
             # add the node as a child of the parent node
-            if not isinstance(parent, TreeNode):
-                raise TypeError("The parent node is not a TreeNode object.")
+            if not isinstance(parent, Node):
+                raise TypeError("The parent node is not a Node object.")
 
             if parent.tree is not self:
                 raise ValueError("The parent node is not part of this tree.")
@@ -368,7 +375,7 @@ class Tree(Datastructure):
 
         Parameters
         ----------
-        node : :class:`~compas.datastructures.TreeNode`
+        node : :class:`~compas.datastructures.Node`
             The node to remove.
 
         Returns
@@ -404,7 +411,7 @@ class Tree(Datastructure):
 
         Yields
         ------
-        :class:`~compas.datastructures.TreeNode`
+        :class:`~compas.datastructures.Node`
             The next node in the traversal.
 
         Raises
@@ -429,7 +436,7 @@ class Tree(Datastructure):
 
         Returns
         -------
-        :class:`~compas.datastructures.TreeNode`
+        :class:`~compas.datastructures.Node`
             The node.
 
         """
@@ -448,7 +455,7 @@ class Tree(Datastructure):
 
         Returns
         -------
-        list[:class:`~compas.datastructures.TreeNode`]
+        list[:class:`~compas.datastructures.Node`]
             The nodes.
 
         """
@@ -470,518 +477,6 @@ class Tree(Datastructure):
                 _print(child, depth + 1)
 
         _print(self.root)
-
-
-class Node(TreeNode):
-    def __init__(self, name=None, elements=None, attributes=None):
-        """
-        Initialize a Node.
-
-        Parameters
-        ----------
-        name : str, optional
-            A name or identifier for the node.
-
-        elements : list, optional
-            A list of attributes or elements to be associated with the node.
-
-        attributes : dict, optional
-            A dictionary of additional attributes to be associated with the node.
-
-        """
-        super(Node, self).__init__(name=name, attributes=attributes)
-        self._children = []  # a sorted list of TreeNode objects instead of set()
-        self._elements = []  # attributes of the node
-
-        # --------------------------------------------------------------------------
-        # user input - add elements to the current node and base tree model, if it exists
-        # --------------------------------------------------------------------------
-        self.add_elements(elements)
-
-    # ==========================================================================
-    # Serialization
-    # ==========================================================================
-    @property
-    def data(self):
-        return {
-            "name": self.name,
-            "attributes": self.attributes,
-            "children": [child.data for child in self.children],
-            "elements": self.elements,
-        }
-
-    @classmethod
-    def from_data(cls, data):
-        elements = data["elements"]
-        node = cls(name=data["name"], elements=elements, attributes=data["attributes"])
-        for child in data["children"]:
-            node.add(cls.from_data(child))
-        return node
-
-    # ==========================================================================
-    # properties
-    # ==========================================================================
-
-    @property
-    def elements(self):
-        """
-        Get the list of elements or attributes associated with the Node.
-
-        Returns
-        -------
-        list
-            A list of elements or attributes linked to the Node.
-        """
-        return self._elements
-
-    def clear_elements(self):
-        """
-        Clear the list of elements or attributes associated with the Node.
-
-        Returns
-        -------
-        None
-        """
-        self._elements = []
-
-    @property
-    def children(self):
-        """
-        Get the child nodes of the Node.
-
-        Returns
-        -------
-        SortedList
-            A sorted list of child nodes (Node objects) linked to the current Node.
-        """
-        return self._children
-
-    def clear_children(self):
-        """
-        Clear the list of elements or attributes associated with the Node.
-
-        Returns
-        -------
-        None
-        """
-        self._children = []
-
-    # ==========================================================================
-    # less than to add elements to the SortedList
-    # ==========================================================================
-
-    def __contains__(self, item):
-        for child in self._children:
-            if child.name == item.name:
-                return True
-        return False
-
-    def __lt__(self, other):
-        """
-        Less than operator for sorting assemblies by name.
-
-        This method is implemented for SortedList to work properly when sorting
-        Nodes by name. It compares the names of two Nodes and returns
-        True if the name of 'self' is less than the name of 'other'.
-
-        Parameters
-        ----------
-        other : Node
-            Another Node object to compare against.
-
-        Returns
-        -------
-        bool
-            True if the name of 'self' is less than the name of 'other'; False otherwise.
-        """
-        if isinstance(self.name, str) and isinstance(other.name, str):
-            return self.name < other.name
-        elif isinstance(self.name, int) and isinstance(other.name, int):
-            # returns false to add the element to the end of the list
-            return self.name < other.name
-        else:
-            return False
-
-    # ==========================================================================
-    # operators
-    # ==========================================================================
-
-    def __getitem__(self, name):
-        """
-        Get the child element at the specified index.
-
-        Parameters:
-            index (int): The index of the child element to retrieve.
-
-        Returns:
-            The child element at the specified index.
-
-        Raises:
-            TypeError: If the index is not an integer.
-
-        Example Usage:
-            # Get the child element at index 0
-            child_element = parent_element[0]
-        """
-        # --------------------------------------------------------------------------
-        # sanity checks
-        # --------------------------------------------------------------------------
-        if isinstance(name, str):
-            for child in self._children:
-                if child.name == name:
-                    return child
-        else:
-            raise TypeError("The name must be a string.")
-
-        # if isinstance(index, int):
-        #     return self._children[index]
-        # else:
-        #     raise TypeError("The index must be an integer.")
-
-    def remove_all_elements_from_the_current_node(self):
-        """
-        Remove all elements from the current node.
-
-        Example Usage:
-            # Remove all elements from the current node
-            node.remove_all_elements_from_the_current_node()
-        """
-
-        # remove elements from the element dictionary
-        for e in self._elements:
-            del self.tree._model._elements[str(e.guid)]  # type: ignore
-
-        # remove the node from the graph
-        for e in self._elements:
-            self.tree._model._interactions.delete_node(str(e.guid))  # type: ignore
-
-        # clear the current node list of elements
-        self._elements.clear()
-
-    def remove_all_children_from_the_current_node(self):
-
-        # remove all the elements from all the childs
-        for child in self._children:
-            child.remove_all_elements_from_the_current_node()
-            for future_child in child._children:
-                future_child.remove_all_children_from_the_current_node()
-
-        # remove all the childs, the childs are stored as SortedList()
-        self._children.clear()
-        del self._children
-
-    def change_base_tree(self, new_tree):
-        """
-        Change the base tree of the current node.
-
-        Parameters:
-            new_tree (ElementTree): The new ElementTree object to set as the base tree.
-
-        Example Usage:
-            # Change the base tree of the current node
-            node.change_base_tree(new_tree)
-        """
-        self._tree = new_tree
-        for child in self._children:
-            child.change_base_tree(new_tree)
-
-    def add_elements_to_the_model_dictionary(self, Node):
-        """
-        Add elements from the current node to the base dictionary of Model class.
-
-        Example Usage:
-            # Add elements from the current node to the base dictionary of Model class
-            node.add_elements_to_the_model_dictionary()
-        """
-        for e in Node._elements:
-            self.tree._model._elements[str(e.guid)] = e  # type: ignore
-            self.tree._model.add_interaction_node(e)  # type: ignore
-
-        for childnode in Node._children:
-            childnode.add_elements_to_the_model_dictionary(childnode)
-
-    def __setitem__(self, name, node):
-        """
-        Set the child element at the specified index to the given Node.
-        WARNING: if the interactions property has edges, they are not updated
-
-        This method allows you to replace a child element at the specified index with the provided Node.
-
-        Parameters:
-            index (int): The index of the child element to set.
-            Node (Node): The Node object to set at the specified index.
-
-        Raises:
-            TypeError: If Node is not a Node object.
-            TypeError: If the index is not an integer.
-
-        Example Usage:
-            # Set the child element at index 0 to a new Node
-            parent_element[0] = new_model_node
-        """
-
-        # --------------------------------------------------------------------------
-        # sanity checks
-        # --------------------------------------------------------------------------
-        if not isinstance(node, Node):
-            raise TypeError("The node is not a Node object.")
-
-        if not isinstance(name, str):
-            raise TypeError("The index must be an str")
-
-        index = None
-        for child in self._children:
-            if child.name == name:
-                index = self._children.index(child)
-                break
-
-        if index is None:
-            raise TypeError("The name does not exist")
-
-        # --------------------------------------------------------------------------
-        # Step 1 - remove elements from the old node and the Model _elements dictionary
-        # --------------------------------------------------------------------------
-        self._children[index].remove_all_elements_from_the_current_node()
-
-        # --------------------------------------------------------------------------
-        # Step 2 - all the children
-        # --------------------------------------------------------------------------
-        self._children[index].remove_all_children_from_the_current_node()
-
-        # --------------------------------------------------------------------------
-        # change the node of the tree and update the node's tree and parent
-        # --------------------------------------------------------------------------
-        temp_tree = self._children[index].tree
-        temp_parent = self._children[index].parent
-        self._children[index] = node
-        self._children[index]._parent = temp_parent
-        self._children[index]._tree = temp_tree
-
-        # --------------------------------------------------------------------------
-        # assign all the future childs of childs tree to the current branch tree
-        # --------------------------------------------------------------------------
-        self.change_base_tree(self.tree)
-
-        # --------------------------------------------------------------------------
-        # add elements to the model dictionary
-        # --------------------------------------------------------------------------
-        self.add_elements_to_the_model_dictionary(node)
-
-    def __call__(self, index, value=None):
-        """
-        Get or set an element within the ElementTree by index.
-
-        This method allows you to retrieve an element from the ElementTree by its index. You can also set an element at
-        the specified index by providing a 'value'.
-
-        Parameters:
-            index (int): The index of the element to retrieve or set.
-            value: The value to set at the specified index, if provided.
-
-        Returns:
-            Element: If 'value' is not provided, the element at the specified index.
-            None: If 'value' is provided, and the element is set.
-
-        """
-        if value is None:
-            return self.get_element(index)  # type: ignore
-        else:
-            self.set_element(index, value)  # type: ignore
-
-    def get_element(self, index):
-        """
-        Get an element at the specified index.
-
-        This method allows you to retrieve an element from the ElementTree by its index.
-
-        Parameters:
-            index (int): The index of the element to retrieve.
-
-        Returns:
-            Element: The element at the specified index.
-        """
-        return self._elements[index]
-
-    def set_element(self, index, other_element):
-        """
-        Set the element of the current node to the given element.
-        WARNING: if the interactions property has edges, they are not updated
-
-        Parameters:
-            other_element: The element to set for the current node.
-
-        Example Usage:
-            # Set the element of the current node to the given element
-            node.set_element(other_element)
-        """
-
-        # --------------------------------------------------------------------------
-        # first delete the old element from the Model _elements dictionary
-        # --------------------------------------------------------------------------
-        del self.tree._model.elements[str(self._elements[index].guid)]  # type: ignore
-
-        # --------------------------------------------------------------------------
-        # then add the new element to the Model _elements dictionary
-        # --------------------------------------------------------------------------
-        self.tree._model.elements[str(other_element.guid)] = other_element  # type: ignore
-
-        # --------------------------------------------------------------------------
-        # then apdate the graph
-        # step 1 - get connected edges to the current node
-        # step 2 - replace the node in the edges with the new one - do not need to delete edges
-        # step 3 - delete the node from the graph
-        # step 4 - add the new node to the graph
-        # --------------------------------------------------------------------------
-
-        edges = self.tree._model._interactions.connected_edges(str(self._elements[index].guid))  # type: ignore
-        new_edges = []
-
-        for edge in edges:
-            if edge[0] == str(self._elements[index].guid):
-                new_edges.append((str(other_element.guid), edge[1]))
-            elif edge[1] == str(self._elements[index].guid):
-                new_edges.append((edge[0], str(other_element.guid)))
-            else:
-                new_edges.append((edge[0], edge[1]))  # type: ignore
-
-        self.tree._model._interactions.delete_node(str(self._elements[index].guid))  # type: ignore
-        self.tree._model._interactions.add_node(str(other_element.guid))  # type: ignore
-
-        for edge in new_edges:
-            self.tree._model._interactions.add_edge(edge[0], edge[1])  # type: ignore
-
-        # --------------------------------------------------------------------------
-        # then update the element in the current node
-        # --------------------------------------------------------------------------
-        self._elements[index] = other_element
-
-    # ==========================================================================
-    # element properties and methods - self._elements = OrderedDict()
-    # ==========================================================================
-
-    def add_elements(self, user_elements):
-        """
-        Add a list of elements to the model (current node list and root dictionary).
-
-        Parameters:
-            elements (list): A list of elements to add to the model.
-
-        Example Usage:
-            # Add a list of elements to the model
-            model.add_elements([element1, element2])
-        """
-        # --------------------------------------------------------------------------
-        # the user input can be empty if the branch only store a name
-        # --------------------------------------------------------------------------
-        if user_elements is None:
-            return
-
-        # --------------------------------------------------------------------------
-        # check if the user tries to add elements with the same GUID
-        # --------------------------------------------------------------------------
-        temp_guid_dict = {}
-        all_elements_are_unique = True
-        for e in user_elements:
-            if str(e.guid) in temp_guid_dict:
-                all_elements_are_unique = False
-                break
-            else:
-                temp_guid_dict[str(e.guid)] = e
-
-        if all_elements_are_unique is False:
-            print(
-                "WARNING: you are adding multiple elements with the same GUID,"
-                + " the elements will be copied to avoid multi-referencing"
-            )
-
-        # --------------------------------------------------------------------------
-        # depending if the condition is met add elements to the tree or make individual copies
-        # --------------------------------------------------------------------------
-        for element in user_elements:
-            if all_elements_are_unique is False:
-                element_copy = element.copy()
-                self.add_element(element_copy)
-            else:
-                self.add_element(element)
-
-    def add_element(self, element):
-        """
-        Add an element to the model (current node list and root dictionary).
-
-        Parameters:
-            element: An element to add to the model.
-
-        Example Usage:
-            # Add an element to the model
-            model.add_element(element)
-        """
-        if element is not None:
-            # add elements to the current node
-            self._elements.append(element)
-
-            # if the node is part of a tree, then add elements to the base dictionary of Model class
-            if self.tree:
-                # update the root class
-                self.tree._model._elements[str(element.guid)] = element
-
-                # add the node to the graph
-                self.tree._model.add_interaction_node(element)
-
-    # ==========================================================================
-    # interactions properties and methods - self._interactions = Graph()
-    # ==========================================================================
-
-    def add_node(self, node):
-        """
-        Add a child node to this node. This function is overridden to use SortedList instead of set().
-
-        Parameters:
-            node (Node): The child node to add to this node.
-
-        Raises:
-            TypeError: If the node is not a Node object.
-
-        Example Usage:
-            # Add a child node to this node
-            parent_node.add(child_node)
-        """
-        if not isinstance(node, Node):
-            raise TypeError("The node is not a TreeNode object.")
-        if node not in self._children:
-            self._children.append(node)
-
-            if self.tree is not None:
-                if self.tree._model is not None:
-                    # add elements from the current node to the base dictionary of Model class
-                    root = self.tree
-                    for e in node._elements:
-                        root._model.elements[str(e.guid)] = e  # type: ignore
-
-                    # add the node to the graph
-                    for e in node._elements:
-                        root._model.add_interaction_node(e)  # type: ignore
-
-            node._parent = self
-
-    # ==========================================================================
-    # print
-    # ==========================================================================
-
-    def __repr__(self):
-        """
-        Return a string representation of the Node.
-
-        Returns:
-            str: A string representation of the Node, including its name and the number of elements.
-
-        Example Usage:
-            # Get a string representation of the Node
-            node_repr = repr(model_node)
-        """
-        return "<Node> {}, elements [{}]".format(self.name, len(self._elements))
-
-    def __str__(self):
-        return self.__repr__()
 
 
 class ElementTree(Tree):
@@ -1031,7 +526,7 @@ class ElementTree(Tree):
         # --------------------------------------------------------------------------
         # process the user input
         # --------------------------------------------------------------------------
-        self.add(Node(name=name))  # the name can be empty
+        self.add(GroupNode(name=name))  # the name can be empty
         # if self._model is not None:
         #     self._model.add_elements(elements)  # elements is a list of Element objects
 
@@ -1061,7 +556,7 @@ class ElementTree(Tree):
         for node in data["nodes"]:
             nodes.append(Node.from_data(node))
         for node in nodes:
-            model_tree.add_node(node)
+            model_tree._add_node(node)
         return model_tree
 
     # ==========================================================================
@@ -1086,9 +581,11 @@ class ElementTree(Tree):
         count = 0
 
         def count_elements(node, count):
-            for child in node.children:
-                count += len(child.elements)
-                count_elements(child, count)  # type: ignore
+            if node.children is not None:
+                for child in node.children:
+                    if isinstance(child, ElementNode):
+                        count += 1
+                    count_elements(child, count)  # type: ignore
             return count
 
         count = count_elements(self.root, count)  # type: ignore
@@ -1098,7 +595,29 @@ class ElementTree(Tree):
     # hierarchy methods: add Node, add_by_path
     # ==========================================================================
 
-    def add_node(
+    def add_group(self, name=None, geometry=None, attributes=None):
+        group_node = GroupNode(name=name, geometry=geometry, attributes=attributes)
+        self._add_node(group_node)
+        return group_node
+
+    def add_element(self, element, attributes=None):
+        if element is not None:
+            # add elements to the current node
+            self._element = element
+
+            # if the node is part of a tree, then add elements to the base dictionary of Model class
+            if self._model:
+                # update the root class
+                self._model._elements[str(element.guid)] = element
+
+                # add the node to the graph
+                self._model.add_interaction_node(element)
+
+        element_node = ElementNode(name=element.name, element=element, attributes=attributes)
+        self._add_node(element_node)
+        return element_node
+
+    def _add_node(
         self,
         node,
         parent=None,
@@ -1107,11 +626,11 @@ class ElementTree(Tree):
         Add a node to the tree.
 
         Parameters:
-            node (TreeNode): The node to add to the tree.
-            parent (TreeNode): The parent node under which to add the new node. Default is None.
+            node (Node): The node to add to the tree.
+            parent (Node): The parent node under which to add the new node. Default is None.
 
         Raises:
-            TypeError: If the node is not a TreeNode object or if the parent is not a TreeNode object.
+            TypeError: If the node is not a Node object or if the parent is not a Node object.
             ValueError: If the node already has a parent or if the tree already has a root node.
 
         Example Usage:
@@ -1120,8 +639,8 @@ class ElementTree(Tree):
             # Add a node to the tree as a child of a parent node
             tree.add(node, parent=parent_node)
         """
-        if not isinstance(node, TreeNode):
-            raise TypeError("The node is not a TreeNode object.")
+        if not isinstance(node, Node):
+            raise TypeError("The node is not a Node object.")
 
         if node.parent:
             raise ValueError("The node already has a parent, remove it from that parent first.")
@@ -1134,8 +653,8 @@ class ElementTree(Tree):
                 node._tree = self._root  # type: ignore
 
                 if self._model is not None:
-                    for e in node.elements:  # type: ignore
-                        self._model.elements[str(e.guid)] = e  # type: ignore
+                    if isinstance(node.my_object, Element):
+                        self._model.elements[str(my_object.guid)] = my_object  # type: ignore
 
                 return node
                 raise ValueError("The tree already has a root node, remove it first.")
@@ -1232,24 +751,22 @@ class ElementTree(Tree):
 
         def _print(node, depth=0):
 
+            # parent_name = "None" if node.parent is None else node.parent.name
             parent_name = "None" if node.parent is None else node.parent.name
 
             # print current data
             print("-" * 100)
-            message = "    " * depth + str(node) + " " + " | Parent: " + parent_name + " | Root: " + node.tree.name
+            message = "    " * depth + str(node) + " " + "| Parent: " + parent_name + " | Root: " + node.tree.name
 
             if depth == 0:
                 message += " | Elements: " + "{" + str(node.tree.number_of_elements) + "}"
 
             print(message)
 
-            # print elements
-            for e in node._elements:
-                print("    " * (depth + 1) + str(e))
-
             # recursively print
-            for child in node.children:
-                _print(child, depth + 1)
+            if node.children is not None:
+                for child in node.children:
+                    _print(child, depth + 1)
 
         _print(self.root)
 
@@ -1419,6 +936,648 @@ class ElementTree(Tree):
             self._root.set_element(index, value)  # type: ignore
 
 
+class GroupNode(Node):
+    def __init__(self, name=None, geometry=None, attributes=None):
+        """
+        Initialize a Node.
+
+        Parameters
+        ----------
+        name : str, optional
+            A name or identifier for the node.
+
+        elements : list, optional
+            A list of attributes or elements to be associated with the node.
+
+        attributes : dict, optional
+            A dictionary of additional attributes to be associated with the node.
+
+        """
+        super().__init__(name=name, my_object=geometry, attributes=attributes)
+        self.name = name if name else str(self.guid)
+
+        # --------------------------------------------------------------------------
+        # user input - add elements to the current node and base tree model, if it exists
+        # --------------------------------------------------------------------------
+        # self.add_elements(elements)
+
+    # ==========================================================================
+    # Serialization
+    # ==========================================================================
+    @property
+    def data(self):
+        return {
+            "name": self.name,
+            "attributes": self.attributes,
+            "children": [child.data for child in self.children],
+            "object": self._my_object,
+        }
+
+    @classmethod
+    def from_data(cls, data):
+        my_object = data["object"]
+        node = cls(name=data["name"], geometry=my_object, attributes=data["attributes"])
+        for child in data["children"]:
+            node.add(cls.from_data(child))
+        return node
+
+    # ==========================================================================
+    # properties
+    # ==========================================================================
+
+    @property
+    def geometry(self):
+        """
+        Get the list of elements or attributes associated with the Node.
+
+        Returns
+        -------
+        list
+            A list of elements or attributes linked to the Node.
+        """
+        return self._my_object
+
+    @property
+    def children(self):
+        """
+        Get the child nodes of the Node.
+
+        Returns
+        -------
+        SortedList
+            A sorted list of child nodes (Node objects) linked to the current Node.
+        """
+        return self._children
+
+    def clear_children(self):
+        """
+        Clear the list of elements or attributes associated with the Node.
+
+        Returns
+        -------
+        None
+        """
+        self._children = []
+
+    # ==========================================================================
+    # less than to add elements to the SortedList
+    # ==========================================================================
+
+    def __contains__(self, item):
+        for child in self._children:
+            if child.name == item.name:
+                return True
+        return False
+
+    def __lt__(self, other):
+        """
+        Less than operator for sorting assemblies by name.
+
+        This method is implemented for SortedList to work properly when sorting
+        Nodes by name. It compares the names of two Nodes and returns
+        True if the name of 'self' is less than the name of 'other'.
+
+        Parameters
+        ----------
+        other : Node
+            Another Node object to compare against.
+
+        Returns
+        -------
+        bool
+            True if the name of 'self' is less than the name of 'other'; False otherwise.
+        """
+        if isinstance(self.name, str) and isinstance(other.name, str):
+            return self.name < other.name
+        elif isinstance(self.name, int) and isinstance(other.name, int):
+            # returns false to add the element to the end of the list
+            return self.name < other.name
+        else:
+            return False
+
+    # ==========================================================================
+    # operators
+    # ==========================================================================
+
+    def __getitem__(self, name):
+        """
+        Get the child element at the specified index.
+
+        Parameters:
+            index (int): The index of the child element to retrieve.
+
+        Returns:
+            The child element at the specified index.
+
+        Raises:
+            TypeError: If the index is not an integer.
+
+        Example Usage:
+            # Get the child element at index 0
+            child_element = parent_element[0]
+        """
+        # --------------------------------------------------------------------------
+        # sanity checks
+        # --------------------------------------------------------------------------
+        if isinstance(name, str):
+            for child in self._children:
+                if child.name == name:
+                    return child
+        else:
+            raise TypeError("The name must be a string.")
+
+        # if isinstance(index, int):
+        #     return self._children[index]
+        # else:
+        #     raise TypeError("The index must be an integer.")
+
+    # def remove_all_children_from_the_current_node(self):
+
+    #     # remove all the elements from all the childs
+    #     for child in self._children:
+    #         child.remove_all_elements_from_the_current_node()
+    #         for future_child in child._children:
+    #             future_child.remove_all_children_from_the_current_node()
+
+    #     # remove all the childs, the childs are stored as SortedList()
+    #     self._children.clear()
+    #     del self._children
+
+    def change_base_tree(self, new_tree):
+        """
+        Change the base tree of the current node.
+
+        Parameters:
+            new_tree (ElementTree): The new ElementTree object to set as the base tree.
+
+        Example Usage:
+            # Change the base tree of the current node
+            node.change_base_tree(new_tree)
+        """
+        self._tree = new_tree
+        for child in self._children:
+            child.change_base_tree(new_tree)
+
+    # def add_elements_to_the_model_dictionary(self, Node):
+    #     """
+    #     Add elements from the current node to the base dictionary of Model class.
+
+    #     Example Usage:
+    #         # Add elements from the current node to the base dictionary of Model class
+    #         node.add_elements_to_the_model_dictionary()
+    #     """
+    #     for e in Node._elements:
+    #         self.tree._model._elements[str(e.guid)] = e  # type: ignore
+    #         self.tree._model.add_interaction_node(e)  # type: ignore
+
+    #     for childnode in Node._children:
+    #         childnode.add_elements_to_the_model_dictionary(childnode)
+
+    # def __setitem__(self, name, node):
+    #     """
+    #     Set the child element at the specified index to the given Node.
+    #     WARNING: if the interactions property has edges, they are not updated
+
+    #     This method allows you to replace a child element at the specified index with the provided Node.
+
+    #     Parameters:
+    #         index (int): The index of the child element to set.
+    #         Node (Node): The Node object to set at the specified index.
+
+    #     Raises:
+    #         TypeError: If Node is not a Node object.
+    #         TypeError: If the index is not an integer.
+
+    #     Example Usage:
+    #         # Set the child element at index 0 to a new Node
+    #         parent_element[0] = new_model_node
+    #     """
+
+    #     # --------------------------------------------------------------------------
+    #     # sanity checks
+    #     # --------------------------------------------------------------------------
+    #     if not isinstance(node, Node):
+    #         raise TypeError("The node is not a Node object.")
+
+    #     if not isinstance(name, str):
+    #         raise TypeError("The index must be an str")
+
+    #     index = None
+    #     for child in self._children:
+    #         if child.name == name:
+    #             index = self._children.index(child)
+    #             break
+
+    #     if index is None:
+    #         raise TypeError("The name does not exist")
+
+    #     # --------------------------------------------------------------------------
+    #     # Step 1 - remove elements from the old node and the Model _elements dictionary
+    #     # --------------------------------------------------------------------------
+    #     self._children[index].remove_all_elements_from_the_current_node()
+
+    #     # --------------------------------------------------------------------------
+    #     # Step 2 - all the children
+    #     # --------------------------------------------------------------------------
+    #     self._children[index].remove_all_children_from_the_current_node()
+
+    #     # --------------------------------------------------------------------------
+    #     # change the node of the tree and update the node's tree and parent
+    #     # --------------------------------------------------------------------------
+    #     temp_tree = self._children[index].tree
+    #     temp_parent = self._children[index].parent
+    #     self._children[index] = node
+    #     self._children[index]._parent = temp_parent
+    #     self._children[index]._tree = temp_tree
+
+    #     # --------------------------------------------------------------------------
+    #     # assign all the future childs of childs tree to the current branch tree
+    #     # --------------------------------------------------------------------------
+    #     self.change_base_tree(self.tree)
+
+    #     # --------------------------------------------------------------------------
+    #     # add elements to the model dictionary
+    #     # --------------------------------------------------------------------------
+    #     self.add_elements_to_the_model_dictionary(node)
+
+    # def __call__(self, index, value=None):
+    #     """
+    #     Get or set an element within the ElementTree by index.
+
+    #     This method allows you to retrieve an element from the ElementTree by its index. You can also set an element at
+    #     the specified index by providing a 'value'.
+
+    #     Parameters:
+    #         index (int): The index of the element to retrieve or set.
+    #         value: The value to set at the specified index, if provided.
+
+    #     Returns:
+    #         Element: If 'value' is not provided, the element at the specified index.
+    #         None: If 'value' is provided, and the element is set.
+
+    #     """
+    #     if value is None:
+    #         return self.get_element(index)  # type: ignore
+    #     else:
+    #         self.set_element(index, value)  # type: ignore
+
+    # def set_element(self, index, other_element):
+    #     """
+    #     Set the element of the current node to the given element.
+    #     WARNING: if the interactions property has edges, they are not updated
+
+    #     Parameters:
+    #         other_element: The element to set for the current node.
+
+    #     Example Usage:
+    #         # Set the element of the current node to the given element
+    #         node.set_element(other_element)
+    #     """
+
+    #     # --------------------------------------------------------------------------
+    #     # first delete the old element from the Model _elements dictionary
+    #     # --------------------------------------------------------------------------
+    #     del self.tree._model.elements[str(self._elements[index].guid)]  # type: ignore
+
+    #     # --------------------------------------------------------------------------
+    #     # then add the new element to the Model _elements dictionary
+    #     # --------------------------------------------------------------------------
+    #     self.tree._model.elements[str(other_element.guid)] = other_element  # type: ignore
+
+    #     # --------------------------------------------------------------------------
+    #     # then apdate the graph
+    #     # step 1 - get connected edges to the current node
+    #     # step 2 - replace the node in the edges with the new one - do not need to delete edges
+    #     # step 3 - delete the node from the graph
+    #     # step 4 - add the new node to the graph
+    #     # --------------------------------------------------------------------------
+
+    #     edges = self.tree._model._interactions.connected_edges(str(self._elements[index].guid))  # type: ignore
+    #     new_edges = []
+
+    #     for edge in edges:
+    #         if edge[0] == str(self._elements[index].guid):
+    #             new_edges.append((str(other_element.guid), edge[1]))
+    #         elif edge[1] == str(self._elements[index].guid):
+    #             new_edges.append((edge[0], str(other_element.guid)))
+    #         else:
+    #             new_edges.append((edge[0], edge[1]))  # type: ignore
+
+    #     self.tree._model._interactions.delete_node(str(self._elements[index].guid))  # type: ignore
+    #     self.tree._model._interactions._add_node(str(other_element.guid))  # type: ignore
+
+    #     for edge in new_edges:
+    #         self.tree._model._interactions.add_edge(edge[0], edge[1])  # type: ignore
+
+    #     # --------------------------------------------------------------------------
+    #     # then update the element in the current node
+    #     # --------------------------------------------------------------------------
+    #     self._elements[index] = other_element
+
+    # # ==========================================================================
+    # # element properties and methods - self._elements = OrderedDict()
+    # # ==========================================================================
+
+    # def add_elements(self, user_elements):
+    #     """
+    #     Add a list of elements to the model (current node list and root dictionary).
+
+    #     Parameters:
+    #         elements (list): A list of elements to add to the model.
+
+    #     Example Usage:
+    #         # Add a list of elements to the model
+    #         model.add_elements([element1, element2])
+    #     """
+    #     # --------------------------------------------------------------------------
+    #     # the user input can be empty if the branch only store a name
+    #     # --------------------------------------------------------------------------
+    #     if user_elements is None:
+    #         return
+
+    #     # --------------------------------------------------------------------------
+    #     # check if the user tries to add elements with the same GUID
+    #     # --------------------------------------------------------------------------
+    #     temp_guid_dict = {}
+    #     all_elements_are_unique = True
+    #     for e in user_elements:
+    #         if str(e.guid) in temp_guid_dict:
+    #             all_elements_are_unique = False
+    #             break
+    #         else:
+    #             temp_guid_dict[str(e.guid)] = e
+
+    #     if all_elements_are_unique is False:
+    #         print(
+    #             "WARNING: you are adding multiple elements with the same GUID,"
+    #             + " the elements will be copied to avoid multi-referencing"
+    #         )
+
+    #     # --------------------------------------------------------------------------
+    #     # depending if the condition is met add elements to the tree or make individual copies
+    #     # --------------------------------------------------------------------------
+    #     for element in user_elements:
+    #         if all_elements_are_unique is False:
+    #             element_copy = element.copy()
+    #             self.add_element(element_copy)
+    #         else:
+    #             self.add_element(element)
+
+    # ==========================================================================
+    # interactions properties and methods - self._interactions = Graph()
+    # ==========================================================================
+    def add_group(self, name=None, geometry=None, attributes=None):
+        group_node = GroupNode(name=name, geometry=geometry, attributes=attributes)
+        self._add_node(group_node)
+        return group_node
+
+    def add_element(self, name=None, element=None, attributes=None):
+        if element is not None:
+            # add elements to the current node
+            self._element = element
+
+            # if the node is part of a tree, then add elements to the base dictionary of Model class
+            if self.tree:
+                # update the root class
+                self.tree._model._elements[str(element.guid)] = element
+
+                # add the node to the graph
+                self.tree._model.add_interaction_node(element)
+
+            element_node = ElementNode(name=name, element=element, attributes=attributes)
+            self._add_node(element_node)
+            return element
+
+    def _add_node(self, node):
+        """
+        Add a child node to this node. This function is overridden to use SortedList instead of set().
+
+        Parameters:
+            node (Node): The child node to add to this node.
+
+        Raises:
+            TypeError: If the node is not a Node object.
+
+        Example Usage:
+            # Add a child node to this node
+            parent_node.add(child_node)
+        """
+        if not isinstance(node, Node):
+            raise TypeError("The node is not a Node object.")
+        if node not in self._children:
+            self._children.append(node)
+
+            if self.tree is not None:
+                if self.tree._model is not None:
+                    # add elements from the current node to the base dictionary of Model class
+                    root = self.tree
+                    if self.children is not None and isinstance(node.my_object, ElementNode):
+                        root._model.elements[str(self.element.guid)] = self.element  # type: ignore
+                        # add the node to the graph
+                        root._model.add_interaction_node(self.element)  # type: ignore
+
+            node._parent = self  # type: ignore
+
+    # ==========================================================================
+    # print
+    # ==========================================================================
+
+    def __repr__(self):
+        """
+        Return a string representation of the Node.
+
+        Returns:
+            str: A string representation of the Node, including its name and the number of elements.
+
+        Example Usage:
+            # Get a string representation of the Node
+            node_repr = repr(model_node)
+        """
+        return "<{}> {}, <geometry> {}".format(self.__class__.__name__, self.name, self.geometry)
+
+    def __str__(self):
+        return self.__repr__()
+
+
+class ElementNode(Node):
+    def __init__(self, name=None, element=None, attributes=None):
+        """
+        Initialize a Node.
+
+        Parameters
+        ----------
+        name : str, optional
+            A name or identifier for the node.
+
+        elements : list, optional
+            A list of attributes or elements to be associated with the node.
+
+        attributes : dict, optional
+            A dictionary of additional attributes to be associated with the node.
+
+        """
+        super().__init__(name=name, my_object=None, attributes=attributes)
+        self.name = name if name else str(self.guid)
+        self._children = None  # make the leaf
+
+        # --------------------------------------------------------------------------
+        # user input - add elements to the current node and base tree model, if it exists
+        # --------------------------------------------------------------------------
+        self.add_element(element)
+
+    # ==========================================================================
+    # Serialization
+    # ==========================================================================
+    @property
+    def data(self):
+        return {
+            "name": self.name,
+            "attributes": self.attributes,
+            "children": None,
+            "element": self.element,
+        }
+
+    @classmethod
+    def from_data(cls, data):
+        element = data["element"]
+        node = cls(name=data["name"], element=element, attributes=data["attributes"])
+        node._children = None
+        return node
+
+    # ==========================================================================
+    # properties
+    # ==========================================================================
+
+    @property
+    def element(self):
+        return self._element
+
+    # ==========================================================================
+    # less than to add elements to the SortedList
+    # ==========================================================================
+
+    def equals(self, other):
+        """
+        Less than operator for sorting assemblies by name.
+
+        This method is implemented for SortedList to work properly when sorting
+        Nodes by name. It compares the names of two Nodes and returns
+        True if the name of 'self' is less than the name of 'other'.
+
+        Parameters
+        ----------
+        other : Node
+            Another Node object to compare against.
+
+        Returns
+        -------
+        bool
+            True if the name of 'self' is less than the name of 'other'; False otherwise.
+        """
+        if self.element.guid == other.element.guid:  # type: ignore
+            return True
+        else:
+            return False
+
+    # def __contains__(self, item):
+    #     for child in self._children:
+    #         if child.name == item.name:
+    #             return True
+    #     return False
+
+    def __lt__(self, other):
+        """
+        Less than operator for sorting assemblies by name.
+
+        This method is implemented for SortedList to work properly when sorting
+        Nodes by name. It compares the names of two Nodes and returns
+        True if the name of 'self' is less than the name of 'other'.
+
+        Parameters
+        ----------
+        other : Node
+            Another Node object to compare against.
+
+        Returns
+        -------
+        bool
+            True if the name of 'self' is less than the name of 'other'; False otherwise.
+        """
+        if isinstance(self.name, str) and isinstance(other.name, str):
+            return self.name < other.name
+        elif isinstance(self.name, int) and isinstance(other.name, int):
+            # returns false to add the element to the end of the list
+            return self.name < other.name
+        else:
+            return False
+
+    # ==========================================================================
+    # operators
+    # ==========================================================================
+
+    def remove_element(self):
+        """
+        Remove all elements from the current node.
+
+        Example Usage:
+            # Remove all elements from the current node
+            node.remove_all_elements_from_the_current_node()
+        """
+
+        # remove elements from the element dictionary
+        del self.tree._model._elements[str(self.element.guid)]  # type: ignore
+
+        # remove the node from the graph
+        self.tree._model._interactions.delete_node(str(self.element.guid))  # type: ignore
+
+    def add_element(self, element):
+        """
+        Add an element to the model (current node list and root dictionary).
+
+        Parameters:
+            element: An element to add to the model.
+
+        Example Usage:
+            # Add an element to the model
+            model.add_element(element)
+        """
+        if element is not None:
+            # add elements to the current node
+            self._element = element
+
+            # if the node is part of a tree, then add elements to the base dictionary of Model class
+            if self.tree:
+                # update the root class
+                self.tree._model._elements[str(element.guid)] = element
+
+                # add the node to the graph
+                self.tree._model.add_interaction_node(element)
+
+    # ==========================================================================
+    # interactions properties and methods - self._interactions = Graph()
+    # ==========================================================================
+
+    # ==========================================================================
+    # print
+    # ==========================================================================
+
+    def __repr__(self):
+        """
+        Return a string representation of the Node.
+
+        Returns:
+            str: A string representation of the Node, including its name and the number of elements.
+
+        Example Usage:
+            # Get a string representation of the Node
+            node_repr = repr(model_node)
+        """
+        return "<{}> {}, <element> {}".format(self.__class__.__name__, self.name, self.element)
+
+    def __str__(self):
+        return self.__repr__()
+
+
 class Model(Data):
     """
     A class representing a model with elements, hierarchy, and interactions.
@@ -1447,7 +1606,7 @@ class Model(Data):
         my_model = Model(name="custom_model", elements=[element1, element2])
     """
 
-    def __init__(self, name="root", elements=[], copy_elements=False):
+    def __init__(self, name="model", elements=[], copy_elements=False):
         """
         Initialize a new Model instance.
 
@@ -1470,7 +1629,9 @@ class Model(Data):
         # --------------------------------------------------------------------------
         # process the user input
         # --------------------------------------------------------------------------
-        self.add_elements(elements, copy_elements)  # elements is a list of Element objects
+        self.add_elements(
+            name="element", user_elements=elements, copy_elements=copy_elements
+        )  # elements is a list of Element objects
 
     # ==========================================================================
     # Serialization
@@ -1557,66 +1718,71 @@ class Model(Data):
                 return True
         return False
 
-    def add_elements(self, user_elements, copy_elements=False):
-        """
-        Add a list of elements to the model, ensuring GUID uniqueness.
+    def add_elements(self, name=None, user_elements=[], copy_elements=False):
 
-        This method allows you to add a list of elements to the model. If the list contains
-        elements with the same GUID, it checks for uniqueness and, if needed, makes copies
-        of the elements to avoid multi-referencing.
-
-        Parameters:
-            user_elements (list): A list of elements to add to the model.
-            copy_elements (bool, optional): If True, elements are copied during addition to
-                avoid multi-referencing. Default is False.
-
-        Example Usage:
-            # Add a list of elements to the model
-            model.add_elements([element1, element2])
-        """
-        # --------------------------------------------------------------------------
-        # The user input can be empty if the branch only stores a name.
-        # --------------------------------------------------------------------------
-        if user_elements is None:
-            return
-
-        # --------------------------------------------------------------------------
-        # Check if the user tries to add elements with the same GUID.
-        # --------------------------------------------------------------------------
-        temp_guid_dict = {}
-        all_elements_are_unique = True
-        if not copy_elements:
-            for e in user_elements:
-                if str(e.guid) in temp_guid_dict:
-                    all_elements_are_unique = False
-                    break
-                else:
-                    temp_guid_dict[str(e.guid)] = e
-
-            if not all_elements_are_unique:
-                print(
-                    "WARNING: You are adding multiple elements with the same GUID. "
-                    "The elements will be copied to avoid multi-referencing."
-                )
-        else:
-            all_elements_are_unique = False
-
-        # --------------------------------------------------------------------------
-        # Depending on whether the condition is met, add elements to the tree or make individual copies.
-        # --------------------------------------------------------------------------
-        added_elements = []
+        guids = []
         for element in user_elements:
-            if not all_elements_are_unique:
-                element_copy = element.copy()
-                self.add_element(element_copy)
-                added_elements.append(element_copy)
-            else:
-                self.add_element(element)
-                added_elements.append(element)
+            guids.append(self.add_element(self, name=name, element=element, copy_element=copy_elements))
+        return guids
+        # """
+        # Add a list of elements to the model, ensuring GUID uniqueness.
 
-        return added_elements
+        # This method allows you to add a list of elements to the model. If the list contains
+        # elements with the same GUID, it checks for uniqueness and, if needed, makes copies
+        # of the elements to avoid multi-referencing.
 
-    def add_element(self, element, copy_element=False):
+        # Parameters:
+        #     user_elements (list): A list of elements to add to the model.
+        #     copy_elements (bool, optional): If True, elements are copied during addition to
+        #         avoid multi-referencing. Default is False.
+
+        # Example Usage:
+        #     # Add a list of elements to the model
+        #     model.add_elements([element1, element2])
+        # """
+        # # --------------------------------------------------------------------------
+        # # The user input can be empty if the branch only stores a name.
+        # # --------------------------------------------------------------------------
+        # if user_elements is None:
+        #     return
+
+        # # --------------------------------------------------------------------------
+        # # Check if the user tries to add elements with the same GUID.
+        # # --------------------------------------------------------------------------
+        # temp_guid_dict = {}
+        # all_elements_are_unique = True
+        # if not copy_elements:
+        #     for e in user_elements:
+        #         if str(e.guid) in temp_guid_dict:
+        #             all_elements_are_unique = False
+        #             break
+        #         else:
+        #             temp_guid_dict[str(e.guid)] = e
+
+        #     if not all_elements_are_unique:
+        #         print(
+        #             "WARNING: You are adding multiple elements with the same GUID. "
+        #             "The elements will be copied to avoid multi-referencing."
+        #         )
+        # else:
+        #     all_elements_are_unique = False
+
+        # # --------------------------------------------------------------------------
+        # # Depending on whether the condition is met, add elements to the tree or make individual copies.
+        # # --------------------------------------------------------------------------
+        # added_elements = []
+        # for element in user_elements:
+        #     if not all_elements_are_unique:
+        #         element_copy = element.copy()
+        #         self.add_element(element_copy)
+        #         added_elements.append(element_copy)
+        #     else:
+        #         self.add_element(element)
+        #         added_elements.append(element)
+
+        # return added_elements
+
+    def add_element(self, name=None, element=None, copy_element=False):
         """
         Adds an element to the model.
 
@@ -1646,9 +1812,10 @@ class Model(Data):
 
         if element is not None:
             element_copy = element.copy() if copy_element else element
-            element_guid = str(element_copy.guid)
-            self.elements[element_guid] = element_copy
-            self.add_interaction_node(element_copy)
+            # element_guid = str(element_copy.guid)
+            # self.elements[element_guid] = element_copy
+            # self.add_interaction_node(element_copy)
+            self._hierarchy.add_element(element_copy)
             return element_copy
 
     def get_element(self, key):
@@ -1664,7 +1831,21 @@ class Model(Data):
     # hierarchy methods: add Node, add_by_poath
     # ==========================================================================
 
-    def add_node(self, node, parent=None):
+    def add_group(self, name=None, geometry=None, attributes=None, parent=None):
+        group_node = GroupNode(name=name, geometry=geometry, attributes=None)
+        self._hierarchy._add_node(group_node, parent)
+        return group_node
+
+    def get_by_guid(self, guid):
+        pass
+
+    def get_by_index(self, index):
+        pass
+
+    def get_by_name(self, name):
+        pass
+
+    def _add_node(self, node, parent=None):
         """
         Add a node to the model.
 
@@ -1698,7 +1879,7 @@ class Model(Data):
         new_node = Node(...)
         """
 
-        self._hierarchy.add_node(node=node, parent=parent)
+        self._hierarchy._add_node(node=node, parent=parent)
 
     def insert_node(self, node, path=[], duplicate=False):
         """
@@ -1744,7 +1925,7 @@ class Model(Data):
                     break
 
             if found and idx == len(paths) - 1:
-                branch.add_node(node)  # type: ignore
+                branch._add_node(node)  # type: ignore
                 break
 
             if found is False:
@@ -1838,13 +2019,13 @@ class Model(Data):
         self.hierarchy.root.clear_children()  # type: ignore
 
         # step3 - create a new node with the collected elements
-        self.hierarchy.add_node(node=Node(name=flatenned_node_name, elements=all_node_elements))
+        self.hierarchy._add_node(node=Node(name=flatenned_node_name, elements=all_node_elements))
 
     def _graft_node(self, node):
         if len(node.elements) > 1:
             for idx, element in enumerate(node.elements):
                 grafted_node = Node(name=str(idx), elements=[element])
-                self.hierarchy.add_node(node=grafted_node, parent=node)
+                self.hierarchy._add_node(node=grafted_node, parent=node)
             node.elements.clear()
 
         for child in node.children:
@@ -2164,6 +2345,8 @@ class Model(Data):
 
         def _count(node):
             count = 0
+            if node.children is None:
+                return 0
             for child in node.children:
                 count += 1 + _count(child)
             return count
@@ -2199,9 +2382,8 @@ class Model(Data):
         """
         name = self._hierarchy.name
         return (
-            "Model "
-            + "<"
-            + name
+            "<"
+            + self.__class__.__name__
             + ">"
             + " with {} elements, {} children, {} interactions, {} nodes".format(
                 self.number_of_elements,
@@ -2239,7 +2421,7 @@ class Model(Data):
 
             # print current data
             print("-" * 100)
-            message = "    " * depth + str(node) + " " + " | Parent: " + parent_name + " | Root: " + node.tree.name
+            message = "    " * depth + str(node) + " " + "| Parent: " + parent_name + " | Root: " + node.tree.name
 
             if depth == 0:
                 # message += " | Elements: " + "{" + str(len(node.tree._model._elements)) + "}"
@@ -2248,12 +2430,13 @@ class Model(Data):
             print(message)
 
             # print elements
-            for e in node._elements:
-                print("    " * (depth + 1) + str(e))
+            if isinstance(node.my_object, Element):
+                print("    " * (depth + 1) + str(node.my_object))
 
             # recursively print
-            for child in node.children:
-                _print(child, depth + 1)
+            if node.children is not None:
+                for child in node.children:
+                    _print(child, depth + 1)
 
         _print(self._hierarchy.root)
 
@@ -2288,7 +2471,7 @@ class Model(Data):
                 for element in main_node_childs[idx].elements:
                     elements_copied.append(dict_old_guid_and_new_element[str(element.guid)])
 
-                copy._hierarchy.add_node(Node(name=main_node_childs[idx].name, elements=elements_copied))
+                copy._hierarchy._add_node(Node(name=main_node_childs[idx].name, elements=elements_copied))
 
                 # recursively copy nodes
                 copy_nodes(main_node_childs[idx].children, other_node_child.children)

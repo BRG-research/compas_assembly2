@@ -1,5 +1,7 @@
 from compas.data import json_load
-from compas.geometry import Point, Line, Vector
+from compas.geometry import Point, Line, Vector, Polyline
+from compas.geometry import Translation
+from compas.geometry import intersection_line_line
 
 viewer_installed = True
 
@@ -60,6 +62,18 @@ if __name__ == "__main__" and viewer_installed:
         sum_forces += forces[idx]
 
     # perform intersection: cable_lines_funicular and loads_lines
+    cable_lines_funicular_transformed = []
+    last_point = loads_lines[0].start
+    temporary_arc = Polyline(points=[loads_lines[0].start])
+
+    for idx, loads_line in enumerate(loads_lines):
+        cable_line_funicular_copy = cable_lines_funicular[idx].copy()
+        xform = Translation.from_vector(Vector.from_start_end(cable_line_funicular_copy.start, last_point))
+        cable_line_funicular_copy.transform(xform)
+        cable_lines_funicular_transformed.append(cable_line_funicular_copy)
+        last_point = intersection_line_line(cable_line_funicular_copy, loads_lines[idx])[0]
+        temporary_arc.append(last_point)
+        # cable_lines_funicular[idx]
 
     # get the Nmax
 
@@ -81,13 +95,14 @@ if __name__ == "__main__" and viewer_installed:
         viewer.add(polyline, linecolor=(0, 0, 0))  # type: ignore
 
     # supports
-    viewer.add(left_point)  # type: ignore
-    viewer.add(right_point)  # type: ignore
-    viewer.add(Collection(loads_points))  # type: ignore
+    # viewer.add(left_point)  # type: ignore
+    # viewer.add(right_point)  # type: ignore
+    # viewer.add(Collection(loads_points))  # type: ignore
     viewer.add(Collection(loads_lines))  # type: ignore
-    viewer.add(arbitrary_load_start_point)  # type: ignore
-    viewer.add(arbitrary_funicular_point)  # type: ignore
-    viewer.add(Collection(loads_lines_funicular))  # type: ignore
+    # viewer.add(arbitrary_load_start_point)  # type: ignore
+    # viewer.add(arbitrary_funicular_point)  # type: ignore
+    # viewer.add(Collection(loads_lines_funicular))  # type: ignore
     viewer.add(Collection(cable_lines_funicular))  # type: ignore
-
+    # viewer.add(Collection(cable_lines_funicular_transformed))  # type: ignore
+    viewer.add(temporary_arc)  # type: ignore
     viewer.show()
