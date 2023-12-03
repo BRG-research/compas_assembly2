@@ -1,138 +1,16 @@
 """
+********************************************************************************
+compas_assembly2
+********************************************************************************
 
 .. currentmodule:: compas_assembly2
-        :member-order: bysource
+
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
 
-.. image:: ../_images/overview.png
-   :width: 85%
-   :align: right
-   :alt: compas_assembly2
-
-test module
-===========
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    test.hello_compas_assembly2
-
-# Assembly class
-# ==============
-
-# .. image:: ../_images/assembly.png
-#    :width: 85%
-#    :align: right
-#    :alt: compas_assembly2
-
-# .. image:: ../_images/assembly_sorted_dict.png
-#    :width: 85%
-#    :align: right
-#    :alt: compas_assembly2
-
-# .. autosummary::
-#     :toctree: generated/
-#     :nosignatures:
-
-#     assembly.Assembly
-
-Element class
-=============
-
-.. image:: ../_images/element.png
-   :width: 85%
-   :align: right
-   :alt: compas_assembly2
-
-.. image:: ../_images/element_collision.png
-   :width: 85%
-   :align: right
-   :alt: compas_assembly2
-
-.. image:: ../_images/element_type.png
-   :width: 85%
-   :align: right
-   :alt: compas_assembly2
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    element.Element
-
-Block class
-===================
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    element_block.Block
-
-Beam class
-===================
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    element_beam.Beam
-
-Joints class
-=============
-
-.. image:: ../_images/joints.png
-   :width: 85%
-   :align: right
-   :alt: compas_assembly2
-
-Viewer class
-============
-
-.. image:: ../_images/log_0.gif
-   :width: 85%
-   :align: right
-   :alt: compas_assembly2
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    viewer.Viewer
-
-Fabrication class
-=================
-
-.. image:: ../_images/fabrication.png
-   :width: 85%
-   :align: right
-   :alt: compas_assembly2
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    fabrication.Fabrication
-
-Structure class
-=================
-
-.. image:: ../_images/structure.png
-   :width: 85%
-   :align: right
-   :alt: compas_assembly2
-
-FabricationNest class
-=====================
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    fabrication_nest.FabricationNest
+    compas_assembly2.element
+    compas_assembly2.model
 
 """
 
@@ -227,8 +105,9 @@ class FABRICATION_TYPES:
 global_geometry = []
 
 from .element import Element  # noqa
-from .model import Model, ElementTree, GroupNode, ElementNode  # noqa
 from .algorithms import Algorithms  # noqa
+from .model import Model, ElementTree, GroupNode, ElementNode  # noqa
+
 from .viewer_model import ViewerModel  # noqa
 from .viewer import Viewer  # noqa
 

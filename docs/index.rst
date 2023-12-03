@@ -4,69 +4,68 @@ compas_assembly2
 
 The **compas_assembly2** represents:
 
-.. image:: /_images/assembly.png
-   :width: 100%
-   :align: right
-   :alt: compas_assembly2
+.. .. image:: /_images/assembly.png
+..    :width: 100%
+..    :align: right
+..    :alt: compas_assembly2
 
 .. rst-class:: lead
 
    * elements:
       * structural elements such as blocks, beams, nodes, and plates.
-      * an element is primary a description of a simple and geometry geometry.
+      * an element is primary a description of a geometry (e.g. closed mesh) and simplified geometry (e.g. point, line).
       * initially elements do not have neither connectivity nor grouping information.
-   * assembly tree:
-      * the elements are stored in a tree structure.
-      * the grouping and connectivity is added manually by the user or automatically by collision detection.
-      * assembly can contain assemblies within assemblies to represent a hierarchy of structural elements.
-      * elements are sorted
+   * model:
+      * a dictionary of elements, where the key is the element.guid
+      * a tree to represent the assembly hierarchy
+      * a graph to represent the connectivity of the elements
 
 
-.. .. image:: /_images/logo.png
-..    :width: 20%
-..    :align: center
+.. .. .. image:: /_images/logo.png
+.. ..    :width: 20%
+.. ..    :align: center
+.. ..    :alt: compas_assembly2
+
+.. .. .. raw::
+
+.. .. image:: /_images/assembly2.png
+..    :width: 100%
+..    :align: right
 ..    :alt: compas_assembly2
 
-.. .. raw::
+.. .. rst-class:: lead
 
-.. image:: /_images/assembly2.png
-   :width: 100%
-   :align: right
-   :alt: compas_assembly2
+.. And the following the overview of the Assembly data-structure:
 
-.. rst-class:: lead
+.. .. image:: /_images/assembly_code_visuals1.png
+..    :width: 100%
+..    :align: right
+..    :alt: compas_assembly2
 
-And the following the overview of the Assembly data-structure:
+.. .. rst-class:: lead
 
-.. image:: /_images/assembly_code_visuals1.png
-   :width: 100%
-   :align: right
-   :alt: compas_assembly2
+.. .. image:: /_images/assembly_code_visuals2.png
+..    :width: 100%
+..    :align: right
+..    :alt: compas_assembly2
 
-.. rst-class:: lead
+.. .. rst-class:: lead
 
-.. image:: /_images/assembly_code_visuals2.png
-   :width: 100%
-   :align: right
-   :alt: compas_assembly2
+.. .. image:: /_images/assembly_code.png
+..    :width: 100%
+..    :align: right
+..    :alt: compas_assembly2
 
-.. rst-class:: lead
+.. .. rst-class:: lead
 
-.. image:: /_images/assembly_code.png
-   :width: 100%
-   :align: right
-   :alt: compas_assembly2
+.. And the elements that are currently implemented:
 
-.. rst-class:: lead
+.. .. image:: /_images/element_type.png
+..    :width: 100%
+..    :align: right
+..    :alt: compas_assembly2
 
-And the elements that are currently implemented:
-
-.. image:: /_images/element_type.png
-   :width: 100%
-   :align: right
-   :alt: compas_assembly2
-
-.. rst-class:: lead
+.. .. rst-class:: lead
 
 
 

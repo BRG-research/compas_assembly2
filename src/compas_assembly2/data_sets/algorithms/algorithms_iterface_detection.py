@@ -3,7 +3,7 @@ from compas.geometry import (
     Polygon,
 )
 
-from compas_assembly2 import Model, Algorithms, Viewer, ViewerModel, Element, Node
+from compas_assembly2 import Model, Algorithms, Viewer, ViewerModel, Element, GroupNode, ElementNode
 from compas.geometry import Frame
 
 
@@ -278,7 +278,7 @@ def example_model_face_to_face_interactions_from_mesh():
 
 
 if __name__ == "__main__":
-    # example_get_collision_pairs()
+    example_get_collision_pairs()
     # example_get_collision_pairs_with_attributes()
     # example_get_collision_pairs_kdtree()
     # example_face_to_face()
@@ -287,4 +287,4 @@ if __name__ == "__main__":
     # example_model_interfaces_cross_vault()
     # example_model_shortest_path()
     # example_model_shortest_path_from_mesh()
-    example_model_face_to_face_interactions_from_mesh()
+    # example_model_face_to_face_interactions_from_mesh()

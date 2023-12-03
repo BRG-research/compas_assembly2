@@ -2,9 +2,10 @@ from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import division
 
-from compas.geometry import Point  # noqa: F401
+from compas.geometry import Point, Frame, Box  # noqa: F401
+from compas.datastructures import Mesh  # noqa: F401
 from compas_assembly2 import Element
-from compas_assembly2 import Model, ElementTree, GroupNode, ElementNode
+from compas_assembly2 import Model, GroupNode, ElementNode
 from compas.data.json import json_dump, json_load
 
 
@@ -78,306 +79,114 @@ def create_model_without_hierarchy():
 
 
 def create_model_tree_operators():
-    # ==========================================================================
-    # create elements
-    # ==========================================================================
-    e0 = Element(name="beam", geometry_simplified=Point(0, 0, 0))
-    e1 = Element(name="beam", geometry_simplified=Point(0, 5, 0))
-    e2 = Element(name="plate", geometry_simplified=Point(0, 0, 0))
-    e3 = Element(name="plate", geometry_simplified=Point(0, 0, 0))
-
-    e4 = Element(name="block", geometry_simplified=Point(0, 5, 0))
-    e5 = Element(name="block", geometry_simplified=Point(0, 0, 0))
-    e6 = Element(name="block", geometry_simplified=Point(0, 0, 0))
-    e7 = Element(name="block", geometry_simplified=Point(0, 0, 0))
-    e8 = Element(name="glulam", geometry_simplified=Point(0, 0, 0))
 
     # ==========================================================================
-    # create Model
+    # create some elemnts elements
     # ==========================================================================
-    model = Model()  # the root of hierarchy automatically initializes the root node as <my_model>
-    model.add_node(Node("structure"))
-    model.hierarchy["structure"].add_node(Node("timber", elements=[e0, e1, e2, e3]))
-    model.hierarchy["structure"].add_node(Node("concrete", elements=[e4, e5, e6]))
+    elements = []
+    for i in range(20):
+        element = Element(
+            name="beam", geometry=Mesh.from_shape(Box(i + 1, 1, 1, Frame.worldXY())), geometry_simplified=Point(i, 0, 0)
+        )
+        elements.append(element)
 
     # ==========================================================================
-    # get Node by index
+    # model with a tree structure
     # ==========================================================================
-    print(model.hierarchy["structure"])
+    # create two models - with a tree structure, with a flat structure just with elements
+    model = Model()
+
+    # create a few nodes and add them to the model
+    structure = model.add_group(name="structure")  # type: ignore
+
+    timber = structure.add_group(name="timber")  # type: ignore
+    for i in range(5):
+        timber.add_element(element=elements[i])
+
+    concrete = structure.add_group(name="concrete")  # type: ignore
+    for i in range(5, 10):
+        concrete.add_element(element=elements[i])
+
+    model.add_interaction(elements[0], elements[1])
+    model.add_interaction(elements[0], elements[9])
+    model.add_interaction(elements[3], elements[9])
+    # model.print()
 
     # ==========================================================================
-    # set Node by index
+    # simple model without hierarchy
     # ==========================================================================
-    model.hierarchy["structure"]["concrete"] = Node("concrete2", elements=[e4, e4, e4, e4, e4])
+    model_simple = Model()
+    model_simple.add_element(name="beam", element=elements[0])
+    model_simple.add_element(name="beam_bam", element=elements[1])
+    model_simple.add_element(name="beam", element=elements[2])
+    model_simple.add_interaction(elements[0], elements[1])
+    model_simple.add_interaction(elements[0], elements[2])
+    # model_simple.print()
+
+    # ==========================================================================
+    # getters - root node
+    # ==========================================================================
+    # print(model["structure"])  # returns a Node of a name "structure"
+    # print(model[0])  # returns a Node of a name "structure"
+    # print(model[elements[5].guid])
+    # print(model[elements[5]])
+    # print(model_simple["beam"])  # returns a Node of a name "beam"
+    # print(model_simple[0])  # returns a Node of a name "beam"
+    # print(model_simple[elements[0].guid])  # returns the parent Node of the ElmentNode that has this element
+    # print(model_simple[elements[0]])  # returns the parent Node of the ElmentNode that has this element
+
+    # ==========================================================================
+    # getters - other nodes
+    # ==========================================================================
+    # print(model["structure"]["concrete"])  # returns a Node of a name "timber"
+    # print(model[0][1])  # returns a Node of a name "timber"
+    # print(model[0][elements[4].guid])  # when quering with guid, the parent of guid is returned
+    # print(model[0][elements[4]])  # when quering with guid, the parent of guid is returned, not the element guid¨!
+
+    # ==========================================================================
+    # setters - root node
+    # ==========================================================================
+    new_node = GroupNode("steel")
+    for i in range(10, 12):
+        new_node.add_element(element=elements[i])
+
+    # model[0] = new_node
+    # model["structure"] = new_node
+    # model[elements[3]] = elements[10]
+    # print(elements[3], elements[10])
+    # model[elements[3].guid] = elements[10]
+    # model_simple.print()
+    # model_simple["beam_bam"] = new_node
+    # model_simple[1] = new_node
+    # model_simple[elements[0].guid] = elements[10]
+    # model_simple[elements[2]] = elements[10]
+    # model_simple.print()
+    # model.print()
+
+    # ==========================================================================
+    # setters - other nodes
+    # ==========================================================================
+    # model[0][1] = new_node
+    # model["structure"]["concrete"] = new_node
+    # model[0][elements[4].guid] = elements[10]
+    # model[0][1][elements[7]] = elements[10]
 
     # ==========================================================================
     # get and set Node element by index
     # ==========================================================================
-    model.add_interaction(e0, e1)
-    model.print_interactions()
-    model.hierarchy["structure"]["timber"].set_element(0, e8)
-    model.print_interactions()
+    # model.add_interaction(e0, e1)
+    # model.print_interactions()
+    # model.hierarchy["structure"]["timber"].set_element(0, e8)
+    # model.print_interactions()
 
     # ==========================================================================
-    # get and set a Node element by index, you can also using call operator
-    # ==========================================================================
-    model.hierarchy["structure"]["timber"].get_element(0)  # type: ignore
-    model.hierarchy["structure"]["timber"].set_element(1, e7)
-
-    # ==========================================================================
-    # print the result
-    # ==========================================================================
-    model.hierarchy.print()
+    # of course, there are methods starting with get and set
+    # ==========================================================================¨
+    model.set_element_by_element(elements[0], elements[10])
+    model.get_node_by_element(elements[10])
+    model.get_child_by_index(0)
+    model.get_child_by_name("concrete")
     return model
-
-
-def insert_nodes():
-    # --------------------------------------------------------------------------
-    # create model
-    # --------------------------------------------------------------------------
-    tree = Model()
-
-    # --------------------------------------------------------------------------
-    # create and add a node
-    # --------------------------------------------------------------------------
-    tree.add_node(Node("structure"))  # type: ignore
-
-    # --------------------------------------------------------------------------
-    # insert a node using a paths -> a list of nodes names
-    # --------------------------------------------------------------------------
-    tree.insert_node(Node("timber"), path=["structure"])  # type: ignore
-    tree.insert_node(Node("concrete"), path=["structure"])  # type: ignore
-    tree.insert_node(Node("steel"), path=["structure"])  # type: ignore
-
-    # --------------------------------------------------------------------------
-    # print the model
-    # --------------------------------------------------------------------------
-    tree.print()
-
-    # --------------------------------------------------------------------------
-    # output
-    # --------------------------------------------------------------------------
-    return tree
-
-
-def insert_element():
-    # --------------------------------------------------------------------------
-    # create elements
-    # --------------------------------------------------------------------------
-    e0 = Element(name="beam", geometry_simplified=Point(0, 0, 0))
-    e1 = Element(name="plate", geometry_simplified=Point(0, 1, 0))
-    e2 = Element(name="block", geometry_simplified=Point(0, 2, 0))
-    e3 = Element(name="beam", geometry_simplified=Point(0, 3, 0))
-    e4 = Element(name="beam", geometry_simplified=Point(0, 4, 0))
-
-    # --------------------------------------------------------------------------
-    # create model
-    # --------------------------------------------------------------------------
-    tree = Model()
-
-    # --------------------------------------------------------------------------
-    # create and add a node
-    # --------------------------------------------------------------------------
-    tree.add_node(Node("structure"))  # type: ignore
-
-    # --------------------------------------------------------------------------
-    # insert a node using a paths -> a list of nodes names
-    # --------------------------------------------------------------------------
-    tree.insert_node(Node("timber", elements=[e0, e1, e3, e4]), path=["structure"])  # type: ignore
-    tree.insert_node(Node("concrete"), path=["structure"])  # type: ignore
-    tree.insert_node(Node("steel"), path=["structure"])  # type: ignore
-
-    # --------------------------------------------------------------------------
-    # print the model
-    # --------------------------------------------------------------------------
-    tree.insert_element(e2, path=["structure", "concrete"], duplicate=False)  # type: ignore
-    tree.print()
-
-    # --------------------------------------------------------------------------
-    # output
-    # --------------------------------------------------------------------------
-    return tree
-
-
-def create_model_tree_and_elements():
-    # ==========================================================================
-    # create Model
-    # ==========================================================================
-    model = Model()  # the root of hierarchy automatically initializes the root node as <my_model>
-
-    # ==========================================================================
-    # add nodes
-    # ==========================================================================
-    model.add_node(Node("structure"))  # type: ignore
-
-    model["structure"].add(
-        Node(
-            "timber",
-            elements=[
-                Element(name="beam", geometry_simplified=Point(0, 0, 0)),
-                Element(name="beam", geometry_simplified=Point(0, 5, 0)),
-                Element(name="plate", geometry_simplified=Point(0, 0, 0)),
-                Element(name="plate", geometry_simplified=Point(0, 0, 0)),
-            ],
-        )
-    )  # type: ignore
-
-    model["structure"].add(
-        Node(
-            "concrete",
-            elements=[
-                Element(name="block", geometry_simplified=Point(0, 5, 0)),
-                Element(name="block", geometry_simplified=Point(0, 0, 0)),
-                Element(name="block", geometry_simplified=Point(0, 0, 0)),
-            ],
-        )
-    )  # type: ignore
-
-    # ==========================================================================
-    # print the tree
-    # ==========================================================================
-    model.hierarchy.print()
-
-    # ==========================================================================
-    # return the model
-    # ==========================================================================
-    return model
-
-
-def merge_models_same_structure():
-    # ==========================================================================
-    # create elements
-    # ==========================================================================
-    e0 = Element(name="beam", geometry_simplified=Point(0, 0, 0))
-    e1 = Element(name="beam", geometry_simplified=Point(0, 5, 0))
-    e2 = Element(name="plate", geometry_simplified=Point(0, 0, 0))
-    e3 = Element(name="plate", geometry_simplified=Point(0, 0, 0))
-    e4 = Element(name="block", geometry_simplified=Point(0, 5, 0))
-    e5 = Element(name="block", geometry_simplified=Point(0, 0, 0))
-    e6 = Element(name="block", geometry_simplified=Point(0, 0, 0))
-
-    # ==========================================================================
-    # create Model1
-    # ==========================================================================
-    model1 = Model()  # the root of hierarchy automatically initializes the root node as <my_model>
-    model1.add_node(Node("structure1"))  # type: ignore
-    model1["structure1"].add_node(Node("timber1", elements=[e0, e1]))  # type: ignore
-    model1["structure1"].add_node(Node("concrete1", elements=[e2]))  # type: ignore
-    model1.add_interaction(e0, e1)
-    model1.add_interaction(e0, e2)
-
-    # ==========================================================================
-    # create Model2
-    # ==========================================================================
-    model2 = Model()  # the root of hierarchy automatically initializes the root node as <my_model>
-    model2.add_node(Node("structure1"))  # type: ignore
-    model2["structure1"].add_node(Node("timber1", elements=[e3, e4]))  # type: ignore
-    model2["structure1"].add_node(Node("concrete1", elements=[e5, e6]))  # type: ignore
-    model2.add_interaction(e3, e4)
-    model2.add_interaction(e3, e5)
-    model2.add_interaction(e5, e6)
-
-    # ==========================================================================
-    # merge models
-    # ==========================================================================
-    model1.merge(model2)
-
-    # ==========================================================================
-    # print and output the result
-    # ==========================================================================
-    model1.print()
-    return model1
-
-
-def merge_models_different_structure():
-    # ==========================================================================
-    # create elements
-    # ==========================================================================
-    e0 = Element(name="beam", geometry_simplified=Point(0, 0, 0))
-    e1 = Element(name="beam", geometry_simplified=Point(0, 5, 0))
-    e2 = Element(name="plate", geometry_simplified=Point(0, 0, 0))
-    e3 = Element(name="plate", geometry_simplified=Point(0, 0, 0))
-    e4 = Element(name="block", geometry_simplified=Point(0, 5, 0))
-    e5 = Element(name="block", geometry_simplified=Point(0, 0, 0))
-    e6 = Element(name="block", geometry_simplified=Point(0, 0, 0))
-
-    # ==========================================================================
-    # create Model1
-    # ==========================================================================
-    model1 = Model()  # the root of hierarchy automatically initializes the root node as <my_model>
-    model1.hierarchy.add_node(Node("structure1"))  # type: ignore
-    model1.hierarchy["structure1"].add_node(Node("timber1", elements=[e0, e1]))  # type: ignore
-    model1.hierarchy["structure1"].add_node(Node("concrete1", elements=[e2]))  # type: ignore
-    model1.add_interaction(e0, e1)
-    model1.add_interaction(e0, e2)
-
-    # ==========================================================================
-    # create Model2
-    # ==========================================================================
-    model2 = Model()  # the root of hierarchy automatically initializes the root node as <my_model>
-    model2.add_node(Node("structure2"))  # type: ignore
-    model2.hierarchy["structure2"].add_node(Node("timber2", elements=[e3, e4]))  # type: ignore
-    model2.hierarchy["structure2"].add_node(Node("concrete2", elements=[e5, e6]))  # type: ignore
-    model2.add_interaction(e3, e4)
-    model2.add_interaction(e3, e5)
-    model2.add_interaction(e5, e6)
-
-    # ==========================================================================
-    # merge models
-    # ==========================================================================
-    model1.merge(model2)
-
-    # ==========================================================================
-    # print and output the result
-    # ==========================================================================
-    model1.print()
-    return model1
-
-
-def merge_models_similar_structure():
-    # ==========================================================================
-    # create elements
-    # ==========================================================================
-    e0 = Element(name="beam", geometry_simplified=Point(0, 0, 0))
-    e1 = Element(name="beam", geometry_simplified=Point(0, 5, 0))
-    e2 = Element(name="plate", geometry_simplified=Point(0, 0, 0))
-    e3 = Element(name="plate", geometry_simplified=Point(0, 0, 0))
-
-    e4 = Element(name="block", geometry_simplified=Point(0, 5, 0))
-    e5 = Element(name="block", geometry_simplified=Point(0, 0, 0))
-    e6 = Element(name="block", geometry_simplified=Point(0, 0, 0))
-
-    # ==========================================================================
-    # create Model1
-    # ==========================================================================
-    model1 = Model()  # the root of hierarchy automatically initializes the root node as <my_model>
-    model1.add_node(Node("structure1"))  # type: ignore
-    model1.hierarchy["structure1"].add_node(Node("timber1", elements=[e0, e1]))  # type: ignore
-    model1.hierarchy["structure1"].add_node(Node("concrete1", elements=[e2]))  # type: ignore
-    model1.add_interaction(e0, e1)
-    model1.add_interaction(e0, e2)
-
-    # ==========================================================================
-    # create Model2
-    # ==========================================================================
-    model2 = Model()  # the root of hierarchy automatically initializes the root node as <my_model>
-    model2.add_node(Node("structure1"))  # type: ignore
-    model2.hierarchy["structure1"].add_node(Node("timber1", elements=[e3, e4]))  # type: ignore
-    model2.hierarchy["structure1"].add_node(Node("concrete2", elements=[e5, e6]))  # type: ignore
-    model2.add_interaction(e3, e4)
-    model2.add_interaction(e3, e5)
-    model2.add_interaction(e5, e6)
-
-    # ==========================================================================
-    # merge models
-    # ==========================================================================
-    model1.merge(model2)
-
-    # ==========================================================================
-    # print and output the result
-    # ==========================================================================
-    model1.print()
-    return model1
 
 
 def copy_model():
@@ -389,12 +198,14 @@ def copy_model():
     e2 = Element(name="block", geometry_simplified=Point(0, 0, 0))
     e3 = Element(name="block", geometry_simplified=Point(0, 5, 0))
 
-    model_node_0 = Node("timber1", elements=[e0, e1])
-    model_node_1 = Node("timber2", elements=[e2, e3])
-
     model = Model()  # the root of hierarchy automatically initializes the root node as <my_model>
-    model.add_node(model_node_0)
-    model.add_node(model_node_1)
+    truss1 = model.add_group("truss1")
+    truss2 = model.add_group("truss2")
+    truss1.add_element(e0)
+    truss1.add_element(e1)
+    truss2.add_element(e2)
+    truss2.add_element(e3)
+
     model.add_interaction(e0, e1)
 
     print("BEFORE COPY")
@@ -427,15 +238,12 @@ def serialize_model_node():
     # ==========================================================================
     # create elements and a Node
     # ==========================================================================
-    e0 = Element(name="beam", geometry_simplified=Point(0, 0, 0))
-    e1 = Element(name="beam", geometry_simplified=Point(0, 5, 0))
-
-    model_node = Node("timber1", elements=[e0, e1])
+    group_node = GroupNode(name="timber1", geometry=Point(0, 0, 0))
 
     # ==========================================================================
     # serialize the model_node
     # =========================================================================
-    json_dump(model_node, "src/compas_assembly2/data_sets/model/model_how_to_use_it_model_node.json", pretty=True)
+    json_dump(group_node, "src/compas_assembly2/data_sets/model/model_how_to_use_it_model_node.json", pretty=True)
 
     # ==========================================================================
     # deserialize the model_node
@@ -445,36 +253,42 @@ def serialize_model_node():
     # ==========================================================================
     # print the contents of the deserialized model_node
     # ==========================================================================
-    for element in model_node.elements:
-        print(element)
-    for element in model_node_deserialized.elements:
-        print(element)
-    print(model_node_deserialized)
+    print("model_node:              ", group_node)
+    print("model_node_deserialized: ", model_node_deserialized)
+
+    # ==========================================================================
+    # create elements and a Node
+    # ==========================================================================
+    element_node = ElementNode(name="spoke1", element=Element.from_frame(1, 10, 1))  # type: ignore
+
+    # ==========================================================================
+    # serialize the model_node
+    # =========================================================================
+    json_dump(element_node, "src/compas_assembly2/data_sets/model/model_how_to_use_it_model_node.json", pretty=True)
+
+    # ==========================================================================
+    # deserialize the model_node
+    # ==========================================================================
+    element_node_deserialized = json_load("src/compas_assembly2/data_sets/model/model_how_to_use_it_model_node.json")
+
+    # ==========================================================================
+    # print the contents of the deserialized model_node
+    # ==========================================================================
+    print("element_node:              ", element_node, element_node.element.geometry)
+    print("element_node_deserialized: ", element_node_deserialized, element_node_deserialized.element.geometry)
 
 
 def serialize_model_tree():
-    # ==========================================================================
-    # create elements and Nodes
-    # ==========================================================================
-    e0 = Element(name="beam", geometry_simplified=Point(0, 0, 0))
-    e1 = Element(name="beam", geometry_simplified=Point(0, 5, 0))
-    e2 = Element(name="block", geometry_simplified=Point(0, 0, 0))
-    e3 = Element(name="block", geometry_simplified=Point(0, 5, 0))
-
-    model_node_0 = Node("timber1", elements=[e0, e1])
-    model_node_1 = Node("timber2", elements=[e2, e3])
 
     # ==========================================================================
-    # add nodes to the model_tree
+    # create model
     # ==========================================================================
-    model_tree = ElementTree()
-    model_tree.add_node(model_node_0)
-    model_tree.add_node(model_node_1)
+    model = create_model()
 
     # ==========================================================================
     # serialize the model_tree
     # ==========================================================================
-    json_dump(model_tree, "src/compas_assembly2/data_sets/model/model_how_to_use_it_model_tree.json", pretty=True)
+    json_dump(model.hierarchy, "src/compas_assembly2/data_sets/model/model_how_to_use_it_model_tree.json", pretty=True)
 
     # ==========================================================================
     # deserialize the model_tree
@@ -484,30 +298,15 @@ def serialize_model_tree():
     # ==========================================================================
     # print the contents of the deserialized model_tree
     # ==========================================================================
-    model_tree_deserialized.print()
+    model.hierarchy.print()
+    model_tree_deserialized.print()  # type: ignore
 
 
 def serialize_model():
     # ==========================================================================
-    # create elements
+    # create model
     # ==========================================================================
-    e0 = Element(name="beam", geometry_simplified=Point(0, 0, 0))
-    e1 = Element(name="beam", geometry_simplified=Point(0, 5, 0))
-    e2 = Element(name="block", geometry_simplified=Point(0, 0, 0))
-    e3 = Element(name="block", geometry_simplified=Point(0, 5, 0))
-
-    # ==========================================================================
-    # create Nodes
-    # ==========================================================================
-    model_node_0 = Node("timber1", elements=[e0, e1])
-    model_node_1 = Node("timber2", elements=[e2, e3])
-
-    # ==========================================================================
-    # create Model and add Nodes to it
-    # ==========================================================================
-    model = Model()
-    model.add_node(model_node_0)
-    model.add_node(model_node_1)
+    model = create_model()
 
     # ==========================================================================
     # serialize the model_tree
@@ -522,23 +321,101 @@ def serialize_model():
     # ==========================================================================
     # print the contents of the deserialized model_tree
     # ==========================================================================
+    model.print()
     model_deserialized.print()
+
+
+def merge_models():
+    # ==========================================================================
+    # create elements
+    # ==========================================================================
+    e0 = Element(name="beam", geometry_simplified=Point(0, 0, 0))
+    e1 = Element(name="beam", geometry_simplified=Point(0, 5, 0))
+    e2 = Element(name="plate", geometry_simplified=Point(0, 0, 0))
+    e3 = Element(name="plate", geometry_simplified=Point(0, 0, 0))
+    e4 = Element(name="block", geometry_simplified=Point(0, 5, 0))
+    e5 = Element(name="block", geometry_simplified=Point(0, 0, 0))
+    e6 = Element(name="block", geometry_simplified=Point(0, 0, 0))
+
+    # ==========================================================================
+    # create Model1
+    # ==========================================================================
+    model1 = Model()  # the root of hierarchy automatically initializes the root node as <my_model>
+    structure1 = model1.add_group("structure1")  # type: ignore
+    timber1 = structure1.add_group("timber1")  # type: ignore
+    timber1.add_element(e0)
+    timber1.add_element(e1)
+    concrete1 = structure1.add_group("concrete1")  # type: ignore
+    concrete1.add_element(e2)
+    model1.add_interaction(e0, e1)
+    model1.add_interaction(e0, e2)
+
+    # ==========================================================================
+    # create Model2
+    # ==========================================================================
+    model2 = Model()  # the root of hierarchy automatically initializes the root node as <my_model>
+    structure1_ = model2.add_group("structure2")  # type: ignore
+    timber2_ = structure1_.add_group("timber2")  # type: ignore
+    timber2_.add_element(e0)
+    timber2_.add_element(e1)
+    timber2_.add_element(e3)
+    timber2_.add_element(e4)
+    timber2_.add_element(e5)
+    timber2_.add_element(e6)
+    concrete1_ = structure1_.add_group("concrete2")  # type: ignore
+    concrete1_.add_element(e2)
+    model1.add_interaction(e0, e1)
+    model1.add_interaction(e0, e2)
+
+    # ==========================================================================
+    # merge models
+    # ==========================================================================
+    model1.print()
+    model2.print()
+    model1.merge(model2)
+
+    # ==========================================================================
+    # print and output the result
+    # ==========================================================================
+    model1.print()
+    return model1
+
+
+def flatten_model():
+    model = create_model_with_interactions()
+    model.print()
+    model.flatten()
+    model.print()
+
+
+def graft_model():
+    model = create_model_with_interactions()
+    model.graft()
+    model.print()
+
+
+def prune_model():
+    model = merge_models()
+    model.prune(1)
+    model.print()
 
 
 if __name__ == "__main__":
     # model = create_model()
-    # model_tree = create_model_with_interactions()
-    model_tree = create_model_without_hierarchy()
-    # model_tree = insert_nodes()
-    # model_tree = insert_element()
-    # model_tree = create_model_tree_operators()
-    # model_tree = create_model_tree_and_elements()
-    # merge_models_same_structure()
-    # merge_models_different_structure()
-    # merge_models_similar_structure()
+    model = create_model_with_interactions()
+    # model = create_model_without_hierarchy()
+    # model = create_model_tree_operators()
+
     # copy_model()
+
     # serialize_element()
     # serialize_model_node()
     # serialize_model_tree()
-    # serialize_model()
+    # ^^serialize_model()
+
+    # merge_models()
+    # flatten_model()
+    # graft_model()
+    # prune_model()
+
     pass
