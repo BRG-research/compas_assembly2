@@ -1,18 +1,10 @@
 ********************************************************************************
 API Reference
 ********************************************************************************
+These are the API docs for the COMPAS Assembly package.
 
 .. toctree::
     :maxdepth: 1
+    :glob:
 
-    api/compas_cgal.booleans
-    api/compas_cgal.intersections
-    api/compas_cgal.measure
-    api/compas_cgal.meshing
-    api/compas_cgal.reconstruction
-    api/compas_cgal.slicer
-    api/compas_cgal.skeletonization
-    api/compas_cgal.subdivision
-    api/compas_cgal.triangulation
-    api/compas_cgal.types
-
+    api/compas_assembly2
