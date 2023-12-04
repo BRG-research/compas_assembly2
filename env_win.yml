@@ -4,6 +4,6 @@ channels:
 dependencies:
   - python>=3.6
   - pip>=19.0
-  - compas
+  - compas>=2.0.0a2
   - pip:
     - -r requirements-dev.txt
