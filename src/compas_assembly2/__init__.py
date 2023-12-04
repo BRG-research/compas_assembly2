@@ -37,9 +37,6 @@ Element class
 """
 
 
-
-
-
 __author__ = ["Petras Vestartas"]
 __copyright__ = "Petras Vestartas"
 __license__ = "MIT License"
