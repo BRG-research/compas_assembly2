@@ -1,11 +1,11 @@
 ********************************************************************************
-test - load the module
+Mesh Subdivision
 ********************************************************************************
 
-.. .. figure:: /_images/cgal_boolean_union.png
-..     :figclass: figure
-..     :class: figure-img img-fluid
+.. figure:: /_images/cgal_subd_loop.png
+    :figclass: figure
+    :class: figure-img img-fluid
 
 
-.. literalinclude:: test.py
+.. literalinclude:: subd.py
     :language: python

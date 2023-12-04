@@ -1,3 +1,3 @@
 # Authors
 
-- Petras Vestartas <<petrasvestartas@gmail.com>> [@brgcode](https://github.com/brgcode), [@petrasvestartas](https://github.com/petrasvestartas)
+- Tom Van Mele <<van.mele@arch.ethz.ch>> [@brgcode](https://github.com/brgcode), [@tomvanmele](https://github.com/tomvanmele)

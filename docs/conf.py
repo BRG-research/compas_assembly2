@@ -12,10 +12,10 @@ import sphinx_compas_theme  # this is a temp solution
 
 # -- General configuration ------------------------------------------------
 
-project = "COMPAS ASSEMBLY 2"
+project = "COMPAS CGAL"
 copyright = "COMPAS Association"
-author = "Petras Vestartas"
-package = "compas_assembly2"
+author = "Tom Van Mele"
+package = "compas_cgal"
 organization = "compas-dev"
 
 

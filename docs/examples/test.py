@@ -1,3 +1,0 @@
-import compas_assembly2
-
-print(compas_assembly2.__version__)
