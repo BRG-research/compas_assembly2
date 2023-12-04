@@ -1,7 +1,9 @@
+from __future__ import print_function  # noqa: F401 E402 F403
+import compas  # noqa: F401 E402 F4037
+import compas_assembly2  # noqa: F401 E402 F403
+import os
+
 """
-********************************************************************************
-compas_assembly2
-********************************************************************************
 
 .. currentmodule:: compas_assembly2
 
@@ -9,15 +11,33 @@ compas_assembly2
 .. toctree::
     :maxdepth: 1
 
-    compas_assembly2.element
-    compas_assembly2.model
+Model class
+===========
+
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
+
+    model.Tree
+    model.Node
+    model.GroupNode
+    model.ElementNode
+    model.Model
+
+
+Element class
+=============
+
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
+
+    element.Element
 
 """
 
 
-from __future__ import print_function
 
-import os
 
 
 __author__ = ["Petras Vestartas"]
@@ -104,13 +124,13 @@ class FABRICATION_TYPES:
 
 global_geometry = []
 
-from .element import Element  # noqa
-from .algorithms import Algorithms  # noqa
-from .model import Model, ElementTree, GroupNode, ElementNode  # noqa
+from element import Element  # noqa: F401 E402 F403
+from algorithms import Algorithms  # noqa: F401 E402 F403
+from model import Model, ElementTree, GroupNode, ElementNode  # noqa: F401 E402 F403
 
-from .viewer_model import ViewerModel  # noqa
-from .viewer import Viewer  # noqa
+from viewer_model import ViewerModel  # noqa: F401 E402 F403
+from viewer import Viewer  # noqa: F401 E402 F403
 
-# from .joint import Joint  # noqa
-from .block import Block  # noqa
-from .beam import Beam  # noqa
+# from .joint import Joint  # noqa: F401 E402 F403
+from block import Block  # noqa: F401 E402 F403
+from beam import Beam  # noqa: F401 E402 F403
