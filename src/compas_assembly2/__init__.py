@@ -1,6 +1,4 @@
 from __future__ import print_function  # noqa: F401 E402 F403
-import compas  # noqa: F401 E402 F4037
-import compas_assembly2  # noqa: F401 E402 F403
 import os
 
 """
