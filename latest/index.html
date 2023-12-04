@@ -118,9 +118,7 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="api/compas_assembly2.html">compas_assembly2</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="api/compas_assembly2.html">compas_assembly2</a></li>
 </ul>
 </li>
 </ul>
@@ -132,6 +130,425 @@
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
 </ul>
+<div class="language-python notranslate"><div class="highlight"><pre><button class="btn copy"><i class="far fa-copy"></i></button><code><span></span><span class="kn">from</span> <span class="nn">compas.geometry</span> <span class="kn">import</span> <span class="n">Point</span><span class="p">,</span> <span class="n">Frame</span><span class="p">,</span> <span class="n">Box</span>  <span class="c1"># noqa: F401</span>
+<span class="kn">from</span> <span class="nn">compas.datastructures</span> <span class="kn">import</span> <span class="n">Mesh</span>  <span class="c1"># noqa: F401</span>
+<span class="kn">from</span> <span class="nn">compas_assembly2</span> <span class="kn">import</span> <span class="n">Element</span>
+<span class="kn">from</span> <span class="nn">compas_assembly2</span> <span class="kn">import</span> <span class="n">Model</span><span class="p">,</span> <span class="n">GroupNode</span><span class="p">,</span> <span class="n">ElementNode</span>
+<span class="kn">from</span> <span class="nn">compas.data.json</span> <span class="kn">import</span> <span class="n">json_dump</span><span class="p">,</span> <span class="n">json_load</span>
+
+
+<span class="k">def</span> <span class="nf">create_model</span><span class="p">():</span>
+
+   <span class="c1"># create model</span>
+   <span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">()</span>
+
+   <span class="c1"># add group nodes - a typical tree node with a name and geometry</span>
+   <span class="n">car</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_group</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;car&quot;</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+   <span class="n">wheel</span> <span class="o">=</span> <span class="n">car</span><span class="o">.</span><span class="n">add_group</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;wheel&quot;</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>  <span class="c1"># type: ignore</span>
+
+   <span class="c1"># add element nodes - a &quot;special&quot; tree node with a name and element</span>
+   <span class="n">wheel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;spoke1&quot;</span><span class="p">,</span> <span class="n">element</span><span class="o">=</span><span class="n">Element</span><span class="o">.</span><span class="n">from_frame</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>  <span class="c1"># type: ignore</span>
+   <span class="n">wheel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;spoke2&quot;</span><span class="p">,</span> <span class="n">element</span><span class="o">=</span><span class="n">Element</span><span class="o">.</span><span class="n">from_frame</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>  <span class="c1"># type: ignore</span>
+
+   <span class="c1"># print the model to preview the tree structure</span>
+   <span class="n">model</span><span class="o">.</span><span class="n">print</span><span class="p">()</span>
+
+   <span class="c1"># output</span>
+   <span class="k">return</span> <span class="n">model</span>
+
+
+<span class="k">def</span> <span class="nf">create_model_with_interactions</span><span class="p">():</span>
+
+   <span class="c1"># create model</span>
+   <span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">()</span>
+
+   <span class="c1"># add group nodes - a typical tree node with a name and geometry</span>
+   <span class="n">car</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_group</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;car&quot;</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+   <span class="n">wheel</span> <span class="o">=</span> <span class="n">car</span><span class="o">.</span><span class="n">add_group</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;wheel&quot;</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>  <span class="c1"># type: ignore</span>
+
+   <span class="c1"># add element nodes - a &quot;special&quot; tree node with a name and element</span>
+   <span class="n">spoke1</span> <span class="o">=</span> <span class="n">wheel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;spoke1&quot;</span><span class="p">,</span> <span class="n">element</span><span class="o">=</span><span class="n">Element</span><span class="o">.</span><span class="n">from_frame</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>  <span class="c1"># type: ignore</span>
+   <span class="n">spoke2</span> <span class="o">=</span> <span class="n">wheel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;spoke2&quot;</span><span class="p">,</span> <span class="n">element</span><span class="o">=</span><span class="n">Element</span><span class="o">.</span><span class="n">from_frame</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>  <span class="c1"># type: ignore</span>
+   <span class="n">spoke3</span> <span class="o">=</span> <span class="n">wheel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;spoke3&quot;</span><span class="p">,</span> <span class="n">element</span><span class="o">=</span><span class="n">Element</span><span class="o">.</span><span class="n">from_frame</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>  <span class="c1"># type: ignore</span>
+
+   <span class="c1"># add interactions</span>
+   <span class="n">model</span><span class="o">.</span><span class="n">add_interaction</span><span class="p">(</span><span class="n">spoke1</span><span class="p">,</span> <span class="n">spoke2</span><span class="p">)</span>
+   <span class="n">model</span><span class="o">.</span><span class="n">add_interaction</span><span class="p">(</span><span class="n">spoke1</span><span class="p">,</span> <span class="n">spoke3</span><span class="p">)</span>
+   <span class="n">model</span><span class="o">.</span><span class="n">add_interaction</span><span class="p">(</span><span class="n">spoke2</span><span class="p">,</span> <span class="n">spoke3</span><span class="p">)</span>
+
+   <span class="c1"># print the model to preview the tree structure</span>
+   <span class="n">model</span><span class="o">.</span><span class="n">print</span><span class="p">()</span>
+
+   <span class="c1"># output</span>
+   <span class="k">return</span> <span class="n">model</span>
+
+
+<span class="k">def</span> <span class="nf">create_model_without_hierarchy</span><span class="p">():</span>
+
+   <span class="c1"># create model</span>
+   <span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">()</span>
+
+   <span class="c1"># add element nodes - a &quot;special&quot; tree node with a name and element</span>
+   <span class="n">spoke1</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;spoke1&quot;</span><span class="p">,</span> <span class="n">element</span><span class="o">=</span><span class="n">Element</span><span class="o">.</span><span class="n">from_frame</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>  <span class="c1"># type: ignore</span>
+   <span class="n">spoke2</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;spoke2&quot;</span><span class="p">,</span> <span class="n">element</span><span class="o">=</span><span class="n">Element</span><span class="o">.</span><span class="n">from_frame</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>  <span class="c1"># type: ignore</span>
+   <span class="n">spoke3</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;spoke3&quot;</span><span class="p">,</span> <span class="n">element</span><span class="o">=</span><span class="n">Element</span><span class="o">.</span><span class="n">from_frame</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>  <span class="c1"># type: ignore</span>
+
+   <span class="c1"># add interactions</span>
+   <span class="n">model</span><span class="o">.</span><span class="n">add_interaction</span><span class="p">(</span><span class="n">spoke1</span><span class="p">,</span> <span class="n">spoke2</span><span class="p">)</span>
+   <span class="n">model</span><span class="o">.</span><span class="n">add_interaction</span><span class="p">(</span><span class="n">spoke1</span><span class="p">,</span> <span class="n">spoke3</span><span class="p">)</span>
+   <span class="n">model</span><span class="o">.</span><span class="n">add_interaction</span><span class="p">(</span><span class="n">spoke2</span><span class="p">,</span> <span class="n">spoke3</span><span class="p">)</span>
+
+   <span class="c1"># print the model to preview the tree structure</span>
+   <span class="n">model</span><span class="o">.</span><span class="n">hierarchy</span><span class="o">.</span><span class="n">print</span><span class="p">()</span>
+   <span class="c1"># model.print()</span>
+
+   <span class="c1"># output</span>
+   <span class="k">return</span> <span class="n">model</span>
+
+
+<span class="k">def</span> <span class="nf">create_model_tree_operators</span><span class="p">():</span>
+
+   <span class="c1"># ==========================================================================</span>
+   <span class="c1"># create some elemnts elements</span>
+   <span class="c1"># ==========================================================================</span>
+   <span class="n">elements</span> <span class="o">=</span> <span class="p">[]</span>
+   <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">):</span>
+      <span class="n">element</span> <span class="o">=</span> <span class="n">Element</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;beam&quot;</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">Mesh</span><span class="o">.</span><span class="n">from_shape</span><span class="p">(</span><span class="n">Box</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Frame</span><span class="o">.</span><span class="n">worldXY</span><span class="p">())),</span> <span class="n">geometry_simplified</span><span class="o">=</span><span class="n">Point</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+      <span class="p">)</span>
+      <span class="n">elements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+
+   <span class="c1"># ==========================================================================</span>
+   <span class="c1"># model with a tree structure</span>
+   <span class="c1"># ==========================================================================</span>
+   <span class="c1"># create two models - with a tree structure, with a flat structure just with elements</span>
+   <span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">()</span>
+
+   <span class="c1"># create a few nodes and add them to the model</span>
+   <span class="n">structure</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_group</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;structure&quot;</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+
+   <span class="n">timber</span> <span class="o">=</span> <span class="n">structure</span><span class="o">.</span><span class="n">add_group</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;timber&quot;</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+   <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
+      <span class="n">timber</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">element</span><span class="o">=</span><span class="n">elements</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+   <span class="n">concrete</span> <span class="o">=</span> <span class="n">structure</span><span class="o">.</span><span class="n">add_group</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;concrete&quot;</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+   <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">):</span>
+      <span class="n">concrete</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">element</span><span class="o">=</span><span class="n">elements</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+   <span class="n">model</span><span class="o">.</span><span class="n">add_interaction</span><span class="p">(</span><span class="n">elements</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">elements</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+   <span class="n">model</span><span class="o">.</span><span class="n">add_interaction</span><span class="p">(</span><span class="n">elements</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">elements</span><span class="p">[</span><span class="mi">9</span><span class="p">])</span>
+   <span class="n">model</span><span class="o">.</span><span class="n">add_interaction</span><span class="p">(</span><span class="n">elements</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">elements</span><span class="p">[</span><span class="mi">9</span><span class="p">])</span>
+   <span class="c1"># model.print()</span>
+
+   <span class="c1"># ==========================================================================</span>
+   <span class="c1"># simple model without hierarchy</span>
+   <span class="c1"># ==========================================================================</span>
+   <span class="n">model_simple</span> <span class="o">=</span> <span class="n">Model</span><span class="p">()</span>
+   <span class="n">model_simple</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;beam&quot;</span><span class="p">,</span> <span class="n">element</span><span class="o">=</span><span class="n">elements</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+   <span class="n">model_simple</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;beam_bam&quot;</span><span class="p">,</span> <span class="n">element</span><span class="o">=</span><span class="n">elements</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+   <span class="n">model_simple</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;beam&quot;</span><span class="p">,</span> <span class="n">element</span><span class="o">=</span><span class="n">elements</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+   <span class="n">model_simple</span><span class="o">.</span><span class="n">add_interaction</span><span class="p">(</span><span class="n">elements</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">elements</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+   <span class="n">model_simple</span><span class="o">.</span><span class="n">add_interaction</span><span class="p">(</span><span class="n">elements</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">elements</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+   <span class="c1"># model_simple.print()</span>
+
+   <span class="c1"># ==========================================================================</span>
+   <span class="c1"># getters - root node</span>
+   <span class="c1"># ==========================================================================</span>
+   <span class="c1"># print(model[&quot;structure&quot;])  # returns a Node of a name &quot;structure&quot;</span>
+   <span class="c1"># print(model[0])  # returns a Node of a name &quot;structure&quot;</span>
+   <span class="c1"># print(model[elements[5].guid])</span>
+   <span class="c1"># print(model[elements[5]])</span>
+   <span class="c1"># print(model_simple[&quot;beam&quot;])  # returns a Node of a name &quot;beam&quot;</span>
+   <span class="c1"># print(model_simple[0])  # returns a Node of a name &quot;beam&quot;</span>
+   <span class="c1"># print(model_simple[elements[0].guid])  # returns the parent Node of the ElmentNode that has this element</span>
+   <span class="c1"># print(model_simple[elements[0]])  # returns the parent Node of the ElmentNode that has this element</span>
+
+   <span class="c1"># ==========================================================================</span>
+   <span class="c1"># getters - other nodes</span>
+   <span class="c1"># ==========================================================================</span>
+   <span class="c1"># print(model[&quot;structure&quot;][&quot;concrete&quot;])  # returns a Node of a name &quot;timber&quot;</span>
+   <span class="c1"># print(model[0][1])  # returns a Node of a name &quot;timber&quot;</span>
+   <span class="c1"># print(model[0][elements[4].guid])  # when quering with guid, the parent of guid is returned</span>
+   <span class="c1"># print(model[0][elements[4]])  # when quering with guid, the parent of guid is returned, not the element guid¨!</span>
+
+   <span class="c1"># ==========================================================================</span>
+   <span class="c1"># setters - root node</span>
+   <span class="c1"># ==========================================================================</span>
+   <span class="n">new_node</span> <span class="o">=</span> <span class="n">GroupNode</span><span class="p">(</span><span class="s2">&quot;steel&quot;</span><span class="p">)</span>
+   <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">12</span><span class="p">):</span>
+      <span class="n">new_node</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">element</span><span class="o">=</span><span class="n">elements</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+   <span class="c1"># model[0] = new_node</span>
+   <span class="c1"># model[&quot;structure&quot;] = new_node</span>
+   <span class="c1"># model[elements[3]] = elements[10]</span>
+   <span class="c1"># print(elements[3], elements[10])</span>
+   <span class="c1"># model[elements[3].guid] = elements[10]</span>
+   <span class="c1"># model_simple.print()</span>
+   <span class="c1"># model_simple[&quot;beam_bam&quot;] = new_node</span>
+   <span class="c1"># model_simple[1] = new_node</span>
+   <span class="c1"># model_simple[elements[0].guid] = elements[10]</span>
+   <span class="c1"># model_simple[elements[2]] = elements[10]</span>
+   <span class="c1"># model_simple.print()</span>
+   <span class="c1"># model.print()</span>
+
+   <span class="c1"># ==========================================================================</span>
+   <span class="c1"># setters - other nodes</span>
+   <span class="c1"># ==========================================================================</span>
+   <span class="c1"># model[0][1] = new_node</span>
+   <span class="c1"># model[&quot;structure&quot;][&quot;concrete&quot;] = new_node</span>
+   <span class="c1"># model[0][elements[4].guid] = elements[10]</span>
+   <span class="c1"># model[0][1][elements[7]] = elements[10]</span>
+
+   <span class="c1"># ==========================================================================</span>
+   <span class="c1"># get and set Node element by index</span>
+   <span class="c1"># ==========================================================================</span>
+   <span class="c1"># model.add_interaction(e0, e1)</span>
+   <span class="c1"># model.print_interactions()</span>
+   <span class="c1"># model.hierarchy[&quot;structure&quot;][&quot;timber&quot;].set_element(0, e8)</span>
+   <span class="c1"># model.print_interactions()</span>
+
+   <span class="c1"># ==========================================================================</span>
+   <span class="c1"># of course, there are methods starting with get and set</span>
+   <span class="c1"># ==========================================================================¨</span>
+   <span class="n">model</span><span class="o">.</span><span class="n">set_element_by_element</span><span class="p">(</span><span class="n">elements</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">elements</span><span class="p">[</span><span class="mi">10</span><span class="p">])</span>
+   <span class="n">model</span><span class="o">.</span><span class="n">get_node_by_element</span><span class="p">(</span><span class="n">elements</span><span class="p">[</span><span class="mi">10</span><span class="p">])</span>
+   <span class="n">model</span><span class="o">.</span><span class="n">get_child_by_index</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+   <span class="n">model</span><span class="o">.</span><span class="n">get_child_by_name</span><span class="p">(</span><span class="s2">&quot;concrete&quot;</span><span class="p">)</span>
+   <span class="k">return</span> <span class="n">model</span>
+
+
+<span class="k">def</span> <span class="nf">copy_model</span><span class="p">():</span>
+   <span class="c1"># ==========================================================================</span>
+   <span class="c1"># create elements and a Node and a ElementTree and a Model</span>
+   <span class="c1"># ==========================================================================</span>
+   <span class="n">e0</span> <span class="o">=</span> <span class="n">Element</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;beam&quot;</span><span class="p">,</span> <span class="n">geometry_simplified</span><span class="o">=</span><span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+   <span class="n">e1</span> <span class="o">=</span> <span class="n">Element</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;beam&quot;</span><span class="p">,</span> <span class="n">geometry_simplified</span><span class="o">=</span><span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+   <span class="n">e2</span> <span class="o">=</span> <span class="n">Element</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;block&quot;</span><span class="p">,</span> <span class="n">geometry_simplified</span><span class="o">=</span><span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+   <span class="n">e3</span> <span class="o">=</span> <span class="n">Element</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;block&quot;</span><span class="p">,</span> <span class="n">geometry_simplified</span><span class="o">=</span><span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+
+   <span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">()</span>  <span class="c1"># the root of hierarchy automatically initializes the root node as &lt;my_model&gt;</span>
+   <span class="n">truss1</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_group</span><span class="p">(</span><span class="s2">&quot;truss1&quot;</span><span class="p">)</span>
+   <span class="n">truss2</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_group</span><span class="p">(</span><span class="s2">&quot;truss2&quot;</span><span class="p">)</span>
+   <span class="n">truss1</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">e0</span><span class="p">)</span>
+   <span class="n">truss1</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">e1</span><span class="p">)</span>
+   <span class="n">truss2</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">e2</span><span class="p">)</span>
+   <span class="n">truss2</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">e3</span><span class="p">)</span>
+
+   <span class="n">model</span><span class="o">.</span><span class="n">add_interaction</span><span class="p">(</span><span class="n">e0</span><span class="p">,</span> <span class="n">e1</span><span class="p">)</span>
+
+   <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;BEFORE COPY&quot;</span><span class="p">)</span>
+   <span class="n">model</span><span class="o">.</span><span class="n">print</span><span class="p">()</span>
+   <span class="n">model</span><span class="o">.</span><span class="n">print_interactions</span><span class="p">()</span>
+   <span class="c1"># ==========================================================================</span>
+   <span class="c1"># copy the model</span>
+   <span class="c1"># ==========================================================================</span>
+   <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;AFTER COPY&quot;</span><span class="p">)</span>
+   <span class="n">model_copy</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+   <span class="n">model_copy</span><span class="o">.</span><span class="n">print</span><span class="p">()</span>
+   <span class="n">model_copy</span><span class="o">.</span><span class="n">print_interactions</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">serialize_element</span><span class="p">():</span>
+   <span class="c1"># ==========================================================================</span>
+   <span class="c1"># create elements and a Node</span>
+   <span class="c1"># ==========================================================================</span>
+   <span class="n">e</span> <span class="o">=</span> <span class="n">Element</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;beam&quot;</span><span class="p">,</span> <span class="n">geometry_simplified</span><span class="o">=</span><span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+   <span class="c1"># ==========================================================================</span>
+   <span class="c1"># serialize the model_node</span>
+   <span class="c1"># =========================================================================</span>
+   <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+   <span class="n">json_dump</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="s2">&quot;src/compas_assembly2/data_sets/model/model_how_to_use_it_element.json&quot;</span><span class="p">,</span> <span class="n">pretty</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+   <span class="n">json_load</span><span class="p">(</span><span class="s2">&quot;src/compas_assembly2/data_sets/model/model_how_to_use_it_element.json&quot;</span><span class="p">)</span>
+   <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">serialize_model_node</span><span class="p">():</span>
+   <span class="c1"># ==========================================================================</span>
+   <span class="c1"># create elements and a Node</span>
+   <span class="c1"># ==========================================================================</span>
+   <span class="n">group_node</span> <span class="o">=</span> <span class="n">GroupNode</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;timber1&quot;</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+
+   <span class="c1"># ==========================================================================</span>
+   <span class="c1"># serialize the model_node</span>
+   <span class="c1"># =========================================================================</span>
+   <span class="n">json_dump</span><span class="p">(</span><span class="n">group_node</span><span class="p">,</span> <span class="s2">&quot;src/compas_assembly2/data_sets/model/model_how_to_use_it_model_node.json&quot;</span><span class="p">,</span> <span class="n">pretty</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+   <span class="c1"># ==========================================================================</span>
+   <span class="c1"># deserialize the model_node</span>
+   <span class="c1"># ==========================================================================</span>
+   <span class="n">model_node_deserialized</span> <span class="o">=</span> <span class="n">json_load</span><span class="p">(</span><span class="s2">&quot;src/compas_assembly2/data_sets/model/model_how_to_use_it_model_node.json&quot;</span><span class="p">)</span>
+
+   <span class="c1"># ==========================================================================</span>
+   <span class="c1"># print the contents of the deserialized model_node</span>
+   <span class="c1"># ==========================================================================</span>
+   <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;model_node:              &quot;</span><span class="p">,</span> <span class="n">group_node</span><span class="p">)</span>
+   <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;model_node_deserialized: &quot;</span><span class="p">,</span> <span class="n">model_node_deserialized</span><span class="p">)</span>
+
+   <span class="c1"># ==========================================================================</span>
+   <span class="c1"># create elements and a Node</span>
+   <span class="c1"># ==========================================================================</span>
+   <span class="n">element_node</span> <span class="o">=</span> <span class="n">ElementNode</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;spoke1&quot;</span><span class="p">,</span> <span class="n">element</span><span class="o">=</span><span class="n">Element</span><span class="o">.</span><span class="n">from_frame</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>  <span class="c1"># type: ignore</span>
+
+   <span class="c1"># ==========================================================================</span>
+   <span class="c1"># serialize the model_node</span>
+   <span class="c1"># =========================================================================</span>
+   <span class="n">json_dump</span><span class="p">(</span><span class="n">element_node</span><span class="p">,</span> <span class="s2">&quot;src/compas_assembly2/data_sets/model/model_how_to_use_it_model_node.json&quot;</span><span class="p">,</span> <span class="n">pretty</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+   <span class="c1"># ==========================================================================</span>
+   <span class="c1"># deserialize the model_node</span>
+   <span class="c1"># ==========================================================================</span>
+   <span class="n">element_node_deserialized</span> <span class="o">=</span> <span class="n">json_load</span><span class="p">(</span><span class="s2">&quot;src/compas_assembly2/data_sets/model/model_how_to_use_it_model_node.json&quot;</span><span class="p">)</span>
+
+   <span class="c1"># ==========================================================================</span>
+   <span class="c1"># print the contents of the deserialized model_node</span>
+   <span class="c1"># ==========================================================================</span>
+   <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;element_node:              &quot;</span><span class="p">,</span> <span class="n">element_node</span><span class="p">,</span> <span class="n">element_node</span><span class="o">.</span><span class="n">element</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span>
+   <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;element_node_deserialized: &quot;</span><span class="p">,</span> <span class="n">element_node_deserialized</span><span class="p">,</span> <span class="n">element_node_deserialized</span><span class="o">.</span><span class="n">element</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">serialize_model_tree</span><span class="p">():</span>
+
+   <span class="c1"># ==========================================================================</span>
+   <span class="c1"># create model</span>
+   <span class="c1"># ==========================================================================</span>
+   <span class="n">model</span> <span class="o">=</span> <span class="n">create_model</span><span class="p">()</span>
+
+   <span class="c1"># ==========================================================================</span>
+   <span class="c1"># serialize the model_tree</span>
+   <span class="c1"># ==========================================================================</span>
+   <span class="n">json_dump</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">hierarchy</span><span class="p">,</span> <span class="s2">&quot;src/compas_assembly2/data_sets/model/model_how_to_use_it_model_tree.json&quot;</span><span class="p">,</span> <span class="n">pretty</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+   <span class="c1"># ==========================================================================</span>
+   <span class="c1"># deserialize the model_tree</span>
+   <span class="c1"># ==========================================================================</span>
+   <span class="n">model_tree_deserialized</span> <span class="o">=</span> <span class="n">json_load</span><span class="p">(</span><span class="s2">&quot;src/compas_assembly2/data_sets/model/model_how_to_use_it_model_tree.json&quot;</span><span class="p">)</span>
+
+   <span class="c1"># ==========================================================================</span>
+   <span class="c1"># print the contents of the deserialized model_tree</span>
+   <span class="c1"># ==========================================================================</span>
+   <span class="n">model</span><span class="o">.</span><span class="n">hierarchy</span><span class="o">.</span><span class="n">print</span><span class="p">()</span>
+   <span class="n">model_tree_deserialized</span><span class="o">.</span><span class="n">print</span><span class="p">()</span>  <span class="c1"># type: ignore</span>
+
+
+<span class="k">def</span> <span class="nf">serialize_model</span><span class="p">():</span>
+   <span class="c1"># ==========================================================================</span>
+   <span class="c1"># create model</span>
+   <span class="c1"># ==========================================================================</span>
+   <span class="n">model</span> <span class="o">=</span> <span class="n">create_model</span><span class="p">()</span>
+
+   <span class="c1"># ==========================================================================</span>
+   <span class="c1"># serialize the model_tree</span>
+   <span class="c1"># ==========================================================================</span>
+   <span class="n">json_dump</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;src/compas_assembly2/data_sets/model/model_how_to_use_it_model.json&quot;</span><span class="p">,</span> <span class="n">pretty</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+   <span class="c1"># ==========================================================================</span>
+   <span class="c1"># deserialize the model_tree</span>
+   <span class="c1"># ==========================================================================</span>
+   <span class="n">model_deserialized</span> <span class="o">=</span> <span class="n">json_load</span><span class="p">(</span><span class="s2">&quot;src/compas_assembly2/data_sets/model/model_how_to_use_it_model.json&quot;</span><span class="p">)</span>
+
+   <span class="c1"># ==========================================================================</span>
+   <span class="c1"># print the contents of the deserialized model_tree</span>
+   <span class="c1"># ==========================================================================</span>
+   <span class="n">model</span><span class="o">.</span><span class="n">print</span><span class="p">()</span>
+   <span class="n">model_deserialized</span><span class="o">.</span><span class="n">print</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">merge_models</span><span class="p">():</span>
+   <span class="c1"># ==========================================================================</span>
+   <span class="c1"># create elements</span>
+   <span class="c1"># ==========================================================================</span>
+   <span class="n">e0</span> <span class="o">=</span> <span class="n">Element</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;beam&quot;</span><span class="p">,</span> <span class="n">geometry_simplified</span><span class="o">=</span><span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+   <span class="n">e1</span> <span class="o">=</span> <span class="n">Element</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;beam&quot;</span><span class="p">,</span> <span class="n">geometry_simplified</span><span class="o">=</span><span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+   <span class="n">e2</span> <span class="o">=</span> <span class="n">Element</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;plate&quot;</span><span class="p">,</span> <span class="n">geometry_simplified</span><span class="o">=</span><span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+   <span class="n">e3</span> <span class="o">=</span> <span class="n">Element</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;plate&quot;</span><span class="p">,</span> <span class="n">geometry_simplified</span><span class="o">=</span><span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+   <span class="n">e4</span> <span class="o">=</span> <span class="n">Element</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;block&quot;</span><span class="p">,</span> <span class="n">geometry_simplified</span><span class="o">=</span><span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+   <span class="n">e5</span> <span class="o">=</span> <span class="n">Element</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;block&quot;</span><span class="p">,</span> <span class="n">geometry_simplified</span><span class="o">=</span><span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+   <span class="n">e6</span> <span class="o">=</span> <span class="n">Element</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;block&quot;</span><span class="p">,</span> <span class="n">geometry_simplified</span><span class="o">=</span><span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+
+   <span class="c1"># ==========================================================================</span>
+   <span class="c1"># create Model1</span>
+   <span class="c1"># ==========================================================================</span>
+   <span class="n">model1</span> <span class="o">=</span> <span class="n">Model</span><span class="p">()</span>  <span class="c1"># the root of hierarchy automatically initializes the root node as &lt;my_model&gt;</span>
+   <span class="n">structure1</span> <span class="o">=</span> <span class="n">model1</span><span class="o">.</span><span class="n">add_group</span><span class="p">(</span><span class="s2">&quot;structure1&quot;</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+   <span class="n">timber1</span> <span class="o">=</span> <span class="n">structure1</span><span class="o">.</span><span class="n">add_group</span><span class="p">(</span><span class="s2">&quot;timber1&quot;</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+   <span class="n">timber1</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">e0</span><span class="p">)</span>
+   <span class="n">timber1</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">e1</span><span class="p">)</span>
+   <span class="n">concrete1</span> <span class="o">=</span> <span class="n">structure1</span><span class="o">.</span><span class="n">add_group</span><span class="p">(</span><span class="s2">&quot;concrete1&quot;</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+   <span class="n">concrete1</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">e2</span><span class="p">)</span>
+   <span class="n">model1</span><span class="o">.</span><span class="n">add_interaction</span><span class="p">(</span><span class="n">e0</span><span class="p">,</span> <span class="n">e1</span><span class="p">)</span>
+   <span class="n">model1</span><span class="o">.</span><span class="n">add_interaction</span><span class="p">(</span><span class="n">e0</span><span class="p">,</span> <span class="n">e2</span><span class="p">)</span>
+
+   <span class="c1"># ==========================================================================</span>
+   <span class="c1"># create Model2</span>
+   <span class="c1"># ==========================================================================</span>
+   <span class="n">model2</span> <span class="o">=</span> <span class="n">Model</span><span class="p">()</span>  <span class="c1"># the root of hierarchy automatically initializes the root node as &lt;my_model&gt;</span>
+   <span class="n">structure1_</span> <span class="o">=</span> <span class="n">model2</span><span class="o">.</span><span class="n">add_group</span><span class="p">(</span><span class="s2">&quot;structure2&quot;</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+   <span class="n">timber2_</span> <span class="o">=</span> <span class="n">structure1_</span><span class="o">.</span><span class="n">add_group</span><span class="p">(</span><span class="s2">&quot;timber2&quot;</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+   <span class="n">timber2_</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">e0</span><span class="p">)</span>
+   <span class="n">timber2_</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">e1</span><span class="p">)</span>
+   <span class="n">timber2_</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">e3</span><span class="p">)</span>
+   <span class="n">timber2_</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">e4</span><span class="p">)</span>
+   <span class="n">timber2_</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">e5</span><span class="p">)</span>
+   <span class="n">timber2_</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">e6</span><span class="p">)</span>
+   <span class="n">concrete1_</span> <span class="o">=</span> <span class="n">structure1_</span><span class="o">.</span><span class="n">add_group</span><span class="p">(</span><span class="s2">&quot;concrete2&quot;</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+   <span class="n">concrete1_</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">e2</span><span class="p">)</span>
+   <span class="n">model1</span><span class="o">.</span><span class="n">add_interaction</span><span class="p">(</span><span class="n">e0</span><span class="p">,</span> <span class="n">e1</span><span class="p">)</span>
+   <span class="n">model1</span><span class="o">.</span><span class="n">add_interaction</span><span class="p">(</span><span class="n">e0</span><span class="p">,</span> <span class="n">e2</span><span class="p">)</span>
+
+   <span class="c1"># ==========================================================================</span>
+   <span class="c1"># merge models</span>
+   <span class="c1"># ==========================================================================</span>
+   <span class="n">model1</span><span class="o">.</span><span class="n">print</span><span class="p">()</span>
+   <span class="n">model2</span><span class="o">.</span><span class="n">print</span><span class="p">()</span>
+   <span class="n">model1</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">model2</span><span class="p">)</span>
+
+   <span class="c1"># ==========================================================================</span>
+   <span class="c1"># print and output the result</span>
+   <span class="c1"># ==========================================================================</span>
+   <span class="n">model1</span><span class="o">.</span><span class="n">print</span><span class="p">()</span>
+   <span class="k">return</span> <span class="n">model1</span>
+
+
+<span class="k">def</span> <span class="nf">flatten_model</span><span class="p">():</span>
+   <span class="n">model</span> <span class="o">=</span> <span class="n">create_model_with_interactions</span><span class="p">()</span>
+   <span class="n">model</span><span class="o">.</span><span class="n">print</span><span class="p">()</span>
+   <span class="n">model</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+   <span class="n">model</span><span class="o">.</span><span class="n">print</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">graft_model</span><span class="p">():</span>
+   <span class="n">model</span> <span class="o">=</span> <span class="n">create_model_with_interactions</span><span class="p">()</span>
+   <span class="n">model</span><span class="o">.</span><span class="n">graft</span><span class="p">()</span>
+   <span class="n">model</span><span class="o">.</span><span class="n">print</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">prune_model</span><span class="p">():</span>
+   <span class="n">model</span> <span class="o">=</span> <span class="n">merge_models</span><span class="p">()</span>
+   <span class="n">model</span><span class="o">.</span><span class="n">prune</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+   <span class="n">model</span><span class="o">.</span><span class="n">print</span><span class="p">()</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+   <span class="c1"># model = create_model()</span>
+   <span class="n">model</span> <span class="o">=</span> <span class="n">create_model_with_interactions</span><span class="p">()</span>
+   <span class="c1"># model = create_model_without_hierarchy()</span>
+   <span class="c1"># model = create_model_tree_operators()</span>
+
+   <span class="c1"># copy_model()</span>
+
+   <span class="c1"># serialize_element()</span>
+   <span class="c1"># serialize_model_node()</span>
+   <span class="c1"># serialize_model_tree()</span>
+   <span class="c1"># ^^serialize_model()</span>
+
+   <span class="c1"># merge_models()</span>
+   <span class="c1"># flatten_model()</span>
+   <span class="c1"># graft_model()</span>
+   <span class="c1"># prune_model()</span>
+
+   <span class="k">pass</span>
+</code></pre></div>
+</div>
 </section>
 </section>
 
@@ -156,9 +573,7 @@
 <li class="toctree-l1 nav-item"><a class="nav-link reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 nav-item"><a class="nav-link reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1 nav-item"><a class="nav-link reference internal" href="api.html">API Reference</a><ul class="nav flex-column collapse">
-<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="api/compas_assembly2.html">compas_assembly2</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="api/compas_assembly2.html">compas_assembly2</a></li>
 </ul>
 </li>
 </ul>
