@@ -20,7 +20,7 @@ lib64/
 parts/
 sdist/
 var/
-wheels/
+#wheels/
 *.egg-info/
 .installed.cfg
 *.egg
@@ -101,20 +101,25 @@ ENV/
 .mypy_cache/
 
 # ==============================================================================
-# compas_assembly2
+# COMPAS ASSEMBLY2
 # ==============================================================================
 
 *.3dmbak
 *.rhl
 *.rui_bak
+*.so
 
 temp/**
-!temp/PLACEHOLDER
 
 .DS_Store
 
-.vscode
+.vscode/**
+.idea/**
 
-docs/api/generated/
+ext/**
 
-conda.recipe/
+dist/**
+
+scripts/.idea/**
+
+generated
